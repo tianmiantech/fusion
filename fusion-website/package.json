@@ -1,0 +1,29 @@
+{
+  "private": true,
+  "author": "",
+  "scripts": {
+    "dev": "max dev",
+    "build": "max build",
+    "postinstall": "max setup",
+    "setup": "max setup",
+    "start": "npm run dev"
+  },
+  "dependencies": {
+    "@tianmiantech/request": "^3.13.4",
+    "@tianmiantech/util": "^3.13.4",
+    "ahooks": "^3.7.8",
+    "antd": "^4.24.12",
+    "hox": "^2.1.1",
+    "lodash": "^4.17.21",
+    "use-immer": "^0.9.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.33",
+    "@types/react-dom": "^18.0.11",
+    "@umijs/lint": "^4.0.81",
+    "@umijs/max": "^4.0.81",
+    "eslint": "^8.49.0",
+    "stylelint": "^14.16.1",
+    "typescript": "5.1.6"
+  }
+}
