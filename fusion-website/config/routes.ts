@@ -15,7 +15,12 @@ export default [
       },{
         path: '/home',
         component: './home',
-      }
+      },
+      {
+        name: 'task',
+        path: '/task',
+        component: './task',
+      },
     ],
   }
 ];
