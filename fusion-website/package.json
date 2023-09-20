@@ -9,6 +9,7 @@
     "start": "npm run dev"
   },
   "dependencies": {
+    "@ant-design/icons": "^5.2.6",
     "@tianmiantech/request": "^3.13.4",
     "@tianmiantech/util": "^3.13.4",
     "ahooks": "^3.7.8",

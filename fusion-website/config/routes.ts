@@ -11,7 +11,10 @@ export default [
     routes: [
       {
         path: '/',
-        component: 'index',
+        redirect: '/home',
+      },{
+        path: '/home',
+        component: './home',
       }
     ],
   }

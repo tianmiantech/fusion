@@ -10,15 +10,8 @@ export default defineConfig({
     define: {
       'process.env.HOST_ENV': process.env.HOST_ENV,
     },
-    lessLoader: {
-      modifyVars: {
-        '@ant-prefix': base,
-        '@biz-prefix': base,
-        '@pro-prefix': base,
-      },
-      javascriptEnabled: true,
-    },
     mountElementId: 'root-slave',
+    styles:['body div:first-child { height:100%}'],
     // {
     //   // https://umijs.org/zh-CN/plugins/plugin-layout
     //   locale: true,
