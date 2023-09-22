@@ -1,2 +1,20 @@
 @import '~antd/es/style/variable.less';
 @import '~antd/dist/antd.less';
+
+.success-plain-btn {
+  border-color: var(--ant-success-color-deprecated-border);
+  background-color: var(--ant-success-color-deprecated-bg);
+  color: var(--ant-success-color);
+
+  &:focus,&:active {
+    border-color: var(--ant-success-color-deprecated-border);
+    background-color: var(--ant-success-color-deprecated-bg);
+    color: var(--ant-success-color);
+  }
+
+  &:hover {
+    border-color: var(--ant-success-color);
+    background-color: var(--ant-success-color);
+    color: #fff;
+  }
+}

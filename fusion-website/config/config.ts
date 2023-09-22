@@ -1,5 +1,6 @@
 import { defineConfig } from 'umi';
 import routes from './routes';
+import extraBabelPlugins from './extraBabelPlugin';
 
 const base = 'fusion';
 export default defineConfig({
@@ -11,7 +12,6 @@ export default defineConfig({
       'process.env.HOST_ENV': process.env.HOST_ENV,
     },
     mountElementId: 'root-slave',
-    styles:['body div:first-child { height:100%}'],
     // {
     //   // https://umijs.org/zh-CN/plugins/plugin-layout
     //   locale: true,
@@ -34,4 +34,6 @@ export default defineConfig({
       basePath: '/',
     },
     fastRefresh: true,
+    mfsu: false,
+    extraBabelPlugins
   });
