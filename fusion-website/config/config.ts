@@ -34,10 +34,6 @@ export default defineConfig({
       },
       javascriptEnabled: true,
     },
-    theme:{
-      '@pro-prefix': 'fusion',
-      '@ant-prefix': 'fusion',
-    },
     locale: {},
     mountElementId: 'root-slave',
     // {

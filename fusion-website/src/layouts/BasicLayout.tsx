@@ -13,17 +13,12 @@ const { Footer, Sider, Content } = Layout;
 
 const BasicLayout = (props:BasicLayoutPros) => {
   return <ConfigProvider prefixCls={'fusion'}  locale={zhCN}>
-        <TmContext.Provider value={{ prefixCls: 'fusion' }}>
-            <TmLayout.Provider value={{ prefixCls: 'fusion' }}>
               <Layout style={{width:'100%',height:'100%'}}>
                   <Header/>
                   <Content >
-                    <Outlet context={{ prefixCls: 'fusion'}}/>
+                    <Outlet/>
                   </Content>
               </Layout>
-            </TmLayout.Provider>
-          </TmContext.Provider>
     </ConfigProvider>
-  )
 }
 export default BasicLayout;
