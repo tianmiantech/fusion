@@ -6,6 +6,7 @@ import { history } from 'umi';
 
 const Index = ()=>{
 
+    const hasTask = localStorage.getItem('hasTask')
     const renderBtn = ()=>{
         return <Button type="primary" onClick={()=>{
             history.push('task')
@@ -27,7 +28,7 @@ const Index = ()=>{
     </Card>
     }
 
-    return renderNoData()
+    return hasTask?renderList():renderNoData()
    
 }
 export default Index
