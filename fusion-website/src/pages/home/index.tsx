@@ -2,11 +2,14 @@ import { Button, Card } from 'antd'
 import styles from './index.less'
 import History from './History'
 import { isQianKun } from '@/utils/request'
+import { history } from 'umi';
 
 const Index = ()=>{
 
     const renderBtn = ()=>{
-        return <Button type="primary">发起任务</Button>
+        return <Button type="primary" onClick={()=>{
+            history.push('task')
+        }}>发起任务</Button>
     }
 
     const renderNoData = ()=>{
@@ -18,11 +21,13 @@ const Index = ()=>{
         </div>
     }
 
-    
-
-    return <Card title='历史任务' extra={renderBtn()}>
+    const renderList = ()=>{
+        return <Card title='历史任务' extra={renderBtn()}>
         <History/>
     </Card>
+    }
+
+    return renderNoData()
    
 }
 export default Index

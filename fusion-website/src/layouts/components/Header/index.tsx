@@ -1,12 +1,35 @@
 import {useRef} from 'react'
 import { Layout, Space } from 'antd';
 import styles from './index.less'
-import {SettingOutlined } from "@ant-design/icons"
+import {SettingOutlined,PlusOutlined,BarsOutlined } from "@ant-design/icons"
 import SecretKeyDrawer from '../SecretKeyDrawer'
-
+import HistoryListDrawer from '../HistoryListDrawer'
+import { useLocation } from 'umi';
 const { Header, Footer, Sider, Content } = Layout;
 const Index =()=>{
     const secretKeyDrawerRef:any = useRef()
+    const historyListRef:any  = useRef()
+    const location = useLocation();
+
+    const renderSetting = ()=>{
+       return  <SettingOutlined className={styles.setting} onClick={()=>{secretKeyDrawerRef?.current?.showDrawer()}}/>
+    }
+
+    const showHistory=()=>{
+        historyListRef?.current?.showDrawer()
+    }
+    
+    const renderRightContent = ()=>{
+        if (location.pathname.indexOf('/home')==-1) {
+            return <>
+                <PlusOutlined  className={styles.setting}/>
+                <BarsOutlined  className={styles.setting} onClick={showHistory}/>
+                {renderSetting()}
+            </>
+        } 
+        return renderSetting()
+    }
+
     
 
     return <Header className={styles.layoutHeader}>
@@ -15,10 +38,11 @@ const Index =()=>{
                 
             </div>
             <div className={styles.right}>
-                <SettingOutlined className={styles.setting} onClick={()=>{secretKeyDrawerRef?.current?.showDrawer()}}/>
+                {renderRightContent()}
             </div>
         </div>
         <SecretKeyDrawer ref={secretKeyDrawerRef}/>
+        <HistoryListDrawer ref={historyListRef}/>
     </Header>
 }
 export default Index

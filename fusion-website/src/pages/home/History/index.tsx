@@ -110,13 +110,13 @@ const Index =()=>{
         rowKey="appCode"
         >
         <TmTable.Table
-              actionItems={(record:RowProps) => [
-                { text: '详情', key: '22'},
-                { text: '删除', key: '3' },
-                { text: '查看备注', key: '33' },
-              ]}
-              actionClickHandle={actionClickHandle}
-            />
+            actionItems={(record:RowProps) => [
+            { text: '详情', key: '22'},
+            { text: '删除', key: '3' },
+            { text: '查看备注', key: '33' },
+            ]}
+        actionClickHandle={actionClickHandle}
+        />
      </TmTable>
 }
 export default Index

@@ -2,7 +2,6 @@ import { defineConfig } from 'umi';
 import routes from './routes';
 const base = 'fusion';
 export default defineConfig({
-    base,
     outputPath: `./dist/${base}/`,
     publicPath: `/${base}/`,
     hash: true,
