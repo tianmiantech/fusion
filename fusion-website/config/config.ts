@@ -1,16 +1,44 @@
 import { defineConfig } from 'umi';
 import routes from './routes';
-import extraBabelPlugins from './extraBabelPlugin';
-
 const base = 'fusion';
 export default defineConfig({
     base,
     outputPath: `./dist/${base}/`,
     publicPath: `/${base}/`,
     hash: true,
+    extraBabelPlugins:[
+      [
+        'babel-plugin-import',
+        {
+          libraryName: '@tianmiantech/pro',
+          libraryDirectory: 'src',
+          camel2DashComponentName: false,
+          style: true
+        }
+      ]
+    ],
     define: {
       'process.env.HOST_ENV': process.env.HOST_ENV,
     },
+    antd: {
+      // configProvider
+      configProvider: {
+        prefixCls:'fusion'
+      },
+    },
+    lessLoader: {
+      modifyVars: {
+        '@ant-prefix': 'fusion',
+        '@biz-prefix': 'fusion',
+        '@pro-prefix': 'fusion',
+      },
+      javascriptEnabled: true,
+    },
+    theme:{
+      '@pro-prefix': 'fusion',
+      '@ant-prefix': 'fusion',
+    },
+    locale: {},
     mountElementId: 'root-slave',
     // {
     //   // https://umijs.org/zh-CN/plugins/plugin-layout
@@ -25,15 +53,11 @@ export default defineConfig({
     // umi routes: https://umijs.org/docs/routing
     routes,
     // Theme for antd: https://ant.design/docs/react/customize-theme-cn
-    theme: {
-      'primary-color': '#1890ff',
-    },
     title: false,
     ignoreMomentLocale: true,
     manifest: {
       basePath: '/',
     },
     fastRefresh: true,
-    mfsu: false,
-    extraBabelPlugins
+    mfsu:false
   });
