@@ -3,15 +3,20 @@ import styles from './index.less'
 import History from './History'
 import { isQianKun } from '@/utils/request'
 import { history } from 'umi';
+import { useMount } from 'ahooks';
+import { useState } from 'react';
 
 const Index = ()=>{
-
-    const hasTask = localStorage.getItem('hasTask')
+    const [hasTask,setHasTask] = useState(localStorage.getItem('hasTask'))
     const renderBtn = ()=>{
         return <Button type="primary" onClick={()=>{
             history.push('task')
         }}>发起任务</Button>
     }
+
+    useMount(()=>{
+        setHasTask(localStorage.getItem('hasTask'))
+    })
 
     const renderNoData = ()=>{
         return <div className={styles.container}>
