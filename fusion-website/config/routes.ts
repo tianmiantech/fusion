@@ -21,6 +21,11 @@ export default [
         path: '/task',
         component: './task',
       },
+      {
+        name: 'taskDetail',
+        path: '/task/detail',
+        component: './task/Detail',
+      },
     ],
   }
 ];
