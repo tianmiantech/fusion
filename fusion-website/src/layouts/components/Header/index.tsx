@@ -4,7 +4,7 @@ import styles from './index.less'
 import {SettingOutlined,PlusOutlined,BarsOutlined } from "@ant-design/icons"
 import SecretKeyDrawer from '../SecretKeyDrawer'
 import HistoryListDrawer from '../HistoryListDrawer'
-import { useLocation } from 'umi';
+import { useLocation,history } from 'umi';
 const { Header, Footer, Sider, Content } = Layout;
 const Index =()=>{
     const secretKeyDrawerRef:any = useRef()
@@ -34,8 +34,10 @@ const Index =()=>{
 
     return <Header className={styles.layoutHeader}>
         <div className={styles.headerBar}>
-            <div className={styles.left}>
-                
+            <div className={styles.left} onClick={()=>{
+                history.back()
+            }}>
+                主页
             </div>
             <div className={styles.right}>
                 {renderRightContent()}
