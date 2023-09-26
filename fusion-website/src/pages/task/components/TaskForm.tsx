@@ -7,6 +7,7 @@ import { dataResourceTypeMap, dataSetAddMethodMap } from '@/constant/dictionary'
 import DataSetPreview from "./DataSetPreview";
 import HashForm from './HashForm/index';
 import DataSourceForm from './DataSourceForm';
+import BloomFilterManage from './BloomFilterManage';
 import { formRuleRequire } from '@/utils/common';
 
 interface FormData {
@@ -22,12 +23,7 @@ const TaskForm = forwardRef((props, ref) => {
   ]);
   const [file, setFile] = useState<UploadFile>();
   const [previewOpen, setPreviewOpen] = useState(false);
-
-  /* useImperativeHandle(ref, () => ({
-    getIsReady: () => {
-      return isReady
-    }
-  })); */
+  const [BFManageOpen, setBFManageOpen] = useState(false);
 
   const uploadProps:UploadProps = {
     name: 'file',
@@ -39,11 +35,7 @@ const TaskForm = forwardRef((props, ref) => {
       }
     }
   };
-
-  const showPreview = () => {
-    setPreviewOpen(true);
-  }
-
+  
   const setHashKey = () => {
     formRef.setFieldsValue({
       hashValues: [{
@@ -52,6 +44,14 @@ const TaskForm = forwardRef((props, ref) => {
       }]
     })
   }
+
+  const validForm = () => {
+    formRef.validateFields();
+  }
+
+  useImperativeHandle(ref, () => ({
+    validForm
+  }));
 
   return (
     <>
@@ -75,7 +75,10 @@ const TaskForm = forwardRef((props, ref) => {
               <Form.Item noStyle shouldUpdate={(prev, cur) => prev.dataResourceType !== cur.dataResourceType }>
                 {({ getFieldValue }) => {
                     return getFieldValue('dataResourceType') === 'BloomFilter' ?
-                    <Button style={{ marginLeft: 15 }}>布隆过滤器管理</Button> : null
+                    <Button
+                      style={{ marginLeft: 15 }}
+                      onClick={() => setBFManageOpen(true)}
+                    >布隆过滤器管理</Button> : null
                   }
                 }
               </Form.Item>
@@ -102,7 +105,11 @@ const TaskForm = forwardRef((props, ref) => {
                             <Button icon={<FolderOpenOutlined />}>选择文件</Button>
                           </Upload>
                           {
-                            file?.name ? <Button icon={<FolderOpenOutlined />} onClick={showPreview}>预览</Button> : ''
+                            file?.name ?
+                            <Button
+                              icon={<FolderOpenOutlined />}
+                              onClick={() => setPreviewOpen(true)}
+                            >预览</Button> : ''
                           }
                         </Space> :
                         <DataSourceForm />
@@ -154,9 +161,15 @@ const TaskForm = forwardRef((props, ref) => {
           </Form>
         </Col>
       </Row>
+      {/* 数据预览 */}
       <DataSetPreview
         open={previewOpen}
         onCancel={() => setPreviewOpen(false)}
+      />
+      {/* 布隆过滤器管理 */}
+      <BloomFilterManage
+        open={BFManageOpen}
+        onClose={() => setBFManageOpen(false)}
       />
     </>
   );

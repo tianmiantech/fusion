@@ -2,6 +2,7 @@ import { Table,Tag ,Button} from "antd"
 import { TmTable } from "@tianmiantech/pro";
 import type { ColumnsType } from 'antd/es/table';
 import { useRequest,useMount } from "ahooks";
+import { history } from 'umi';
 import {getHistoryList} from './service'
 
 interface RowProps {
@@ -55,7 +56,7 @@ const Index =()=>{
         dataIndex: 'create',
         key: 'create',
         width:200,
-        render:(text:String,row:RowProps)=>{
+        render:(text:string,row:RowProps)=>{
             const { createTime,coast} = row;
             return <><div>{createTime}</div>
                 <div>{coast}</div>
@@ -66,7 +67,7 @@ const Index =()=>{
         dataIndex: 'prompter',
         key: 'prompter',
         width:400,
-        render:(text:String,row:RowProps)=>{
+        render:(text:string,row:RowProps)=>{
             const { prompterName,prompterFile,promptertotalNum,prompterprimaryKey} = row;
             return <><div>{prompterName}</div>
                 <div>{prompterFile}</div>
@@ -78,7 +79,7 @@ const Index =()=>{
         dataIndex: 'provider',
         key: 'provider',
         width:400,
-        render:(text:String,row:RowProps)=>{
+        render:(text:string,row:RowProps)=>{
             const { providerName,providerFile,providertotalNum,providerprimaryKey} = row;
             return <><div>{providerName}</div>
                 <div>{providerFile}</div>
@@ -100,8 +101,10 @@ const Index =()=>{
         }
     }]
 
-    const actionClickHandle = ()=>{
-
+    const actionClickHandle = (key:string, record:RowProps, index:number)=>{
+        if (key === 'detail') {
+            history.push('/task/detail');
+        }
     }
 
     return  <TmTable
@@ -111,9 +114,9 @@ const Index =()=>{
         >
         <TmTable.Table
             actionItems={(record:RowProps) => [
-            { text: '详情', key: '22'},
-            { text: '删除', key: '3' },
-            { text: '查看备注', key: '33' },
+            { text: '详情', key: 'detail'},
+            { text: '删除', key: 'delete' },
+            { text: '查看备注', key: 'remark' },
             ]}
         actionClickHandle={actionClickHandle}
         />
