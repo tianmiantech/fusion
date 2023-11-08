@@ -41,7 +41,7 @@
     </dependencies>
 
     <build>
-        <finalName>fusion-tool</finalName>
+        <finalName>fusion</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

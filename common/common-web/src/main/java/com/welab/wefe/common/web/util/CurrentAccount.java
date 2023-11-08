@@ -51,11 +51,14 @@ public class CurrentAccount {
      */
     private static final ThreadLocal<String> tokens = new TransmittableThreadLocal<>();
 
-    public synchronized static void logined(String token, String accountId, String username) {
+    /**
+     * 登录之后登记登录状态
+     */
+    public synchronized static void logined(String accountId, String username) {
         synchronized (ACCOUNT_MAP_BY_TOKEN) {
             ACCOUNT_MAP_BY_TOKEN.entrySet().removeIf(item -> accountId.equals(item.getValue().getId()));
         }
-
+        String token = generateToken();
         ACCOUNT_MAP_BY_TOKEN.put(token, AccountInfo.of(accountId, username));
     }
 

@@ -18,6 +18,7 @@ package com.welab.fusion.service.database.entity;
 
 import com.welab.fusion.service.database.repository.base.BaseRepository;
 import com.welab.fusion.service.database.repository.base.RepositoryManager;
+import com.welab.wefe.common.ModelMapper;
 
 import javax.persistence.Column;
 import javax.persistence.Id;
@@ -55,11 +56,18 @@ public abstract class AbstractDbModel implements Serializable {
         repository.save(this);
     }
 
-    public static String generateId(){
+    /**
+     * 转换为其它实体
+     */
+    public <T> T mapTo(Class<T> clazz) {
+        return ModelMapper.map(this, clazz);
+    }
+
+    public static String generateId() {
         return UUID.randomUUID().toString().replaceAll("-", "");
     }
 
-    //region getter/setter
+    // region getter/setter
 
     public String getId() {
         return id;
@@ -85,5 +93,5 @@ public abstract class AbstractDbModel implements Serializable {
         this.updatedTime = updatedTime;
     }
 
-    //endregion
+    // endregion
 }

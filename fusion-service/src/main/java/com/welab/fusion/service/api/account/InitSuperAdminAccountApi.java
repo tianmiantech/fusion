@@ -16,6 +16,7 @@
 package com.welab.fusion.service.api.account;
 
 import com.welab.fusion.service.service.AccountService;
+import com.welab.wefe.common.fieldvalidate.annotation.Check;
 import com.welab.wefe.common.web.api.base.AbstractApi;
 import com.welab.wefe.common.web.api.base.Api;
 import com.welab.wefe.common.web.dto.AbstractApiInput;
@@ -26,19 +27,21 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author zane.luo
  * @date 2023/11/7
  */
-@Api(path = "account/init_super_admin", name = "list account")
-public class AddAccountApi extends AbstractApi<AddAccountApi.Input, AddAccountApi.Output> {
+@Api(path = "account/init_super_admin", name = "初始化超级管理员账号")
+public class InitSuperAdminAccountApi extends AbstractApi<InitSuperAdminAccountApi.Input, InitSuperAdminAccountApi.Output> {
     @Autowired
     private AccountService accountService;
 
     @Override
-    protected ApiResult<AddAccountApi.Output> handle(AddAccountApi.Input input) throws Exception {
+    protected ApiResult<InitSuperAdminAccountApi.Output> handle(InitSuperAdminAccountApi.Input input) throws Exception {
         accountService.initSuperAdminAccount(input.username, input.password);
         return success();
     }
 
     public static class Input extends AbstractApiInput {
+        @Check(require = true)
         public String username;
+        @Check(require = true)
         public String password;
     }
 

@@ -16,32 +16,36 @@
 
 package com.welab.wefe.common.web.controller;
 
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.parser.Feature;
 import com.welab.wefe.common.StatusCode;
 import com.welab.wefe.common.util.StringUtil;
 import com.welab.wefe.common.util.UrlUtil;
+import com.welab.wefe.common.util.enums.ContentType;
 import com.welab.wefe.common.web.ApiExecutor;
 import com.welab.wefe.common.web.dto.ApiResult;
 import com.welab.wefe.common.web.util.CurrentAccount;
 import org.apache.catalina.connector.RequestFacade;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.http.HttpHeaders;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.support.StandardMultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 import java.util.TreeMap;
@@ -52,25 +56,27 @@ import java.util.TreeMap;
 @RestController
 public class BaseController {
 
+    private static final Logger LOG = LoggerFactory.getLogger(BaseController.class);
 
-    @GetMapping(value = "/download")
-    public ResponseEntity<FileSystemResource> download(HttpServletRequest httpServletRequest) {
-        File file = new File("");
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
-        headers.add("Content-Disposition", "attachment; filename=" + file.getName());
-        headers.add("Pragma", "no-cache");
-        headers.add("Expires", "0");
-        headers.add("Last-Modified", file.lastModified() + "");
-        headers.add("ETag", String.valueOf(System.currentTimeMillis()));
+    @RequestMapping("/website/**")
+    public ResponseEntity<?> getHtml(HttpServletRequest request, HttpServletResponse response) {
+        String path = StrUtil.subAfter(request.getRequestURI(), "/website", false);
+        path = path.replace("//", "/");
+        String fileName = StrUtil.subBefore(path, "?", false);
+        if (fileName.startsWith("/")) {
+            fileName = fileName.substring(1);
+        }
+        if (StrUtil.isEmpty(fileName)) {
+            fileName = "index.html";
+        }
+        fileName = "website/" + fileName;
 
         return ResponseEntity
                 .ok()
-                .headers(headers)
-                .contentLength(file.length())
-                .contentType(MediaType.parseMediaType("application/octet-stream"))
-                .body(new FileSystemResource(file));
+                .contentType(MediaType.parseMediaType(ContentType.of(fileName)))
+                .body(new InputStreamResource(
+                        Thread.currentThread().getContextClassLoader().getResourceAsStream(fileName)
+                ));
 
     }
 

@@ -15,10 +15,15 @@
  */
 package com.welab.fusion.service.api.account;
 
+import com.welab.fusion.service.dto.entity.AccountOutputModel;
+import com.welab.fusion.service.service.AccountService;
+import com.welab.wefe.common.fieldvalidate.annotation.Check;
 import com.welab.wefe.common.web.api.base.AbstractApi;
 import com.welab.wefe.common.web.api.base.Api;
 import com.welab.wefe.common.web.dto.AbstractApiInput;
 import com.welab.wefe.common.web.dto.ApiResult;
+import com.welab.wefe.common.web.util.CurrentAccount;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author zane.luo
@@ -27,14 +32,32 @@ import com.welab.wefe.common.web.dto.ApiResult;
 @Api(path = "account/login", name = "login", allowAccessWithNothing = true)
 public class LoginApi extends AbstractApi<LoginApi.Input, LoginApi.Output> {
 
+    @Autowired
+    private AccountService accountService;
+
     @Override
     protected ApiResult<LoginApi.Output> handle(LoginApi.Input input) throws Exception {
-        return success();
+        AccountOutputModel account = accountService.login(input.username, input.password);
+        String token = CurrentAccount.token();
+        return success(Output.of(token, account));
     }
 
     public static class Input extends AbstractApiInput {
+        @Check(require = true)
+        public String username;
+        @Check(require = true)
+        public String password;
     }
 
-    public class Output {
+    public static class Output {
+        public String token;
+        public AccountOutputModel account;
+
+        public static Output of(String token, AccountOutputModel account) {
+            Output output = new Output();
+            output.token = token;
+            output.account = account;
+            return output;
+        }
     }
 }
