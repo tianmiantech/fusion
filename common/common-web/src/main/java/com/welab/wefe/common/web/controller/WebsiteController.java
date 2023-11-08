@@ -65,7 +65,8 @@ public class WebsiteController {
      * 从请求路径中提取资源名称
      */
     private static String extractResourceName(HttpServletRequest request) {
-        String path = StrUtil.subAfter(request.getRequestURI(), "/website", false);
+        // e.g: /website/index.html
+        String path = StrUtil.subAfter(request.getServletPath(), "/website", false);
         path = path.replace("//", "/");
         String fileName = StrUtil.subBefore(path, "?", false);
         if (fileName.startsWith("/")) {
