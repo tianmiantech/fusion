@@ -45,3 +45,6 @@ venv/
 
 *.lock
 *.lock.json
+
+# 排除 jar 包中的 website
+/fusion-service/src/main/resources/website/
