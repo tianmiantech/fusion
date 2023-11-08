@@ -46,5 +46,6 @@ venv/
 *.lock
 *.lock.json
 
-# 排除 jar 包中的 website
-/fusion-service/src/main/resources/website/
+# 排除 jar 包中的 website（保留目录，不保留目录中的文件）
+/fusion-service/src/main/resources/website/**
+!/fusion-service/src/main/resources/website/.gitkeep
