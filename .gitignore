@@ -1,0 +1,51 @@
+# 排除 ide 文件
+.idea/
+*.iml
+out
+gen
+
+*.project
+.settings/
+.classpath
+.vscode/
+
+# 排除编译输出
+*.class
+target/
+
+# 排除日志
+log/
+logs/
+*.log
+*.log.*
+
+# 排除 Microsoft Office 临时文件
+~$*.*
+
+# py相关排除
+*.py[cod]
+*.ipynb
+
+# 排除build
+build/
+package-lock.json
+# 排除mac本地文件
+*.DS_Store
+
+venv/
+/docker/
+
+
+# 排除环境配置文件
+.env.local
+/.env.local
+.env.*.local
+.factorypath
+**/.factorypath
+
+*.lock
+*.lock.json
+
+# 排除 jar 包中的 website（保留目录，不保留目录中的文件）
+/fusion-service/src/main/resources/website/**
+!/fusion-service/src/main/resources/website/.gitkeep
