@@ -67,7 +67,7 @@ public class AccountService extends AbstractService {
         }
 
         // 随机生成 rsa 私钥作为 salt
-        String salt = Md5.of(Rsa.generateKeyPair().getPrivate().getEncoded());
+        String salt = Md5.of(Rsa.generateKeyPair().getPrivateKey().getEncoded());
         // 入库前，先将密码混入 salt ，再进行 hash，确保数据库中的密码不可反解。
         String passwordWithSalt = Sha256.of(password + salt);
 

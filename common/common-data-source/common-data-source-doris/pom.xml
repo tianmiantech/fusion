@@ -3,18 +3,21 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>fusion</artifactId>
+        <artifactId>common-data-source</artifactId>
         <groupId>com.welab.wefe</groupId>
         <version>1.0.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>common</artifactId>
-    <packaging>pom</packaging>
+    <artifactId>common-data-source-doris</artifactId>
 
-    <modules>
-        <module>common-lang</module>
-        <module>common-web</module>
-        <module>common-data-source</module>
-    </modules>
+    <dependencies>
+        <dependency>
+            <groupId>com.welab.wefe</groupId>
+            <artifactId>common-data-source-mysql</artifactId>
+            <version>1.0.0</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
+
 </project>
