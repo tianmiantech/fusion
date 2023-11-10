@@ -10,6 +10,38 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>fusion-core</artifactId>
+    <dependencies>
+        <dependency>
+            <groupId>com.welab.wefe</groupId>
+            <artifactId>common-lang</artifactId>
+            <version>1.0.0</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.welab.wefe</groupId>
+            <artifactId>common-data-source-core</artifactId>
+            <version>1.0.0</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.welab.wefe</groupId>
+            <artifactId>common-data-source-jdbc</artifactId>
+            <version>1.0.0</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.welab.wefe</groupId>
+            <artifactId>common-data-source-doris</artifactId>
+            <version>1.0.0</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.welab.wefe</groupId>
+            <artifactId>common-data-source-hive</artifactId>
+            <version>1.0.0</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
 
 
 </project>

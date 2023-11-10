@@ -47,6 +47,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -57,28 +58,6 @@ import java.util.TreeMap;
 public class BaseController {
 
     private static final Logger LOG = LoggerFactory.getLogger(BaseController.class);
-
-    @RequestMapping("/website/**")
-    public ResponseEntity<?> getHtml(HttpServletRequest request, HttpServletResponse response) {
-        String path = StrUtil.subAfter(request.getRequestURI(), "/website", false);
-        path = path.replace("//", "/");
-        String fileName = StrUtil.subBefore(path, "?", false);
-        if (fileName.startsWith("/")) {
-            fileName = fileName.substring(1);
-        }
-        if (StrUtil.isEmpty(fileName)) {
-            fileName = "index.html";
-        }
-        fileName = "website/" + fileName;
-
-        return ResponseEntity
-                .ok()
-                .contentType(MediaType.parseMediaType(ContentType.of(fileName)))
-                .body(new InputStreamResource(
-                        Thread.currentThread().getContextClassLoader().getResourceAsStream(fileName)
-                ));
-
-    }
 
     @GetMapping(value = "**", produces = "application/json; charset=UTF-8")
     public ResponseEntity<?> get(HttpServletRequest httpServletRequest) throws IOException {

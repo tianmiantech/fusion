@@ -22,7 +22,10 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
 
+        <mysql.connector.version>8.0.27</mysql.connector.version>
+
         <slf4j.version>1.7.15</slf4j.version>
+        <guava.version>30.1-jre</guava.version>
         <fastjson.version>1.2.83</fastjson.version>
         <hutool.version>5.8.22</hutool.version>
         <apache.poi.version>4.1.2</apache.poi.version>
@@ -34,6 +37,11 @@
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${guava.version}</version>
+            </dependency>
             <dependency>
                 <groupId>cn.hutool</groupId>
                 <artifactId>hutool-bom</artifactId>

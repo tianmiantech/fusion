@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>java</artifactId>
+        <groupId>com.welab.wefe</groupId>
+        <version>1.0.0</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>common-data-source</artifactId>
+    <packaging>pom</packaging>
+    <version>1.0.0</version>
+
+    <modules>
+        <module>common-data-source-core</module>
+        <module>common-data-source-mysql</module>
+        <module>common-data-source-hive</module>
+        <module>common-data-source-jdbc</module>
+        <module>common-data-source-clickhouse</module>
+        <module>common-data-source-impala</module>
+        <module>common-data-source-doris</module>
+    </modules>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.welab.wefe</groupId>
+            <artifactId>common-lang</artifactId>
+            <version>1.0.0</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+
+</project>

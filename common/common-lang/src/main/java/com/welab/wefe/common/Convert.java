@@ -21,6 +21,7 @@ import com.welab.wefe.common.util.StringUtil;
 
 import java.lang.reflect.Array;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -35,6 +36,11 @@ import java.util.UUID;
  * @author Zane
  */
 public class Convert {
+
+    public static BigInteger toBigInteger(String str) {
+        byte[] input = str.getBytes(StandardCharsets.UTF_8);
+        return new BigInteger(1, input);
+    }
 
     //region Int
 

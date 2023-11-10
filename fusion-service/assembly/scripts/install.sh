@@ -29,7 +29,7 @@ echo `date "+%Y-%m-%d %H:%M:%S    打包完毕"`
 ## JSON 中的 key 值，事先和运维约定好
 cat > /tmp/"$application" <<-EOF
 {
-    "targetPath": "${workdir}/board/board-service/target"
+    "targetPath": "${workdir}/fusion-service/target"
 }
 EOF
 

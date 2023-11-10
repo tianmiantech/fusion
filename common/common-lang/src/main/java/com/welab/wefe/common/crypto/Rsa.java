@@ -17,6 +17,8 @@ package com.welab.wefe.common.crypto;
 
 import cn.hutool.core.codec.Base64;
 import cn.hutool.crypto.SecureUtil;
+import org.bouncycastle.jcajce.provider.asymmetric.rsa.BCRSAPrivateCrtKey;
+import org.bouncycastle.jcajce.provider.asymmetric.rsa.BCRSAPublicKey;
 
 import java.security.KeyPair;
 import java.security.PrivateKey;
@@ -30,40 +32,42 @@ public class Rsa {
     /**
      * 生成密钥对
      */
-    public static KeyPair generateKeyPair() {
-        return SecureUtil.generateKeyPair("RSA", 2048);
+    public static RsaKeyPair generateKeyPair() {
+        KeyPair keyPair = SecureUtil.generateKeyPair("RSA", 2048);
+        return new RsaKeyPair(keyPair);
     }
 
-    /**
-     * 生成文本格式的密钥对
-     */
-    public static StringKeyPair generateStringKeyPair() {
-        return new StringKeyPair(generateKeyPair());
-    }
 
-    /**
-     * 文本格式的密钥对
-     */
-    public static class StringKeyPair {
-        private String publicKey;
-        private String privateKey;
+    public static class RsaKeyPair {
+        BCRSAPublicKey publicKey;
+        BCRSAPrivateCrtKey privateKey;
 
-        public StringKeyPair(KeyPair keyPair) {
-            this.publicKey = Base64.encode(keyPair.getPublic().getEncoded());
-            this.privateKey = Base64.encode(keyPair.getPrivate().getEncoded());
+        public RsaKeyPair(KeyPair keyPair) {
+            this.publicKey = (BCRSAPublicKey) keyPair.getPublic();
+            this.privateKey = (BCRSAPrivateCrtKey) keyPair.getPrivate();
         }
 
-        public String getPublicKey() {
+        public BCRSAPublicKey getPublicKey() {
             return publicKey;
         }
 
-        public String getPrivateKey() {
+        public BCRSAPrivateCrtKey getPrivateKey() {
             return privateKey;
+        }
+
+        public String getPublicKeyAsString() {
+            return Base64.encode(publicKey.getEncoded());
+        }
+
+        public String getPrivateKeyAsString() {
+            return Base64.encode(privateKey.getEncoded());
         }
     }
 
+
     public static void main(String[] args) {
-        PrivateKey privateKey = Rsa.generateKeyPair().getPrivate();
+        RsaKeyPair keyPair = Rsa.generateKeyPair();
+        PrivateKey privateKey = keyPair.getPrivateKey();
         String encode = Base64.encode(privateKey.getEncoded());
         System.out.println(encode);
     }

@@ -15,5 +15,6 @@
     <modules>
         <module>common-lang</module>
         <module>common-web</module>
+        <module>common-data-source</module>
     </modules>
 </project>
