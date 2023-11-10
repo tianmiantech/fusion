@@ -17,6 +17,7 @@ package com.welab.fusion.core.bloom_filter;
 
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.thread.NamedThreadFactory;
+import cn.hutool.core.thread.ThreadUtil;
 import com.google.common.base.Charsets;
 import com.google.common.hash.BloomFilter;
 import com.google.common.hash.Funnels;
@@ -26,7 +27,6 @@ import com.welab.fusion.core.hash.HashConfig;
 import com.welab.fusion.core.hash.HashMethod;
 import com.welab.wefe.common.crypto.Rsa;
 import com.welab.wefe.common.exception.StatusCodeWithException;
-import com.welab.wefe.common.util.OS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,17 +78,7 @@ public class PsiBloomFilterCreator implements Closeable {
      * 创建线程池，将加密动作并行。
      */
     private ThreadPoolExecutor createThreadPoll() {
-        /**
-         * 这里经过了大量测试
-         * 在华为云测试环境（6物理核6逻辑核），池大小为 2 时最快。
-         * 在 Mac M1，（4物理核4逻辑核），池大小为 6 时最快。
-         */
-        // 默认
-        int pollSize = Runtime.getRuntime().availableProcessors() / 2;
-        // mac
-        if (OS.get() == OS.mac) {
-            pollSize = Runtime.getRuntime().availableProcessors() - 2;
-        }
+        int pollSize = Runtime.getRuntime().availableProcessors() - 2;
 
         return new ThreadPoolExecutor(
                 pollSize,
@@ -109,37 +99,74 @@ public class PsiBloomFilterCreator implements Closeable {
          * 而是在实际的业务场景中世界样本的总量。
          *
          * 由于我们的场景大多是用户的手机号、身份证号等，这些数据的总量大约是十亿。
-         * 综合考虑，这个预估值设定在一亿。
+         * 综合考虑，这个预估值设定最小为一亿。
          */
         int minCount = 100_000_000;
+        int maxCount = Integer.MAX_VALUE;
         long count = dataSourceReader.getTotalDataRowCount();
 
         long expectedInsertions = Math.max(count, minCount);
-        return BloomFilter.create(Funnels.stringFunnel(Charsets.UTF_8), expectedInsertions, 0.0001);
+        // 不能超过上限
+        if (expectedInsertions > maxCount) {
+            expectedInsertions = maxCount;
+        }
+
+        return BloomFilter.create(
+                Funnels.stringFunnel(Charsets.UTF_8),
+                expectedInsertions,
+                0.0001
+        );
     }
 
     /**
      * 从数据源读取数据，加密，写入布隆过滤器。
      */
     public PsiBloomFilter create() throws StatusCodeWithException {
+        final long start = System.currentTimeMillis();
         dataSourceReader.readAll(new BiConsumer<Long, LinkedHashMap<String, Object>>() {
             @Override
             public void accept(Long index, LinkedHashMap<String, Object> row) {
-                String key = hashConfigs.stream().map(x -> x.hash(row)).collect(Collectors.joining());
+
+                // 避免读取的数据堆积在内存
+                while (GENERATE_FILTER_THREAD_POOL.getQueue().size() > 10000) {
+                    ThreadUtil.safeSleep(100);
+                }
+
+                // 这一句如果放在异步线程会导致性能大幅下降，原因不详。
+                String key = hashConfigs.stream()
+                        .map(x -> x.hash(row))
+                        .collect(Collectors.joining());
 
                 try {
-                    BigInteger z = CompletableFuture.supplyAsync(
-                            () -> encrypt(key),
+                    CompletableFuture.runAsync(
+                            () -> {
+                                BigInteger z = encrypt(key);
+                                bloomFilter.put(z.toString());
+                            },
                             GENERATE_FILTER_THREAD_POOL
-                    ).get();
-                    bloomFilter.put(z.toString());
+                    ).thenRun(() -> {
+
+                    });
+
                 } catch (Exception e) {
                     LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);
                 }
             }
         });
 
-        return PsiBloomFilter.of(hashConfigs, rsaPsiParam, dataSourceReader.getReadDataRows(), bloomFilter);
+        while (GENERATE_FILTER_THREAD_POOL.getActiveCount() > 0) {
+            ThreadUtil.safeSleep(1000);
+        }
+
+        long spend = System.currentTimeMillis() - start;
+        System.out.println(spend + "ms");
+
+        return PsiBloomFilter.of(
+                hashConfigs,
+                rsaPsiParam,
+                dataSourceReader.getReadDataRows(),
+                bloomFilter
+        );
     }
 
     /**
@@ -150,7 +177,9 @@ public class PsiBloomFilterCreator implements Closeable {
 
         BigInteger rp = h.modPow(rsaPsiParam.getEp(), rsaPsiParam.privatePrimeP);
         BigInteger rq = h.modPow(rsaPsiParam.getEq(), rsaPsiParam.privatePrimeQ);
-        BigInteger z = (rp.multiply(rsaPsiParam.getCp()).add(rq.multiply(rsaPsiParam.getCq()))).remainder(rsaPsiParam.publicModulus);
+        BigInteger z = (rp.multiply(rsaPsiParam.getCp())
+                .add(rq.multiply(rsaPsiParam.getCq())))
+                .remainder(rsaPsiParam.publicModulus);
         return z;
     }
 
@@ -171,12 +200,11 @@ public class PsiBloomFilterCreator implements Closeable {
      * 测试
      */
     public static void main(String[] args) throws IOException, StatusCodeWithException {
-        File file = new File("D:\\data\\wefe\\ivenn_10w_20210319_vert_promoter.csv");
+        // File file = new File("D:\\data\\wefe\\ivenn_10w_20210319_vert_promoter.csv");
+        File file = new File("D:\\data\\wefe\\3x100000000rows-miss0-auto_increment.csv");
         CsvTableDataSourceReader reader = new CsvTableDataSourceReader(file);
         System.out.println(reader.getHeader());
-        List<HashConfig> hashConfigs = Arrays.asList(
-                HashConfig.of(HashMethod.MD5, "id")
-        );
+        List<HashConfig> hashConfigs = Arrays.asList(HashConfig.of(HashMethod.MD5, "id"));
 
         Path dir = Paths.get(file.getParent()).resolve("test-bf");
 

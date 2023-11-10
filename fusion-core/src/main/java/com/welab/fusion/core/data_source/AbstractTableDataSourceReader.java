@@ -161,7 +161,7 @@ public abstract class AbstractTableDataSourceReader implements Closeable {
     /**
      * 获取数据源中的全量数据行数
      */
-    public abstract long doGetTotalDataRowCount();
+    protected abstract long doGetTotalDataRowCount();
 
     /**
      * Read data row
