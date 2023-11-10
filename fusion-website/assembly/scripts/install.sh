@@ -14,14 +14,17 @@ echo "当前npm源"
 npm config get registry
 
 echo ">> 安装依赖"
-pnpm install --no-frozen-lockfile
-# npm install --legacy-peer-deps --verbose
+#npm  install --no-frozen-lockfile
+npm install --legacy-peer-deps --verbose
 
 echo ">> 安装依赖完成"
 
-echo "编译"
-npm run build
-# npm run build:$CI_SERVICE_PRODUCT
-
+echo ">>  编译"
+if [ "$0" = "$BASH_SOURCE" ]; then
+    echo ">>  判断JAVA后端打包，执行本地编译中..."
+    npm run build:local
+else
+    npm run build
+fi
 echo "编译完成"
 

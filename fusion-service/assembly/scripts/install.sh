@@ -17,6 +17,8 @@ workdir=$(pwd)
 
 cd "$workdir"
 
+echo `date "+%Y-%m-%d %H:%M:%S    开始构建前端资源"`
+bash ./buildWebSource.sh
 
 echo `date "+%Y-%m-%d %H:%M:%S    开始打包"`
 # mvn -T 1C clean install -DskipTests=true -am -pl fusion-service
