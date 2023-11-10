@@ -42,7 +42,7 @@ public class PsiBloomFilter {
     protected final Logger LOG = LoggerFactory.getLogger(this.getClass());
     private static final String META_FILE_NAME = "PsiBloomFilter.json";
     private static final String DATA_FILE_NAME = "PsiBloomFilter.data";
-    public List<HashConfig> hashConfigs;
+    public List<HashConfig> hashConfigList;
     public RsaPsiParam rsaPsiParam;
     /**
      * 过滤器中已插入的元素数量
@@ -63,7 +63,10 @@ public class PsiBloomFilter {
         // 加载过滤器
         File bfFile = dir.resolve(DATA_FILE_NAME).toFile();
         try (FileInputStream inputStream = new FileInputStream(bfFile)) {
-            result.bloomFilter = BloomFilter.readFrom(inputStream, Funnels.stringFunnel(StandardCharsets.UTF_8));
+            result.bloomFilter = BloomFilter.readFrom(
+                    inputStream,
+                    Funnels.stringFunnel(StandardCharsets.UTF_8)
+            );
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -73,7 +76,7 @@ public class PsiBloomFilter {
 
     public static PsiBloomFilter of(List<HashConfig> hashConfigs, RsaPsiParam rsaPsiParam, long insertedElementCount, BloomFilter<String> bloomFilter) {
         PsiBloomFilter psiBloomFilter = new PsiBloomFilter();
-        psiBloomFilter.hashConfigs = hashConfigs;
+        psiBloomFilter.hashConfigList = hashConfigs;
         psiBloomFilter.rsaPsiParam = rsaPsiParam;
         psiBloomFilter.insertedElementCount = insertedElementCount;
         psiBloomFilter.bloomFilter = bloomFilter;
