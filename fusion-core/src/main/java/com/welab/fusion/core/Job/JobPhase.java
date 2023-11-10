@@ -15,6 +15,11 @@
  */
 package com.welab.fusion.core.Job;
 
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
+
 /**
  * @author zane.luo
  * @date 2023/11/10
@@ -23,22 +28,58 @@ public enum JobPhase {
     /**
      * 生成过滤器
      */
-    CreatePsiBloomFilter,
+    CreatePsiBloomFilter(0),
     /**
      * 下载过滤器
      */
-    DownloadPsiBloomFilter,
-    /**
-     * 求交
-     */
-    Intersection,
+    DownloadPsiBloomFilter(1),
     /**
      * 拼接扩展字段到求交结果
      */
-    AppendExtendedFieldToResult,
+    AppendExtendedFieldToResult(3),
+    /**
+     * 求交
+     */
+    Intersection(2),
     /**
      * 下载结果
      */
-    DownloadResult;
+    DownloadResult(4);
+    private static final List<JobPhase> sortedList;
 
+    static {
+        sortedList = Arrays.stream(JobPhase.values())
+                .sorted(Comparator.comparingInt(o -> o.phaseIndex))
+                .collect(Collectors.toList());
+    }
+
+    private int phaseIndex;
+
+    JobPhase(int phaseIndex) {
+        this.phaseIndex = phaseIndex;
+    }
+
+    /**
+     * 获取下一个阶段
+     */
+    public JobPhase next() {
+        if (phaseIndex == sortedList.size() - 1) {
+            return null;
+        }
+        return sortedList.get(phaseIndex + 1);
+    }
+
+    /**
+     * 获取按顺序排列的所有阶段
+     */
+    public static List<JobPhase> list() {
+        return sortedList;
+    }
+
+    /**
+     * 获取第一个阶段
+     */
+    public static JobPhase firstPhase() {
+        return JobPhase.CreatePsiBloomFilter;
+    }
 }

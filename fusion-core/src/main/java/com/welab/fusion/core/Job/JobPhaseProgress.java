@@ -47,6 +47,7 @@ public class JobPhaseProgress {
      */
     private Date endTime;
     private String message;
+    private JobStatus status;
 
     public static JobPhaseProgress of(String jobId, JobPhase jobPhase, long totalWorkload) {
         JobPhaseProgress progress = new JobPhaseProgress();
@@ -56,15 +57,17 @@ public class JobPhaseProgress {
         return progress;
     }
 
-    public void success() {
-        this.endTime = new Date();
-        this.completedWorkload = totalWorkload;
-        this.message = "completed";
-    }
-
-    public void fail(String message) {
+    public void finish(JobStatus status, String message) {
         this.endTime = new Date();
         this.message = message;
+        this.status = status;
+    }
+
+    /**
+     * 更新已完成工作量
+     */
+    public void updateCompletedWorkload(long completedWorkload) {
+        this.completedWorkload = completedWorkload;
     }
 
     /**
@@ -135,6 +138,9 @@ public class JobPhaseProgress {
         return message;
     }
 
+    public JobStatus getStatus() {
+        return status;
+    }
 
     // endregion
 }

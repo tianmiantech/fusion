@@ -42,10 +42,9 @@ public class WebsiteController {
     @RequestMapping("/website/**")
     public ResponseEntity<?> response(HttpServletRequest request) {
         String resourceName = extractResourceName(request);
+        LOG.info("website resourceName:{}", resourceName);
 
-        InputStream inputStream = Thread.currentThread()
-                .getContextClassLoader()
-                .getResourceAsStream(resourceName);
+        InputStream inputStream = getClass().getClassLoader().getResourceAsStream(resourceName);
 
         // 404
         if (inputStream == null) {
