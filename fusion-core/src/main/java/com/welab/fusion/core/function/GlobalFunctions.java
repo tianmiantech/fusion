@@ -13,25 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.welab.fusion.core.Job;
-
-import com.alibaba.fastjson.annotation.JSONField;
-import com.welab.fusion.core.bloom_filter.PsiBloomFilter;
-import com.welab.fusion.core.data_resource.base.DataResourceInfo;
-import com.welab.fusion.core.data_source.AbstractTableDataSourceReader;
+package com.welab.fusion.core.function;
 
 /**
  * @author zane.luo
- * @date 2023/11/10
+ * @date 2023/11/13
  */
-public class JobMember {
-    public String memberId;
-    public String memberName;
-    public DataResourceInfo dataResourceInfo;
-
-    @JSONField(serialize = false)
-    public AbstractTableDataSourceReader tableDataResourceReader;
-
-    @JSONField(serialize = false)
-    public PsiBloomFilter psiBloomFilter;
+public class GlobalFunctions {
+    public static AddPsiBloomFilterFunction addPsiBloomFilterFunction;
+    public static DownloadPsiBloomFilterFunction downloadPsiBloomFilterFunction;
 }

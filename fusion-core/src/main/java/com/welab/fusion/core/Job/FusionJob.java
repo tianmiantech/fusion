@@ -15,31 +15,44 @@
  */
 package com.welab.fusion.core.Job;
 
+import cn.hutool.core.thread.NamedThreadFactory;
+import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.StrUtil;
+import com.welab.fusion.core.Job.action.AbstractJobPhaseAction;
+import com.welab.fusion.core.Job.action.FusionJobRole;
+import com.welab.fusion.core.Job.action.JobPhaseActionCreator;
 import com.welab.fusion.core.data_resource.base.DataResourceType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.UUID;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author zane.luo
  * @date 2023/11/10
  */
 public class FusionJob {
+    protected final Logger LOG = LoggerFactory.getLogger(this.getClass());
 
     private String jobId;
     private JobMember myself;
     private JobMember partner;
-    JobProgress myProgress = new JobProgress();
-
+    private JobProgress myProgress = new JobProgress();
+    private FusionJobRole jobRole;
+    private ThreadPoolExecutor singleThreadExecutor;
 
     public FusionJob(String jobId, JobMember myself, JobMember partner) {
-        this.jobId = StrUtil.isEmpty(jobId)
-                ? UUID.randomUUID().toString().replace("-", "")
-                : jobId;
+        this.jobId = StrUtil.isEmpty(jobId) ? UUID.randomUUID().toString().replace("-", "") : jobId;
         this.myself = myself;
         this.partner = partner;
 
         myProgress.init(jobId, myself);
+
+        singleThreadExecutor = createSingleThreadPoll();
     }
 
     public void fusion() throws Exception {
@@ -55,22 +68,72 @@ public class FusionJob {
      * 不对其它方的任务进行主动通知。
      */
     private void startKeeper() {
+        LOG.info("启动监工线程，开始任务。");
         while (true) {
+            if (myProgress.getCurrentPhaseStatus().isFinished()) {
+                break;
+            }
+
             JobProgress partnerProgress = getPartnerProgress();
+            // 失联，任务中止。
             if (partnerProgress == null) {
                 finishJobByDisconnection();
+                break;
             }
 
             // 如果对方已失败，则我方跟随失败。
-            if (partnerProgress.getStatus().isFailed()) {
+            if (partnerProgress.getCurrentPhaseStatus().isFailed()) {
                 finishJobFollowFailed(partnerProgress);
                 break;
             }
 
-            // 如果双方处于同一阶段，且双方都已完成，则进入下一阶段。
-            if (myProgress.getCurrentPhase() == partnerProgress.getCurrentPhase()) {
+            // 双方都已完成，任务结束。
+            if (myProgress.getCurrentPhase().isLastPhase() && partnerProgress.getCurrentPhase().isLastPhase()) {
+                if (myProgress.getCurrentPhaseStatus().isSuccess() && partnerProgress.getCurrentPhaseStatus().isSuccess()) {
+                    finishJobBySuccess();
+                    break;
+                }
+            }
+
+            // 进入下一个阶段。
+            if (needGotoNextPhase(partnerProgress)) {
+                gotoAction(myProgress.getCurrentPhase().next());
+            }
+
+            // 考虑到要获取合作方的进度需要远程调用，这里不要太频繁。
+            ThreadUtil.safeSleep(5_000);
+        }
+    }
+
+
+    /**
+     * 是否需要进入下一阶段
+     */
+    private boolean needGotoNextPhase(JobProgress partnerProgress) {
+
+        // 我方未完成，不进入下一阶段。
+        if (!myProgress.getCurrentPhaseStatus().isSuccess()) {
+            return false;
+        }
+
+        // 已经是最后一个阶段，不进入下一阶段。
+        if (myProgress.getCurrentPhase().isLastPhase()) {
+            return false;
+        }
+
+        // 如果我方进度落后于对方，进入下一阶段。
+        if (myProgress.getCurrentPhase().index() < partnerProgress.getCurrentPhase().index()) {
+            return true;
+        }
+
+        // 双方进度相同，且双方都已完成，进入下一阶段。
+        if (myProgress.getCurrentPhase().index() == partnerProgress.getCurrentPhase().index()) {
+            if (myProgress.getCurrentPhaseStatus().isSuccess() && partnerProgress.getCurrentPhaseStatus().isSuccess()) {
+                return true;
             }
         }
+
+        return false;
     }
 
     /**
@@ -90,9 +153,23 @@ public class FusionJob {
     }
 
     /**
+     * 我方任务异常中止
+     */
+    public void finishJobOnException(Exception e) {
+        String message = "成员[" + myself.memberName + "]发生异常：" + e.getMessage();
+        finishJob(JobStatus.error_on_running, message);
+    }
+
+    private void finishJobBySuccess() {
+        String message = "success";
+        finishJob(JobStatus.success, message);
+    }
+
+    /**
      * 结束任务
      */
     private void finishJob(JobStatus status, String message) {
+        LOG.info("任务结束，状态：{}，消息：{}", status, message);
         myProgress.finish(status, message);
     }
 
@@ -103,17 +180,62 @@ public class FusionJob {
         return null;
     }
 
+    /**
+     * 由调度器调用，进入指定阶段。
+     */
+    private void gotoAction(JobPhase phase) {
+        AbstractJobPhaseAction action = JobPhaseActionCreator.create(phase, this);
 
-    private void action(JobPhase phase) {
-        switch (phase) {
-
-        }
+        // 异步执行当前阶段动作
+        singleThreadExecutor.submit(() -> {
+            action.run();
+        });
     }
 
     private void checkBeforeFusion() throws Exception {
-        if (myself.dataResourceInfo.dataResourceType == DataResourceType.PsiBloomFilter
-                && partner.dataResourceInfo.dataResourceType == DataResourceType.PsiBloomFilter) {
+        if (myself.dataResourceInfo.dataResourceType == DataResourceType.PsiBloomFilter && partner.dataResourceInfo.dataResourceType == DataResourceType.PsiBloomFilter) {
             throw new Exception("不能双方都使用布隆过滤器，建议数据量大的一方使用布隆过滤器。");
         }
     }
+
+    private ThreadPoolExecutor createSingleThreadPoll() {
+        ThreadFactory threadFactory = new NamedThreadFactory("job-" + jobId, false);
+        return new ThreadPoolExecutor(
+                1,
+                1,
+                0L,
+                TimeUnit.MILLISECONDS,
+                new LinkedBlockingQueue<Runnable>(),
+                threadFactory
+        );
+    }
+
+    // region getter/setter
+
+    public JobMember getMyself() {
+        return myself;
+    }
+
+    public JobMember getPartner() {
+        return partner;
+    }
+
+    public void setMyRole(FusionJobRole jobRole) {
+        this.jobRole = jobRole;
+    }
+
+    public FusionJobRole getJobRole() {
+        return jobRole;
+    }
+
+    public JobProgress getMyProgress() {
+        return myProgress;
+    }
+
+    public String getJobId() {
+        return jobId;
+    }
+
+    // endregion
+
 }

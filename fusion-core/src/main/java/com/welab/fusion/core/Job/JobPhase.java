@@ -26,25 +26,29 @@ import java.util.stream.Collectors;
  */
 public enum JobPhase {
     /**
+     * 确认成员角色
+     */
+    ConfirmMemberRole(0),
+    /**
      * 生成过滤器
      */
-    CreatePsiBloomFilter(0),
+    CreatePsiBloomFilter(1),
     /**
      * 下载过滤器
      */
-    DownloadPsiBloomFilter(1),
-    /**
-     * 拼接扩展字段到求交结果
-     */
-    AppendExtendedFieldToResult(3),
+    DownloadPsiBloomFilter(2),
     /**
      * 求交
      */
-    Intersection(2),
+    Intersection(3),
+    /**
+     * 拼接扩展字段到求交结果
+     */
+    AppendExtendedFieldToResult(4),
     /**
      * 下载结果
      */
-    DownloadResult(4);
+    DownloadResult(5);
     private static final List<JobPhase> sortedList;
 
     static {
@@ -81,5 +85,16 @@ public enum JobPhase {
      */
     public static JobPhase firstPhase() {
         return JobPhase.CreatePsiBloomFilter;
+    }
+
+    public int index() {
+        return phaseIndex;
+    }
+
+    /**
+     * 是否是最后一个阶段
+     */
+    public boolean isLastPhase() {
+        return next() == null;
     }
 }

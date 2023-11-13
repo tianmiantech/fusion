@@ -54,13 +54,21 @@ public class JobPhaseProgress {
         progress.jobId = jobId;
         progress.jobPhase = jobPhase;
         progress.totalWorkload = totalWorkload;
+        progress.status = JobStatus.running;
         return progress;
     }
 
     public void finish(JobStatus status, String message) {
+        if (!status.isFinished()) {
+            throw new RuntimeException("意料之外的状态：" + status);
+        }
         this.endTime = new Date();
         this.message = message;
         this.status = status;
+
+        if (status == JobStatus.success) {
+            this.completedWorkload = this.totalWorkload;
+        }
     }
 
     /**
@@ -106,6 +114,10 @@ public class JobPhaseProgress {
         return BigDecimal.valueOf(totalWorkload - completedWorkload)
                 .divide(BigDecimal.valueOf(completedWorkload), 5, RoundingMode.HALF_UP)
                 .multiply(BigDecimal.valueOf(getCostTime())).longValue();
+    }
+
+    public void updateTotalWorkload(Long totalWorkload) {
+        this.totalWorkload = totalWorkload;
     }
 
     // region getter/setter

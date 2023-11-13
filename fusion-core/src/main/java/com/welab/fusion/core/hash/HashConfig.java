@@ -18,6 +18,7 @@ package com.welab.fusion.core.hash;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author zane.luo
@@ -25,7 +26,7 @@ import java.util.Map;
  */
 public class HashConfig {
     public List<String> columns;
-    public HashMethod options;
+    public HashMethod method;
 
     public String hash(Map<String, Object> data) {
         String values = buildHashString(data);
@@ -33,7 +34,12 @@ public class HashConfig {
             return null;
         }
 
-        return options.hash(values);
+        return method.hash(values);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(columns, method);
     }
 
     private String buildHashString(Map<String, Object> data) {
@@ -58,10 +64,10 @@ public class HashConfig {
         return builder.toString();
     }
 
-    public static HashConfig of(HashMethod options,String... columns) {
+    public static HashConfig of(HashMethod options, String... columns) {
         HashConfig config = new HashConfig();
         config.columns = Arrays.asList(columns);
-        config.options = options;
+        config.method = options;
         return config;
     }
 }

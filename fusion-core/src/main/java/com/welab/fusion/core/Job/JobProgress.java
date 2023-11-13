@@ -37,6 +37,10 @@ public class JobProgress {
         jobPhaseProgressList.add(phaseProgress);
     }
 
+    public void addPhaseProgress(JobPhaseProgress phaseProgress) {
+        jobPhaseProgressList.add(phaseProgress);
+    }
+
     /**
      * 返回最后一个阶段的 message
      */
@@ -44,7 +48,10 @@ public class JobProgress {
         return getCurrentPhaseProgress().getMessage();
     }
 
-    public JobStatus getStatus() {
+    /**
+     * 获取当前阶段的状态
+     */
+    public JobStatus getCurrentPhaseStatus() {
         return getCurrentPhaseProgress().getStatus();
     }
 

@@ -61,4 +61,8 @@ public enum JobStatus {
                 return false;
         }
     }
+
+    public boolean isSuccess() {
+        return this == success;
+    }
 }

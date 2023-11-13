@@ -43,7 +43,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.LongAdder;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -118,11 +120,18 @@ public class PsiBloomFilterCreator implements Closeable {
         );
     }
 
+    public PsiBloomFilter create() throws StatusCodeWithException {
+        return create(null);
+    }
+
     /**
      * 从数据源读取数据，加密，写入布隆过滤器。
+     *
+     * @param progressConsumer 进度回调
      */
-    public PsiBloomFilter create() throws StatusCodeWithException {
+    public PsiBloomFilter create(Consumer<Long> progressConsumer) throws StatusCodeWithException {
         final long start = System.currentTimeMillis();
+        LongAdder insertedElementCount = new LongAdder();
         dataSourceReader.readAll(new BiConsumer<Long, LinkedHashMap<String, Object>>() {
             @Override
             public void accept(Long index, LinkedHashMap<String, Object> row) {
@@ -142,11 +151,10 @@ public class PsiBloomFilterCreator implements Closeable {
                             () -> {
                                 BigInteger z = encrypt(key);
                                 bloomFilter.put(z.toString());
+                                insertedElementCount.increment();
                             },
                             GENERATE_FILTER_THREAD_POOL
-                    ).thenRun(() -> {
-
-                    });
+                    );
 
                 } catch (Exception e) {
                     LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);
@@ -156,6 +164,11 @@ public class PsiBloomFilterCreator implements Closeable {
 
         while (GENERATE_FILTER_THREAD_POOL.getActiveCount() > 0) {
             ThreadUtil.safeSleep(1000);
+
+            // 更新进度
+            if (progressConsumer != null) {
+                progressConsumer.accept(insertedElementCount.longValue());
+            }
         }
 
         long spend = System.currentTimeMillis() - start;
@@ -164,7 +177,7 @@ public class PsiBloomFilterCreator implements Closeable {
         return PsiBloomFilter.of(
                 hashConfigs,
                 rsaPsiParam,
-                dataSourceReader.getReadDataRows(),
+                insertedElementCount.longValue(),
                 bloomFilter
         );
     }

@@ -18,6 +18,7 @@ package com.welab.fusion.core.bloom_filter;
 import com.welab.wefe.common.crypto.Rsa;
 
 import java.math.BigInteger;
+import java.util.Objects;
 
 /**
  * @author zane.luo
@@ -69,6 +70,17 @@ public class RsaPsiParam {
         param.preproccess();
 
         return param;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(
+                publicExponent,
+                publicModulus,
+                privateExponent,
+                privatePrimeP,
+                privatePrimeQ
+        );
     }
 
     // region getter/setter

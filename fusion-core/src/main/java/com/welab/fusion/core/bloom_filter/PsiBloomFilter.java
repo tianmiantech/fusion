@@ -18,6 +18,7 @@ package com.welab.fusion.core.bloom_filter;
 import cn.hutool.core.io.FileUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.annotation.JSONField;
+import com.google.common.base.Objects;
 import com.google.common.hash.BloomFilter;
 import com.google.common.hash.Funnels;
 import com.welab.fusion.core.hash.HashConfig;
@@ -50,6 +51,15 @@ public class PsiBloomFilter {
     public long insertedElementCount;
     @JSONField(serialize = false)
     public BloomFilter<String> bloomFilter;
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(
+                bloomFilter,
+                rsaPsiParam,
+                hashConfigList
+        );
+    }
 
     /**
      * 从磁盘中加载 PsiBloomFilter 对象
@@ -90,7 +100,6 @@ public class PsiBloomFilter {
         LOG.info("start to sink PsiBloomFilter to disk. dir:{}", dir);
         long start = System.currentTimeMillis();
         dir.toFile().mkdirs();
-
         // 输出过滤器
         File bfFile = dir.resolve(DATA_FILE_NAME).toFile();
         try (FileOutputStream outputStream = new FileOutputStream(bfFile)) {
