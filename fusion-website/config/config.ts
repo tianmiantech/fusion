@@ -3,11 +3,11 @@ import routes from './routes';
 const base = 'fusion';
 //OUTPUT_EXTRA：需要将编译后的文件复制到Java后端项目中 ，Java后端项目以website目录来确认是接口还是地址
 const OUTPUT_EXTRA = process.env.OUTPUT_EXTRA||''
-const PUBLIC_PATH = process.env.NO_PUBLIC_PATH?'/':`/${base}/`
+const BASE_PATH = process.env.NO_PUBLIC_PATH?'/':`/${base}/`
 export default defineConfig({
+    base: BASE_PATH,
     outputPath: `./dist/${base}/${OUTPUT_EXTRA}`,
-    publicPath: PUBLIC_PATH,
-    hash: true,
+    publicPath:BASE_PATH,
     extraBabelPlugins:[
       [
         'babel-plugin-import',
@@ -51,9 +51,6 @@ export default defineConfig({
     // Theme for antd: https://ant.design/docs/react/customize-theme-cn
     title: false,
     ignoreMomentLocale: true,
-    manifest: {
-      basePath: '/',
-    },
     fastRefresh: true,
     mfsu:false
   });
