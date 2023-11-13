@@ -27,7 +27,7 @@ bash $WEB_SCRIPT_PATH/buildLocal.sh
 
 echo " =======  Web编译执行完毕 ======"
 
-# TARGET_DIST=$JAVA_PROJECT_PATH/src/main/resources/
+TARGET_DIST=$JAVA_PROJECT_PATH/src/main/resources/
 # if [ -d "$TARGET_DIST/website" ]; then
 #   echo "JAVA端目录存在，即将进行清理..."
 #   rm -r "$TARGET_DIST/website"
