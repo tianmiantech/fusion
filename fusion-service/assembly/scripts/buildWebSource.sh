@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-
+# 打包前端资源到 resource 目录
 
 SCRIPT_PATH=$(dirname "$(readlink -f "$0") ")
 
