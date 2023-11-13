@@ -3,9 +3,10 @@ import routes from './routes';
 const base = 'fusion';
 //OUTPUT_EXTRA：需要将编译后的文件复制到Java后端项目中 ，Java后端项目以website目录来确认是接口还是地址
 const OUTPUT_EXTRA = process.env.OUTPUT_EXTRA||''
+const PUBLIC_PATH = process.env.NO_PUBLIC_PATH?'':`/${base}/`
 export default defineConfig({
     outputPath: `./dist/${base}/${OUTPUT_EXTRA}`,
-    publicPath: `/${base}/`,
+    publicPath: PUBLIC_PATH,
     hash: true,
     extraBabelPlugins:[
       [
