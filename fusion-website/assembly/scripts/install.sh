@@ -18,10 +18,11 @@ echo ">> 安装依赖"
 npm install --legacy-peer-deps --verbose
 
 echo ">> 安装依赖完成"
-
+export WEB_BASE_PATH="$1"
 echo ">>  编译"
 if [ "$0" = "$BASH_SOURCE" ]; then
-    echo ">>  判断JAVA后端打包，执行本地编译中..."
+    echo "WEB_BASE_PATH:$WEB_BASE_PATH"
+    echo ">>  当前环境为JAVA后端打包，执行本地编译中..."
     npm run build:local
 else
     npm run build

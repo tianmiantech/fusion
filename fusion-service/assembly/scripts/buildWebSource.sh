@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-
+# 打包前端资源到 resource 目录
 
 SCRIPT_PATH=$(dirname "$(readlink -f "$0") ")
 
@@ -23,11 +23,14 @@ echo "编译文件所在的目录：$WEB_PROJECT_PATH"
 #   rm -r "$WBE_OLD_DIST"
 # fi
 
-bash $WEB_SCRIPT_PATH/buildLocal.sh
+#java中访问资源的路径默认为根目录，此处需要根据访问路径定义资源
+WEB_PROJECT_CODE=$(echo $JAVA_PROJECT_PATH | cut -d'/' -f3)
+
+bash $WEB_SCRIPT_PATH/buildLocal.sh "/$WEB_PROJECT_CODE/website/"
 
 echo " =======  Web编译执行完毕 ======"
 
-# TARGET_DIST=$JAVA_PROJECT_PATH/src/main/resources/
+TARGET_DIST=$JAVA_PROJECT_PATH/src/main/resources/
 # if [ -d "$TARGET_DIST/website" ]; then
 #   echo "JAVA端目录存在，即将进行清理..."
 #   rm -r "$TARGET_DIST/website"

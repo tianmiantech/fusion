@@ -18,7 +18,9 @@ workdir=$(pwd)
 cd "$workdir"
 
 echo `date "+%Y-%m-%d %H:%M:%S    开始构建前端资源"`
-bash ./buildWebSource.sh
+CURRENT_SCRIPT_PATH=$(dirname "$(readlink -f "$0") ")
+echo "当前脚本所在的目录为：$CURRENT_SCRIPT_PATH "
+bash $CURRENT_SCRIPT_PATH/buildWebSource.sh
 
 echo `date "+%Y-%m-%d %H:%M:%S    开始打包"`
 # mvn -T 1C clean install -DskipTests=true -am -pl fusion-service
