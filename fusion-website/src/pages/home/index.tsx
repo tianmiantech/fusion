@@ -10,7 +10,7 @@ const Index = ()=>{
     const [hasTask,setHasTask] = useState(localStorage.getItem('hasTask'))
     const renderBtn = ()=>{
         return <Button type="primary" onClick={()=>{
-            history.push('task')
+            history.push('/task')
         }}>发起任务</Button>
     }
 
