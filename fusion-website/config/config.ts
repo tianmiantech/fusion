@@ -1,6 +1,6 @@
 import { defineConfig } from 'umi';
 import routes from './routes';
-const base = 'terry/test';
+const base = 'fusion';
 //OUTPUT_EXTRA：需要将编译后的文件复制到Java后端项目中 ，Java后端项目以website目录来确认是接口还是地址
 const OUTPUT_EXTRA = process.env.OUTPUT_EXTRA||''
 const BASE_PATH = process.env.BASE_PATH?`${process.env.BASE_PATH}`:`/${base}/`
