@@ -16,14 +16,15 @@
 package com.welab.fusion.core.Job.action;
 
 import com.welab.fusion.core.Job.FusionJob;
+import com.welab.fusion.core.Job.FusionJobRole;
 import com.welab.fusion.core.Job.JobPhase;
 import com.welab.fusion.core.bloom_filter.PsiBloomFilter;
-import com.welab.fusion.core.function.GlobalFunctions;
+import com.welab.fusion.core.function.DownloadPsiBloomFilterFunction;
+import com.welab.fusion.core.io.FileSystem;
 import com.welab.wefe.common.file.decompression.SuperDecompressor;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 /**
  * @author zane.luo
@@ -36,15 +37,17 @@ public class DownloadPsiBloomFilterAction extends AbstractJobPhaseAction {
 
     @Override
     protected boolean skipThisAction() {
-        return false;
+        return job.getMyJobRole() == FusionJobRole.psi_bool_filter_provider;
     }
 
     @Override
     protected void doAction() throws Exception {
+        DownloadPsiBloomFilterFunction function = job.getJobFunctions().downloadPsiBloomFilterFunction;
+
         // 从合作方下载过滤器
-        File file = GlobalFunctions.downloadPsiBloomFilterFunction.download(
+        File file = function.download(
                 job.getPartner().memberId,
-                job.getJobId(),
+                job.getPartner().dataResourceInfo.id,
                 size -> {
                     phaseProgress.updateTotalWorkload(size);
                 },
@@ -53,7 +56,7 @@ public class DownloadPsiBloomFilterAction extends AbstractJobPhaseAction {
                 });
 
         // file 解压至 dir
-        Path dir = Paths.get("");
+        Path dir = FileSystem.PsiBloomFilter.getPath(job.getPartner().memberId + "-" + job.getPartner().dataResourceInfo.id);
         SuperDecompressor.decompression(file, dir.toAbsolutePath().toString(), false);
 
         // 加载过滤器

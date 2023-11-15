@@ -19,12 +19,17 @@ import cn.hutool.core.thread.NamedThreadFactory;
 import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.StrUtil;
 import com.welab.fusion.core.Job.action.AbstractJobPhaseAction;
-import com.welab.fusion.core.Job.action.FusionJobRole;
 import com.welab.fusion.core.Job.action.JobPhaseActionCreator;
 import com.welab.fusion.core.data_resource.base.DataResourceType;
+import com.welab.fusion.core.function.JobFunctions;
+import com.welab.wefe.common.util.CloseableUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.Closeable;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
@@ -35,7 +40,7 @@ import java.util.concurrent.TimeUnit;
  * @author zane.luo
  * @date 2023/11/10
  */
-public class FusionJob {
+public class FusionJob implements Closeable {
     protected final Logger LOG = LoggerFactory.getLogger(this.getClass());
 
     private String jobId;
@@ -43,65 +48,111 @@ public class FusionJob {
     private JobMember partner;
     private JobProgress myProgress = new JobProgress();
     private FusionJobRole jobRole;
-    private ThreadPoolExecutor singleThreadExecutor;
+    private ThreadPoolExecutor actionSingleThreadExecutor;
+    private ThreadPoolExecutor scheduleSingleThreadExecutor;
+    private JobFunctions jobFunctions;
+    private FusionResult fusionResult;
+    /**
+     * 已执行的阶段
+     */
+    private final Set<JobPhase> executedPhases = new HashSet<>();
 
-    public FusionJob(String jobId, JobMember myself, JobMember partner) {
+    public FusionJob(String jobId, JobMember myself, JobMember partner, JobFunctions jobFunctions) {
+        jobFunctions.check();
+
         this.jobId = StrUtil.isEmpty(jobId) ? UUID.randomUUID().toString().replace("-", "") : jobId;
         this.myself = myself;
         this.partner = partner;
+        this.jobFunctions = jobFunctions;
 
-        myProgress.init(jobId, myself);
+        this.fusionResult = FusionResult.of(jobId);
 
-        singleThreadExecutor = createSingleThreadPoll();
-    }
-
-    public void fusion() throws Exception {
-        checkBeforeFusion();
-        startKeeper();
+        this.actionSingleThreadExecutor = createSingleThreadPoll("job-" + jobId + "-action-executor");
+        this.scheduleSingleThreadExecutor = createSingleThreadPoll("job-" + jobId + "-schedule");
     }
 
     /**
-     * 启动监工线程
-     * 监工线程负责调度
+     * 此方法会执行一些事前检查后进入异步执行
+     * 使用异步线程调度任务，使其按顺序执行各阶段动作，并在必要时结束任务。
+     */
+    public void start() throws Exception {
+        checkBeforeFusion();
+        startSchedule();
+    }
+
+    /**
+     * 启动调度线程
+     * 调度线程负责调度
      *
      * 这里采取观察者模式，各方根据观察到的信息调度自己的任务。
      * 不对其它方的任务进行主动通知。
      */
-    private void startKeeper() {
+    private void startSchedule() {
         LOG.info("启动监工线程，开始任务。");
-        while (true) {
-            if (myProgress.getCurrentPhaseStatus().isFinished()) {
-                break;
-            }
+        scheduleSingleThreadExecutor.submit(() -> {
+            try {
+                // 开始执行第一阶段任务
+                gotoAction(JobPhase.firstPhase());
 
-            JobProgress partnerProgress = getPartnerProgress();
-            // 失联，任务中止。
-            if (partnerProgress == null) {
-                finishJobByDisconnection();
-                break;
-            }
+                while (true) {
+                    if (myProgress.getJobStatus().isFinished()) {
+                        break;
+                    }
 
-            // 如果对方已失败，则我方跟随失败。
-            if (partnerProgress.getCurrentPhaseStatus().isFailed()) {
-                finishJobFollowFailed(partnerProgress);
-                break;
-            }
+                    // 执行调度
+                    schedule();
 
-            // 双方都已完成，任务结束。
-            if (myProgress.getCurrentPhase().isLastPhase() && partnerProgress.getCurrentPhase().isLastPhase()) {
-                if (myProgress.getCurrentPhaseStatus().isSuccess() && partnerProgress.getCurrentPhaseStatus().isSuccess()) {
-                    finishJobBySuccess();
-                    break;
+                    // 这里二次判断是为了快速跳出，少等待一次。
+                    if (myProgress.getJobStatus().isFinished()) {
+                        break;
+                    }
+
+                    // 考虑到要获取合作方的进度需要远程调用，这里不要太频繁。
+                    ThreadUtil.safeSleep(5_000);
                 }
+            } catch (Exception e) {
+                LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);
+                finishJobOnException(e);
+            } finally {
+                CloseableUtils.closeQuietly(this);
             }
+        });
+        scheduleSingleThreadExecutor.shutdown();
+    }
 
-            // 进入下一个阶段。
-            if (needGotoNextPhase(partnerProgress)) {
-                gotoAction(myProgress.getCurrentPhase().next());
+    /**
+     * 观察，并调度任务。
+     */
+    private void schedule() throws Exception {
+        JobProgress partnerProgress = getPartnerProgress();
+        // 失联，任务中止。
+        if (partnerProgress == null) {
+            finishJobByDisconnection();
+            return;
+        }
+
+        // 还没有任何进度，跳过。
+        if (partnerProgress.isEmpty()) {
+            return;
+        }
+
+        // 如果对方已失败，则我方跟随失败。
+        if (partnerProgress.getJobStatus().isFailed()) {
+            finishJobFollowFailed(partnerProgress);
+            return;
+        }
+
+        // 双方都已完成，任务结束。
+        if (myProgress.getCurrentPhase().isLastPhase() && partnerProgress.getCurrentPhase().isLastPhase()) {
+            if (myProgress.getJobStatus().isSuccess() && partnerProgress.getJobStatus().isSuccess()) {
+                finishJobBySuccess();
+                return;
             }
+        }
 
-            // 考虑到要获取合作方的进度需要远程调用，这里不要太频繁。
-            ThreadUtil.safeSleep(5_000);
+        // 进入下一个阶段。
+        if (needGotoNextPhase(partnerProgress)) {
+            gotoAction(myProgress.getCurrentPhase().next());
         }
     }
 
@@ -176,18 +227,22 @@ public class FusionJob {
     /**
      * 获取合作伙伴的任务进度
      */
-    private JobProgress getPartnerProgress() {
-        return null;
+    private JobProgress getPartnerProgress() throws Exception {
+        return jobFunctions.getPartnerProgressFunction.get();
     }
 
     /**
      * 由调度器调用，进入指定阶段。
      */
-    private void gotoAction(JobPhase phase) {
-        AbstractJobPhaseAction action = JobPhaseActionCreator.create(phase, this);
+    private synchronized void gotoAction(JobPhase phase) {
+        if (executedPhases.contains(phase)) {
+            throw new RuntimeException("阶段已执行过，不能重复执行。");
+        }
+        executedPhases.add(phase);
 
         // 异步执行当前阶段动作
-        singleThreadExecutor.submit(() -> {
+        AbstractJobPhaseAction action = JobPhaseActionCreator.create(phase, this);
+        actionSingleThreadExecutor.submit(() -> {
             action.run();
         });
     }
@@ -198,8 +253,8 @@ public class FusionJob {
         }
     }
 
-    private ThreadPoolExecutor createSingleThreadPoll() {
-        ThreadFactory threadFactory = new NamedThreadFactory("job-" + jobId, false);
+    private ThreadPoolExecutor createSingleThreadPoll(String prefix) {
+        ThreadFactory threadFactory = new NamedThreadFactory(prefix, false);
         return new ThreadPoolExecutor(
                 1,
                 1,
@@ -208,6 +263,36 @@ public class FusionJob {
                 new LinkedBlockingQueue<Runnable>(),
                 threadFactory
         );
+    }
+
+    /**
+     * 等待任务结束
+     */
+    public void waitFinish() {
+        while (!isFinished()) {
+            ThreadUtil.safeSleep(1000);
+        }
+    }
+
+    /**
+     * 任务是否已结束
+     */
+    public boolean isFinished() {
+        if (myProgress.isEmpty()) {
+            return false;
+        }
+        return myProgress.getJobStatus().isFinished();
+    }
+
+
+    @Override
+    public void close() throws IOException {
+        scheduleSingleThreadExecutor.shutdownNow();
+        actionSingleThreadExecutor.shutdownNow();
+
+        if (myself.tableDataResourceReader != null) {
+            myself.tableDataResourceReader.close();
+        }
     }
 
     // region getter/setter
@@ -224,7 +309,7 @@ public class FusionJob {
         this.jobRole = jobRole;
     }
 
-    public FusionJobRole getJobRole() {
+    public FusionJobRole getMyJobRole() {
         return jobRole;
     }
 
@@ -234,6 +319,14 @@ public class FusionJob {
 
     public String getJobId() {
         return jobId;
+    }
+
+    public JobFunctions getJobFunctions() {
+        return jobFunctions;
+    }
+
+    public FusionResult getJobResult() {
+        return fusionResult;
     }
 
     // endregion

@@ -13,38 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.welab.fusion.core.Job.action;
+package com.welab.fusion.core.function;
 
-import com.welab.fusion.core.Job.FusionJob;
-import com.welab.fusion.core.Job.JobPhase;
+import com.welab.fusion.core.Job.FusionResult;
 
 /**
  * @author zane.luo
- * @date 2023/11/13
+ * @date 2023/11/15
  */
-
-public class AppendExtendedFieldToResultAction extends AbstractJobPhaseAction{
-    public AppendExtendedFieldToResultAction(FusionJob job) {
-        super(job);
-    }
-
-    @Override
-    protected void doAction() throws Exception {
-
-    }
-
-    @Override
-    public JobPhase getPhase() {
-        return null;
-    }
-
-    @Override
-    public long getTotalWorkload() {
-        return 0;
-    }
-
-    @Override
-    protected boolean skipThisAction() {
-        return false;
-    }
+@FunctionalInterface
+public interface SaveFusionResultFunction {
+    void save(FusionResult result);
 }

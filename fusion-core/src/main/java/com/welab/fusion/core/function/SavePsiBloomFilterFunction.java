@@ -15,11 +15,17 @@
  */
 package com.welab.fusion.core.function;
 
+import com.welab.fusion.core.bloom_filter.PsiBloomFilter;
+import com.welab.wefe.common.exception.StatusCodeWithException;
+
 /**
  * @author zane.luo
  * @date 2023/11/13
  */
-public class GlobalFunctions {
-    public static AddPsiBloomFilterFunction addPsiBloomFilterFunction;
-    public static DownloadPsiBloomFilterFunction downloadPsiBloomFilterFunction;
+@FunctionalInterface
+public interface SavePsiBloomFilterFunction {
+    /**
+     * 保存一个新的 PSI 过滤器
+     */
+    void save(PsiBloomFilter psiBloomFilter) throws StatusCodeWithException;
 }

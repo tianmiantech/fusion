@@ -13,19 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.welab.fusion.core.Job.action;
+package com.welab.fusion.core.test.function;
+
+import com.welab.fusion.core.bloom_filter.PsiBloomFilter;
+import com.welab.fusion.core.function.SavePsiBloomFilterFunction;
+import com.welab.fusion.core.io.FileSystem;
+
+import java.nio.file.Path;
 
 /**
  * @author zane.luo
- * @date 2023/11/13
+ * @date 2023/11/15
  */
-public enum FusionJobRole {
-    /**
-     * PSI 过滤器
-     */
-    psi_bool_filter,
-    /**
-     * 数据集
-     */
-    table_data_resource;
+public class SavePsiBloomFilterFunctionImpl implements SavePsiBloomFilterFunction {
+    @Override
+    public void save(PsiBloomFilter psiBloomFilter) {
+        Path dir = FileSystem.PsiBloomFilter.getPath(psiBloomFilter.id);
+        psiBloomFilter.sink(dir);
+    }
 }

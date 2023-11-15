@@ -25,18 +25,6 @@ import java.util.List;
 public class JobProgress {
     public List<JobPhaseProgress> jobPhaseProgressList = new ArrayList<>();
 
-    /**
-     * 初始化，填充初始阶段的进度。
-     */
-    public void init(String jobId, JobMember myself) {
-        JobPhaseProgress phaseProgress = JobPhaseProgress.of(
-                jobId,
-                JobPhase.firstPhase(),
-                myself.dataResourceInfo.dataCount
-        );
-        jobPhaseProgressList.add(phaseProgress);
-    }
-
     public void addPhaseProgress(JobPhaseProgress phaseProgress) {
         jobPhaseProgressList.add(phaseProgress);
     }
@@ -49,9 +37,36 @@ public class JobProgress {
     }
 
     /**
-     * 获取当前阶段的状态
+     * 获取整个任务的状态
+     */
+    public JobStatus getJobStatus() {
+        if (isEmpty()) {
+            return JobStatus.wait_run;
+        }
+
+        JobPhaseProgress currentPhaseProgress = getCurrentPhaseProgress();
+        // 如果已经失败，整个任务失败
+        if (currentPhaseProgress.getStatus().isFailed()) {
+            return currentPhaseProgress.getStatus();
+        }
+
+        // 如果已经到最后一个阶段，且已成功，则整个任务成功。
+        if (currentPhaseProgress.getJobPhase().isLastPhase() && currentPhaseProgress.getStatus().isSuccess()) {
+            return JobStatus.success;
+        }
+
+        // 其它情况都判定为运行中
+        return JobStatus.running;
+    }
+
+    /**
+     * 获取当前进度的状态
      */
     public JobStatus getCurrentPhaseStatus() {
+        if (jobPhaseProgressList.isEmpty()) {
+            return JobStatus.wait_run;
+        }
+
         return getCurrentPhaseProgress().getStatus();
     }
 
@@ -59,6 +74,9 @@ public class JobProgress {
      * 获取当前阶段的进度
      */
     public JobPhaseProgress getCurrentPhaseProgress() {
+        if (jobPhaseProgressList.isEmpty()) {
+            return null;
+        }
         return jobPhaseProgressList.get(jobPhaseProgressList.size() - 1);
     }
 
@@ -74,5 +92,16 @@ public class JobProgress {
      */
     public void finish(JobStatus status, String message) {
         getCurrentPhaseProgress().finish(status, message);
+    }
+
+    /**
+     * 打印进度信息到控制台
+     */
+    public void print() {
+        System.out.println(getCurrentPhase().name() + "(" + getCurrentPhaseStatus() + "):" + getMessage());
+    }
+
+    public boolean isEmpty() {
+        return jobPhaseProgressList.isEmpty();
     }
 }

@@ -15,16 +15,22 @@
  */
 package com.welab.fusion.core.function;
 
-import com.welab.fusion.core.bloom_filter.PsiBloomFilter;
+import java.util.List;
 
 /**
  * @author zane.luo
- * @date 2023/11/13
+ * @date 2023/11/14
  */
 @FunctionalInterface
-public interface AddPsiBloomFilterFunction {
+public interface EncryptPsiRecordsFunction {
     /**
-     * 保存一个新的 PSI 过滤器
+     * 加密数据
+     *
+     * @param memberId         合作方id
+     * @param psiBloomFilterId 过滤器id
+     * @param bucket           待加密的数据
+     * @return 加密后的数据
      */
-    void save(PsiBloomFilter psiBloomFilter);
+    List<String> encrypt(String memberId, String psiBloomFilterId, List<String> bucket) throws Exception;
+
 }

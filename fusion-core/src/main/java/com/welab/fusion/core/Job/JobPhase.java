@@ -42,13 +42,9 @@ public enum JobPhase {
      */
     Intersection(3),
     /**
-     * 拼接扩展字段到求交结果
-     */
-    AppendExtendedFieldToResult(4),
-    /**
      * 下载结果
      */
-    DownloadResult(5);
+    DownloadResult(4);
     private static final List<JobPhase> sortedList;
 
     static {
@@ -84,7 +80,7 @@ public enum JobPhase {
      * 获取第一个阶段
      */
     public static JobPhase firstPhase() {
-        return JobPhase.CreatePsiBloomFilter;
+        return sortedList.get(0);
     }
 
     public int index() {

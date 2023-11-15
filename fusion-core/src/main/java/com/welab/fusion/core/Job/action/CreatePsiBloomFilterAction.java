@@ -16,12 +16,12 @@
 package com.welab.fusion.core.Job.action;
 
 import com.welab.fusion.core.Job.FusionJob;
+import com.welab.fusion.core.Job.FusionJobRole;
 import com.welab.fusion.core.Job.JobPhase;
 import com.welab.fusion.core.bloom_filter.PsiBloomFilter;
 import com.welab.fusion.core.bloom_filter.PsiBloomFilterCreator;
 import com.welab.fusion.core.data_resource.base.DataResourceType;
 import com.welab.fusion.core.data_source.AbstractTableDataSourceReader;
-import com.welab.fusion.core.function.GlobalFunctions;
 import com.welab.fusion.core.hash.HashConfig;
 
 import java.util.List;
@@ -39,6 +39,8 @@ public class CreatePsiBloomFilterAction extends AbstractJobPhaseAction {
         // 生成过滤器
         try (PsiBloomFilterCreator creator = new PsiBloomFilterCreator(reader, hashConfigList)) {
             PsiBloomFilter psiBloomFilter = creator.create(
+                    // 这里使用数据源的 Id 作为生成后的过滤器 Id。
+                    job.getMyself().dataResourceInfo.id,
                     // 更新进度
                     index -> {
                         phaseProgress.updateCompletedWorkload(index);
@@ -49,9 +51,7 @@ public class CreatePsiBloomFilterAction extends AbstractJobPhaseAction {
             job.getMyself().psiBloomFilter = psiBloomFilter;
 
             // 保存过滤器
-            if (GlobalFunctions.addPsiBloomFilterFunction != null) {
-                GlobalFunctions.addPsiBloomFilterFunction.save(psiBloomFilter);
-            }
+            job.getJobFunctions().savePsiBloomFilterFunction.save(psiBloomFilter);
         }
 
 
@@ -74,7 +74,7 @@ public class CreatePsiBloomFilterAction extends AbstractJobPhaseAction {
     @Override
     protected boolean skipThisAction() {
         // 仅在我方提供的是数据集，但需要以过滤器身份执行时，才需要创建过滤器。
-        boolean needCreate = job.getJobRole() == FusionJobRole.psi_bool_filter
+        boolean needCreate = job.getMyJobRole() == FusionJobRole.psi_bool_filter_provider
                 && job.getMyself().dataResourceInfo.dataResourceType == DataResourceType.TableDataSource;
 
         return !needCreate;

@@ -31,6 +31,30 @@ import java.util.zip.ZipOutputStream;
  * @date 2021/12/8
  */
 public class Zip extends AbstractCompression {
+
+    /**
+     * 将多个文件压缩到一个zip文件中
+     */
+    public static void to(File destFile, File... srcFiles) throws IOException {
+        try (
+                FileOutputStream fileOutputStream = new FileOutputStream(destFile);
+                ZipOutputStream zipOutputStream = new ZipOutputStream(fileOutputStream);
+        ) {
+            for (File srcFile : srcFiles) {
+                try (FileInputStream fis = new FileInputStream(srcFile)) {
+                    ZipEntry zipEntry = new ZipEntry(srcFile.getName());
+                    zipOutputStream.putNextEntry(zipEntry);
+                    byte[] bytes = new byte[1024];
+                    int length;
+                    while ((length = fis.read(bytes)) >= 0) {
+                        zipOutputStream.write(bytes, 0, length);
+                    }
+                }
+
+            }
+        }
+    }
+
     @Override
     protected void doCompression(Path srcDir, String destFileName) throws IOException {
 
@@ -56,7 +80,7 @@ public class Zip extends AbstractCompression {
             }
             zipOutputStream.putNextEntry(new ZipEntry(entryName));
             zipOutputStream.closeEntry();
-            //遍历文件夹子目录，进行递归的zipFile
+            // 遍历文件夹子目录，进行递归的zipFile
             File[] children = srcFile.listFiles();
             for (File childFile : children) {
                 zipFile(childFile, entryName + childFile.getName(), zipOutputStream);

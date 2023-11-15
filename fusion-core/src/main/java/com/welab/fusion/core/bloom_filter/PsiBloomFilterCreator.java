@@ -24,6 +24,7 @@ import com.google.common.hash.Funnels;
 import com.welab.fusion.core.data_source.AbstractTableDataSourceReader;
 import com.welab.fusion.core.data_source.CsvTableDataSourceReader;
 import com.welab.fusion.core.hash.HashConfig;
+import com.welab.fusion.core.hash.HashConfigUtil;
 import com.welab.fusion.core.hash.HashMethod;
 import com.welab.wefe.common.crypto.Rsa;
 import com.welab.wefe.common.exception.StatusCodeWithException;
@@ -46,7 +47,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.LongAdder;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 /**
  * 生成用于 PSI（Private Set Intersection） 的布隆过滤器
@@ -56,6 +56,10 @@ import java.util.stream.Collectors;
  */
 public class PsiBloomFilterCreator implements Closeable {
     protected final Logger LOG = LoggerFactory.getLogger(this.getClass());
+    /**
+     * 最小的预估数据量
+     */
+    public static int MIN_EXPECTED_INSERTIONS = 100_000_000;
     private AbstractTableDataSourceReader dataSourceReader;
     public List<HashConfig> hashConfigs;
     private RsaPsiParam rsaPsiParam;
@@ -103,7 +107,7 @@ public class PsiBloomFilterCreator implements Closeable {
          * 由于我们的场景大多是用户的手机号、身份证号等，这些数据的总量大约是十亿。
          * 综合考虑，这个预估值设定最小为一亿。
          */
-        int minCount = 100_000_000;
+        int minCount = MIN_EXPECTED_INSERTIONS;
         int maxCount = Integer.MAX_VALUE;
         long count = dataSourceReader.getTotalDataRowCount();
 
@@ -120,8 +124,8 @@ public class PsiBloomFilterCreator implements Closeable {
         );
     }
 
-    public PsiBloomFilter create() throws StatusCodeWithException {
-        return create(null);
+    public PsiBloomFilter create(String id) throws StatusCodeWithException {
+        return create(id, null);
     }
 
     /**
@@ -129,7 +133,7 @@ public class PsiBloomFilterCreator implements Closeable {
      *
      * @param progressConsumer 进度回调
      */
-    public PsiBloomFilter create(Consumer<Long> progressConsumer) throws StatusCodeWithException {
+    public PsiBloomFilter create(String id, Consumer<Long> progressConsumer) throws StatusCodeWithException {
         final long start = System.currentTimeMillis();
         LongAdder insertedElementCount = new LongAdder();
         dataSourceReader.readAll(new BiConsumer<Long, LinkedHashMap<String, Object>>() {
@@ -142,9 +146,7 @@ public class PsiBloomFilterCreator implements Closeable {
                 }
 
                 // 这一句如果放在异步线程会导致性能大幅下降，原因不详。
-                String key = hashConfigs.stream()
-                        .map(x -> x.hash(row))
-                        .collect(Collectors.joining());
+                String key = HashConfigUtil.hash(hashConfigs, row);
 
                 try {
                     CompletableFuture.runAsync(
@@ -172,9 +174,9 @@ public class PsiBloomFilterCreator implements Closeable {
         }
 
         long spend = System.currentTimeMillis() - start;
-        System.out.println(spend + "ms");
 
         return PsiBloomFilter.of(
+                id,
                 hashConfigs,
                 rsaPsiParam,
                 insertedElementCount.longValue(),
@@ -212,7 +214,7 @@ public class PsiBloomFilterCreator implements Closeable {
     /**
      * 测试
      */
-    public static void main(String[] args) throws IOException, StatusCodeWithException {
+    public static void main(String[] args) throws Exception {
         // File file = new File("D:\\data\\wefe\\ivenn_10w_20210319_vert_promoter.csv");
         File file = new File("D:\\data\\wefe\\3x100000000rows-miss0-auto_increment.csv");
         CsvTableDataSourceReader reader = new CsvTableDataSourceReader(file);
@@ -223,7 +225,7 @@ public class PsiBloomFilterCreator implements Closeable {
 
         // 生成过滤器
         try (PsiBloomFilterCreator creator = new PsiBloomFilterCreator(reader, hashConfigs)) {
-            PsiBloomFilter psiBloomFilter = creator.create();
+            PsiBloomFilter psiBloomFilter = creator.create("test");
             psiBloomFilter.sink(dir);
         }
 

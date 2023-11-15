@@ -16,6 +16,7 @@
 package com.welab.fusion.core.Job.action;
 
 import com.welab.fusion.core.Job.FusionJob;
+import com.welab.fusion.core.Job.FusionJobRole;
 import com.welab.fusion.core.Job.JobMember;
 import com.welab.fusion.core.Job.JobPhase;
 import com.welab.fusion.core.data_resource.base.DataResourceInfo;
@@ -104,14 +105,14 @@ public class ConfirmMemberRoleAction extends AbstractJobPhaseAction {
             }
 
             return myHash > partnerHash
-                    ? FusionJobRole.psi_bool_filter
-                    : FusionJobRole.table_data_resource;
+                    ? FusionJobRole.psi_bool_filter_provider
+                    : FusionJobRole.table_data_resource_provider;
         }
 
         // 双方数据量不同，数据量大的生成过滤器。
         return myDataResourceInfo.dataCount > partnerDataResourceInfo.dataCount
-                ? FusionJobRole.psi_bool_filter
-                : FusionJobRole.table_data_resource;
+                ? FusionJobRole.psi_bool_filter_provider
+                : FusionJobRole.table_data_resource_provider;
     }
 
     /**
@@ -120,10 +121,10 @@ public class ConfirmMemberRoleAction extends AbstractJobPhaseAction {
     private FusionJobRole consultMyRoleWhenNotEqualType() {
         switch (job.getMyself().dataResourceInfo.dataResourceType) {
             case PsiBloomFilter:
-                return FusionJobRole.psi_bool_filter;
+                return FusionJobRole.psi_bool_filter_provider;
 
             case TableDataSource:
-                return FusionJobRole.table_data_resource;
+                return FusionJobRole.table_data_resource_provider;
             default:
                 throw new RuntimeException("意料之外的情形");
         }

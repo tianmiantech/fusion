@@ -15,22 +15,13 @@
  */
 package com.welab.fusion.core.function;
 
-import java.io.File;
-import java.util.function.Consumer;
+import com.welab.fusion.core.Job.JobProgress;
 
 /**
  * @author zane.luo
- * @date 2023/11/13
+ * @date 2023/11/15
  */
-public interface DownloadPsiBloomFilterFunction {
-    /**
-     * 从合作方下载过滤器
-     *
-     * @param memberId             合作方id
-     * @param psiBloomFilterId     过滤器id
-     * @param totalSizeConsumer    用于更新总大小的消费者
-     * @param downloadSizeConsumer 用于更新已下载大小的消费者
-     * @return 下载的文件
-     */
-    File download(String memberId, String psiBloomFilterId, Consumer<Long> totalSizeConsumer, Consumer<Long> downloadSizeConsumer) throws Exception;
+@FunctionalInterface
+public interface GetPartnerProgressFunction {
+    JobProgress get() throws Exception;
 }

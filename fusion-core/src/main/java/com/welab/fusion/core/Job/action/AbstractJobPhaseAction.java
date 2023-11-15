@@ -59,6 +59,9 @@ public abstract class AbstractJobPhaseAction {
      * 由于此方法运行于异步线程中，所以需要自行捕获异常。
      */
     public void run() {
+        LOG.info("start phase: {}", getPhase());
+        long start = System.currentTimeMillis();
+
         JobStatus status = JobStatus.success;
         String message = "success";
 
@@ -88,6 +91,8 @@ public abstract class AbstractJobPhaseAction {
             job.finishJobOnException(e);
         } finally {
             phaseProgress.finish(status, message);
+            long spend = System.currentTimeMillis() - start;
+            LOG.info("finished phase: {} spend: {}ms", getPhase(), spend);
         }
 
     }

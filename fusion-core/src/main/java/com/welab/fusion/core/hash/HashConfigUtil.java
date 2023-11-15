@@ -13,24 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.welab.fusion.core.function;
+package com.welab.fusion.core.hash;
 
-import java.io.File;
-import java.util.function.Consumer;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author zane.luo
- * @date 2023/11/13
+ * @date 2023/11/14
  */
-public interface DownloadPsiBloomFilterFunction {
-    /**
-     * 从合作方下载过滤器
-     *
-     * @param memberId             合作方id
-     * @param psiBloomFilterId     过滤器id
-     * @param totalSizeConsumer    用于更新总大小的消费者
-     * @param downloadSizeConsumer 用于更新已下载大小的消费者
-     * @return 下载的文件
-     */
-    File download(String memberId, String psiBloomFilterId, Consumer<Long> totalSizeConsumer, Consumer<Long> downloadSizeConsumer) throws Exception;
+public class HashConfigUtil {
+    public static String hash(List<HashConfig> configs, LinkedHashMap<String, Object> row) {
+        return configs.stream()
+                .map(x -> x.hash(row))
+                .collect(Collectors.joining());
+    }
 }

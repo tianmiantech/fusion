@@ -13,24 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.welab.fusion.core.function;
+package com.welab.fusion.core.test.function;
+
+import com.welab.fusion.core.bloom_filter.PsiBloomFilter;
+import com.welab.fusion.core.function.DownloadPsiBloomFilterFunction;
+import com.welab.fusion.core.io.FileSystem;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.function.Consumer;
 
 /**
  * @author zane.luo
- * @date 2023/11/13
+ * @date 2023/11/15
  */
-public interface DownloadPsiBloomFilterFunction {
-    /**
-     * 从合作方下载过滤器
-     *
-     * @param memberId             合作方id
-     * @param psiBloomFilterId     过滤器id
-     * @param totalSizeConsumer    用于更新总大小的消费者
-     * @param downloadSizeConsumer 用于更新已下载大小的消费者
-     * @return 下载的文件
-     */
-    File download(String memberId, String psiBloomFilterId, Consumer<Long> totalSizeConsumer, Consumer<Long> downloadSizeConsumer) throws Exception;
+public class DownloadPsiBloomFilterFunctionImpl implements DownloadPsiBloomFilterFunction {
+    @Override
+    public File download(String memberId, String psiBloomFilterId, Consumer<Long> totalSizeConsumer, Consumer<Long> downloadSizeConsumer) throws Exception {
+        Path dir = FileSystem.PsiBloomFilter.getPath(psiBloomFilterId);
+        PsiBloomFilter psiBloomFilter = PsiBloomFilter.of(dir);
+
+        return psiBloomFilter.zip();
+    }
 }

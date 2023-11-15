@@ -29,12 +29,13 @@ public class DownloadResultAction extends AbstractJobPhaseAction {
 
     @Override
     protected void doAction() throws Exception {
-
+        // 储存结果
+        job.getJobFunctions().saveFusionResultFunction.save(job.getJobResult());
     }
 
     @Override
     public JobPhase getPhase() {
-        return null;
+        return JobPhase.DownloadResult;
     }
 
     @Override
@@ -42,6 +43,9 @@ public class DownloadResultAction extends AbstractJobPhaseAction {
         return 0;
     }
 
+    /**
+     * 所有角色都需要下载结果
+     */
     @Override
     protected boolean skipThisAction() {
         return false;

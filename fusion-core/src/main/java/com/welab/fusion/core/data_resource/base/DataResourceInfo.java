@@ -23,9 +23,20 @@ import java.util.List;
  * @author zane.luo
  * @date 2023/11/10
  */
-public abstract class DataResourceInfo {
+public class DataResourceInfo {
+    public String id;
     public String name;
     public long dataCount;
     public DataResourceType dataResourceType;
     public List<HashConfig> hashConfigList;
+
+    public static DataResourceInfo of(String id,String name,long dataCount,DataResourceType dataResourceType,List<HashConfig> hashConfigList){
+        DataResourceInfo dataResourceInfo = new DataResourceInfo();
+        dataResourceInfo.id = id;
+        dataResourceInfo.name = name;
+        dataResourceInfo.dataCount = dataCount;
+        dataResourceInfo.dataResourceType = dataResourceType;
+        dataResourceInfo.hashConfigList = hashConfigList;
+        return dataResourceInfo;
+    }
 }

@@ -34,4 +34,20 @@ public class JobMember {
 
     @JSONField(serialize = false)
     public PsiBloomFilter psiBloomFilter;
+
+    public static JobMember of(String memberId, String memberName, DataResourceInfo dataResourceInfo) {
+        JobMember jobMember = new JobMember();
+        jobMember.memberId = memberId;
+        jobMember.memberName = memberName;
+        jobMember.dataResourceInfo = dataResourceInfo;
+        return jobMember;
+    }
+
+    public static JobMember of(String memberId, String memberName, PsiBloomFilter psiBloomFilter) {
+        JobMember jobMember = new JobMember();
+        jobMember.memberId = memberId;
+        jobMember.memberName = memberName;
+        jobMember.psiBloomFilter = psiBloomFilter;
+        return jobMember;
+    }
 }

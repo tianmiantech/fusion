@@ -20,6 +20,7 @@ package com.welab.fusion.core.Job;
  * @date 2023/11/10
  */
 public enum JobStatus {
+    wait_run,
     /**
      * 执行中
      */
