@@ -4,7 +4,7 @@
   "scripts": {
     "dev": "max dev",
     "build": "max build",
-    "build:local": "cross-env OUTPUT_EXTRA=website max build",
+    "build:local": "cross-env OUTPUT_EXTRA=website BASE_PATH=$WEB_BASE_PATH max build",
     "postinstall": "max setup",
     "setup": "max setup",
     "start": "npm run dev"
