@@ -20,6 +20,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.welab.fusion.service.database.entity.DataSourceDbModel;
 import com.welab.wefe.common.ModelMapper;
 import com.welab.wefe.common.enums.DatabaseType;
+import com.welab.wefe.common.exception.StatusCodeWithException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,7 +52,7 @@ public class DataSourceOutputModel extends AbstractOutputModel {
     private JSONObject connectorConfig;
 
 
-    public static DataSourceOutputModel of(DataSourceDbModel model) {
+    public static DataSourceOutputModel of(DataSourceDbModel model) throws StatusCodeWithException {
         DataSourceOutputModel output = ModelMapper.map(model, DataSourceOutputModel.class);
         // 根据实体类标注进行脱敏
         output.connectorConfig = model.getJdbcDataSourceClient().getParams().toOutputJson();
