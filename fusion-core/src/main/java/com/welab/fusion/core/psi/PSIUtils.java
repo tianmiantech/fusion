@@ -13,16 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.welab.fusion.core.util;
+package com.welab.fusion.core.psi;
 
 import cn.hutool.core.codec.Base64;
-import com.welab.fusion.core.Job.FusionJobRole;
 import com.welab.fusion.core.bloom_filter.PsiBloomFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,6 +33,31 @@ import java.util.List;
 public class PSIUtils {
     protected static final Logger LOG = LoggerFactory.getLogger(PSIUtils.class);
 
+    /**
+     * 碰撞，返回碰撞的数据。
+     *
+     * @param psiBloomFilter 过滤器对象
+     * @param rawRecords     包含原文的记录
+     * @param encryptedKeys  加密后的 key
+     * @param publicModulus  rsa 公钥模数
+     * @return 交集
+     */
+    public static List<PsiRecord> match(PsiBloomFilter psiBloomFilter, List<PsiRecord> rawRecords, List<String> encryptedKeys, BigInteger publicModulus) {
+        byte[][] ret = new byte[encryptedKeys.size()][];
+        for (int i = 0; i < encryptedKeys.size(); i++) {
+            ret[i] = Base64.decode(encryptedKeys.get(i));
+        }
+
+        List<PsiRecord> fruit = new ArrayList<>();
+        for (int i = 0; i < ret.length; i++) {
+            BigInteger y = PSIUtils.bytesToBigInteger(ret[i], 0, ret[i].length);
+            BigInteger z = y.multiply(rawRecords.get(i).inv).mod(publicModulus);
+            if (psiBloomFilter.contains(z)) {
+                fruit.add(rawRecords.get(i));
+            }
+        }
+        return fruit;
+    }
 
     /**
      * 过滤器方对数据集方发送过来的数据进行加密
@@ -61,6 +86,26 @@ public class PSIUtils {
         }
 
         return result;
+    }
+
+    /**
+     * 生成盲化因子
+     *
+     * @param publicModulus rsa 公钥模数
+     */
+    public static BigInteger generateBlindingFactor(BigInteger publicModulus) {
+        BigInteger zero = BigInteger.valueOf(0);
+        BigInteger one = BigInteger.valueOf(1);
+
+        int length = publicModulus.bitLength() - 1;
+        BigInteger gcd;
+        BigInteger blindFactor = new BigInteger(length, new SecureRandom());
+        do {
+            gcd = blindFactor.gcd(publicModulus);
+        }
+        while (blindFactor.equals(zero) || blindFactor.equals(one) || !gcd.equals(one));
+
+        return blindFactor;
     }
 
     public static BigInteger stringToBigInteger(String s) {

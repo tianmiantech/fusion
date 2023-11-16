@@ -13,85 +13,76 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.welab.fusion.core.Job.action;
+package com.welab.fusion.core.test;
 
 import cn.hutool.core.codec.Base64;
-import com.welab.fusion.core.Job.FusionJob;
-import com.welab.fusion.core.Job.FusionJobRole;
-import com.welab.fusion.core.Job.FusionResult;
-import com.welab.fusion.core.Job.JobPhase;
+import com.welab.fusion.core.bloom_filter.PsiBloomFilter;
+import com.welab.fusion.core.bloom_filter.PsiBloomFilterCreator;
+import com.welab.fusion.core.data_source.CsvTableDataSourceReader;
+import com.welab.fusion.core.hash.HashConfig;
 import com.welab.fusion.core.hash.HashConfigUtil;
+import com.welab.fusion.core.hash.HashMethod;
 import com.welab.fusion.core.psi.PSIUtils;
 import com.welab.fusion.core.psi.PsiRecord;
 import com.welab.wefe.common.BatchConsumer;
 
 import java.io.File;
 import java.math.BigInteger;
-import java.security.SecureRandom;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.LongAdder;
 import java.util.stream.Collectors;
 
 /**
  * @author zane.luo
- * @date 2023/11/13
+ * @date 2023/11/16
  */
-public class IntersectionAction extends AbstractJobPhaseAction {
-    private static final int batchSize = 50000;
-    /**
-     * E
-     */
-    private BigInteger publicExponent;
-    /**
-     * N
-     */
-    private BigInteger publicModulus;
+public class LocalPsiTest {
 
-    public IntersectionAction(FusionJob job) {
-        super(job);
-    }
+    private static List<HashConfig> hashConfigs = Arrays.asList(HashConfig.of(HashMethod.MD5, "id"));
 
-    @Override
-    protected void doAction() throws Exception {
-        publicModulus = job.getPartner().psiBloomFilter.rsaPsiParam.publicModulus;
-        publicExponent = job.getPartner().psiBloomFilter.rsaPsiParam.publicExponent;
+    public static void main(String[] args) throws Exception {
+        String csv = "promoter-569.csv";
+        File file = new File("D:\\data\\wefe\\" + csv);
 
-        FusionResult result = job.getJobResult();
+        PsiBloomFilter psiBloomFilter = createPsiBloomFilter(file);
+
+        CsvTableDataSourceReader reader = new CsvTableDataSourceReader(file);
+        BigInteger publicModulus = psiBloomFilter.rsaPsiParam.publicModulus;
+        BigInteger publicExponent = psiBloomFilter.rsaPsiParam.publicExponent;
+
         LongAdder progress = new LongAdder();
         LongAdder fruitCount = new LongAdder();
         File resultFile = new File("");
 
         // 批处理
-        BatchConsumer<PsiRecord> consumer = new BatchConsumer<>(batchSize, 5_000, records -> {
+        BatchConsumer<PsiRecord> consumer = new BatchConsumer<>(10, 5_000, records -> {
             try {
                 // 将数据发送到过滤器方加密
-                List<String> encryptedList = job.getJobFunctions().encryptPsiRecordsFunction.encrypt(
-                        job.getPartner().memberId,
-                        job.getPartner().dataResourceInfo.id,
+                List<String> encryptedList = PSIUtils.encryptPsiRecords(
+                        psiBloomFilter,
                         records.stream().map(x -> x.encodedKey).collect(Collectors.toList())
                 );
 
-
-                // 碰撞，并获取交集。
                 List<PsiRecord> fruit = PSIUtils.match(
-                        job.getPartner().psiBloomFilter,
+                        psiBloomFilter,
                         records,
                         encryptedList,
                         publicModulus
                 );
 
+
+                System.out.println("fruit size: " + fruit.size());
                 // 更新进度
                 fruitCount.add(fruit.size());
                 progress.add(records.size());
-                phaseProgress.updateCompletedWorkload(progress.longValue());
             } catch (Exception e) {
-                LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);
-                job.finishJobOnException(e);
+                e.printStackTrace();
             }
         });
 
         // 从数据源逐条读取数据集并编码
-        job.getMyself().tableDataResourceReader.readAll((index, row) -> {
+        reader.readAll((index, row) -> {
 
             PsiRecord record = new PsiRecord();
             record.row = row;
@@ -100,7 +91,7 @@ public class IntersectionAction extends AbstractJobPhaseAction {
             BigInteger random = blindFactor.modPow(publicExponent, publicModulus);
             record.inv = blindFactor.modInverse(publicModulus);
 
-            String key = HashConfigUtil.hash(job.getMyself().dataResourceInfo.hashConfigList, row);
+            String key = HashConfigUtil.hash(hashConfigs, row);
             BigInteger h = PSIUtils.stringToBigInteger(key);
             BigInteger x = h.multiply(random).mod(publicModulus);
             byte[] bytes = PSIUtils.bigIntegerToBytes(x);
@@ -111,26 +102,14 @@ public class IntersectionAction extends AbstractJobPhaseAction {
 
         // 等待消费完成
         consumer.waitForFinishAndClose();
-
-        // 包装结果
-        result.finish(resultFile, fruitCount.longValue());
     }
 
+    private static PsiBloomFilter createPsiBloomFilter(File file) throws Exception {
+        CsvTableDataSourceReader reader = new CsvTableDataSourceReader(file);
 
-
-
-    @Override
-    public JobPhase getPhase() {
-        return JobPhase.Intersection;
-    }
-
-    @Override
-    public long getTotalWorkload() {
-        return job.getMyself().tableDataResourceReader.getTotalDataRowCount();
-    }
-
-    @Override
-    protected boolean skipThisAction() {
-        return job.getMyJobRole() == FusionJobRole.psi_bool_filter_provider;
+        // 生成过滤器
+        try (PsiBloomFilterCreator creator = new PsiBloomFilterCreator(reader, hashConfigs)) {
+            return creator.create("test");
+        }
     }
 }

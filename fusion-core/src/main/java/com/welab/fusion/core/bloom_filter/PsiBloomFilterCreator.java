@@ -26,6 +26,7 @@ import com.welab.fusion.core.data_source.CsvTableDataSourceReader;
 import com.welab.fusion.core.hash.HashConfig;
 import com.welab.fusion.core.hash.HashConfigUtil;
 import com.welab.fusion.core.hash.HashMethod;
+import com.welab.fusion.core.psi.PSIUtils;
 import com.welab.wefe.common.crypto.Rsa;
 import com.welab.wefe.common.exception.StatusCodeWithException;
 import org.slf4j.Logger;
@@ -188,7 +189,7 @@ public class PsiBloomFilterCreator implements Closeable {
      * 对主键进行加密
      */
     private BigInteger encrypt(String key) {
-        BigInteger h = Convert.toBigInteger(key);
+        BigInteger h = PSIUtils.stringToBigInteger(key);
 
         BigInteger rp = h.modPow(rsaPsiParam.getEp(), rsaPsiParam.privatePrimeP);
         BigInteger rq = h.modPow(rsaPsiParam.getEq(), rsaPsiParam.privatePrimeQ);

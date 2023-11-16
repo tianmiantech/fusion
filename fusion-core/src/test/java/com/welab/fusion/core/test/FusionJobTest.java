@@ -29,7 +29,7 @@ import com.welab.fusion.core.hash.HashMethod;
 import com.welab.fusion.core.io.FileSystem;
 import com.welab.fusion.core.test.function.DownloadPsiBloomFilterFunctionImpl;
 import com.welab.fusion.core.test.function.SavePsiBloomFilterFunctionImpl;
-import com.welab.fusion.core.util.PSIUtils;
+import com.welab.fusion.core.psi.PSIUtils;
 
 import java.io.File;
 import java.nio.file.Path;
