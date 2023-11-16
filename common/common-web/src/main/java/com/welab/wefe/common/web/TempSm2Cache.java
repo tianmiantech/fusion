@@ -89,6 +89,14 @@ public class TempSm2Cache {
      * 解密，并转为实体。
      */
     public static <T> T decrypt(Map<String, Object> map, Class<T> clazz) throws Exception {
+        map = decryptMap(map, clazz);
+        return new JSONObject(map).toJavaObject(clazz);
+    }
+
+    /**
+     * 解密
+     */
+    public static Map<String, Object> decryptMap(Map<String, Object> map, Class<?> clazz) {
         // 对参数做解密
         for (Map.Entry<String, Object> entry : map.entrySet()) {
             if (entry.getValue() == null) {
@@ -109,8 +117,7 @@ public class TempSm2Cache {
                 continue;
             }
         }
-
-        return new JSONObject(map).toJavaObject(clazz);
+        return map;
     }
 
     public static void main(String[] args) throws Exception {

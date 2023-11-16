@@ -16,6 +16,7 @@
 package com.welab.wefe.common.data.source;
 
 import com.alibaba.fastjson.JSONObject;
+import com.welab.wefe.common.exception.StatusCodeWithException;
 import com.welab.wefe.common.util.ClassUtils;
 
 import java.lang.reflect.Constructor;
@@ -61,7 +62,8 @@ public class SuperDataSourceClient {
     /**
      * 创建一个数据源实例
      */
-    public static <T extends AbstractDataSource> T create(Class<? extends AbstractDataSource> clazz, DataSourceParams params) {
+    public static <T extends AbstractDataSource> T create(Class<? extends AbstractDataSource> clazz, DataSourceParams params) throws StatusCodeWithException {
+        params.checkAndStandardize();
         try {
             Constructor<? extends AbstractDataSource> constructor = clazz.getConstructor(params.getClass());
             return (T) constructor.newInstance(params);
@@ -89,16 +91,16 @@ public class SuperDataSourceClient {
 
     // region 重载方法：create()
 
-    public static <T extends AbstractDataSource> T create(String dataSourceType, Map<String,Object> params) {
+    public static <T extends AbstractDataSource> T create(String dataSourceType, Map<String, Object> params) throws StatusCodeWithException {
         return create(dataSourceType, new JSONObject(params));
     }
 
-    public static <T extends AbstractDataSource> T create(String dataSourceType, DataSourceParams params) {
+    public static <T extends AbstractDataSource> T create(String dataSourceType, DataSourceParams params) throws StatusCodeWithException {
         Class<? extends AbstractDataSource> clazz = getDataSourceClass(dataSourceType);
         return create(clazz, params);
     }
 
-    public static <T extends AbstractDataSource> T create(String dataSourceType, JSONObject jsonParams) {
+    public static <T extends AbstractDataSource> T create(String dataSourceType, JSONObject jsonParams) throws StatusCodeWithException {
         Class<? extends AbstractDataSource> clazz = getDataSourceClass(dataSourceType);
 
         Class<?> paramsClass = ClassUtils.getGenericClass(clazz, 0);
@@ -106,6 +108,13 @@ public class SuperDataSourceClient {
 
         return create(clazz, params);
     }
+
+    public static <T extends DataSourceParams> Class<T> getParamsClass(String dataSourceType){
+        Class<? extends AbstractDataSource> clazz = getDataSourceClass(dataSourceType);
+
+        return (Class<T>) ClassUtils.getGenericClass(clazz, 0);
+    }
+
 
     // endregion
 }

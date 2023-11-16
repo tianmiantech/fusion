@@ -1,0 +1,151 @@
+mysql:
+{
+	"name": "xxx",
+	"databaseType": "mysql",
+
+	"form": {
+		"database_type": "mysql",
+		"host": "xx.xx.x.xxx",
+		"name": "xxx",
+		"userName": "xxx",
+		"password": "xxx",
+		"port": 1234,
+		"databaseName": "xxx"
+	}
+}
+
+postgresql:
+{
+	"name": "xxx",
+	"databaseType": "postgresql",
+
+	"form": {
+		"database_type": "postgresql",
+		"host": "xx.xx.x.xxx",
+		"name": "xxx",
+		"userName": "xxx",
+		"password": "xxx",
+		"port": 1234,
+		"databaseName": "xxx"
+	}
+}
+
+clickhouse:
+{
+	"name": "xxx",
+	"databaseType": "clickhouse",
+
+	"form": {
+		"database_type": "clickhouse",
+		"host": "xx.xx.x.xxx",
+		"name": "xxx",
+		"userName": "xxx",
+		"password": "xxx",
+		"port": 1234,
+		"databaseName": "xxx"
+	}
+}
+
+Redis:
+{
+	"name": "xxx",
+	"databaseType": "Redis",
+
+	"form": {
+		"database_type": "Redis",
+		"host": "xx.xx.x.xxx",
+		"name": "xxx",
+		"tables": "xxx",
+		"password": "xxx",
+		"port": 1234
+	}
+}
+
+Kafka:
+{
+	"name": "xxx",
+	"databaseType": "Kafka",
+
+	"form": {
+		"database_type": "Kafka",
+		"host": "xx.xx.x.xxx",
+		"name": "xxx",
+		"port": 1234,
+		"topics": "xxx"
+	}
+}
+
+Oracle:
+{
+	"name": "xxx",
+	"databaseType": "Oracle",
+
+	"form": {
+		"database_type": "Oracle",
+		"host": "xx.xx.x.xxx",
+		"name": "xxx",
+		"userName": "xxx",
+		"password": "xxx",
+		"port": 1234,
+		"databaseName": "xxx",
+		"SID": "xxx"
+	}
+}
+
+Cassandra:
+{
+	"name": "xxx",
+	"databaseType": "Cassandra",
+
+	"form": {
+		"database_type": "Cassandra",
+		"host": "xx.xx.x.xxx",
+		"name": "xxx",
+		"userName": "xxx",
+		"password": "xxx",
+		"port": 1234
+	}
+}
+
+elasticsearch:
+{
+	"name": "xxx",
+	"databaseType": "elasticsearch",
+
+	"form": {
+		"database_type": "elasticsearch",
+		"host": "xx.xx.x.xxx",
+		"name": "xxx",
+		"port": 1234,
+		"databaseName": "xxx"
+	}
+}
+
+sqlserver:
+{
+	"name": "xxx",
+	"databaseType": "sqlserver",
+
+	"form": {
+		"database_type": "sqlserver",
+		"host": "xx.xx.x.xxx",
+		"name": "xxx",
+		"userName": "xxx",
+		"password": "xxx",
+		"port": 1234,
+		"databaseName": "xxx"
+	}
+}
+
+hive:
+{
+	"name": "xxx",
+	"databaseType": "hive",
+
+	"form": {
+		"database_type": "hive",
+		"host": "xx.xx.x.xxx",
+		"name": "xxx",
+		"port": 1234
+	}
+}

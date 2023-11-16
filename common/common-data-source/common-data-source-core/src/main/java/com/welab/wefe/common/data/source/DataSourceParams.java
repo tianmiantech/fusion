@@ -15,17 +15,71 @@
  */
 package com.welab.wefe.common.data.source;
 
+import com.alibaba.fastjson.JSONObject;
+import com.welab.wefe.common.exception.StatusCodeWithException;
 import com.welab.wefe.common.fieldvalidate.AbstractCheckModel;
 import com.welab.wefe.common.fieldvalidate.annotation.Check;
+import com.welab.wefe.common.fieldvalidate.secret.SecretUtil;
+import com.welab.wefe.common.util.JObject;
+import com.welab.wefe.common.util.StringUtil;
 
 /**
  * @author zane.luo
  * @date 2023/5/16
  */
 public class DataSourceParams extends AbstractCheckModel {
+    public String name;
     @Check(messageOnEmpty = "Host 不能为空", require = true)
     public String host;
     @Check(messageOnEmpty = "端口不能为空", require = true)
     public Integer port;
 
+    @Override
+    public void checkAndStandardize() throws StatusCodeWithException {
+        super.checkAndStandardize();
+
+        if (StringUtil.isEmpty(name)) {
+            name = host + ":" + port;
+        }
+    }
+
+    public JSONObject toJson() {
+        return JObject.create(this);
+    }
+
+    /**
+     * 根据实体类中的 @Secret 注解，将敏感信息替脱敏。
+     * @return
+     */
+    public JSONObject toOutputJson() {
+        return SecretUtil.toJson(this);
+    }
+    
+    // region getter/setter
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getHost() {
+        return host;
+    }
+
+    public void setHost(String host) {
+        this.host = host;
+    }
+
+    public Integer getPort() {
+        return port;
+    }
+
+    public void setPort(Integer port) {
+        this.port = port;
+    }
+
+    // endregion
 }
