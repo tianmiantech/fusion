@@ -18,6 +18,8 @@ package com.welab.wefe.common.data.source;
 import com.alibaba.fastjson.JSONObject;
 import com.welab.wefe.common.exception.StatusCodeWithException;
 import com.welab.wefe.common.util.ClassUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
@@ -29,6 +31,8 @@ import java.util.Set;
  * @date 2023/5/16
  */
 public class SuperDataSourceClient {
+    private static final Logger LOG = LoggerFactory.getLogger(SuperDataSourceClient.class);
+    
     private static final Map<String, Class<? extends AbstractDataSource>> CLASS_MAPS = new HashMap<>();
 
     /**
@@ -62,8 +66,13 @@ public class SuperDataSourceClient {
     /**
      * 创建一个数据源实例
      */
-    public static <T extends AbstractDataSource> T create(Class<? extends AbstractDataSource> clazz, DataSourceParams params) throws StatusCodeWithException {
-        params.checkAndStandardize();
+    public static <T extends AbstractDataSource> T create(Class<? extends AbstractDataSource> clazz, DataSourceParams params) {
+        try {
+            params.checkAndStandardize();
+        } catch (StatusCodeWithException e) {
+            LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);
+            throw new RuntimeException(e);
+        }
         try {
             Constructor<? extends AbstractDataSource> constructor = clazz.getConstructor(params.getClass());
             return (T) constructor.newInstance(params);
@@ -91,16 +100,16 @@ public class SuperDataSourceClient {
 
     // region 重载方法：create()
 
-    public static <T extends AbstractDataSource> T create(String dataSourceType, Map<String, Object> params) throws StatusCodeWithException {
+    public static <T extends AbstractDataSource> T create(String dataSourceType, Map<String, Object> params) {
         return create(dataSourceType, new JSONObject(params));
     }
 
-    public static <T extends AbstractDataSource> T create(String dataSourceType, DataSourceParams params) throws StatusCodeWithException {
+    public static <T extends AbstractDataSource> T create(String dataSourceType, DataSourceParams params) {
         Class<? extends AbstractDataSource> clazz = getDataSourceClass(dataSourceType);
         return create(clazz, params);
     }
 
-    public static <T extends AbstractDataSource> T create(String dataSourceType, JSONObject jsonParams) throws StatusCodeWithException {
+    public static <T extends AbstractDataSource> T create(String dataSourceType, JSONObject jsonParams) {
         Class<? extends AbstractDataSource> clazz = getDataSourceClass(dataSourceType);
 
         Class<?> paramsClass = ClassUtils.getGenericClass(clazz, 0);
@@ -109,7 +118,7 @@ public class SuperDataSourceClient {
         return create(clazz, params);
     }
 
-    public static <T extends DataSourceParams> Class<T> getParamsClass(String dataSourceType){
+    public static <T extends DataSourceParams> Class<T> getParamsClass(String dataSourceType) {
         Class<? extends AbstractDataSource> clazz = getDataSourceClass(dataSourceType);
 
         return (Class<T>) ClassUtils.getGenericClass(clazz, 0);
