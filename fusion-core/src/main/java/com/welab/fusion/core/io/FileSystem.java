@@ -15,12 +15,16 @@
  */
 package com.welab.fusion.core.io;
 
+import com.welab.wefe.common.util.FileUtil;
+import com.welab.wefe.common.util.OS;
 import com.welab.wefe.common.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * @author zane.luo
@@ -34,13 +38,26 @@ public class FileSystem {
     /**
      * 初始化，指定根目录。
      */
-    public static void init(Path rootDir) {
-        ROOT_DIR = rootDir;
+    public static void init(String fileSystemBaseDir) throws IOException {
+        // 当未指定时，设置默认值。
+        if (StringUtil.isEmpty(fileSystemBaseDir)) {
+            fileSystemBaseDir = OS.get() == OS.windows
+                    ? "D:\\data\\fusion"
+                    : "/data/fusion";
+        }
+
+        ROOT_DIR = Paths.get(fileSystemBaseDir);
+
         // 创建目录
         File dir = ROOT_DIR.toFile();
         if (!dir.exists()) {
             dir.mkdirs();
         }
+
+        // 测试权限
+        Path testFilePath = ROOT_DIR.resolve("test.txt");
+        FileUtil.writeTextToFile("write is ok!", testFilePath, false);
+        testFilePath.toFile().delete();
     }
 
 

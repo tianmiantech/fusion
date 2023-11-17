@@ -25,8 +25,14 @@ import com.welab.fusion.core.hash.HashConfig;
 import com.welab.fusion.core.io.FileSystem;
 import com.welab.fusion.service.api.bloom_filter.AddBloomFilterApi;
 import com.welab.fusion.service.api.bloom_filter.PreviewTableDataSourceApi;
-import com.welab.fusion.service.constans.BloomFilterAddMethod;
+import com.welab.fusion.service.api.bloom_filter.QueryBloomFilterApi;
+import com.welab.fusion.service.api.bloom_filter.UpdateBloomFilterApi;
+import com.welab.fusion.service.database.base.MySpecification;
+import com.welab.fusion.service.database.base.Where;
 import com.welab.fusion.service.database.entity.BloomFilterDbModel;
+import com.welab.fusion.service.database.repository.BloomFilterRepository;
+import com.welab.fusion.service.dto.base.PagingOutput;
+import com.welab.fusion.service.dto.entity.BloomFilterOutputModel;
 import com.welab.fusion.service.model.Progress;
 import com.welab.fusion.service.model.ProgressManager;
 import com.welab.fusion.service.service.base.AbstractService;
@@ -42,6 +48,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Date;
 
 
 /**
@@ -53,6 +60,8 @@ public class BloomFilterService extends AbstractService {
 
     @Autowired
     private DataSourceService dataSourceService;
+    @Autowired
+    private BloomFilterRepository bloomFilterRepository;
 
     public Progress add(AddBloomFilterApi.Input input) throws Exception {
         AbstractTableDataSourceReader reader = createReader(input, -1, -1);
@@ -72,6 +81,11 @@ public class BloomFilterService extends AbstractService {
                 create(model, progress, reader, input.hashConfig);
                 model.save();
                 progress.success();
+
+                // 清理
+                input.getFile().delete();
+                reader.close();
+
             } catch (Exception e) {
                 LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);
                 progress.failed(e);
@@ -117,12 +131,7 @@ public class BloomFilterService extends AbstractService {
                 return new SqlTableDataSourceReader(client, input.sql, maxReadRows, maxReadTimeInMs);
 
             default:
-                File file;
-                if (input.addMethod == BloomFilterAddMethod.LocalFile) {
-                    file = new File(input.dataSourceFile);
-                } else {
-                    file = FileSystem.getTempDir().resolve(input.dataSourceFile).toFile();
-                }
+                File file = input.getFile();
 
                 if (!file.exists()) {
                     throw new RuntimeException("未找到文件:" + file.getAbsolutePath());
@@ -141,12 +150,54 @@ public class BloomFilterService extends AbstractService {
     public PreviewTableDataSourceApi.Output previewTableDataSource(PreviewTableDataSourceApi.Input input) throws Exception {
         AbstractTableDataSourceReader reader = createReader(input, 100, -1);
 
-
         PreviewTableDataSourceApi.Output output = new PreviewTableDataSourceApi.Output();
         output.header = reader.getHeader();
         output.rows = new ArrayList<>(100);
 
         reader.readRows((index, row) -> output.rows.add(row));
         return output;
+    }
+
+    /**
+     * 分页查询
+     */
+    public PagingOutput<BloomFilterOutputModel> query(QueryBloomFilterApi.Input input) {
+        MySpecification<BloomFilterDbModel> where = Where.create()
+                .contains("name", input.name)
+                .build();
+        return bloomFilterRepository.paging(where, input, BloomFilterOutputModel.class);
+    }
+
+    public BloomFilterDbModel findOneById(String id) {
+        BloomFilterDbModel model = bloomFilterRepository.findById(id).orElse(null);
+        if (model == null) {
+            return null;
+        }
+
+        return model;
+    }
+
+    /**
+     * 删除过滤器
+     *
+     * 1. 删除磁盘文件
+     * 2. 删除数据库记录
+     */
+    public void delete(String id) {
+        BloomFilterDbModel model = findOneById(id);
+
+        // 删除整个文件夹
+        File dir = new File(model.getStorageDir());
+        dir.delete();
+
+        bloomFilterRepository.delete(model);
+    }
+
+    public void update(UpdateBloomFilterApi.Input input) {
+        BloomFilterDbModel model = findOneById(input.id);
+        model.setName(input.name);
+        model.setDescription(input.description);
+        model.setUpdatedTime(new Date());
+        model.save();
     }
 }

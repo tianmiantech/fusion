@@ -28,14 +28,12 @@ import com.welab.fusion.core.hash.HashConfig;
 import com.welab.fusion.core.hash.HashConfigItem;
 import com.welab.fusion.core.hash.HashMethod;
 import com.welab.fusion.core.io.FileSystem;
+import com.welab.fusion.core.psi.PsiUtils;
 import com.welab.fusion.core.test.function.DownloadPsiBloomFilterFunctionImpl;
 import com.welab.fusion.core.test.function.SavePsiBloomFilterFunctionImpl;
-import com.welab.fusion.core.psi.PsiUtils;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -54,7 +52,7 @@ public class FusionJobTest {
         // 设置小一点，生成的过滤器体积也小一点，便于测试。
         PsiBloomFilterCreator.MIN_EXPECTED_INSERTIONS = 10_000;
 
-        FileSystem.init(Paths.get("D:\\data\\wefe\\fusion"));
+        FileSystem.init("D:\\data\\wefe\\fusion");
 
         createJobs();
 

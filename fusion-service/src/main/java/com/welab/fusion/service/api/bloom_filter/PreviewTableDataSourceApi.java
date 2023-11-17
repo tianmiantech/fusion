@@ -15,6 +15,8 @@
  */
 package com.welab.fusion.service.api.bloom_filter;
 
+import com.alibaba.fastjson.annotation.JSONField;
+import com.welab.fusion.core.io.FileSystem;
 import com.welab.fusion.service.api.data_source.AddDataSourceApi;
 import com.welab.fusion.service.constans.BloomFilterAddMethod;
 import com.welab.fusion.service.service.BloomFilterService;
@@ -24,6 +26,7 @@ import com.welab.wefe.common.web.api.base.Api;
 import com.welab.wefe.common.web.dto.ApiResult;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 
@@ -53,6 +56,15 @@ public class PreviewTableDataSourceApi extends AbstractApi<PreviewTableDataSourc
 
         @Check(name = "数据源文件")
         public String dataSourceFile;
+
+        @JSONField(serialize = false)
+        public File getFile() {
+            if (addMethod == BloomFilterAddMethod.LocalFile) {
+                return new File(dataSourceFile);
+            } else {
+                return FileSystem.getTempDir().resolve(dataSourceFile).toFile();
+            }
+        }
     }
 
     public static class Output {
