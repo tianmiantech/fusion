@@ -15,9 +15,11 @@
  */
 package com.welab.fusion.service.service;
 
+import com.welab.fusion.service.api.bloom_filter.AddBloomFilterApi;
 import com.welab.fusion.service.api.data_source.AddDataSourceApi;
 import com.welab.fusion.service.api.data_source.TestDataSourceApi;
 import com.welab.fusion.service.api.data_source.UpdateApi;
+import com.welab.fusion.service.constans.BloomFilterAddMethod;
 import com.welab.fusion.service.database.entity.DataSourceDbModel;
 import com.welab.fusion.service.database.repository.DataSourceRepository;
 import com.welab.fusion.service.dto.entity.DataSourceOutputModel;
@@ -139,5 +141,27 @@ public class DataSourceService extends AbstractService {
         model.setConnectorConfig(params.toJson());
 
         dataSourceRepository.save(model);
+    }
+
+    /**
+     * 由添加过滤器触发的创建数据源
+     * 由于这里创建数据源是个顺带的操作，所以仅作尝试，失败时不抛出异常。
+     */
+    public void tryAdd(AddBloomFilterApi.Input input) {
+        // 不是数据库类型的数据源，不创建。
+        if (input.addMethod != BloomFilterAddMethod.Database) {
+            return;
+        }
+
+        // 指定了数据源id，说明已创建。
+        if (input.dataSourceId != null) {
+            return;
+        }
+
+        try {
+            add(input);
+        } catch (StatusCodeWithException e) {
+            LOG.error(e.getClass().getSimpleName() + " 自动创建数据源失败：" + e.getMessage(), e);
+        }
     }
 }

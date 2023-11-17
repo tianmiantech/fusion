@@ -65,6 +65,8 @@ public class BloomFilterService extends AbstractService {
 
     public Progress add(AddBloomFilterApi.Input input) throws Exception {
         AbstractTableDataSourceReader reader = createReader(input, -1, -1);
+        // 自动保存数据源信息
+        dataSourceService.tryAdd(input);
 
         BloomFilterDbModel model = new BloomFilterDbModel();
         model.setName(input.name);
@@ -73,9 +75,7 @@ public class BloomFilterService extends AbstractService {
         model.setSql(input.sql);
         model.setHashConfigs(input.hashConfig.toJson());
 
-
         Progress progress = ProgressManager.startNew(model.getId());
-
         CommonThreadPool.run(() -> {
             try {
                 create(model, progress, reader, input.hashConfig);
@@ -85,13 +85,11 @@ public class BloomFilterService extends AbstractService {
                 // 清理
                 input.getFile().delete();
                 reader.close();
-
             } catch (Exception e) {
                 LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);
                 progress.failed(e);
             }
         });
-
 
         return progress;
     }

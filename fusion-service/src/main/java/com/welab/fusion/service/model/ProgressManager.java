@@ -43,4 +43,8 @@ public class ProgressManager {
     public static Progress get(String sessionId) {
         return CACHE.get(sessionId);
     }
+
+    public static void remove(Progress progress) {
+        throw new UnsupportedOperationException("考虑到任务完成之后前端也需要展示状态，所以禁止主动删除，由过期策略自动删除。");
+    }
 }
