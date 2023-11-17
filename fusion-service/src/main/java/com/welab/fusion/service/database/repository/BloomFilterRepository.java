@@ -15,27 +15,20 @@
  */
 package com.welab.fusion.service.database.repository;
 
-import com.welab.fusion.service.database.entity.DataSourceDbModel;
+import com.welab.fusion.service.database.entity.BloomFilterDbModel;
 import com.welab.fusion.service.database.repository.base.BaseRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 /**
  * @author zane.luo
  * @date 2023/11/16
  */
 @Repository
-public interface DataSourceRepository extends BaseRepository<DataSourceDbModel, String> {
+public interface BloomFilterRepository extends BaseRepository<BloomFilterDbModel, String> {
     @Query(value = "select count(*) from #{#entityName} where name=?1", nativeQuery = true)
     int countByName(String name);
 
-    @Query(value = "select name from #{#entityName} where id=?1")
-    String getNameById(String dataSourceId);
-
-    List<DataSourceDbModel> findByHostAndPort(String host, Integer port);
-
+    @Query(value = "select count(*) from #{#entityName} where name=?1 and id<>?2", nativeQuery = true)
+    int countByName(String name, String id);
 }

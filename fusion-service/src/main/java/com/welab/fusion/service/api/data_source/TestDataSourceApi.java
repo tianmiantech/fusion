@@ -41,7 +41,7 @@ public class TestDataSourceApi extends AbstractApi<TestDataSourceApi.Input, Test
         }
     }
 
-    public static class Input extends AddApi.Input {
+    public static class Input extends AddDataSourceApi.Input {
         @Check(name = "数据源Id", desc = "添加时不需要指定，修改时需要指定。")
         public String id;
 

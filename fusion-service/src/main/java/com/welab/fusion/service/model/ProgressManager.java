@@ -13,20 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.welab.fusion.core.hash;
-
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.stream.Collectors;
+package com.welab.fusion.service.model;
 
 /**
  * @author zane.luo
- * @date 2023/11/14
+ * @date 2023/11/16
  */
-public class HashConfigUtil {
-    public static String hash(List<HashConfig> configs, LinkedHashMap<String, Object> row) {
-        return configs.stream()
-                .map(x -> x.hash(row))
-                .collect(Collectors.joining());
-    }
+public class ProgressManager {
 }

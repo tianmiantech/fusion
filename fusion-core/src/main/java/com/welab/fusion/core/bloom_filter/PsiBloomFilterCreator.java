@@ -15,7 +15,6 @@
  */
 package com.welab.fusion.core.bloom_filter;
 
-import cn.hutool.core.convert.Convert;
 import cn.hutool.core.thread.NamedThreadFactory;
 import cn.hutool.core.thread.ThreadUtil;
 import com.google.common.base.Charsets;
@@ -24,9 +23,9 @@ import com.google.common.hash.Funnels;
 import com.welab.fusion.core.data_source.AbstractTableDataSourceReader;
 import com.welab.fusion.core.data_source.CsvTableDataSourceReader;
 import com.welab.fusion.core.hash.HashConfig;
-import com.welab.fusion.core.hash.HashConfigUtil;
+import com.welab.fusion.core.hash.HashConfigItem;
 import com.welab.fusion.core.hash.HashMethod;
-import com.welab.fusion.core.psi.PSIUtils;
+import com.welab.fusion.core.psi.PsiUtils;
 import com.welab.wefe.common.crypto.Rsa;
 import com.welab.wefe.common.exception.StatusCodeWithException;
 import org.slf4j.Logger;
@@ -38,9 +37,7 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -62,7 +59,7 @@ public class PsiBloomFilterCreator implements Closeable {
      */
     public static int MIN_EXPECTED_INSERTIONS = 100_000_000;
     private AbstractTableDataSourceReader dataSourceReader;
-    public List<HashConfig> hashConfigs;
+    public HashConfig hashConfig;
     private RsaPsiParam rsaPsiParam;
     private final BloomFilter<String> bloomFilter;
     /**
@@ -70,8 +67,8 @@ public class PsiBloomFilterCreator implements Closeable {
      */
     private final ThreadPoolExecutor GENERATE_FILTER_THREAD_POOL;
 
-    public PsiBloomFilterCreator(AbstractTableDataSourceReader dataSourceReader, List<HashConfig> hashConfigs) {
-        this.hashConfigs = hashConfigs;
+    public PsiBloomFilterCreator(AbstractTableDataSourceReader dataSourceReader, HashConfig hashConfig) {
+        this.hashConfig = hashConfig;
         this.dataSourceReader = dataSourceReader;
 
         Rsa.RsaKeyPair keyPair = Rsa.generateKeyPair();
@@ -147,7 +144,7 @@ public class PsiBloomFilterCreator implements Closeable {
                 }
 
                 // 这一句如果放在异步线程会导致性能大幅下降，原因不详。
-                String key = HashConfigUtil.hash(hashConfigs, row);
+                String key = hashConfig.hash(row);
 
                 try {
                     CompletableFuture.runAsync(
@@ -178,7 +175,7 @@ public class PsiBloomFilterCreator implements Closeable {
 
         return PsiBloomFilter.of(
                 id,
-                hashConfigs,
+                hashConfig,
                 rsaPsiParam,
                 insertedElementCount.longValue(),
                 bloomFilter
@@ -189,7 +186,7 @@ public class PsiBloomFilterCreator implements Closeable {
      * 对主键进行加密
      */
     private BigInteger encrypt(String key) {
-        BigInteger h = PSIUtils.stringToBigInteger(key);
+        BigInteger h = PsiUtils.stringToBigInteger(key);
 
         BigInteger rp = h.modPow(rsaPsiParam.getEp(), rsaPsiParam.privatePrimeP);
         BigInteger rq = h.modPow(rsaPsiParam.getEq(), rsaPsiParam.privatePrimeQ);
@@ -220,12 +217,12 @@ public class PsiBloomFilterCreator implements Closeable {
         File file = new File("D:\\data\\wefe\\3x100000000rows-miss0-auto_increment.csv");
         CsvTableDataSourceReader reader = new CsvTableDataSourceReader(file);
         System.out.println(reader.getHeader());
-        List<HashConfig> hashConfigs = Arrays.asList(HashConfig.of(HashMethod.MD5, "id"));
+        HashConfig hashConfig = HashConfig.of(HashConfigItem.of(HashMethod.MD5, "id"));
 
         Path dir = Paths.get(file.getParent()).resolve("test-bf");
 
         // 生成过滤器
-        try (PsiBloomFilterCreator creator = new PsiBloomFilterCreator(reader, hashConfigs)) {
+        try (PsiBloomFilterCreator creator = new PsiBloomFilterCreator(reader, hashConfig)) {
             PsiBloomFilter psiBloomFilter = creator.create("test");
             psiBloomFilter.sink(dir);
         }

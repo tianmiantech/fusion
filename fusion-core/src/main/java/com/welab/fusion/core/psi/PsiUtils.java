@@ -30,8 +30,8 @@ import java.util.List;
  * @author zane.luo
  * @date 2023/11/15
  */
-public class PSIUtils {
-    protected static final Logger LOG = LoggerFactory.getLogger(PSIUtils.class);
+public class PsiUtils {
+    protected static final Logger LOG = LoggerFactory.getLogger(PsiUtils.class);
 
     /**
      * 碰撞，返回碰撞的数据。
@@ -50,7 +50,7 @@ public class PSIUtils {
 
         List<PsiRecord> fruit = new ArrayList<>();
         for (int i = 0; i < ret.length; i++) {
-            BigInteger y = PSIUtils.bytesToBigInteger(ret[i], 0, ret[i].length);
+            BigInteger y = PsiUtils.bytesToBigInteger(ret[i], 0, ret[i].length);
             BigInteger z = y.multiply(rawRecords.get(i).inv).mod(publicModulus);
             if (psiBloomFilter.contains(z)) {
                 fruit.add(rawRecords.get(i));
@@ -73,14 +73,14 @@ public class PSIUtils {
         List<String> result = new ArrayList<>(list.size());
         for (int i = 0; i < list.size(); i++) {
             byte[] bytes = Base64.decode(list.get(i));
-            BigInteger x = PSIUtils.bytesToBigInteger(bytes, 0, bytes.length);
+            BigInteger x = PsiUtils.bytesToBigInteger(bytes, 0, bytes.length);
 
             // crt优化后
             BigInteger rp = x.modPow(d.remainder(p.subtract(BigInteger.valueOf(1))), p);
             BigInteger rq = x.modPow(d.remainder(q.subtract(BigInteger.valueOf(1))), q);
             BigInteger y = (rp.multiply(cp).add(rq.multiply(cq))).remainder(n);
 
-            byte[] encrypted = PSIUtils.bigIntegerToBytes(y);
+            byte[] encrypted = PsiUtils.bigIntegerToBytes(y);
             String base64 = Base64.encode(encrypted);
             result.add(base64);
         }

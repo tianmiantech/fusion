@@ -15,7 +15,6 @@
  */
 package com.welab.fusion.core.io;
 
-import com.welab.wefe.common.exception.StatusCodeWithException;
 import com.welab.wefe.common.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,6 +61,13 @@ public class FileSystem {
          * 融合结果
          */
         FusionResult
+    }
+
+    /**
+     * 获取临时目录
+     */
+    public static Path getTempDir() {
+        return getBaseDir(UseType.Temp);
     }
 
     /**

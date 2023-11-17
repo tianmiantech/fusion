@@ -38,7 +38,7 @@ public class UpdateApi extends AbstractNoneOutputApi<UpdateApi.Input> {
         return success();
     }
 
-    public static class Input extends AddApi.Input {
+    public static class Input extends AddDataSourceApi.Input {
         @Check(name = "数据源Id", require = true)
         public String id;
 

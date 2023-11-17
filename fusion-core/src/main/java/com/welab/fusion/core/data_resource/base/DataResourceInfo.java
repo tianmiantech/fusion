@@ -16,6 +16,7 @@
 package com.welab.fusion.core.data_resource.base;
 
 import com.welab.fusion.core.hash.HashConfig;
+import com.welab.fusion.core.hash.HashConfigItem;
 
 import java.util.List;
 
@@ -28,15 +29,15 @@ public class DataResourceInfo {
     public String name;
     public long dataCount;
     public DataResourceType dataResourceType;
-    public List<HashConfig> hashConfigList;
+    public HashConfig hashConfig;
 
-    public static DataResourceInfo of(String id,String name,long dataCount,DataResourceType dataResourceType,List<HashConfig> hashConfigList){
+    public static DataResourceInfo of(String id,String name,long dataCount,DataResourceType dataResourceType,HashConfig hashConfig){
         DataResourceInfo dataResourceInfo = new DataResourceInfo();
         dataResourceInfo.id = id;
         dataResourceInfo.name = name;
         dataResourceInfo.dataCount = dataCount;
         dataResourceInfo.dataResourceType = dataResourceType;
-        dataResourceInfo.hashConfigList = hashConfigList;
+        dataResourceInfo.hashConfig = hashConfig;
         return dataResourceInfo;
     }
 }

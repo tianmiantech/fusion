@@ -23,6 +23,7 @@ import com.welab.fusion.core.bloom_filter.PsiBloomFilterCreator;
 import com.welab.fusion.core.data_resource.base.DataResourceType;
 import com.welab.fusion.core.data_source.AbstractTableDataSourceReader;
 import com.welab.fusion.core.hash.HashConfig;
+import com.welab.fusion.core.hash.HashConfigItem;
 
 import java.util.List;
 
@@ -34,10 +35,10 @@ public class CreatePsiBloomFilterAction extends AbstractJobPhaseAction {
     @Override
     protected void doAction() throws Exception {
         AbstractTableDataSourceReader reader = job.getMyself().tableDataResourceReader;
-        List<HashConfig> hashConfigList = job.getMyself().dataResourceInfo.hashConfigList;
+        HashConfig hashConfig = job.getMyself().dataResourceInfo.hashConfig;
 
         // 生成过滤器
-        try (PsiBloomFilterCreator creator = new PsiBloomFilterCreator(reader, hashConfigList)) {
+        try (PsiBloomFilterCreator creator = new PsiBloomFilterCreator(reader, hashConfig)) {
             PsiBloomFilter psiBloomFilter = creator.create(
                     // 这里使用数据源的 Id 作为生成后的过滤器 Id。
                     job.getMyself().dataResourceInfo.id,

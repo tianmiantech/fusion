@@ -34,7 +34,7 @@ import java.util.Map;
  * @author Johnny.lin
  */
 @Api(path = "data_source/add", name = "添加数据源")
-public class AddApi extends AbstractApi<AddApi.Input, AddApi.Output> {
+public class AddDataSourceApi extends AbstractApi<AddDataSourceApi.Input, AddDataSourceApi.Output> {
     @Autowired
     DataSourceService dataSourceService;
 
@@ -45,19 +45,19 @@ public class AddApi extends AbstractApi<AddApi.Input, AddApi.Output> {
     }
 
     public static class Input extends AbstractApiInput {
-        @Check(messageOnEmpty = "数据库类型不能为空", require = true)
+        @Check(messageOnEmpty = "数据库类型不能为空")
         public DatabaseType databaseType;
 
         @Check(require = true)
-        public Map<String, Object> form;
+        public Map<String, Object> dataSourceParams;
 
         @Override
         public void checkAndStandardize() throws StatusCodeWithException {
             super.checkAndStandardize();
 
-            form.put("databaseType", databaseType.name());
-
-            form = TempSm2Cache.decryptMap(form, JdbcDataSourceParams.class);
+            dataSourceParams.put("databaseType", databaseType.name());
+            // 参数解密
+            dataSourceParams = TempSm2Cache.decryptMap(dataSourceParams, JdbcDataSourceParams.class);
         }
     }
 

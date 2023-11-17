@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.welab.fusion.service.api.account;
+package com.welab.fusion.service.api.service;
 
 import com.welab.fusion.service.service.AccountService;
 import com.welab.wefe.common.fieldvalidate.annotation.Check;
@@ -27,7 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author zane.luo
  * @date 2023/11/7
  */
-@Api(path = "account/init_super_admin", name = "初始化超级管理员账号")
+@Api(path = "service/init", name = "超级管理员账号，初始化服务。")
 public class InitSuperAdminAccountApi extends AbstractApi<InitSuperAdminAccountApi.Input, InitSuperAdminAccountApi.Output> {
     @Autowired
     private AccountService accountService;

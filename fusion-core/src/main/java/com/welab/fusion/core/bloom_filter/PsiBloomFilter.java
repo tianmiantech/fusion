@@ -18,10 +18,10 @@ package com.welab.fusion.core.bloom_filter;
 import cn.hutool.core.io.FileUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.annotation.JSONField;
-import com.google.common.base.Objects;
 import com.google.common.hash.BloomFilter;
 import com.google.common.hash.Funnels;
 import com.welab.fusion.core.hash.HashConfig;
+import com.welab.fusion.core.hash.HashConfigItem;
 import com.welab.fusion.core.io.FileSystem;
 import com.welab.wefe.common.TimeSpan;
 import com.welab.wefe.common.file.compression.impl.Zip;
@@ -49,23 +49,18 @@ public class PsiBloomFilter {
     private static final String DATA_FILE_NAME = "PsiBloomFilter.data";
     private static final String ZIP_FILE_NAME = "PsiBloomFilter.zip";
     public String id;
-    public List<HashConfig> hashConfigList;
+    public HashConfig hashConfig;
     public RsaPsiParam rsaPsiParam;
     /**
      * 过滤器中已插入的元素数量
      */
     public long insertedElementCount;
     @JSONField(serialize = false)
-    public BloomFilter<String> bloomFilter;
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(
-                bloomFilter,
-                rsaPsiParam,
-                hashConfigList
-        );
-    }
+    private BloomFilter<String> bloomFilter;
+    /**
+     * 文件所在目录，用于从磁盘中加载时使用。
+     */
+    private Path dir;
 
     /**
      * 从磁盘中加载 PsiBloomFilter 对象
@@ -77,24 +72,35 @@ public class PsiBloomFilter {
         PsiBloomFilter result = JSON.parseObject(json).toJavaObject(PsiBloomFilter.class);
         result.rsaPsiParam.preproccess();
 
+        dir = dir;
+
+        return result;
+    }
+
+    /**
+     * 为避免资源浪费，过滤器文件在需要用到的时候才加载。
+     */
+    private synchronized void loadDataFile() {
+        if (this.bloomFilter != null) {
+            return;
+        }
+
         // 加载过滤器
         File bfFile = dir.resolve(DATA_FILE_NAME).toFile();
         try (FileInputStream inputStream = new FileInputStream(bfFile)) {
-            result.bloomFilter = BloomFilter.readFrom(
+            this.bloomFilter = BloomFilter.readFrom(
                     inputStream,
                     Funnels.stringFunnel(StandardCharsets.UTF_8)
             );
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-
-        return result;
     }
 
-    public static PsiBloomFilter of(String id, List<HashConfig> hashConfigs, RsaPsiParam rsaPsiParam, long insertedElementCount, BloomFilter<String> bloomFilter) {
+    public static PsiBloomFilter of(String id, HashConfig hashConfig, RsaPsiParam rsaPsiParam, long insertedElementCount, BloomFilter<String> bloomFilter) {
         PsiBloomFilter psiBloomFilter = new PsiBloomFilter();
         psiBloomFilter.id = id;
-        psiBloomFilter.hashConfigList = hashConfigs;
+        psiBloomFilter.hashConfig = hashConfig;
         psiBloomFilter.rsaPsiParam = rsaPsiParam;
         psiBloomFilter.insertedElementCount = insertedElementCount;
         psiBloomFilter.bloomFilter = bloomFilter;
@@ -129,7 +135,7 @@ public class PsiBloomFilter {
     }
 
     public boolean contains(BigInteger x) {
-        return bloomFilter.mightContain(x.toString());
+        return getBloomFilter().mightContain(x.toString());
     }
 
     /**
@@ -156,5 +162,12 @@ public class PsiBloomFilter {
         Zip.to(zipFile, tempMetaFile, dataFile);
 
         return zipFile;
+    }
+
+    public BloomFilter<String> getBloomFilter() {
+        if (bloomFilter == null) {
+            loadDataFile();
+        }
+        return bloomFilter;
     }
 }

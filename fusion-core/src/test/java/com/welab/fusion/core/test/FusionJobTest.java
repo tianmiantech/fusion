@@ -25,11 +25,12 @@ import com.welab.fusion.core.data_resource.base.DataResourceType;
 import com.welab.fusion.core.data_source.CsvTableDataSourceReader;
 import com.welab.fusion.core.function.JobFunctions;
 import com.welab.fusion.core.hash.HashConfig;
+import com.welab.fusion.core.hash.HashConfigItem;
 import com.welab.fusion.core.hash.HashMethod;
 import com.welab.fusion.core.io.FileSystem;
 import com.welab.fusion.core.test.function.DownloadPsiBloomFilterFunctionImpl;
 import com.welab.fusion.core.test.function.SavePsiBloomFilterFunctionImpl;
-import com.welab.fusion.core.psi.PSIUtils;
+import com.welab.fusion.core.psi.PsiUtils;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -71,7 +72,7 @@ public class FusionJobTest {
     }
 
     private static void createJobs() throws Exception {
-        List<HashConfig> hashConfigs = Arrays.asList(HashConfig.of(HashMethod.MD5, "id"));
+        HashConfig hashConfig = HashConfig.of(HashConfigItem.of(HashMethod.MD5, "id"));
 
         // String csv = "ivenn_10w_20210319_vert_promoter.csv";
         String csv = "promoter-569.csv";
@@ -79,8 +80,8 @@ public class FusionJobTest {
         CsvTableDataSourceReader readerA = new CsvTableDataSourceReader(file);
         CsvTableDataSourceReader readerB = new CsvTableDataSourceReader(file);
 
-        DataResourceInfo dataResourceInfoA = DataResourceInfo.of("dataResourceInfoA", file.getName(), readerA.getTotalDataRowCount(), DataResourceType.TableDataSource, hashConfigs);
-        DataResourceInfo dataResourceInfoB = DataResourceInfo.of("dataResourceInfoB", file.getName(), readerB.getTotalDataRowCount(), DataResourceType.TableDataSource, hashConfigs);
+        DataResourceInfo dataResourceInfoA = DataResourceInfo.of("dataResourceInfoA", file.getName(), readerA.getTotalDataRowCount(), DataResourceType.TableDataSource, hashConfig);
+        DataResourceInfo dataResourceInfoB = DataResourceInfo.of("dataResourceInfoB", file.getName(), readerB.getTotalDataRowCount(), DataResourceType.TableDataSource, hashConfig);
 
 
         memberA = JobMember.of("memberA", "memberA", dataResourceInfoA);
@@ -115,7 +116,7 @@ public class FusionJobTest {
         jobFunctions.encryptPsiRecordsFunction = (String memberId, String psiBloomFilterId, List<String> bucket) -> {
             Path dir = FileSystem.PsiBloomFilter.getPath(psiBloomFilterId);
             PsiBloomFilter psiBloomFilter = PsiBloomFilter.of(dir);
-            return PSIUtils.encryptPsiRecords(psiBloomFilter, bucket);
+            return PsiUtils.encryptPsiRecords(psiBloomFilter, bucket);
         };
 
         jobFunctions.saveFusionResultFunction = (result) -> {

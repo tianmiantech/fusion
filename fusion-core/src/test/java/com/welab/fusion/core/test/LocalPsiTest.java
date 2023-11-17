@@ -20,15 +20,14 @@ import com.welab.fusion.core.bloom_filter.PsiBloomFilter;
 import com.welab.fusion.core.bloom_filter.PsiBloomFilterCreator;
 import com.welab.fusion.core.data_source.CsvTableDataSourceReader;
 import com.welab.fusion.core.hash.HashConfig;
-import com.welab.fusion.core.hash.HashConfigUtil;
+import com.welab.fusion.core.hash.HashConfigItem;
 import com.welab.fusion.core.hash.HashMethod;
-import com.welab.fusion.core.psi.PSIUtils;
 import com.welab.fusion.core.psi.PsiRecord;
+import com.welab.fusion.core.psi.PsiUtils;
 import com.welab.wefe.common.BatchConsumer;
 
 import java.io.File;
 import java.math.BigInteger;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.LongAdder;
 import java.util.stream.Collectors;
@@ -39,7 +38,7 @@ import java.util.stream.Collectors;
  */
 public class LocalPsiTest {
 
-    private static List<HashConfig> hashConfigs = Arrays.asList(HashConfig.of(HashMethod.MD5, "id"));
+    private static HashConfig hashConfig = HashConfig.of(HashConfigItem.of(HashMethod.MD5, "id"));
 
     public static void main(String[] args) throws Exception {
         String csv = "promoter-569.csv";
@@ -59,12 +58,12 @@ public class LocalPsiTest {
         BatchConsumer<PsiRecord> consumer = new BatchConsumer<>(10, 5_000, records -> {
             try {
                 // 将数据发送到过滤器方加密
-                List<String> encryptedList = PSIUtils.encryptPsiRecords(
+                List<String> encryptedList = PsiUtils.encryptPsiRecords(
                         psiBloomFilter,
                         records.stream().map(x -> x.encodedKey).collect(Collectors.toList())
                 );
 
-                List<PsiRecord> fruit = PSIUtils.match(
+                List<PsiRecord> fruit = PsiUtils.match(
                         psiBloomFilter,
                         records,
                         encryptedList,
@@ -87,14 +86,14 @@ public class LocalPsiTest {
             PsiRecord record = new PsiRecord();
             record.row = row;
 
-            BigInteger blindFactor = PSIUtils.generateBlindingFactor(publicModulus);
+            BigInteger blindFactor = PsiUtils.generateBlindingFactor(publicModulus);
             BigInteger random = blindFactor.modPow(publicExponent, publicModulus);
             record.inv = blindFactor.modInverse(publicModulus);
 
-            String key = HashConfigUtil.hash(hashConfigs, row);
-            BigInteger h = PSIUtils.stringToBigInteger(key);
+            String key = hashConfig.hash(row);
+            BigInteger h = PsiUtils.stringToBigInteger(key);
             BigInteger x = h.multiply(random).mod(publicModulus);
-            byte[] bytes = PSIUtils.bigIntegerToBytes(x);
+            byte[] bytes = PsiUtils.bigIntegerToBytes(x);
             record.encodedKey = Base64.encode(bytes);
 
             consumer.add(record);
@@ -108,7 +107,7 @@ public class LocalPsiTest {
         CsvTableDataSourceReader reader = new CsvTableDataSourceReader(file);
 
         // 生成过滤器
-        try (PsiBloomFilterCreator creator = new PsiBloomFilterCreator(reader, hashConfigs)) {
+        try (PsiBloomFilterCreator creator = new PsiBloomFilterCreator(reader, hashConfig)) {
             return creator.create("test");
         }
     }

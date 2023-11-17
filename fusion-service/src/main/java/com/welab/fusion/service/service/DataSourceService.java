@@ -15,7 +15,7 @@
  */
 package com.welab.fusion.service.service;
 
-import com.welab.fusion.service.api.data_source.AddApi;
+import com.welab.fusion.service.api.data_source.AddDataSourceApi;
 import com.welab.fusion.service.api.data_source.TestDataSourceApi;
 import com.welab.fusion.service.api.data_source.UpdateApi;
 import com.welab.fusion.service.database.entity.DataSourceDbModel;
@@ -43,8 +43,12 @@ public class DataSourceService extends AbstractService {
     @Autowired
     private DataSourceRepository dataSourceRepository;
 
-    public String add(AddApi.Input input) throws StatusCodeWithException {
-        JdbcDataSourceClient dataSourceClient = SuperDataSourceClient.create(input.databaseType.name(), input.form);
+    public DataSourceDbModel findById(String id) {
+        return dataSourceRepository.findById(id).orElse(null);
+    }
+
+    public String add(AddDataSourceApi.Input input) throws StatusCodeWithException {
+        JdbcDataSourceClient dataSourceClient = SuperDataSourceClient.create(input.databaseType.name(), input.dataSourceParams);
         dataSourceClient.test();
 
         if (dataSourceRepository.countByName(dataSourceClient.getParams().name) > 0) {
@@ -105,7 +109,7 @@ public class DataSourceService extends AbstractService {
                 // 前端传了 id，从数据库取出数据源配置
                 ? dataSourceRepository.findById(input.id).orElse(null).getJdbcDataSourceClient()
                 // 前端没传 id，直接用前端传的数据源配置
-                : SuperDataSourceClient.create(input.databaseType.name(), input.form);
+                : SuperDataSourceClient.create(input.databaseType.name(), input.dataSourceParams);
 
         client.test();
     }
@@ -113,7 +117,7 @@ public class DataSourceService extends AbstractService {
     public void update(UpdateApi.Input input) throws StatusCodeWithException {
         JdbcDataSourceClient client = SuperDataSourceClient.create(
                 input.databaseType.name(),
-                input.form
+                input.dataSourceParams
         );
         client.test();
 

@@ -20,14 +20,12 @@ import com.welab.fusion.core.Job.FusionJob;
 import com.welab.fusion.core.Job.FusionJobRole;
 import com.welab.fusion.core.Job.FusionResult;
 import com.welab.fusion.core.Job.JobPhase;
-import com.welab.fusion.core.hash.HashConfigUtil;
-import com.welab.fusion.core.psi.PSIUtils;
+import com.welab.fusion.core.psi.PsiUtils;
 import com.welab.fusion.core.psi.PsiRecord;
 import com.welab.wefe.common.BatchConsumer;
 
 import java.io.File;
 import java.math.BigInteger;
-import java.security.SecureRandom;
 import java.util.List;
 import java.util.concurrent.atomic.LongAdder;
 import java.util.stream.Collectors;
@@ -73,7 +71,7 @@ public class IntersectionAction extends AbstractJobPhaseAction {
 
 
                 // 碰撞，并获取交集。
-                List<PsiRecord> fruit = PSIUtils.match(
+                List<PsiRecord> fruit = PsiUtils.match(
                         job.getPartner().psiBloomFilter,
                         records,
                         encryptedList,
@@ -96,14 +94,14 @@ public class IntersectionAction extends AbstractJobPhaseAction {
             PsiRecord record = new PsiRecord();
             record.row = row;
 
-            BigInteger blindFactor = PSIUtils.generateBlindingFactor(publicModulus);
+            BigInteger blindFactor = PsiUtils.generateBlindingFactor(publicModulus);
             BigInteger random = blindFactor.modPow(publicExponent, publicModulus);
             record.inv = blindFactor.modInverse(publicModulus);
 
-            String key = HashConfigUtil.hash(job.getMyself().dataResourceInfo.hashConfigList, row);
-            BigInteger h = PSIUtils.stringToBigInteger(key);
+            String key = job.getMyself().dataResourceInfo.hashConfig.hash(row);
+            BigInteger h = PsiUtils.stringToBigInteger(key);
             BigInteger x = h.multiply(random).mod(publicModulus);
-            byte[] bytes = PSIUtils.bigIntegerToBytes(x);
+            byte[] bytes = PsiUtils.bigIntegerToBytes(x);
             record.encodedKey = Base64.encode(bytes);
 
             consumer.add(record);
@@ -115,8 +113,6 @@ public class IntersectionAction extends AbstractJobPhaseAction {
         // 包装结果
         result.finish(resultFile, fruitCount.longValue());
     }
-
-
 
 
     @Override
