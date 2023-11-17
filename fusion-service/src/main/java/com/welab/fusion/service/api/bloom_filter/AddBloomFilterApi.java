@@ -16,7 +16,6 @@
 package com.welab.fusion.service.api.bloom_filter;
 
 import com.welab.fusion.core.hash.HashConfig;
-import com.welab.fusion.service.api.data_source.AddDataSourceApi;
 import com.welab.fusion.service.constans.BloomFilterAddMethod;
 import com.welab.fusion.service.model.Progress;
 import com.welab.fusion.service.service.BloomFilterService;
@@ -34,7 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author zane.luo
  * @date 2023/11/16
  */
-@Api(path = "bloom_filter/add", name = "添加布隆过滤器")
+@Api(path = "bloom_filter/add", name = "添加布隆过滤器", desc = "添加过程为异步执行，需要通过 progress/get 接口查询进度")
 public class AddBloomFilterApi extends AbstractApi<AddBloomFilterApi.Input, AddBloomFilterApi.Output> {
     @Autowired
     private BloomFilterService bloomFilterService;
@@ -46,21 +45,11 @@ public class AddBloomFilterApi extends AbstractApi<AddBloomFilterApi.Input, AddB
         return success(Output.of(progress.getSessionId()));
     }
 
-    public static class Input extends AddDataSourceApi.Input {
+    public static class Input extends PreviewTableDataSourceApi.Input {
         @Check(name = "名称", require = true, regex = "^.{4,50}$", messageOnInvalid = "名称长度不能少于4，不能大于50")
         public String name;
         @Check(name = "描述", regex = "^[\\s\\S]{0,3072}$", messageOnInvalid = "你写的描述太多了~")
         public String description;
-        @Check(require = true)
-        public BloomFilterAddMethod addMethod;
-
-        @Check(name = "数据源id")
-        public String dataSourceId;
-        @Check(name = "sql脚本", blockXss = false, oneSelectSql = true)
-        public String sql;
-
-        @Check(name = "数据源文件")
-        public String dataSourceFile;
 
         @Check(name = "主键 hash 方案", require = true)
         public HashConfig hashConfig;
@@ -92,6 +81,7 @@ public class AddBloomFilterApi extends AbstractApi<AddBloomFilterApi.Input, AddB
     }
 
     public static class Output {
+        @Check(desc = "用于使用 progress/get 接口查询进度")
         public String sessionId;
 
         public static Output of(String sessionId) {

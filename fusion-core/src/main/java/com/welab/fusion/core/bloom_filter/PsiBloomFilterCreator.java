@@ -134,7 +134,7 @@ public class PsiBloomFilterCreator implements Closeable {
     public PsiBloomFilter create(String id, Consumer<Long> progressConsumer) throws StatusCodeWithException {
         final long start = System.currentTimeMillis();
         LongAdder insertedElementCount = new LongAdder();
-        dataSourceReader.readAll(new BiConsumer<Long, LinkedHashMap<String, Object>>() {
+        dataSourceReader.readRows(new BiConsumer<Long, LinkedHashMap<String, Object>>() {
             @Override
             public void accept(Long index, LinkedHashMap<String, Object> row) {
 

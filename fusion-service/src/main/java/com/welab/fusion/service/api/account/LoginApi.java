@@ -29,7 +29,12 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author zane.luo
  * @date 2023/11/7
  */
-@Api(path = "account/login", name = "login", allowAccessWithNothing = true)
+@Api(
+        path = "account/login",
+        name = "login",
+        desc = "登录成功后，需要在后续所有请求中带上 token",
+        allowAccessWithNothing = true
+)
 public class LoginApi extends AbstractApi<LoginApi.Input, LoginApi.Output> {
 
     @Autowired

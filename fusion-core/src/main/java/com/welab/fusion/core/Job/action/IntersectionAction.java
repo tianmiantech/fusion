@@ -89,7 +89,7 @@ public class IntersectionAction extends AbstractJobPhaseAction {
         });
 
         // 从数据源逐条读取数据集并编码
-        job.getMyself().tableDataResourceReader.readAll((index, row) -> {
+        job.getMyself().tableDataResourceReader.readRows((index, row) -> {
 
             PsiRecord record = new PsiRecord();
             record.row = row;

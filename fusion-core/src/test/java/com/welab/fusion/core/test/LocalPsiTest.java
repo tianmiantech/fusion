@@ -81,7 +81,7 @@ public class LocalPsiTest {
         });
 
         // 从数据源逐条读取数据集并编码
-        reader.readAll((index, row) -> {
+        reader.readRows((index, row) -> {
 
             PsiRecord record = new PsiRecord();
             record.row = row;

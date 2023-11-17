@@ -33,7 +33,12 @@ import java.util.List;
 public class ExcelTableDataSourceReader extends AbstractTableDataSourceReader {
     private final ExcelReader reader;
 
-    public ExcelTableDataSourceReader(File file) throws IOException {
+    public ExcelTableDataSourceReader(File file) throws Exception {
+        this(file, -1, -1);
+    }
+
+    public ExcelTableDataSourceReader(File file,long maxReadRows, long maxReadTimeInMs) throws IOException {
+        super(maxReadRows, maxReadTimeInMs);
         reader = new ExcelReader(file);
     }
 

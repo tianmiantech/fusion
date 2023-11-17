@@ -44,6 +44,11 @@ public class CsvTableDataSourceReader extends AbstractTableDataSourceReader {
     private final File file;
 
     public CsvTableDataSourceReader(File file) throws Exception {
+        this(file, -1, -1);
+    }
+
+    public CsvTableDataSourceReader(File file, long maxReadRows, long maxReadTimeInMs) throws Exception {
+        super(maxReadRows, maxReadTimeInMs);
         if (!file.exists()) {
             throw new RuntimeException("文件不存在：" + file.getAbsolutePath());
         }

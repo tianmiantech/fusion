@@ -24,6 +24,7 @@ import com.welab.fusion.core.data_source.SqlTableDataSourceReader;
 import com.welab.fusion.core.hash.HashConfig;
 import com.welab.fusion.core.io.FileSystem;
 import com.welab.fusion.service.api.bloom_filter.AddBloomFilterApi;
+import com.welab.fusion.service.api.bloom_filter.PreviewTableDataSourceApi;
 import com.welab.fusion.service.constans.BloomFilterAddMethod;
 import com.welab.fusion.service.database.entity.BloomFilterDbModel;
 import com.welab.fusion.service.model.Progress;
@@ -40,6 +41,8 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
+
 
 /**
  * @author zane.luo
@@ -52,7 +55,7 @@ public class BloomFilterService extends AbstractService {
     private DataSourceService dataSourceService;
 
     public Progress add(AddBloomFilterApi.Input input) throws Exception {
-        AbstractTableDataSourceReader reader = createReader(input);
+        AbstractTableDataSourceReader reader = createReader(input, -1, -1);
 
         BloomFilterDbModel model = new BloomFilterDbModel();
         model.setName(input.name);
@@ -102,7 +105,7 @@ public class BloomFilterService extends AbstractService {
         }
     }
 
-    public AbstractTableDataSourceReader createReader(AddBloomFilterApi.Input input) throws Exception {
+    public AbstractTableDataSourceReader createReader(PreviewTableDataSourceApi.Input input, long maxReadRows, long maxReadTimeInMs) throws Exception {
         switch (input.addMethod) {
             case Database:
                 JdbcDataSourceClient client = StringUtil.isNotEmpty(input.dataSourceId)
@@ -111,7 +114,7 @@ public class BloomFilterService extends AbstractService {
 
                 client.test();
 
-                return new SqlTableDataSourceReader(client, input.sql);
+                return new SqlTableDataSourceReader(client, input.sql, maxReadRows, maxReadTimeInMs);
 
             default:
                 File file;
@@ -127,8 +130,23 @@ public class BloomFilterService extends AbstractService {
 
                 boolean isCsv = file.getName().endsWith("csv");
                 return isCsv
-                        ? new CsvTableDataSourceReader(file)
-                        : new ExcelTableDataSourceReader(file);
+                        ? new CsvTableDataSourceReader(file, maxReadRows, maxReadTimeInMs)
+                        : new ExcelTableDataSourceReader(file, maxReadRows, maxReadTimeInMs);
         }
+    }
+
+    /**
+     * 预览数据源中的数据
+     */
+    public PreviewTableDataSourceApi.Output previewTableDataSource(PreviewTableDataSourceApi.Input input) throws Exception {
+        AbstractTableDataSourceReader reader = createReader(input, 100, -1);
+
+
+        PreviewTableDataSourceApi.Output output = new PreviewTableDataSourceApi.Output();
+        output.header = reader.getHeader();
+        output.rows = new ArrayList<>(100);
+
+        reader.readRows((index, row) -> output.rows.add(row));
+        return output;
     }
 }

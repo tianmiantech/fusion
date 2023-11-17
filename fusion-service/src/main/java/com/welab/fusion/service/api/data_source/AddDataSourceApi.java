@@ -45,10 +45,9 @@ public class AddDataSourceApi extends AbstractApi<AddDataSourceApi.Input, AddDat
     }
 
     public static class Input extends AbstractApiInput {
-        @Check(messageOnEmpty = "数据库类型不能为空")
+
         public DatabaseType databaseType;
 
-        @Check(require = true)
         public Map<String, Object> dataSourceParams;
 
         @Override

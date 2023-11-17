@@ -48,11 +48,24 @@ public abstract class AbstractTableDataSourceReader implements Closeable {
      * 已读取的数据量
      */
     protected long readDataRows = 0;
+    /**
+     * 最大读取行数
+     */
+    protected long maxReadRows;
+    /**
+     * 最大读取时长（毫秒）
+     */
+    protected long maxReadTimeInMs;
 
     static {
         SuperDataSourceClient.register(DorisDataSourceClient.class);
         SuperDataSourceClient.register(HiveDataSourceClient.class);
         SuperDataSourceClient.register(MySqlDataSourceClient.class);
+    }
+
+    public AbstractTableDataSourceReader(long maxReadRows, long maxReadTimeInMs) {
+        this.maxReadRows = maxReadRows;
+        this.maxReadTimeInMs = maxReadTimeInMs;
     }
 
     public synchronized long getTotalDataRowCount() {
@@ -99,22 +112,11 @@ public abstract class AbstractTableDataSourceReader implements Closeable {
     }
 
     /**
-     * Read all data rows
-     *
-     * @param dataRowConsumer Data row consumption method
-     */
-    public void readAll(BiConsumer<Long, LinkedHashMap<String, Object>> dataRowConsumer) throws StatusCodeWithException {
-        read(dataRowConsumer, -1, -1);
-    }
-
-    /**
      * Read data row
      *
      * @param dataRowConsumer Data row consumption method
-     * @param maxReadRows     Maximum number of read lines allowed
-     * @param maxReadTimeInMs Maximum read time allowed
      */
-    public void read(BiConsumer<Long, LinkedHashMap<String, Object>> dataRowConsumer, long maxReadRows, long maxReadTimeInMs) throws StatusCodeWithException {
+    public void readRows(BiConsumer<Long, LinkedHashMap<String, Object>> dataRowConsumer) throws StatusCodeWithException {
 
         long start = System.currentTimeMillis();
 
