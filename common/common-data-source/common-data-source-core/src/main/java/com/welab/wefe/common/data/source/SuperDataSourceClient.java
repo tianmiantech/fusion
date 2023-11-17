@@ -32,7 +32,7 @@ import java.util.Set;
  */
 public class SuperDataSourceClient {
     private static final Logger LOG = LoggerFactory.getLogger(SuperDataSourceClient.class);
-    
+
     private static final Map<String, Class<? extends AbstractDataSource>> CLASS_MAPS = new HashMap<>();
 
     /**
@@ -40,6 +40,12 @@ public class SuperDataSourceClient {
      */
     public static Set<String> registeredTypes() {
         return CLASS_MAPS.keySet();
+    }
+
+    public static void register(Class<? extends AbstractDataSource>... classes) {
+        for (Class<? extends AbstractDataSource> clazz : classes) {
+            register(clazz);
+        }
     }
 
     /**

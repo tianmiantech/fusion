@@ -13,39 +13,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.welab.fusion.service.api.service;
+package com.welab.fusion.service.api.progress;
 
-import com.welab.fusion.service.service.AccountService;
-import com.welab.wefe.common.fieldvalidate.annotation.Check;
+import com.welab.fusion.service.model.Progress;
+import com.welab.fusion.service.model.ProgressManager;
 import com.welab.wefe.common.web.api.base.AbstractApi;
 import com.welab.wefe.common.web.api.base.Api;
 import com.welab.wefe.common.web.dto.AbstractApiInput;
 import com.welab.wefe.common.web.dto.ApiResult;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author zane.luo
- * @date 2023/11/7
+ * @date 2023/11/17
  */
-@Api(path = "service/init", name = "超级管理员账号，初始化服务。")
-public class InitSuperAdminAccountApi extends AbstractApi<InitSuperAdminAccountApi.Input, InitSuperAdminAccountApi.Output> {
-    @Autowired
-    private AccountService accountService;
-
+@Api(path = "progress/get", name = "获取任务进度")
+public class GetProgressApi extends AbstractApi<GetProgressApi.Input,GetProgressApi.Output> {
     @Override
-    protected ApiResult<InitSuperAdminAccountApi.Output> handle(InitSuperAdminAccountApi.Input input) throws Exception {
-        accountService.initSuperAdminAccount(input.username, input.password);
-        return success();
+    protected ApiResult<GetProgressApi.Output> handle(GetProgressApi.Input input) throws Exception {
+        Progress progress = ProgressManager.get(input.sessionId);
+        return success(Output.of(progress));
     }
 
     public static class Input extends AbstractApiInput {
-        @Check(require = true)
-        public String username;
-        @Check(require = true)
-        public String password;
+        public String sessionId;
     }
 
     public static class Output {
+        public Progress progress;
 
+        public static Output of(Progress progress) {
+            Output output = new Output();
+            output.progress = progress;
+            return output;
+        }
     }
 }

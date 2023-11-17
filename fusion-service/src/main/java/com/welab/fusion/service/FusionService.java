@@ -16,6 +16,10 @@
 
 package com.welab.fusion.service;
 
+import com.welab.wefe.common.data.source.DorisDataSourceClient;
+import com.welab.wefe.common.data.source.HiveDataSourceClient;
+import com.welab.wefe.common.data.source.MySqlDataSourceClient;
+import com.welab.wefe.common.data.source.SuperDataSourceClient;
 import com.welab.wefe.common.web.Launcher;
 import com.welab.wefe.common.web.config.ApiBeanNameGenerator;
 import org.slf4j.Logger;
@@ -47,6 +51,12 @@ public class FusionService implements ApplicationContextAware {
     private static final Logger LOG = LoggerFactory.getLogger(FusionService.class);
 
     public static void main(String[] args) {
+        SuperDataSourceClient.register(
+                MySqlDataSourceClient.class,
+                DorisDataSourceClient.class,
+                HiveDataSourceClient.class
+        );
+        
         Launcher
                 .instance()
                 //.apiLogger(new BoardApiLogger())

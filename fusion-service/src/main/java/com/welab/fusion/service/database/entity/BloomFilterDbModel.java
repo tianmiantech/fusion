@@ -48,7 +48,7 @@ public class BloomFilterDbModel extends AbstractDbModel {
     /**
      * 存储大小
      */
-    private String storageSize;
+    private long storageSize = -1;
     /**
      * 总数据量
      */
@@ -96,11 +96,11 @@ public class BloomFilterDbModel extends AbstractDbModel {
         this.storageDir = storageDir;
     }
 
-    public String getStorageSize() {
+    public long getStorageSize() {
         return storageSize;
     }
 
-    public void setStorageSize(String storageSize) {
+    public void setStorageSize(long storageSize) {
         this.storageSize = storageSize;
     }
 

@@ -77,6 +77,10 @@ public class PsiBloomFilter {
         return result;
     }
 
+    public static File getDataFile(Path dir) {
+        return dir.resolve(DATA_FILE_NAME).toFile();
+    }
+
     /**
      * 为避免资源浪费，过滤器文件在需要用到的时候才加载。
      */

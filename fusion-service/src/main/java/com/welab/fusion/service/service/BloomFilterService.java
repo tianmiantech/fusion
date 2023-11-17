@@ -22,12 +22,12 @@ import com.welab.fusion.core.data_source.CsvTableDataSourceReader;
 import com.welab.fusion.core.data_source.ExcelTableDataSourceReader;
 import com.welab.fusion.core.data_source.SqlTableDataSourceReader;
 import com.welab.fusion.core.hash.HashConfig;
-import com.welab.fusion.core.hash.HashConfigItem;
 import com.welab.fusion.core.io.FileSystem;
 import com.welab.fusion.service.api.bloom_filter.AddBloomFilterApi;
 import com.welab.fusion.service.constans.BloomFilterAddMethod;
 import com.welab.fusion.service.database.entity.BloomFilterDbModel;
 import com.welab.fusion.service.model.Progress;
+import com.welab.fusion.service.model.ProgressManager;
 import com.welab.fusion.service.service.base.AbstractService;
 import com.welab.wefe.common.CommonThreadPool;
 import com.welab.wefe.common.data.source.JdbcDataSourceClient;
@@ -40,7 +40,6 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.List;
 
 /**
  * @author zane.luo
@@ -62,9 +61,8 @@ public class BloomFilterService extends AbstractService {
         model.setSql(input.sql);
         model.setHashConfigs(input.hashConfig.toJson());
 
-        Progress progress = Progress.of(model.getId(), 0);
-        progress.setMessage("正在统计数据总量...");
-        progress.updateTotalWorkload(reader.getTotalDataRowCount());
+
+        Progress progress = ProgressManager.startNew(model.getId());
 
         CommonThreadPool.run(() -> {
             try {
@@ -83,6 +81,9 @@ public class BloomFilterService extends AbstractService {
 
     private void create(BloomFilterDbModel model, Progress progress, AbstractTableDataSourceReader dataSourceReader, HashConfig hashConfig) throws IOException, StatusCodeWithException {
 
+        progress.setMessage("正在统计数据总量...");
+        progress.updateTotalWorkload(dataSourceReader.getTotalDataRowCount());
+
         progress.setMessage("正在生成过滤器...");
         // 生成过滤器
         try (PsiBloomFilterCreator creator = new PsiBloomFilterCreator(dataSourceReader, hashConfig)) {
@@ -90,8 +91,14 @@ public class BloomFilterService extends AbstractService {
                 progress.updateCompletedWorkload(index);
             });
 
+            progress.setMessage("过滤器生成完毕，正在储存...");
             Path sinkDir = FileSystem.PsiBloomFilter.getPath(model.getId());
             psiBloomFilter.sink(sinkDir);
+
+            // 填充 model
+            model.setTotalDataCount(dataSourceReader.getTotalDataRowCount());
+            model.setStorageDir(sinkDir.toAbsolutePath().toString());
+            model.setStorageSize(PsiBloomFilter.getDataFile(sinkDir).length());
         }
     }
 
@@ -112,6 +119,10 @@ public class BloomFilterService extends AbstractService {
                     file = new File(input.dataSourceFile);
                 } else {
                     file = FileSystem.getTempDir().resolve(input.dataSourceFile).toFile();
+                }
+
+                if (!file.exists()) {
+                    throw new RuntimeException("未找到文件:" + file.getAbsolutePath());
                 }
 
                 boolean isCsv = file.getName().endsWith("csv");

@@ -15,9 +15,32 @@
  */
 package com.welab.fusion.service.model;
 
+import net.jodah.expiringmap.ExpirationPolicy;
+import net.jodah.expiringmap.ExpiringMap;
+
+import java.util.concurrent.TimeUnit;
+
 /**
  * @author zane.luo
  * @date 2023/11/16
  */
 public class ProgressManager {
+    /**
+     * sessionId : Progress
+     */
+    private static ExpiringMap<String, Progress> CACHE = ExpiringMap
+            .builder()
+            .expirationPolicy(ExpirationPolicy.ACCESSED)
+            .expiration(10, TimeUnit.MINUTES)
+            .build();
+
+    public static Progress startNew(String modelId) {
+        Progress progress = Progress.of(modelId, 0);
+        CACHE.put(progress.getSessionId(), progress);
+        return progress;
+    }
+
+    public static Progress get(String sessionId) {
+        return CACHE.get(sessionId);
+    }
 }
