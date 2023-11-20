@@ -19,6 +19,8 @@ package com.welab.fusion.service.model.global_config;
 import com.welab.fusion.service.model.global_config.base.AbstractConfigModel;
 import com.welab.fusion.service.model.global_config.base.ConfigGroupConstant;
 import com.welab.fusion.service.model.global_config.base.ConfigModel;
+import com.welab.wefe.common.fieldvalidate.secret.MaskStrategy;
+import com.welab.wefe.common.fieldvalidate.secret.Secret;
 
 /**
  * @author zane.luo
@@ -36,5 +38,6 @@ public class FusionConfigModel extends AbstractConfigModel {
     /**
      * 私钥
      */
+    @Secret(maskStrategy = MaskStrategy.BLOCK)
     public String privateKey;
 }

@@ -21,6 +21,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.PropertyNamingStrategy;
 import com.alibaba.fastjson.serializer.SerializeConfig;
 import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.welab.fusion.service.api.global_config.GlobalConfigUpdateApi;
 import com.welab.fusion.service.database.base.Where;
 import com.welab.fusion.service.database.entity.GlobalConfigDbModel;
 import com.welab.fusion.service.database.repository.GlobalConfigRepository;
@@ -227,5 +228,14 @@ public class GlobalConfigService extends AbstractService {
         Class<? extends AbstractConfigModel> clazz = AbstractConfigModel.getModelClass(group);
 
         return TempSm2Cache.decrypt(map, clazz);
+    }
+
+
+    public void update(GlobalConfigUpdateApi.Input input) throws Exception {
+        for (Map.Entry<String, Map<String, Object>> group : input.groups.entrySet()) {
+            AbstractConfigModel model = toModel(group.getKey(), group.getValue());
+            save(model);
+        }
+
     }
 }

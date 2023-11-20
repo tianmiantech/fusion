@@ -16,10 +16,12 @@
 package com.welab.fusion.service.service;
 
 import com.welab.fusion.service.service.base.AbstractService;
+import org.springframework.stereotype.Service;
 
 /**
  * @author zane.luo
  * @date 2023/11/20
  */
+@Service
 public class PartnerService extends AbstractService {
 }
