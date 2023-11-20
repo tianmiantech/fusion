@@ -21,6 +21,8 @@ import com.welab.wefe.common.data.source.JdbcDataSourceParams;
 import com.welab.wefe.common.enums.DatabaseType;
 import com.welab.wefe.common.exception.StatusCodeWithException;
 import com.welab.wefe.common.fieldvalidate.annotation.Check;
+import com.welab.wefe.common.fieldvalidate.secret.MaskStrategy;
+import com.welab.wefe.common.fieldvalidate.secret.Secret;
 import com.welab.wefe.common.web.TempSm2Cache;
 import com.welab.wefe.common.web.api.base.AbstractApi;
 import com.welab.wefe.common.web.api.base.Api;
@@ -48,6 +50,7 @@ public class AddDataSourceApi extends AbstractApi<AddDataSourceApi.Input, AddDat
 
         public DatabaseType databaseType;
 
+        @Secret(maskStrategy = MaskStrategy.BLOCK)
         public Map<String, Object> dataSourceParams;
 
         @Override

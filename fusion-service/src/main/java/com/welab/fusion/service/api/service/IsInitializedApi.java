@@ -16,7 +16,7 @@
 
 package com.welab.fusion.service.api.service;
 
-import com.welab.fusion.service.service.FusionService;
+import com.welab.fusion.service.service.InitService;
 import com.welab.wefe.common.exception.StatusCodeWithException;
 import com.welab.wefe.common.web.api.base.AbstractNoneInputApi;
 import com.welab.wefe.common.web.api.base.Api;
@@ -30,11 +30,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class IsInitializedApi extends AbstractNoneInputApi<IsInitializedApi.Output> {
 
     @Autowired
-    private FusionService fusionService;
+    private InitService initService;
 
     @Override
     protected ApiResult<Output> handle() throws StatusCodeWithException {
-        return success(Output.of(fusionService.isInitialized()));
+        return success(Output.of(initService.isInitialized()));
     }
 
     public static class Output {

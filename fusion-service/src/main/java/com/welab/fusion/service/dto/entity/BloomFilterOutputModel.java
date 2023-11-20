@@ -16,14 +16,10 @@
 package com.welab.fusion.service.dto.entity;
 
 import com.alibaba.fastjson.JSONObject;
-import com.vladmihalcea.hibernate.type.json.JsonStringType;
-import com.welab.fusion.service.constans.BloomFilterAddMethod;
-import com.welab.fusion.service.database.entity.AbstractDbModel;
+import com.welab.fusion.service.constans.AddMethod;
 import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.Column;
-import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 
@@ -63,7 +59,7 @@ public class BloomFilterOutputModel extends AbstractOutputModel {
      * 布隆过滤器添加方式
      */
     @Enumerated(EnumType.STRING)
-    private BloomFilterAddMethod addMethod;
+    private AddMethod addMethod;
     /**
      * sql语句
      */
@@ -119,11 +115,11 @@ public class BloomFilterOutputModel extends AbstractOutputModel {
         this.hashConfigs = hashConfigs;
     }
 
-    public BloomFilterAddMethod getAddMethod() {
+    public AddMethod getAddMethod() {
         return addMethod;
     }
 
-    public void setAddMethod(BloomFilterAddMethod addMethod) {
+    public void setAddMethod(AddMethod addMethod) {
         this.addMethod = addMethod;
     }
 

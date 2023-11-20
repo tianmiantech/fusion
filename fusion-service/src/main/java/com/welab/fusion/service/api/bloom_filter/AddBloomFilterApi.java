@@ -16,7 +16,7 @@
 package com.welab.fusion.service.api.bloom_filter;
 
 import com.welab.fusion.core.hash.HashConfig;
-import com.welab.fusion.service.constans.BloomFilterAddMethod;
+import com.welab.fusion.service.constans.AddMethod;
 import com.welab.fusion.service.model.Progress;
 import com.welab.fusion.service.service.BloomFilterService;
 import com.welab.wefe.common.StatusCode;
@@ -46,7 +46,7 @@ public class AddBloomFilterApi extends AbstractApi<AddBloomFilterApi.Input, AddB
     }
 
     public static class Input extends PreviewTableDataSourceApi.Input {
-        @Check(name = "名称", require = true, regex = "^.{4,50}$", messageOnInvalid = "名称长度不能少于4，不能大于50")
+        @Check(name = "名称", regex = "^.{4,50}$", messageOnInvalid = "名称长度不能少于4，不能大于50")
         public String name;
         @Check(name = "描述", regex = "^[\\s\\S]{0,3072}$", messageOnInvalid = "你写的描述太多了~")
         public String description;
@@ -58,12 +58,11 @@ public class AddBloomFilterApi extends AbstractApi<AddBloomFilterApi.Input, AddB
         public void checkAndStandardize() throws StatusCodeWithException {
             super.checkAndStandardize();
 
-
             if (hashConfig.isEmpty()) {
                 throw new StatusCodeWithException(StatusCode.PARAMETER_VALUE_INVALID, "请设置主键");
             }
 
-            if (addMethod == BloomFilterAddMethod.Database) {
+            if (addMethod == AddMethod.Database) {
                 if (StringUtils.isEmpty(dataSourceId) || MapUtils.isEmpty(dataSourceParams)) {
                     StatusCode.PARAMETER_VALUE_INVALID.throwException("请设置数据源");
                 }

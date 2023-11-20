@@ -19,7 +19,7 @@ package com.welab.fusion.service.constans;
  * @author zane.luo
  * @date 2023/11/16
  */
-public enum BloomFilterAddMethod {
+public enum AddMethod {
     /**
      *
      */

@@ -19,7 +19,7 @@ import com.welab.fusion.service.api.bloom_filter.AddBloomFilterApi;
 import com.welab.fusion.service.api.data_source.AddDataSourceApi;
 import com.welab.fusion.service.api.data_source.TestDataSourceApi;
 import com.welab.fusion.service.api.data_source.UpdateApi;
-import com.welab.fusion.service.constans.BloomFilterAddMethod;
+import com.welab.fusion.service.constans.AddMethod;
 import com.welab.fusion.service.database.entity.DataSourceDbModel;
 import com.welab.fusion.service.database.repository.DataSourceRepository;
 import com.welab.fusion.service.dto.entity.DataSourceOutputModel;
@@ -149,7 +149,7 @@ public class DataSourceService extends AbstractService {
      */
     public void tryAdd(AddBloomFilterApi.Input input) {
         // 不是数据库类型的数据源，不创建。
-        if (input.addMethod != BloomFilterAddMethod.Database) {
+        if (input.addMethod != AddMethod.Database) {
             return;
         }
 

@@ -21,12 +21,14 @@ import com.welab.wefe.common.StatusCode;
 import com.welab.wefe.common.crypto.Sm2;
 import com.welab.wefe.common.exception.StatusCodeWithException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * @author zane.luo
  * @date 2023/11/20
  */
-public class FusionService extends AbstractService {
+@Service
+public class InitService extends AbstractService {
     @Autowired
     private GlobalConfigService globalConfigService;
 
