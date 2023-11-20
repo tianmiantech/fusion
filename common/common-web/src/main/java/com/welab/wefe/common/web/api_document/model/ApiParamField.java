@@ -15,6 +15,7 @@
  */
 package com.welab.wefe.common.web.api_document.model;
 
+import cn.hutool.core.util.StrUtil;
 import com.welab.wefe.common.fieldvalidate.annotation.Check;
 import com.welab.wefe.common.util.ClassUtils;
 import com.welab.wefe.common.util.StringUtil;
@@ -40,7 +41,7 @@ public class ApiParamField {
     public ApiParamField(Field field) {
         name = StringUtil.stringToUnderLineLowerCase(field.getName());
 
-        typeName = StringUtil.substringAfterLast(field.getType().getCanonicalName(), ".");
+        typeName = field.getType().getSimpleName();
         typeClass = field.getType();
         isList = field.getType().equals(List.class);
         if (isList) {

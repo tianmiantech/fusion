@@ -31,6 +31,7 @@ import java.util.Map;
 public class HtmlFormatter extends AbstractApiDocumentFormatter {
     StringBuilder str = new StringBuilder(2048);
     private Map<Class<?>, String> enumTypeDicMap = new HashMap<>();
+    private Map<Class<?>, String> classTypeDicMap = new HashMap<>();
 
     public HtmlFormatter() {
         setToc();
@@ -99,13 +100,20 @@ public class HtmlFormatter extends AbstractApiDocumentFormatter {
         str
                 .append("<div id='type-dic-map'>")
                 .append("<h2>数据类型字典</h2>");
+
         for (Map.Entry<Class<?>, String> entry : enumTypeDicMap.entrySet()) {
             str.append(entry.getValue());
         }
+        str.append("<div class='clear-both'></div>");
 
-        str
-                .append("<div class='clear-both'></div>")
-                .append("</div>");
+        str.append("<div class='class-type-dic-list'>");
+        for (Map.Entry<Class<?>, String> entry : classTypeDicMap.entrySet()) {
+            str.append(entry.getValue());
+        }
+        str.append("</div>");
+        str.append("<div class='clear-both'></div>");
+
+        str.append("</div>");
     }
 
     private String getParams(String title, ApiParam params) {
@@ -156,16 +164,29 @@ public class HtmlFormatter extends AbstractApiDocumentFormatter {
 
         if (item.typeClass.isEnum()) {
             enumTypeDicMap.put(item.typeClass, renderEnumTypeDic(item.typeClass));
+        } else {
+            classTypeDicMap.put(item.typeClass, renderClassTypeDic(item.typeClass));
         }
 
         return "<a href='#" + id + "'>" + item.typeName + "</a>";
+    }
+
+    private String renderClassTypeDic(Class<?> type) {
+        String id = classToId(type);
+        StringBuilder html = new StringBuilder(256);
+        html
+                .append("<div id='" + id + "' class='class-dic-panel'>")
+                .append(getParams(type.getSimpleName(), new ApiParam(type)))
+                .append("</div>");
+
+        return html.toString();
     }
 
     private String renderEnumTypeDic(Class<?> type) {
         String id = classToId(type);
         StringBuilder html = new StringBuilder(128);
         html
-                .append("<div id='" + id + "' class='type-dic-panel'>")
+                .append("<div id='" + id + "' class='enum-dic-panel'>")
                 .append("<p class='enum-title'>" + type.getSimpleName() + "</p>")
                 .append("<ul>");
 
@@ -185,6 +206,10 @@ public class HtmlFormatter extends AbstractApiDocumentFormatter {
 
     private boolean isSimpleType(Class<?> type) {
         if (type.isEnum()) {
+            return false;
+        }
+
+        if (type.getName().contains("welab")) {
             return false;
         }
 
