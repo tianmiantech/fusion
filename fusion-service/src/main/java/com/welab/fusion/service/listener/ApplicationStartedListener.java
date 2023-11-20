@@ -17,8 +17,10 @@
 package com.welab.fusion.service.listener;
 
 import com.welab.fusion.core.io.FileSystem;
+import com.welab.fusion.service.service.GlobalConfigService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.ApplicationListener;
@@ -39,9 +41,19 @@ public class ApplicationStartedListener implements ApplicationListener<Applicati
 
     @Value("${fusion.file-system.base-dir:}")
     private String fileSystemBaseDir;
+    @Autowired
+    private GlobalConfigService globalConfigService;
 
     @Override
     public void onApplicationEvent(ApplicationStartedEvent event) {
+
+        // 初始化全局配置
+        try {
+            globalConfigService.init();
+        } catch (Exception e) {
+            LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);
+            System.exit(-1);
+        }
 
         // 初始化文件系统
         try {
@@ -50,6 +62,5 @@ public class ApplicationStartedListener implements ApplicationListener<Applicati
             LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);
             System.exit(-1);
         }
-
     }
 }

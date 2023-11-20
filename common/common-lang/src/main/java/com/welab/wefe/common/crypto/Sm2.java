@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package com.welab.wefe.common.util;
+package com.welab.wefe.common.crypto;
 
+import com.welab.wefe.common.util.IpAddressUtil;
 import org.apache.commons.codec.binary.Base64;
 import org.bouncycastle.asn1.gm.GMNamedCurves;
 import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
@@ -38,13 +39,16 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.spec.ECGenParameterSpec;
+
 import org.bouncycastle.jce.spec.ECPrivateKeySpec;
 import org.bouncycastle.jce.spec.ECPublicKeySpec;
 
 /**
+ * 国密算法：非对称加密
+ *
  * @author yuxin.zhang
  */
-public class SM2Util {
+public class Sm2 {
     private static final Logger LOG = LoggerFactory.getLogger(IpAddressUtil.class);
 
     static {
@@ -153,7 +157,7 @@ public class SM2Util {
         ECDomainParameters ecDomainParameters = new ECDomainParameters(ecParameterSpec.getCurve(),
                 ecParameterSpec.getG(), ecParameterSpec.getN());
         ECPublicKeyParameters ecPublicKeyParameters = new ECPublicKeyParameters(publicKey.getQ(), ecDomainParameters);
-        //SM2Engine sm2Engine = new SM2Engine(SM2Engine.Mode.C1C3C2);
+        // SM2Engine sm2Engine = new SM2Engine(SM2Engine.Mode.C1C3C2);
         SM2Engine sm2Engine = new SM2Engine();
         sm2Engine.init(true, new ParametersWithRandom(ecPublicKeyParameters, new SecureRandom()));
         byte[] data = plaintext.getBytes(StandardCharsets.UTF_8);
@@ -170,7 +174,7 @@ public class SM2Util {
                 ecParameterSpec.getG(), ecParameterSpec.getN());
         ECPrivateKeyParameters ecPrivateKeyParameters = new ECPrivateKeyParameters(privateKey.getD(),
                 ecDomainParameters);
-        //SM2Engine sm2Engine = new SM2Engine(SM2Engine.Mode.C1C3C2);
+        // SM2Engine sm2Engine = new SM2Engine(SM2Engine.Mode.C1C3C2);
         SM2Engine sm2Engine = new SM2Engine();
         sm2Engine.init(false, ecPrivateKeyParameters);
         byte[] data = Base64.decodeBase64(ciphertext.getBytes(StandardCharsets.UTF_8));

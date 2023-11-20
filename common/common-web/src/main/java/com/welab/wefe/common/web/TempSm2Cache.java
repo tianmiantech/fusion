@@ -19,7 +19,7 @@ package com.welab.wefe.common.web;
 import com.alibaba.fastjson.JSONObject;
 import com.welab.wefe.common.fieldvalidate.secret.Secret;
 import com.welab.wefe.common.fieldvalidate.secret.SecretUtil;
-import com.welab.wefe.common.util.SM2Util;
+import com.welab.wefe.common.crypto.Sm2;
 import com.welab.wefe.common.util.StringUtil;
 import com.welab.wefe.common.web.util.CurrentAccount;
 import net.jodah.expiringmap.ExpirationPolicy;
@@ -44,7 +44,7 @@ public class TempSm2Cache {
     /**
      * user id : KeyPair
      */
-    private static ExpiringMap<String, SM2Util.Sm2KeyPair> KEY_PAIR_MAP_BY_USER = ExpiringMap
+    private static ExpiringMap<String, Sm2.Sm2KeyPair> KEY_PAIR_MAP_BY_USER = ExpiringMap
             .builder()
             .expirationPolicy(ExpirationPolicy.ACCESSED)
             .expiration(60, TimeUnit.MINUTES)
@@ -57,7 +57,7 @@ public class TempSm2Cache {
      * 获取一个新的公钥
      */
     public static String getPublicKey() {
-        SM2Util.Sm2KeyPair sm2KeyPair = SM2Util.generateKeyPair();
+        Sm2.Sm2KeyPair sm2KeyPair = Sm2.generateKeyPair();
         KEY_PAIR_MAP_BY_USER.put(CurrentAccount.get().getId(), sm2KeyPair);
         return sm2KeyPair.publicKey;
     }
@@ -69,12 +69,12 @@ public class TempSm2Cache {
         if (StringUtil.isEmpty(ciphertext)) {
             return ciphertext;
         }
-        SM2Util.Sm2KeyPair sm2KeyPair = KEY_PAIR_MAP_BY_USER.get(CurrentAccount.get().getId());
+        Sm2.Sm2KeyPair sm2KeyPair = KEY_PAIR_MAP_BY_USER.get(CurrentAccount.get().getId());
         if (sm2KeyPair == null) {
             return ciphertext;
         }
         try {
-            return SM2Util.decryptHexByPrivateKey(ciphertext, sm2KeyPair.privateKey);
+            return Sm2.decryptHexByPrivateKey(ciphertext, sm2KeyPair.privateKey);
         } catch (Exception e) {
             String message = System.lineSeparator()
                     + "ciphertext:" + ciphertext + System.lineSeparator()
@@ -137,7 +137,7 @@ public class TempSm2Cache {
         String publicKey = "04267bc87fde3d541d64629fa2b641c6a5d0acb9a4c2f40c0f5cd9f28c36311dd65b508c0306d12b63caa47aea9b0f915cc50bd088b2a2de4424712fe3fe00ef0e";
         String privateKey = "63b5aeb4ecfb4a178cf892534a179d44242fcf42f20c8c6f985c50edcd0c44d9";
         String ciphertext = "04891f22789ba1d69d05bda360a75ed1162f95693d0fced1c2bac5ee01f43c0ebdabba73c57b0762a000dd1ee5f8fd6df5332699899e1f52653775fbf74f6c64fe147be2671c93ec83a194de793efbd6734d179ed44b41ca3dd47a45def4b0d743832d6a";
-        String decryptData = SM2Util.decryptHexByPrivateKey(ciphertext, privateKey);
+        String decryptData = Sm2.decryptHexByPrivateKey(ciphertext, privateKey);
         System.out.println("decryptData==" + decryptData);
     }
 

@@ -16,6 +16,7 @@
 package com.welab.fusion.service.api.service;
 
 import com.welab.fusion.service.service.AccountService;
+import com.welab.fusion.service.service.FusionService;
 import com.welab.wefe.common.fieldvalidate.annotation.Check;
 import com.welab.wefe.common.web.api.base.AbstractApi;
 import com.welab.wefe.common.web.api.base.Api;
@@ -30,11 +31,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Api(path = "service/init", name = "注册超级管理员账号，初始化服务。")
 public class InitServiceApi extends AbstractApi<InitServiceApi.Input, InitServiceApi.Output> {
     @Autowired
-    private AccountService accountService;
+    private FusionService fusionService;
 
     @Override
     protected ApiResult<InitServiceApi.Output> handle(InitServiceApi.Input input) throws Exception {
-        accountService.initSuperAdminAccount(input.username, input.password);
+        fusionService.init(input.username, input.password);
         return success();
     }
 
