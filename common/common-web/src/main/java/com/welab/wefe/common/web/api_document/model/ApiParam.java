@@ -55,4 +55,7 @@ public class ApiParam {
         }
     }
 
+    public boolean isEmpty() {
+        return fields.isEmpty();
+    }
 }

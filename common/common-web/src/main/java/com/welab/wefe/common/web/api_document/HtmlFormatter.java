@@ -20,6 +20,7 @@ import com.welab.wefe.common.util.StringUtil;
 import com.welab.wefe.common.web.api_document.model.ApiItem;
 import com.welab.wefe.common.web.api_document.model.ApiParam;
 import com.welab.wefe.common.web.api_document.model.ApiParamField;
+import org.springframework.web.util.HtmlUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -117,7 +118,7 @@ public class HtmlFormatter extends AbstractApiDocumentFormatter {
     }
 
     private String getParams(String title, ApiParam params) {
-        if (params == null) {
+        if (params == null || params.isEmpty()) {
             return "";
         }
         String output = "</br>" +
@@ -128,7 +129,7 @@ public class HtmlFormatter extends AbstractApiDocumentFormatter {
                 "<thead>\n" +
                 "<tr>\n" +
                 "<th style=\"width:200px\">name</th>\n" +
-                "<th style=\"width:200px\">type</th>\n" +
+                "<th style=\"width:250px\">type</th>\n" +
                 "<th style=\"width:50px\">require</th>\n" +
                 "<th style=\"width:20%\">comment</th>\n" +
                 "<th style=\"\">desc</th>\n" +
@@ -154,12 +155,13 @@ public class HtmlFormatter extends AbstractApiDocumentFormatter {
 
     private String renderTypeName(ApiParamField item) {
         if (isSimpleType(item.typeClass)) {
-            return item.typeName;
+            return HtmlUtils.htmlEscape(item.typeName);
         }
 
         String id = classToId(item.typeClass);
+        String link = "<a href='#" + id + "'>" + HtmlUtils.htmlEscape(item.typeName) + "</a>";
         if (enumTypeDicMap.containsKey(item.typeClass)) {
-            return "<a href='#" + id + "'>" + item.typeName + "</a>";
+            return link;
         }
 
         if (item.typeClass.isEnum()) {
@@ -168,7 +170,7 @@ public class HtmlFormatter extends AbstractApiDocumentFormatter {
             classTypeDicMap.put(item.typeClass, renderClassTypeDic(item.typeClass));
         }
 
-        return "<a href='#" + id + "'>" + item.typeName + "</a>";
+        return link;
     }
 
     private String renderClassTypeDic(Class<?> type) {

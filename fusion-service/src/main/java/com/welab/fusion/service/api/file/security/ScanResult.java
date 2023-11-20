@@ -20,23 +20,23 @@ package com.welab.fusion.service.api.file.security;
  * @date 2023/3/17
  */
 public class ScanResult {
-    public boolean complete;
+    public boolean finished;
     public boolean success;
     public String message;
 
     public static ScanResult of() {
         ScanResult result = new ScanResult();
-        result.complete = false;
+        result.finished = false;
         return result;
     }
 
     public void success() {
-        this.complete = true;
+        this.finished = true;
         this.success = true;
     }
 
     public void fail(String message) {
-        this.complete = true;
+        this.finished = true;
         this.success = false;
         this.message = message;
     }

@@ -17,6 +17,7 @@
 package com.welab.wefe.common.util;
 
 import com.alibaba.fastjson.JSONObject;
+import com.welab.wefe.common.tuple.Tuple2;
 import sun.reflect.generics.reflectiveObjects.TypeVariableImpl;
 
 import java.lang.reflect.Field;
@@ -33,8 +34,8 @@ public class ClassUtils {
     /**
      * build a readable type name for field
      */
-    public static String getTypeSimpleName(Class<?> type) {
-        String name = type.getCanonicalName();
+    public static String getTypeSimpleName(Type type) {
+        String name =  type.getTypeName();
         name = name.contains(".") ? StringUtil.substringAfterLast(name, ".") : name;
         name = name.replace("$", ".");
         return name;
@@ -49,6 +50,21 @@ public class ClassUtils {
 
         Type genericType = ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
         return genericType;
+    }
+
+    public static Tuple2<Type,Type> getMapFieldGenericType(Field field) {
+        Class<?> type = field.getType();
+
+        if (!type.equals(Map.class)) {
+            throw new UnsupportedOperationException();
+        }
+
+        Type[] actualTypeArguments = ((ParameterizedType) field.getGenericType()).getActualTypeArguments();
+
+        return Tuple2.of(
+                actualTypeArguments[0],
+                actualTypeArguments[1]
+        );
     }
 
     /**
