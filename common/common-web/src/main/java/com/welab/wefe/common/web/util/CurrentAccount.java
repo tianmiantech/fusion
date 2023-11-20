@@ -59,6 +59,7 @@ public class CurrentAccount {
             ACCOUNT_MAP_BY_TOKEN.entrySet().removeIf(item -> accountId.equals(item.getValue().getId()));
         }
         String token = generateToken();
+        tokens.set(token);
         ACCOUNT_MAP_BY_TOKEN.put(token, AccountInfo.of(accountId, username));
     }
 
