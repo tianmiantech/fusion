@@ -15,10 +15,14 @@
  */
 package com.welab.wefe.common.web.api_document;
 
+import com.welab.wefe.common.util.FileUtil;
 import com.welab.wefe.common.util.StringUtil;
 import com.welab.wefe.common.web.api_document.model.ApiItem;
 import com.welab.wefe.common.web.api_document.model.ApiParam;
 import com.welab.wefe.common.web.api_document.model.ApiParamField;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author zane
@@ -26,9 +30,9 @@ import com.welab.wefe.common.web.api_document.model.ApiParamField;
  */
 public class HtmlFormatter extends AbstractApiDocumentFormatter {
     StringBuilder str = new StringBuilder(2048);
+    private Map<Class<?>, String> enumTypeDicMap = new HashMap<>();
 
     public HtmlFormatter() {
-        setHeader();
         setToc();
     }
 
@@ -82,8 +86,26 @@ public class HtmlFormatter extends AbstractApiDocumentFormatter {
 
     @Override
     protected String getOutput() {
-        setFooter();
-        return str.toString();
+        setTypeDic();
+
+        String html = str.toString();
+        return FileUtil
+                .readFileFromResource("api_doc/index.html")
+                .replace("$content$", html);
+
+    }
+
+    private void setTypeDic() {
+        str
+                .append("<div id='type-dic-map'>")
+                .append("<h2>数据类型字典</h2>");
+        for (Map.Entry<Class<?>, String> entry : enumTypeDicMap.entrySet()) {
+            str.append(entry.getValue());
+        }
+
+        str
+                .append("<div class='clear-both'></div>")
+                .append("</div>");
     }
 
     private String getParams(String title, ApiParam params) {
@@ -109,7 +131,7 @@ public class HtmlFormatter extends AbstractApiDocumentFormatter {
         for (ApiParamField item : params.fields) {
             output += "<tr>\n" +
                     "<td>" + item.name + "</td>\n" +
-                    "<td>" + item.typeName + "</td>\n" +
+                    "<td>" + renderTypeName(item) + "</td>\n" +
                     "<td style=\"text-align: center;\">" + item.require + "</td>\n" +
                     "<td>" + item.comment + "</td>\n" +
                     "<td>" + item.desc + "</td>\n" +
@@ -121,100 +143,57 @@ public class HtmlFormatter extends AbstractApiDocumentFormatter {
         return output;
     }
 
-    private void setHeader() {
-        str.append("<!DOCTYPE html>\n" +
-                "<html lang=\"zh-cn\">\n" +
-                "\n" +
-                "<head>\n" +
-                "<meta charset=\"UTF-8\">\n" +
-                "<meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\n" +
-                "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n" +
-                "<title>API Documentation</title>\n" +
-                "<style>\n" +
-                "h1 {\n" +
-                "text-align: center;\n" +
-                "}\n" +
-                "\n" +
-                ".group-title {\n" +
-                "border-bottom: 1px solid #999;\n" +
-                "color: red;\n" +
-                "margin-top: 50px;\n" +
-                "cursor: pointer;\n" +
-                "}\n" +
-                "\n" +
-                ".api-item {\n" +
-                "border: 1px solid #000;\n" +
-                "padding: 8px;\n" +
-                "margin-top: 25px;\n" +
-                "}\n" +
-                "\n" +
-                ".api-name {\n" +
-                "color: black;\n" +
-                "background-color: #ccc;\n" +
-                "padding: 15px 15px;\n" +
-                "margin: -8px -8px 0 -8px;\n" +
-                "}\n" +
-                "\n" +
-                ".api-desc {\n" +
-                "text-indent: 30px;\n" +
-                "}\n" +
-                "\n" +
-                ".api-params {\n" +
-                "width: 100%;\n" +
-                "display: none;" +
-                "}\n" +
-                ".api-param-table {\n" +
-                "width: 100%;\n" +
-                "border-collapse: collapse;\n" +
-                "}\n" +
-                ".api-params caption{\n" +
-                "font-weight: bold;\n" +
-                "color: blue;\n" +
-                "}\n" +
-                "\n" +
-                ".api-params th,\n" +
-                ".api-params td {\n" +
-                "border: 1px solid blue;\n" +
-                "padding: 3px 8px;\n" +
-                "}\n" +
-                ".goto-top {\n" +
-                "    position: fixed;\n" +
-                "    right: 10px;\n" +
-                "    bottom: 50px;\n" +
-                "    border: 1px solid #333;\n" +
-                "    padding: 3px;\n" +
-                "    height: 40px;\n" +
-                "    width: 40px;\n" +
-                "    line-height: 40px;\n" +
-                "    text-align: center;\n" +
-                "    font-weight: bold;\n" +
-                "text-decoration: none;" +
-                "    z-index: 1024;" +
-                "}" +
-                ".goto-top:visited {\n" +
-                "  color: black;\n" +
-                "}" +
-                "</style>\n" +
-                "</head><body>\n" +
-                "<h1>API Documentation</h1>");
+
+    private String renderTypeName(ApiParamField item) {
+        if (isSimpleType(item.typeClass)) {
+            return item.typeName;
+        }
+
+        String id = classToId(item.typeClass);
+        if (enumTypeDicMap.containsKey(item.typeClass)) {
+            return "<a href='#" + id + "'>" + item.typeName + "</a>";
+        }
+
+        if (item.typeClass.isEnum()) {
+            enumTypeDicMap.put(item.typeClass, renderEnumTypeDic(item.typeClass));
+        }
+
+        return "<a href='#" + id + "'>" + item.typeName + "</a>";
     }
 
-    private void setFooter() {
-        str.append(
-                "<a href='#' class=\"goto-top\">TOP</a>" +
-                        "<script src='https://code.jquery.com/jquery-3.6.0.min.js'></script>" +
-                        "<script>\n" +
-                        "    $(\".group-title\").click(function(){\n" +
-                        "        var group = $(this).attr(\"value\");\n" +
-                        "        $(\".api-item[value=\" + group + \"]\").toggle();\n" +
-                        "    });\n" +
-                        "    $(\".api-name\").click(function(){\n" +
-                        "        $(this).parent().find(\".api-params\").toggle();\n" +
-                        "    });" +
-                        "</script>" +
-                        "</body>\n" +
-                        "</html>"
-        );
+    private String renderEnumTypeDic(Class<?> type) {
+        String id = classToId(type);
+        StringBuilder html = new StringBuilder(128);
+        html
+                .append("<div id='" + id + "' class='type-dic-panel'>")
+                .append("<p class='enum-title'>" + type.getSimpleName() + "</p>")
+                .append("<ul>");
+
+        for (Object constant : type.getEnumConstants()) {
+            html
+                    .append("<li>")
+                    .append(constant.toString())
+                    .append("</li>");
+        }
+
+        html
+                .append("</ul>")
+                .append("</div>");
+
+        return html.toString();
     }
+
+    private boolean isSimpleType(Class<?> type) {
+        if (type.isEnum()) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private String classToId(Class<?> clazz) {
+        return clazz.getName().replace("#", ".");
+    }
+
 
 }

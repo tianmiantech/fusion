@@ -32,6 +32,7 @@ public class ApiParamField {
     public String desc = "";
     public String regex = "";
     public String typeName = "";
+    public Class<?> typeClass;
     public String comment = "";
     public String require = "";
     public boolean isList;
@@ -40,6 +41,7 @@ public class ApiParamField {
         name = StringUtil.stringToUnderLineLowerCase(field.getName());
 
         typeName = StringUtil.substringAfterLast(field.getType().getCanonicalName(), ".");
+        typeClass = field.getType();
         isList = field.getType().equals(List.class);
         if (isList) {
             Type listFieldGenericType = ClassUtils.getListFieldGenericType(field);
