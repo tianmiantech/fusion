@@ -16,13 +16,11 @@
 
 package com.welab.fusion.service.api.service;
 
-import com.welab.fusion.service.service.InitService;
 import com.welab.wefe.common.exception.StatusCodeWithException;
 import com.welab.wefe.common.util.HostUtil;
 import com.welab.wefe.common.web.api.base.AbstractNoneInputApi;
 import com.welab.wefe.common.web.api.base.Api;
 import com.welab.wefe.common.web.dto.ApiResult;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.TreeMap;
 
@@ -32,24 +30,25 @@ import java.util.TreeMap;
 @Api(path = "service/env", name = "服务环境信息")
 public class EnvApi extends AbstractNoneInputApi<TreeMap<String, Object>> {
 
-    private static final TreeMap<String, Object> env = new TreeMap<>();
+    private static final TreeMap<String, Object> ENV = new TreeMap<>();
+    /**
+     * 使用缓存，一个小时更新一次。
+     */
+    private static final long CACHE_TIMEOUT = 1000 * 60 * 60;
     private static long lastUpdateTime = 0;
-    @Autowired
-    private InitService initService;
 
     @Override
     protected ApiResult<TreeMap<String, Object>> handle() throws StatusCodeWithException {
-        // 使用缓存，一个小时更新一次。
-        if (env.isEmpty() || System.currentTimeMillis() - lastUpdateTime > 1000 * 60 * 60) {
+        if (System.currentTimeMillis() - lastUpdateTime > CACHE_TIMEOUT) {
             updateCache();
         }
 
-        return success(env);
+        return success(ENV);
     }
 
     private static void updateCache() {
-        env.put("local_ip", HostUtil.getLocalIp());
-        env.put("internet_ip", HostUtil.getInternetIp());
+        ENV.put("local_ip", HostUtil.getLocalIp());
+        ENV.put("internet_ip", HostUtil.getInternetIp());
         lastUpdateTime = System.currentTimeMillis();
     }
 
