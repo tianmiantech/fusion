@@ -30,6 +30,7 @@ import java.util.concurrent.TimeUnit;
  * 当前登录用户工具类
  */
 public class CurrentAccount {
+    private static final String TOKEN_KEY_NAME = "x-user-token";
 
     /**
      * token : AccountInfo
@@ -75,12 +76,15 @@ public class CurrentAccount {
     }
 
     /**
-     * 从 header 中取出 token，并储存到当前线程中，使得接口内可以使用 CurrentAccount 获取当前用户信息。
+     * 从请求中取出 token，并储存到当前线程中。
+     * 使得接口内可以使用 CurrentAccount 获取当前用户信息。
      */
     public static void token(HttpServletRequest httpServletRequest) {
-        String token = httpServletRequest.getHeader("token");
+        // 从 header 中获取
+        String token = httpServletRequest.getHeader(TOKEN_KEY_NAME);
         if (StringUtil.isEmpty(token)) {
-            token = httpServletRequest.getParameter("token");
+            // 从 query 参数中获取
+            token = httpServletRequest.getParameter(TOKEN_KEY_NAME);
         }
 
         if (StrUtil.isEmpty(token)) {
