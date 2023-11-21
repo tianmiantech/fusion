@@ -20,10 +20,11 @@ import com.welab.wefe.common.util.StringUtil;
 import com.welab.wefe.common.web.api_document.model.ApiItem;
 import com.welab.wefe.common.web.api_document.model.ApiParam;
 import com.welab.wefe.common.web.api_document.model.ApiParamField;
+import org.apache.commons.lang3.compare.ObjectToStringComparator;
 import org.springframework.web.util.HtmlUtils;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * @author zane
@@ -31,8 +32,8 @@ import java.util.Map;
  */
 public class HtmlFormatter extends AbstractApiDocumentFormatter {
     StringBuilder str = new StringBuilder(2048);
-    private Map<Class<?>, String> enumTypeDicMap = new HashMap<>();
-    private Map<Class<?>, String> classTypeDicMap = new HashMap<>();
+    private Map<Class<?>, String> enumTypeDicMap = new TreeMap<>((a, b) -> ObjectToStringComparator.INSTANCE.compare(a.getSimpleName(), b.getSimpleName()));
+    private Map<Class<?>, String> classTypeDicMap = new TreeMap<>((a, b) -> ObjectToStringComparator.INSTANCE.compare(a.getSimpleName(), b.getSimpleName()));
 
     public HtmlFormatter() {
         setToc();
