@@ -21,6 +21,7 @@ import com.welab.wefe.common.util.HostUtil;
 import com.welab.wefe.common.web.api.base.AbstractNoneInputApi;
 import com.welab.wefe.common.web.api.base.Api;
 import com.welab.wefe.common.web.dto.ApiResult;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.TreeMap;
 
@@ -36,6 +37,8 @@ public class EnvApi extends AbstractNoneInputApi<TreeMap<String, Object>> {
      */
     private static final long CACHE_TIMEOUT = 1000 * 60 * 60;
     private static long lastUpdateTime = 0;
+    @Value("${server.port:}")
+    private String serverPort;
 
     @Override
     protected ApiResult<TreeMap<String, Object>> handle() throws StatusCodeWithException {
@@ -46,8 +49,9 @@ public class EnvApi extends AbstractNoneInputApi<TreeMap<String, Object>> {
         return success(ENV);
     }
 
-    private static void updateCache() {
+    private void updateCache() {
         ENV.put("local_ip", HostUtil.getLocalIp());
+        ENV.put("local_port", serverPort);
         ENV.put("internet_ip", HostUtil.getInternetIp());
         lastUpdateTime = System.currentTimeMillis();
     }
