@@ -32,15 +32,26 @@ import java.util.TreeMap;
 @Api(path = "service/env", name = "服务环境信息")
 public class EnvApi extends AbstractNoneInputApi<TreeMap<String, Object>> {
 
+    private static final TreeMap<String, Object> env = new TreeMap<>();
+    private static long lastUpdateTime = 0;
     @Autowired
     private InitService initService;
 
     @Override
     protected ApiResult<TreeMap<String, Object>> handle() throws StatusCodeWithException {
-        TreeMap<String, Object> env = new TreeMap<>();
-        env.put("local_ip", HostUtil.getLocalIp());
-        env.put("internet_ip", HostUtil.getInternetIp());
+        // 使用缓存，一个小时更新一次。
+        if (env.isEmpty() || System.currentTimeMillis() - lastUpdateTime > 1000 * 60 * 60) {
+            updateCache();
+        }
+
         return success(env);
     }
+
+    private static void updateCache() {
+        env.put("local_ip", HostUtil.getLocalIp());
+        env.put("internet_ip", HostUtil.getInternetIp());
+        lastUpdateTime = System.currentTimeMillis();
+    }
+
 
 }
