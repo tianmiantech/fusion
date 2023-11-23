@@ -78,4 +78,12 @@ public class ThreadPool {
     public int size() {
         return THREAD_POOL.getQueue().size();
     }
+
+    public void shutdown() {
+        THREAD_POOL.shutdown();
+    }
+
+    public void shutdownNow() {
+        THREAD_POOL.shutdownNow();
+    }
 }

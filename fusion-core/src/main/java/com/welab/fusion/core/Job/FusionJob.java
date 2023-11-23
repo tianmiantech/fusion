@@ -15,13 +15,13 @@
  */
 package com.welab.fusion.core.Job;
 
-import cn.hutool.core.thread.NamedThreadFactory;
 import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.StrUtil;
 import com.welab.fusion.core.Job.action.AbstractJobPhaseAction;
 import com.welab.fusion.core.Job.action.JobPhaseActionCreator;
 import com.welab.fusion.core.data_resource.base.DataResourceType;
 import com.welab.fusion.core.function.JobFunctions;
+import com.welab.wefe.common.thread.ThreadPool;
 import com.welab.wefe.common.util.CloseableUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,10 +31,6 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author zane.luo
@@ -48,8 +44,8 @@ public class FusionJob implements Closeable {
     private JobMember partner;
     private JobProgress myProgress = new JobProgress();
     private FusionJobRole jobRole;
-    private ThreadPoolExecutor actionSingleThreadExecutor;
-    private ThreadPoolExecutor scheduleSingleThreadExecutor;
+    private ThreadPool actionSingleThreadExecutor;
+    private ThreadPool scheduleSingleThreadExecutor;
     private JobFunctions jobFunctions;
     private FusionResult fusionResult;
     /**
@@ -67,8 +63,8 @@ public class FusionJob implements Closeable {
 
         this.fusionResult = FusionResult.of(jobId);
 
-        this.actionSingleThreadExecutor = createSingleThreadPoll("job-" + jobId + "-action-executor");
-        this.scheduleSingleThreadExecutor = createSingleThreadPoll("job-" + jobId + "-schedule");
+        this.actionSingleThreadExecutor = new ThreadPool("job-" + jobId + "-action-executor");
+        this.scheduleSingleThreadExecutor = new ThreadPool("job-" + jobId + "-schedule");
     }
 
     /**
@@ -89,7 +85,7 @@ public class FusionJob implements Closeable {
      */
     private void startSchedule() {
         LOG.info("启动监工线程，开始任务。");
-        scheduleSingleThreadExecutor.submit(() -> {
+        scheduleSingleThreadExecutor.run(() -> {
             try {
                 // 开始执行第一阶段任务
                 gotoAction(JobPhase.firstPhase());
@@ -242,7 +238,7 @@ public class FusionJob implements Closeable {
 
         // 异步执行当前阶段动作
         AbstractJobPhaseAction action = JobPhaseActionCreator.create(phase, this);
-        actionSingleThreadExecutor.submit(() -> {
+        actionSingleThreadExecutor.run(() -> {
             action.run();
         });
     }
@@ -253,17 +249,6 @@ public class FusionJob implements Closeable {
         }
     }
 
-    private ThreadPoolExecutor createSingleThreadPoll(String prefix) {
-        ThreadFactory threadFactory = new NamedThreadFactory(prefix, false);
-        return new ThreadPoolExecutor(
-                1,
-                1,
-                0L,
-                TimeUnit.MILLISECONDS,
-                new LinkedBlockingQueue<Runnable>(),
-                threadFactory
-        );
-    }
 
     /**
      * 等待任务结束

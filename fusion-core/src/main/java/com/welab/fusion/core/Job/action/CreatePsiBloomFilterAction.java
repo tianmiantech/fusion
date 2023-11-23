@@ -43,8 +43,8 @@ public class CreatePsiBloomFilterAction extends AbstractJobPhaseAction {
                     // 这里使用数据源的 Id 作为生成后的过滤器 Id。
                     job.getMyself().dataResourceInfo.id,
                     // 更新进度
-                    index -> {
-                        phaseProgress.updateCompletedWorkload(index);
+                    (progress, speed) -> {
+                        phaseProgress.updateCompletedWorkload(progress);
                     }
             );
 

@@ -16,6 +16,7 @@
 package com.welab.test;
 
 import cn.hutool.core.util.StrUtil;
+import com.welab.wefe.common.http.HttpRequest;
 
 /**
  * @author zane.luo
@@ -23,25 +24,12 @@ import cn.hutool.core.util.StrUtil;
  */
 public class Playground {
     public static void main(String[] args) {
-        String[] urls = {
-                "http://localhost:8080/fusion/website",
-                "http://localhost:8080/fusion/website/",
-                "http://localhost:8080/fusion/website/index.html",
-                "http://localhost:8080/fusion/website/hello/world/index.html?a=b&b=c"
-        };
+        byte[] bytes = HttpRequest
+                .create("https://qingluan-dev.tianmiantech.com/skyscanner-dataoperation/v1/model-layer/list")
+                .putHeader("X-User-Token", "dxxifnotbxixt0934095521474150400")
+                .get()
+                .getBodyBytes();
 
-        for (String url : urls) {
-            String path = StrUtil.subAfter( url,"/website",false);
-            path = path.replace("//","/");
-            String fileName = StrUtil.subBefore(path,"?",false);
-            if (fileName.startsWith("/")){
-                fileName = fileName.substring(1);
-            }
-            if (StrUtil.isEmpty(fileName)){
-                fileName = "index.html";
-            }
-            System.out.println(fileName);
-        }
-
+        System.out.println(bytes);
     }
 }

@@ -56,6 +56,10 @@ public abstract class AbstractTableDataSourceReader implements Closeable {
      * 最大读取时长（毫秒）
      */
     protected long maxReadTimeInMs;
+    /**
+     * 是否已读取完毕
+     */
+    protected boolean finished = false;
 
     static {
         SuperDataSourceClient.register(DorisDataSourceClient.class);
@@ -117,7 +121,7 @@ public abstract class AbstractTableDataSourceReader implements Closeable {
      * @param dataRowConsumer Data row consumption method
      */
     public void readRows(BiConsumer<Long, LinkedHashMap<String, Object>> dataRowConsumer) throws StatusCodeWithException {
-
+        finished = false;
         long start = System.currentTimeMillis();
 
         LinkedHashMap<String, Object> row;
@@ -125,6 +129,7 @@ public abstract class AbstractTableDataSourceReader implements Closeable {
         while ((row = readOneRow()) != null) {
 
             if (getHeader().size() != row.size()) {
+                finished=true;
                 StatusCode
                         .PARAMETER_VALUE_INVALID
                         .throwException(
@@ -143,14 +148,18 @@ public abstract class AbstractTableDataSourceReader implements Closeable {
             }
             // Limit the number of rows read
             if (maxReadRows > 0 && readDataRows >= maxReadRows) {
+                finished = true;
                 break;
             }
 
             // Limit the duration of reading
             if (maxReadTimeInMs > 0 && System.currentTimeMillis() - start > maxReadTimeInMs) {
+                finished = true;
                 break;
             }
         }
+
+        finished = true;
     }
 
     public long getReadDataRows() {
@@ -170,4 +179,7 @@ public abstract class AbstractTableDataSourceReader implements Closeable {
      */
     protected abstract LinkedHashMap<String, Object> readOneRow() throws StatusCodeWithException;
 
+    public boolean isFinished() {
+        return finished;
+    }
 }
