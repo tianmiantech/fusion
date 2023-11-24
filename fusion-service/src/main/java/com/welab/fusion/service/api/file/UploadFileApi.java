@@ -79,14 +79,14 @@ public class UploadFileApi extends AbstractApi<UploadFileApi.Input, UploadFileAp
      * Check if the chunk already exists
      */
     private ApiResult<Output> checkChunk(Input input) {
-        Integer chunkNumber = input.chunkId;
-        if (chunkNumber == null) {
-            chunkNumber = 0;
+        Integer chunkId = input.chunkId;
+        if (chunkId == null) {
+            chunkId = 0;
         }
 
         File outFile = FileSystem.getTempDir()
                 .resolve(input.fileId)
-                .resolve(chunkNumber + ".part")
+                .resolve(chunkId + ".part")
                 .toFile();
 
         if (outFile.exists()) {
