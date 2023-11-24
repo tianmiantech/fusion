@@ -18,6 +18,7 @@ package com.welab.fusion.service.database.entity;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.vladmihalcea.hibernate.type.json.JsonStringType;
+import com.welab.fusion.service.database.entity.id_class.DataSourceDbModelId;
 import com.welab.wefe.common.data.source.JdbcDataSourceClient;
 import com.welab.wefe.common.data.source.SuperDataSourceClient;
 import com.welab.wefe.common.enums.DatabaseType;
@@ -25,10 +26,8 @@ import com.welab.wefe.common.exception.StatusCodeWithException;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
+import javax.persistence.*;
+import java.util.Map;
 
 /**
  * @author zane.luo
@@ -36,11 +35,15 @@ import javax.persistence.Enumerated;
  */
 @Entity(name = "data_source")
 @TypeDef(name = "json", typeClass = JsonStringType.class)
+@IdClass(DataSourceDbModelId.class)
 public class DataSourceDbModel extends AbstractDbModel {
     private String name;
     @Enumerated(EnumType.STRING)
     private DatabaseType databaseType;
+
+    @Id
     private String host;
+    @Id
     private Integer port;
 
     /**
@@ -53,6 +56,18 @@ public class DataSourceDbModel extends AbstractDbModel {
     @JSONField(serialize = false)
     public JdbcDataSourceClient getJdbcDataSourceClient() throws StatusCodeWithException {
         return SuperDataSourceClient.create(databaseType.name(), connectorConfig);
+    }
+
+    /**
+     * 由于用户未编辑密码时前端不会传递此字段，所以需要用数据库的数据补齐。
+     */
+    public void padLostParams(Map<String, Object> input) {
+        for (Map.Entry<String, Object> item : getConnectorConfig().entrySet()) {
+            // 补齐前端未传的参数（密码）
+            if (!input.containsKey(item.getKey()) || input.get(item.getKey()) == null) {
+                input.put(item.getKey(), item.getValue());
+            }
+        }
     }
 
     // region getter/setter

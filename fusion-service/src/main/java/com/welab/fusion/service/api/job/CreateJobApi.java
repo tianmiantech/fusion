@@ -17,14 +17,14 @@ package com.welab.fusion.service.api.job;
 
 import com.welab.fusion.core.data_resource.base.DataResourceType;
 import com.welab.fusion.core.hash.HashConfig;
-import com.welab.fusion.service.api.bloom_filter.AddBloomFilterApi;
 import com.welab.fusion.service.api.bloom_filter.PreviewTableDataSourceApi;
-import com.welab.fusion.service.constans.AddMethod;
+import com.welab.fusion.service.service.JobService;
 import com.welab.wefe.common.fieldvalidate.annotation.Check;
 import com.welab.wefe.common.web.api.base.AbstractApi;
 import com.welab.wefe.common.web.api.base.Api;
 import com.welab.wefe.common.web.dto.AbstractApiInput;
 import com.welab.wefe.common.web.dto.ApiResult;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author zane.luo
@@ -32,9 +32,13 @@ import com.welab.wefe.common.web.dto.ApiResult;
  */
 @Api(path = "job/create", name = "创建任务")
 public class CreateJobApi extends AbstractApi<CreateJobApi.Input, CreateJobApi.Output> {
+    @Autowired
+    private JobService jobService;
+
     @Override
     protected ApiResult<CreateJobApi.Output> handle(CreateJobApi.Input input) throws Exception {
-        return null;
+        String jobId = jobService.createJob(input);
+        return success(Output.of(jobId));
     }
 
     public static class Input extends AbstractApiInput {
@@ -46,8 +50,11 @@ public class CreateJobApi extends AbstractApi<CreateJobApi.Input, CreateJobApi.O
         public BloomFilterResourceInput bloomFilterResourceInput;
         @Check(name = "输入的数据集信息")
         public TableDataResourceInput tableDataResourceInput;
+
         @Check(name = "主键 hash 方案", require = true)
         public HashConfig hashConfig;
+        @Check(name = "备注")
+        public String remark;
     }
 
     public static class BloomFilterResourceInput extends AbstractApiInput {
@@ -60,5 +67,13 @@ public class CreateJobApi extends AbstractApi<CreateJobApi.Input, CreateJobApi.O
     }
 
     public static class Output {
+        @Check(name = "任务Id")
+        public String jobId;
+
+        public static Output of(String jobId) {
+            Output output = new Output();
+            output.jobId = jobId;
+            return output;
+        }
     }
 }

@@ -15,17 +15,23 @@
  */
 package com.welab.fusion.service.database.entity;
 
+import com.welab.fusion.service.database.entity.id_class.PartnerDbModelId;
+
 import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.IdClass;
 
 /**
  * @author zane.luo
  * @date 2023/11/20
  */
 @Entity(name = "partner")
+@IdClass(PartnerDbModelId.class)
 public class PartnerDbModel extends AbstractDbModel {
     /**
      * 合作方名称
      */
+    @Id
     private String name;
     /**
      * 公钥

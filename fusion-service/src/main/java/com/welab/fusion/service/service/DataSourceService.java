@@ -95,13 +95,17 @@ public class DataSourceService extends AbstractService {
      * 有则修改，无则添加。
      */
     public String save(SaveDataSourceApi.Input input) throws StatusCodeWithException {
+        DataSourceDbModel model = dataSourceRepository.findByHostAndPort(
+                input.getHost(),
+                input.getPort()
+        );
+
+        if (model != null) {
+            model.padLostParams(input.dataSourceParams);
+        }
+
         JdbcDataSourceClient dataSourceClient = SuperDataSourceClient.create(input.databaseType.name(), input.dataSourceParams);
         dataSourceClient.test();
-
-        DataSourceDbModel model = dataSourceRepository.findByHostAndPort(
-                dataSourceClient.getParams().getHost(),
-                dataSourceClient.getParams().getPort()
-        );
 
         if (model == null) {
             model = new DataSourceDbModel();

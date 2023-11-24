@@ -16,6 +16,7 @@
 
 package com.welab.fusion.service.api.data_source;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.welab.fusion.service.service.DataSourceService;
 import com.welab.wefe.common.data.source.JdbcDataSourceParams;
 import com.welab.wefe.common.enums.DatabaseType;
@@ -51,11 +52,28 @@ public class SaveDataSourceApi extends AbstractApi<SaveDataSourceApi.Input, Save
     }
 
     public static class Input extends AbstractApiInput {
-
         public DatabaseType databaseType;
 
         @Secret(maskStrategy = MaskStrategy.BLOCK)
         public Map<String, Object> dataSourceParams;
+
+        @JSONField(serialize = false)
+        public String getHost() {
+            Object host = dataSourceParams.get("host");
+            if (host == null) {
+                return null;
+            }
+            return (String) host;
+        }
+
+        @JSONField(serialize = false)
+        public Integer getPort() {
+            Object port = dataSourceParams.get("port");
+            if (port == null) {
+                return null;
+            }
+            return (Integer) port;
+        }
 
         @Override
         public void checkAndStandardize() throws StatusCodeWithException {
