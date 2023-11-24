@@ -15,6 +15,7 @@
  */
 package com.welab.fusion.service.service;
 
+import com.welab.fusion.core.progress.Progress;
 import com.welab.fusion.core.bloom_filter.PsiBloomFilter;
 import com.welab.fusion.core.bloom_filter.PsiBloomFilterCreator;
 import com.welab.fusion.core.data_source.AbstractTableDataSourceReader;
@@ -33,19 +34,17 @@ import com.welab.fusion.service.database.entity.BloomFilterDbModel;
 import com.welab.fusion.service.database.repository.BloomFilterRepository;
 import com.welab.fusion.service.dto.base.PagingOutput;
 import com.welab.fusion.service.dto.entity.BloomFilterOutputModel;
-import com.welab.fusion.service.model.Progress;
+import com.welab.fusion.core.progress.Progress;
 import com.welab.fusion.service.model.ProgressManager;
 import com.welab.fusion.service.service.base.AbstractService;
 import com.welab.wefe.common.CommonThreadPool;
 import com.welab.wefe.common.data.source.JdbcDataSourceClient;
 import com.welab.wefe.common.data.source.SuperDataSourceClient;
-import com.welab.wefe.common.exception.StatusCodeWithException;
 import com.welab.wefe.common.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Date;
@@ -94,17 +93,16 @@ public class BloomFilterService extends AbstractService {
         return progress;
     }
 
-    private void create(BloomFilterDbModel model, Progress progress, AbstractTableDataSourceReader dataSourceReader, HashConfig hashConfig) throws IOException, StatusCodeWithException {
+    private void create(BloomFilterDbModel model, Progress progress, AbstractTableDataSourceReader dataSourceReader, HashConfig hashConfig) throws Exception {
 
         progress.setMessage("正在统计数据总量...");
         progress.updateTotalWorkload(dataSourceReader.getTotalDataRowCount());
 
         progress.setMessage("正在生成过滤器...");
         // 生成过滤器
-        try (PsiBloomFilterCreator creator = new PsiBloomFilterCreator(dataSourceReader, hashConfig)) {
-            PsiBloomFilter psiBloomFilter = creator.create(model.getId(), (index) -> {
-                progress.updateCompletedWorkload(index);
-            });
+        try (PsiBloomFilterCreator creator = new PsiBloomFilterCreator(model.getId(), dataSourceReader, hashConfig, progress)) {
+
+            PsiBloomFilter psiBloomFilter = creator.create();
 
             progress.setMessage("过滤器生成完毕，正在储存...");
             Path sinkDir = FileSystem.PsiBloomFilter.getPath(model.getId());
@@ -114,6 +112,9 @@ public class BloomFilterService extends AbstractService {
             model.setTotalDataCount(dataSourceReader.getTotalDataRowCount());
             model.setStorageDir(sinkDir.toAbsolutePath().toString());
             model.setStorageSize(PsiBloomFilter.getDataFile(sinkDir).length());
+        } catch (Exception e) {
+            LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);
+            throw e;
         }
     }
 

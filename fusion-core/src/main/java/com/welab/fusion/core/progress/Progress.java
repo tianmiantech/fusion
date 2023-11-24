@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.welab.fusion.service.model;
+package com.welab.fusion.core.progress;
 
 import com.welab.wefe.common.Convert;
 
@@ -23,34 +23,37 @@ import java.util.Date;
 import java.util.UUID;
 
 /**
- * 关于某活动的进度
- *
  * @author zane.luo
- * @date 2023/11/10
+ * @date 2023/11/24
  */
 public class Progress {
-    private String sessionId;
-    /**
-     * 处理中的实体 Id
-     */
-    private String modelId;
+    protected String modelId;
+    protected String sessionId;
     /**
      * 总工作量
      */
-    private long totalWorkload;
+    protected long totalWorkload;
     /**
      * 已完成工作量
      */
-    private long completedWorkload;
+    protected long completedWorkload;
+    /**
+     * 速度，以秒为单位。
+     */
+    protected long speedInSecond;
+    /**
+     * 上一次更新进度的时间
+     */
+    private long lastUpdateCompletedWorkloadTime = System.currentTimeMillis();
     /**
      * 开始时间
      */
-    private Date startTime = new Date();
+    protected Date startTime = new Date();
     /**
      * 结束时间
      */
-    private Date endTime;
-    private String message;
+    protected Date endTime;
+    protected String message;
     private ProgressStatus status;
 
     public static Progress of(String modelId, long totalWorkload) {
@@ -83,10 +86,19 @@ public class Progress {
         }
     }
 
+
     /**
      * 更新已完成工作量
+     * 并更新速度
      */
-    public void updateCompletedWorkload(long completedWorkload) {
+    public synchronized void updateCompletedWorkload(long completedWorkload) {
+        BigDecimal increment = BigDecimal.valueOf(completedWorkload - this.completedWorkload);
+        BigDecimal cost = BigDecimal.valueOf(System.currentTimeMillis() - lastUpdateCompletedWorkloadTime);
+        this.speedInSecond = increment.divide(cost, 5, RoundingMode.HALF_UP)
+                .multiply(BigDecimal.valueOf(1_000))
+                .longValue();
+
+        this.lastUpdateCompletedWorkloadTime = System.currentTimeMillis();
         this.completedWorkload = completedWorkload;
     }
 
@@ -113,7 +125,6 @@ public class Progress {
         return Convert.toInt(completedWorkload * 100L / totalWorkload);
     }
 
-
     /**
      * 预计剩余时间
      */
@@ -132,42 +143,63 @@ public class Progress {
         this.totalWorkload = totalWorkload;
     }
 
+
     // region getter/setter
 
     public String getSessionId() {
         return sessionId;
     }
 
-    public String getModelId() {
-        return modelId;
+    public void setSessionId(String sessionId) {
+        this.sessionId = sessionId;
     }
 
     public long getTotalWorkload() {
         return totalWorkload;
     }
 
+    public void setTotalWorkload(long totalWorkload) {
+        this.totalWorkload = totalWorkload;
+    }
+
     public long getCompletedWorkload() {
         return completedWorkload;
+    }
+
+    public void setCompletedWorkload(long completedWorkload) {
+        this.completedWorkload = completedWorkload;
     }
 
     public Date getStartTime() {
         return startTime;
     }
 
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
+    }
+
     public Date getEndTime() {
         return endTime;
+    }
+
+    public void setEndTime(Date endTime) {
+        this.endTime = endTime;
     }
 
     public String getMessage() {
         return message;
     }
 
-    public ProgressStatus getStatus() {
-        return status;
-    }
-
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public long getSpeedInSecond() {
+        return speedInSecond;
+    }
+
+    public ProgressStatus getStatus() {
+        return status;
     }
 
     // endregion

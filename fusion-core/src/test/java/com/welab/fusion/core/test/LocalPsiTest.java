@@ -107,8 +107,8 @@ public class LocalPsiTest {
         CsvTableDataSourceReader reader = new CsvTableDataSourceReader(file);
 
         // 生成过滤器
-        try (PsiBloomFilterCreator creator = new PsiBloomFilterCreator(reader, hashConfig)) {
-            return creator.create("test");
+        try (PsiBloomFilterCreator creator = new PsiBloomFilterCreator("test", reader, hashConfig)) {
+            return creator.create();
         }
     }
 }

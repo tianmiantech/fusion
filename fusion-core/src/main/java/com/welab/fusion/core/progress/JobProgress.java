@@ -13,7 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.welab.fusion.core.Job;
+package com.welab.fusion.core.progress;
+
+import com.welab.fusion.core.Job.JobPhase;
+import com.welab.fusion.core.Job.JobStatus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,12 +49,12 @@ public class JobProgress {
 
         JobPhaseProgress currentPhaseProgress = getCurrentPhaseProgress();
         // 如果已经失败，整个任务失败
-        if (currentPhaseProgress.getStatus().isFailed()) {
-            return currentPhaseProgress.getStatus();
+        if (currentPhaseProgress.getJobStatus().isFailed()) {
+            return currentPhaseProgress.getJobStatus();
         }
 
         // 如果已经到最后一个阶段，且已成功，则整个任务成功。
-        if (currentPhaseProgress.getJobPhase().isLastPhase() && currentPhaseProgress.getStatus().isSuccess()) {
+        if (currentPhaseProgress.getJobPhase().isLastPhase() && currentPhaseProgress.getJobStatus().isSuccess()) {
             return JobStatus.success;
         }
 
@@ -67,7 +70,7 @@ public class JobProgress {
             return JobStatus.wait_run;
         }
 
-        return getCurrentPhaseProgress().getStatus();
+        return getCurrentPhaseProgress().getJobStatus();
     }
 
     /**

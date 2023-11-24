@@ -101,12 +101,11 @@ public class PsiBloomFilter {
         }
     }
 
-    public static PsiBloomFilter of(String id, HashConfig hashConfig, RsaPsiParam rsaPsiParam, long insertedElementCount, BloomFilter<String> bloomFilter) {
+    public static PsiBloomFilter of(String id, HashConfig hashConfig, RsaPsiParam rsaPsiParam, BloomFilter<String> bloomFilter) {
         PsiBloomFilter psiBloomFilter = new PsiBloomFilter();
         psiBloomFilter.id = id;
         psiBloomFilter.hashConfig = hashConfig;
         psiBloomFilter.rsaPsiParam = rsaPsiParam;
-        psiBloomFilter.insertedElementCount = insertedElementCount;
         psiBloomFilter.bloomFilter = bloomFilter;
         return psiBloomFilter;
     }

@@ -15,6 +15,7 @@
  */
 package com.welab.fusion.service.model;
 
+import com.welab.fusion.core.progress.Progress;
 import net.jodah.expiringmap.ExpirationPolicy;
 import net.jodah.expiringmap.ExpiringMap;
 

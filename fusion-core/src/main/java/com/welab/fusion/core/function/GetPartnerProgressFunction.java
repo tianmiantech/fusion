@@ -15,7 +15,7 @@
  */
 package com.welab.fusion.core.function;
 
-import com.welab.fusion.core.Job.JobProgress;
+import com.welab.fusion.core.progress.JobProgress;
 
 /**
  * @author zane.luo

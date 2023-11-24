@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.welab.fusion.service.model;
+package com.welab.fusion.core.progress;
 
 /**
  * 进度的状态

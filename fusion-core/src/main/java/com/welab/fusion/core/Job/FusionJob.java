@@ -21,6 +21,7 @@ import com.welab.fusion.core.Job.action.AbstractJobPhaseAction;
 import com.welab.fusion.core.Job.action.JobPhaseActionCreator;
 import com.welab.fusion.core.data_resource.base.DataResourceType;
 import com.welab.fusion.core.function.JobFunctions;
+import com.welab.fusion.core.progress.JobProgress;
 import com.welab.wefe.common.thread.ThreadPool;
 import com.welab.wefe.common.util.CloseableUtils;
 import org.slf4j.Logger;
@@ -85,7 +86,7 @@ public class FusionJob implements Closeable {
      */
     private void startSchedule() {
         LOG.info("启动监工线程，开始任务。");
-        scheduleSingleThreadExecutor.run(() -> {
+        scheduleSingleThreadExecutor.execute(() -> {
             try {
                 // 开始执行第一阶段任务
                 gotoAction(JobPhase.firstPhase());
@@ -238,7 +239,7 @@ public class FusionJob implements Closeable {
 
         // 异步执行当前阶段动作
         AbstractJobPhaseAction action = JobPhaseActionCreator.create(phase, this);
-        actionSingleThreadExecutor.run(() -> {
+        actionSingleThreadExecutor.execute(() -> {
             action.run();
         });
     }

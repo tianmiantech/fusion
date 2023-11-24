@@ -15,21 +15,18 @@
  */
 package com.welab.fusion.core.bloom_filter;
 
-import cn.hutool.core.thread.NamedThreadFactory;
 import cn.hutool.core.thread.ThreadUtil;
 import com.google.common.base.Charsets;
 import com.google.common.hash.BloomFilter;
 import com.google.common.hash.Funnels;
+import com.welab.fusion.core.progress.Progress;
 import com.welab.fusion.core.data_source.AbstractTableDataSourceReader;
 import com.welab.fusion.core.data_source.CsvTableDataSourceReader;
 import com.welab.fusion.core.hash.HashConfig;
 import com.welab.fusion.core.hash.HashConfigItem;
 import com.welab.fusion.core.hash.HashMethod;
-import com.welab.fusion.core.psi.PsiUtils;
-import com.welab.wefe.common.CommonThreadPool;
 import com.welab.wefe.common.TimeSpan;
 import com.welab.wefe.common.crypto.Rsa;
-import com.welab.wefe.common.exception.StatusCodeWithException;
 import com.welab.wefe.common.thread.ThreadPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,17 +34,8 @@ import org.slf4j.LoggerFactory;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
-import java.math.BigInteger;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.LinkedHashMap;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.concurrent.atomic.LongAdder;
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 /**
  * 生成用于 PSI（Private Set Intersection） 的布隆过滤器
@@ -62,38 +50,33 @@ public class PsiBloomFilterCreator implements Closeable {
      */
     public static int MIN_EXPECTED_INSERTIONS = 100_000_000;
     private AbstractTableDataSourceReader dataSourceReader;
-    public HashConfig hashConfig;
-    private RsaPsiParam rsaPsiParam;
-    private final BloomFilter<String> bloomFilter;
+    private PsiBloomFilter psiBloomFilter;
     /**
-     * 用于生成过滤器的线程池
+     * 用来异步生成过滤器的线程池
      */
-    private final ThreadPoolExecutor GENERATE_FILTER_THREAD_POOL;
+    private ThreadPool singleThreadExecutor;
+    private Progress progress;
 
-    public PsiBloomFilterCreator(AbstractTableDataSourceReader dataSourceReader, HashConfig hashConfig) {
-        this.hashConfig = hashConfig;
-        this.dataSourceReader = dataSourceReader;
-
-        Rsa.RsaKeyPair keyPair = Rsa.generateKeyPair();
-        this.rsaPsiParam = RsaPsiParam.of(keyPair);
-
-        this.bloomFilter = createBloomFilter(dataSourceReader);
-        GENERATE_FILTER_THREAD_POOL = createThreadPoll();
+    public PsiBloomFilterCreator(String id, AbstractTableDataSourceReader dataSourceReader, HashConfig hashConfig) {
+        this(
+                id,
+                dataSourceReader,
+                hashConfig,
+                Progress.of(id, dataSourceReader.getTotalDataRowCount())
+        );
     }
 
-    /**
-     * 创建线程池，将加密动作并行。
-     */
-    private ThreadPoolExecutor createThreadPoll() {
-        int pollSize = Runtime.getRuntime().availableProcessors() - 2;
+    public PsiBloomFilterCreator(String id, AbstractTableDataSourceReader dataSourceReader, HashConfig hashConfig, Progress progress) {
+        this.dataSourceReader = dataSourceReader;
+        this.singleThreadExecutor = new ThreadPool("create-psi_bloom_filter:" + id, 1);
 
-        return new ThreadPoolExecutor(
-                pollSize,
-                pollSize,
-                10L,
-                TimeUnit.SECONDS,
-                new LinkedBlockingQueue<>(),
-                new NamedThreadFactory("generate-filter-thread-pool-", true)
+        this.progress = progress;
+
+        this.psiBloomFilter = PsiBloomFilter.of(
+                id,
+                hashConfig,
+                RsaPsiParam.of(Rsa.generateKeyPair()),
+                createBloomFilter(dataSourceReader)
         );
     }
 
@@ -125,8 +108,8 @@ public class PsiBloomFilterCreator implements Closeable {
         );
     }
 
-    public PsiBloomFilter create(String id) throws Exception {
-        return create(id, null);
+    public PsiBloomFilter create() throws Exception {
+        return create(null);
     }
 
     /**
@@ -134,106 +117,56 @@ public class PsiBloomFilterCreator implements Closeable {
      *
      * @param progressConsumer 进度回调
      */
-    public PsiBloomFilter create(String id, BiConsumer<Long, Long> progressConsumer) throws Exception {
-        LOG.info("start to create PsiBloomFilter. id:{}", id);
+    public PsiBloomFilter create(Consumer<Progress> progressConsumer) throws Exception {
+        LOG.info("start to create PsiBloomFilter. id:{}", psiBloomFilter.id);
         final long start = System.currentTimeMillis();
-        LongAdder insertedElementCount = new LongAdder();
+
         AtomicReference<Exception> error = new AtomicReference<>();
-        ThreadPool singleThreadExecutor = new ThreadPool("create-psi_bloom_filter:" + id, 1);
-        singleThreadExecutor.run(() -> {
-            try {
-                dataSourceReader.readRows(new BiConsumer<Long, LinkedHashMap<String, Object>>() {
-                    @Override
-                    public void accept(Long index, LinkedHashMap<String, Object> row) {
+        try (PsiBloomFilterConsumer consumer = new PsiBloomFilterConsumer(psiBloomFilter, progress)) {
+            singleThreadExecutor.execute(() -> {
+                try {
+                    dataSourceReader.readRows(consumer);
+                } catch (Exception e) {
+                    error.set(e);
+                }
+            });
+            singleThreadExecutor.shutdown();
 
-                        // 避免读取的数据堆积在内存
-                        while (GENERATE_FILTER_THREAD_POOL.getQueue().size() > 10000) {
-                            ThreadUtil.safeSleep(100);
-                        }
+            // 等待：未读取完毕 or 线程还在工作中
+            while (!dataSourceReader.isFinished() || consumer.isWorking()) {
+                ThreadUtil.safeSleep(1000);
 
-                        // 这一句如果放在异步线程会导致性能大幅下降，原因不详。
-                        String key = hashConfig.hash(row);
+                consumer.refreshProgress();
 
-                        try {
-                            CompletableFuture.runAsync(
-                                    () -> {
-                                        BigInteger z = encrypt(key);
-                                        bloomFilter.put(z.toString());
-                                        insertedElementCount.increment();
-                                    },
-                                    GENERATE_FILTER_THREAD_POOL
-                            );
+                // 更新进度
+                if (progressConsumer != null) {
+                    progressConsumer.accept(consumer.getProgress());
+                }
 
-                        } catch (Exception e) {
-                            LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);
-                        }
-                    }
-                });
-            } catch (StatusCodeWithException e) {
-                error.set(e);
-            }
-        });
-
-        long lastProgress = 0;
-        while (
-            // 未读取完毕
-                !dataSourceReader.isFinished()
-                        // 队列未消费完
-                        || GENERATE_FILTER_THREAD_POOL.getQueue().size() > 0
-                        // 线程还在工作中
-                        || GENERATE_FILTER_THREAD_POOL.getActiveCount() > 0
-        ) {
-            ThreadUtil.safeSleep(1000);
-
-            long progress = insertedElementCount.longValue();
-            long speed = progress - lastProgress;
-            lastProgress = progress;
-
-            // 更新进度
-            if (progressConsumer != null) {
-                progressConsumer.accept(progress, speed);
+                if (error.get() != null) {
+                    throw error.get();
+                }
             }
 
-            if (error.get() != null) {
-                throw error.get();
-            }
+            psiBloomFilter.insertedElementCount = consumer.getInsertedElementCount().longValue();
         }
 
         long spend = System.currentTimeMillis() - start;
-        LOG.info("create PsiBloomFilter success({}). id:{}", TimeSpan.fromMs(spend), id);
+        LOG.info("create PsiBloomFilter success({}). id:{}", TimeSpan.fromMs(spend), psiBloomFilter.id);
 
-        return PsiBloomFilter.of(
-                id,
-                hashConfig,
-                rsaPsiParam,
-                insertedElementCount.longValue(),
-                bloomFilter
-        );
+        return psiBloomFilter;
     }
 
-    /**
-     * 对主键进行加密
-     */
-    private BigInteger encrypt(String key) {
-        BigInteger h = PsiUtils.stringToBigInteger(key);
-
-        BigInteger rp = h.modPow(rsaPsiParam.getEp(), rsaPsiParam.privatePrimeP);
-        BigInteger rq = h.modPow(rsaPsiParam.getEq(), rsaPsiParam.privatePrimeQ);
-        BigInteger z = (rp.multiply(rsaPsiParam.getCp())
-                .add(rq.multiply(rsaPsiParam.getCq())))
-                .remainder(rsaPsiParam.publicModulus);
-        return z;
+    public Progress getProgress() {
+        return progress;
     }
-
 
     @Override
     public void close() throws IOException {
-        GENERATE_FILTER_THREAD_POOL.shutdown();
-        try {
-            GENERATE_FILTER_THREAD_POOL.awaitTermination(10, TimeUnit.MINUTES);
-        } catch (InterruptedException e) {
-            LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);
+        if (singleThreadExecutor != null) {
+            singleThreadExecutor.shutdownNow();
         }
+
         dataSourceReader.close();
     }
 
@@ -250,9 +183,9 @@ public class PsiBloomFilterCreator implements Closeable {
         HashConfig hashConfig = HashConfig.of(HashConfigItem.of(HashMethod.MD5, "id"));
 
         // 生成过滤器
-        try (PsiBloomFilterCreator creator = new PsiBloomFilterCreator(reader, hashConfig)) {
-            PsiBloomFilter psiBloomFilter = creator.create("test", (progress, speed) -> {
-                System.out.println("进度：" + progress + "," + speed + "条/秒");
+        try (PsiBloomFilterCreator creator = new PsiBloomFilterCreator("test", reader, hashConfig)) {
+            PsiBloomFilter psiBloomFilter = creator.create(progress -> {
+                System.out.println("进度：" + progress.getCompletedWorkload() + "," + progress.getSpeedInSecond() + "条/秒");
             });
 
             // Path dir = Paths.get(file.getParent()).resolve("test-bf");
@@ -261,4 +194,6 @@ public class PsiBloomFilterCreator implements Closeable {
 
         System.out.println("end");
     }
+
+
 }

@@ -17,7 +17,7 @@ package com.welab.fusion.service.api.bloom_filter;
 
 import com.welab.fusion.core.hash.HashConfig;
 import com.welab.fusion.service.constans.AddMethod;
-import com.welab.fusion.service.model.Progress;
+import com.welab.fusion.core.progress.Progress;
 import com.welab.fusion.service.service.BloomFilterService;
 import com.welab.wefe.common.StatusCode;
 import com.welab.wefe.common.exception.StatusCodeWithException;

@@ -15,11 +15,16 @@
  */
 package com.welab.fusion.core.Job;
 
+import com.welab.fusion.core.progress.ProgressStatus;
+
 /**
  * @author zane.luo
  * @date 2023/11/10
  */
 public enum JobStatus {
+    /**
+     * 待执行
+     */
     wait_run,
     /**
      * 执行中
@@ -65,5 +70,23 @@ public enum JobStatus {
 
     public boolean isSuccess() {
         return this == success;
+    }
+
+    /**
+     * 将任务状态转换为通用进度状态
+     */
+    public ProgressStatus toProgressStatus() {
+        switch (this) {
+            case wait_run:
+            case running:
+                return ProgressStatus.doing;
+            case stop_on_running:
+            case error_on_running:
+                return ProgressStatus.failed;
+            case success:
+                return ProgressStatus.completed;
+            default:
+                throw new RuntimeException("意料之外的状态：" + this);
+        }
     }
 }

@@ -15,7 +15,7 @@
  */
 package com.welab.fusion.service.api.progress;
 
-import com.welab.fusion.service.model.Progress;
+import com.welab.fusion.core.progress.Progress;
 import com.welab.fusion.service.model.ProgressManager;
 import com.welab.wefe.common.web.api.base.AbstractApi;
 import com.welab.wefe.common.web.api.base.Api;

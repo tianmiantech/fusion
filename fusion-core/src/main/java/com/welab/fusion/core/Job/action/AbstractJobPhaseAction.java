@@ -17,7 +17,7 @@ package com.welab.fusion.core.Job.action;
 
 import com.welab.fusion.core.Job.FusionJob;
 import com.welab.fusion.core.Job.JobPhase;
-import com.welab.fusion.core.Job.JobPhaseProgress;
+import com.welab.fusion.core.progress.JobPhaseProgress;
 import com.welab.fusion.core.Job.JobStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
