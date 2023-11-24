@@ -41,8 +41,14 @@ import java.nio.file.Path;
  *
  * @author zane.luo
  */
-@Api(path = "file/upload", name = "upload file")
-public class FileUploadApi extends AbstractApi<FileUploadApi.Input, FileUploadApi.Output> {
+@Api(
+        path = "file/upload",
+        name = "分片上传文件",
+        desc = "支持大文件分片上传，支持断点续传，所有分片上传完毕后需调用 file/merge 合并分片。\n" +
+                "POST请求：上传分片\n" +
+                "GET请求：检查分片是否已存在， http code 299 表示已存在，http code 200 表示不存在。"
+)
+public class UploadFileApi extends AbstractApi<UploadFileApi.Input, UploadFileApi.Output> {
 
     @Override
     protected ApiResult<Output> handle(Input input) throws StatusCodeWithException {
@@ -73,13 +79,13 @@ public class FileUploadApi extends AbstractApi<FileUploadApi.Input, FileUploadAp
      * Check if the chunk already exists
      */
     private ApiResult<Output> checkChunk(Input input) {
-        Integer chunkNumber = input.getChunkNumber();
+        Integer chunkNumber = input.chunkId;
         if (chunkNumber == null) {
             chunkNumber = 0;
         }
 
         File outFile = FileSystem.getTempDir()
-                .resolve(input.getIdentifier())
+                .resolve(input.fileId)
                 .resolve(chunkNumber + ".part")
                 .toFile();
 
@@ -99,13 +105,13 @@ public class FileUploadApi extends AbstractApi<FileUploadApi.Input, FileUploadAp
     private ApiResult<Output> saveChunk(Input input) throws StatusCodeWithException {
         MultipartFile inputFile = input.getFirstFile();
 
-        Integer chunkNumber = input.getChunkNumber();
+        Integer chunkNumber = input.chunkId;
         if (chunkNumber == null) {
             chunkNumber = 0;
         }
 
         Path outputDir = FileSystem.getTempDir()
-                .resolve(input.getIdentifier());
+                .resolve(input.fileId);
         FileUtil.createDir(outputDir.toString());
 
         File outFile = outputDir.resolve(chunkNumber + ".part").toFile();
@@ -138,118 +144,13 @@ public class FileUploadApi extends AbstractApi<FileUploadApi.Input, FileUploadAp
     }
 
     public static class Input extends AbstractWithFilesApiInput {
-        private Long id;
-        @Check(name = "当前文件块，从1开始")
-        private Integer chunkNumber;
-        @Check(name = "分块大小")
-        private Long chunkSize;
-        @Check(name = "当前分块大小")
-        private Long currentChunkSize;
-        @Check(name = "总大小")
-        private Long totalSize;
-        @Check(name = "文件标识")
-        private String identifier;
+        @Check(name = "分片Id", desc = "通常是从0开始的数字")
+        private Integer chunkId;
+        @Check(name = "文件标识", desc = "通常是文件的 hash 值，或文件名拼接文件大小。")
+        private String fileId;
         @Check(name = "文件名")
         private String filename;
-        @Check(name = "相对路径")
-        private String relativePath;
-        @Check(name = "总块数")
-        private Integer totalChunks;
-        @Check(name = "文件类型")
-        private String type;
         @Check(name = "文件用途", require = true)
-        private FileSystem.UseType uploadFileUseType;
-
-        // region getter/setter
-
-        public Long getId() {
-            return id;
-        }
-
-        public void setId(Long id) {
-            this.id = id;
-        }
-
-        public Integer getChunkNumber() {
-            return chunkNumber;
-        }
-
-        public void setChunkNumber(Integer chunkNumber) {
-            this.chunkNumber = chunkNumber;
-        }
-
-        public Long getChunkSize() {
-            return chunkSize;
-        }
-
-        public void setChunkSize(Long chunkSize) {
-            this.chunkSize = chunkSize;
-        }
-
-        public Long getCurrentChunkSize() {
-            return currentChunkSize;
-        }
-
-        public void setCurrentChunkSize(Long currentChunkSize) {
-            this.currentChunkSize = currentChunkSize;
-        }
-
-        public Long getTotalSize() {
-            return totalSize;
-        }
-
-        public void setTotalSize(Long totalSize) {
-            this.totalSize = totalSize;
-        }
-
-        public String getIdentifier() {
-            return identifier;
-        }
-
-        public void setIdentifier(String identifier) {
-            this.identifier = identifier;
-        }
-
-        public String getFilename() {
-            return filename;
-        }
-
-        public void setFilename(String filename) {
-            this.filename = filename;
-        }
-
-        public String getRelativePath() {
-            return relativePath;
-        }
-
-        public void setRelativePath(String relativePath) {
-            this.relativePath = relativePath;
-        }
-
-        public Integer getTotalChunks() {
-            return totalChunks;
-        }
-
-        public void setTotalChunks(Integer totalChunks) {
-            this.totalChunks = totalChunks;
-        }
-
-        public String getType() {
-            return type;
-        }
-
-        public void setType(String type) {
-            this.type = type;
-        }
-
-        public FileSystem.UseType getUploadFileUseType() {
-            return uploadFileUseType;
-        }
-
-        public void setUploadFileUseType(FileSystem.UseType uploadFileUseType) {
-            this.uploadFileUseType = uploadFileUseType;
-        }
-
-// endregion
+        public FileSystem.UseType uploadFileUseType;
     }
 }

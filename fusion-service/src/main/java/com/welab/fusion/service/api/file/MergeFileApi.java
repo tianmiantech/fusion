@@ -39,7 +39,7 @@ import java.util.UUID;
  * @author zane.luo
  */
 @Api(path = "file/merge", name = "Merge the chunks after the file is uploaded")
-public class MergeApi extends AbstractApi<MergeApi.Input, MergeApi.Output> {
+public class MergeFileApi extends AbstractApi<MergeFileApi.Input, MergeFileApi.Output> {
 
     @Override
     protected ApiResult<Output> handle(Input input) throws Exception {
@@ -47,7 +47,7 @@ public class MergeApi extends AbstractApi<MergeApi.Input, MergeApi.Output> {
         String mergedFileName = UUID.randomUUID() + "-" + input.filename;
 
         File dir = FileSystem.getBaseDir(input.uploadFileUseType)
-                .resolve(input.uniqueIdentifier)
+                .resolve(input.fileId)
                 .toFile();
 
         File[] parts = dir.listFiles();
@@ -63,7 +63,7 @@ public class MergeApi extends AbstractApi<MergeApi.Input, MergeApi.Output> {
         try {
             for (int i = 1; i <= parts.length; i++) {
                 File part = FileSystem.getBaseDir(input.uploadFileUseType)
-                        .resolve(input.uniqueIdentifier)
+                        .resolve(input.fileId)
                         .resolve(i + ".part")
                         .toFile();
 
@@ -120,33 +120,12 @@ public class MergeApi extends AbstractApi<MergeApi.Input, MergeApi.Output> {
     }
 
     public static class Input extends AbstractApiInput {
+        @Check(name = "文件标识", desc = "通常是文件的 hash 值，或文件名拼接文件大小。")
+        private String fileId;
+        @Check(name = "文件名")
         private String filename;
-        private String uniqueIdentifier;
         @Check(name = "文件用途", require = true)
-        private FileSystem.UseType uploadFileUseType;
+        public FileSystem.UseType uploadFileUseType;
 
-        public String getFilename() {
-            return filename;
-        }
-
-        public void setFilename(String filename) {
-            this.filename = filename;
-        }
-
-        public String getUniqueIdentifier() {
-            return uniqueIdentifier;
-        }
-
-        public void setUniqueIdentifier(String uniqueIdentifier) {
-            this.uniqueIdentifier = uniqueIdentifier;
-        }
-
-        public FileSystem.UseType getUploadFileUseType() {
-            return uploadFileUseType;
-        }
-
-        public void setUploadFileUseType(FileSystem.UseType uploadFileUseType) {
-            this.uploadFileUseType = uploadFileUseType;
-        }
     }
 }
