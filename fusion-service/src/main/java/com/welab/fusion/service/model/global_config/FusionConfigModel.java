@@ -40,4 +40,9 @@ public class FusionConfigModel extends AbstractConfigModel {
      */
     @Secret(maskStrategy = MaskStrategy.BLOCK)
     public String privateKey;
+
+    /**
+     * 对外服务地址
+     */
+    public String publicServiceBaseUrl;
 }

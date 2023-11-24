@@ -35,15 +35,12 @@ import java.util.Map;
  */
 @Entity(name = "data_source")
 @TypeDef(name = "json", typeClass = JsonStringType.class)
-@IdClass(DataSourceDbModelId.class)
 public class DataSourceDbModel extends AbstractDbModel {
     private String name;
     @Enumerated(EnumType.STRING)
     private DatabaseType databaseType;
 
-    @Id
     private String host;
-    @Id
     private Integer port;
 
     /**

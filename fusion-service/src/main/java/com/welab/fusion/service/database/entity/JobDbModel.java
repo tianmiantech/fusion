@@ -18,6 +18,7 @@ package com.welab.fusion.service.database.entity;
 import com.welab.fusion.service.constans.JobMemberRole;
 import com.welab.wefe.common.fieldvalidate.annotation.Check;
 
+import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 
@@ -25,6 +26,7 @@ import javax.persistence.Enumerated;
  * @author zane.luo
  * @date 2023/11/24
  */
+@Entity(name = "job")
 public class JobDbModel extends AbstractDbModel {
     private String jobId;
     @Check(name = "合作方名称")

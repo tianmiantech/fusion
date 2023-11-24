@@ -25,6 +25,7 @@ import com.welab.fusion.service.api.global_config.GlobalConfigUpdateApi;
 import com.welab.fusion.service.database.base.Where;
 import com.welab.fusion.service.database.entity.GlobalConfigDbModel;
 import com.welab.fusion.service.database.repository.GlobalConfigRepository;
+import com.welab.fusion.service.model.global_config.FusionConfigModel;
 import com.welab.fusion.service.model.global_config.base.AbstractConfigModel;
 import com.welab.fusion.service.model.global_config.base.ConfigModel;
 import com.welab.fusion.service.service.base.AbstractService;
@@ -237,5 +238,9 @@ public class GlobalConfigService extends AbstractService {
             save(model);
         }
 
+    }
+
+    public FusionConfigModel getFusionConfig() {
+        return getModel(FusionConfigModel.class);
     }
 }

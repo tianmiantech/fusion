@@ -13,16 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.welab.fusion.service.database.entity;
-
-import javax.persistence.Entity;
+package com.welab.fusion.service.dto.entity;
 
 /**
  * @author zane.luo
- * @date 2023/11/20
+ * @date 2023/11/24
  */
-@Entity(name = "partner")
-public class PartnerDbModel extends AbstractDbModel {
+public class PartnerOutputModel extends AbstractOutputModel{
     /**
      * 合作方名称
      */

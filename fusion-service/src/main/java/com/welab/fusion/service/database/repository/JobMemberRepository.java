@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,18 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.welab.fusion.service.database.repository;
 
-import com.welab.fusion.service.database.entity.PartnerDbModel;
+import com.welab.fusion.service.database.entity.JobMemberDbModel;
 import com.welab.fusion.service.database.repository.base.BaseRepository;
 import org.springframework.stereotype.Repository;
 
 /**
  * @author zane.luo
- * @date 2023/11/20
+ * @date 2023/11/24
  */
 @Repository
-public interface PartnerRepository extends BaseRepository<PartnerDbModel, String> {
-    PartnerDbModel findByName(String name);
+public interface JobMemberRepository extends BaseRepository<JobMemberDbModel, String> {
 }

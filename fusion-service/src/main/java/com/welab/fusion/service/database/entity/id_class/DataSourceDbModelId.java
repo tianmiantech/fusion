@@ -15,11 +15,14 @@
  */
 package com.welab.fusion.service.database.entity.id_class;
 
+import java.io.Serializable;
+
 /**
  * @author zane.luo
  * @date 2023/11/24
  */
-public class DataSourceDbModelId {
+public class DataSourceDbModelId implements Serializable {
+    private String id;
     private String host;
 
     private Integer port;

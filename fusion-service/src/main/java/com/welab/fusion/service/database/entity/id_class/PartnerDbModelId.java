@@ -15,13 +15,15 @@
  */
 package com.welab.fusion.service.database.entity.id_class;
 
+import java.io.Serializable;
+
 /**
  * 联合主键
  *
  * @author zane.luo
  * @date 2023/11/24
  */
-public class PartnerDbModelId {
+public class PartnerDbModelId implements Serializable {
     private String id;
     private String name;
 }

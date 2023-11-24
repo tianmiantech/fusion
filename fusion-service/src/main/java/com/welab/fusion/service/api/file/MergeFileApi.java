@@ -47,9 +47,13 @@ public class MergeFileApi extends AbstractApi<MergeFileApi.Input, MergeFileApi.O
         String mergedFileName = UUID.randomUUID() + "-" + input.filename;
 
         File dir = FileSystem.getBaseDir(input.uploadFileUseType)
-                .resolve(input.fileId)
+                .resolve(input.identifier)
                 .toFile();
 
+        if (!dir.exists()) {
+            StatusCode.DATA_NOT_FOUND.throwException("文件不存在：" + input.identifier);
+        }
+        
         File[] parts = dir.listFiles();
 
         File mergedFile = FileSystem.getBaseDir(input.uploadFileUseType)
@@ -63,7 +67,7 @@ public class MergeFileApi extends AbstractApi<MergeFileApi.Input, MergeFileApi.O
         try {
             for (int i = 1; i <= parts.length; i++) {
                 File part = FileSystem.getBaseDir(input.uploadFileUseType)
-                        .resolve(input.fileId)
+                        .resolve(input.identifier)
                         .resolve(i + ".part")
                         .toFile();
 
@@ -120,10 +124,12 @@ public class MergeFileApi extends AbstractApi<MergeFileApi.Input, MergeFileApi.O
     }
 
     public static class Input extends AbstractApiInput {
-        @Check(name = "文件标识", desc = "通常是文件的 hash 值，或文件名拼接文件大小。")
-        private String fileId;
-        @Check(name = "文件名")
-        private String filename;
+        @Check(name = "总大小")
+        public Long totalSize;
+        @Check(name = "文件标识", require = true)
+        public String identifier;
+        @Check(name = "文件名", require = true)
+        public String filename;
         @Check(name = "文件用途", require = true)
         public FileSystem.UseType uploadFileUseType;
 

@@ -16,6 +16,7 @@
 package com.welab.fusion.service.service;
 
 import com.welab.fusion.service.api.job.CreateJobApi;
+import com.welab.fusion.service.model.global_config.FusionConfigModel;
 import com.welab.fusion.service.service.base.AbstractService;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +27,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class JobService extends AbstractService {
     public String createJob(CreateJobApi.Input input) {
+        FusionConfigModel config = globalConfigService.getFusionConfig();
+
         return null;
     }
 }

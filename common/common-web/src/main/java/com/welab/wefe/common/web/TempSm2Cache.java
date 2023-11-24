@@ -17,9 +17,9 @@
 package com.welab.wefe.common.web;
 
 import com.alibaba.fastjson.JSONObject;
+import com.welab.wefe.common.crypto.Sm2;
 import com.welab.wefe.common.fieldvalidate.secret.Secret;
 import com.welab.wefe.common.fieldvalidate.secret.SecretUtil;
-import com.welab.wefe.common.crypto.Sm2;
 import com.welab.wefe.common.util.StringUtil;
 import com.welab.wefe.common.web.util.CurrentAccount;
 import net.jodah.expiringmap.ExpirationPolicy;
@@ -97,6 +97,10 @@ public class TempSm2Cache {
      * 解密
      */
     public static Map<String, Object> decryptMap(Map<String, Object> map, Class<?> clazz) {
+        if (StringUtil.isEmpty(CurrentAccount.token()) || KEY_PAIR_MAP_BY_USER.get(CurrentAccount.id()) == null) {
+            return map;
+        }
+
         // 对参数做解密
         for (Map.Entry<String, Object> entry : map.entrySet()) {
             if (entry.getValue() == null) {

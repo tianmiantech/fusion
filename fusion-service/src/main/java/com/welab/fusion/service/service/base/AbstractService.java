@@ -17,6 +17,7 @@
 package com.welab.fusion.service.service.base;
 
 import com.welab.fusion.service.config.Config;
+import com.welab.fusion.service.service.GlobalConfigService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,8 @@ public class AbstractService {
 
     @Autowired
     protected Config config;
+    @Autowired
+    protected GlobalConfigService globalConfigService;
 
     protected void log(Exception e) {
         LOG.error(e.getClass() + " " + e.getMessage(), e);
