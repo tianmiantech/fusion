@@ -34,7 +34,6 @@ import com.welab.fusion.service.database.entity.BloomFilterDbModel;
 import com.welab.fusion.service.database.repository.BloomFilterRepository;
 import com.welab.fusion.service.dto.base.PagingOutput;
 import com.welab.fusion.service.dto.entity.BloomFilterOutputModel;
-import com.welab.fusion.core.progress.Progress;
 import com.welab.fusion.service.model.ProgressManager;
 import com.welab.fusion.service.service.base.AbstractService;
 import com.welab.wefe.common.CommonThreadPool;
@@ -63,9 +62,8 @@ public class BloomFilterService extends AbstractService {
     private BloomFilterRepository bloomFilterRepository;
 
     public Progress add(AddBloomFilterApi.Input input) throws Exception {
-        AbstractTableDataSourceReader reader = createReader(input, -1, -1);
         // 自动保存数据源信息
-        dataSourceService.tryAdd(input);
+        dataSourceService.trySave(input);
 
         BloomFilterDbModel model = new BloomFilterDbModel();
         model.setName(input.name);
@@ -76,14 +74,13 @@ public class BloomFilterService extends AbstractService {
 
         Progress progress = ProgressManager.startNew(model.getId());
         CommonThreadPool.run(() -> {
-            try {
+            try (AbstractTableDataSourceReader reader = createReader(input, -1, -1)){
                 create(model, progress, reader, input.hashConfig);
                 model.save();
                 progress.success();
 
                 // 清理
                 input.getFile().delete();
-                reader.close();
             } catch (Exception e) {
                 LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);
                 progress.failed(e);
@@ -121,10 +118,7 @@ public class BloomFilterService extends AbstractService {
     public AbstractTableDataSourceReader createReader(PreviewTableDataSourceApi.Input input, long maxReadRows, long maxReadTimeInMs) throws Exception {
         switch (input.addMethod) {
             case Database:
-                JdbcDataSourceClient client = StringUtil.isNotEmpty(input.dataSourceId)
-                        ? dataSourceService.findById(input.dataSourceId).getJdbcDataSourceClient()
-                        : SuperDataSourceClient.create(input.databaseType.name(), input.dataSourceParams);
-
+                JdbcDataSourceClient client = SuperDataSourceClient.create(input.databaseType.name(), input.dataSourceParams);
                 client.test();
 
                 return new SqlTableDataSourceReader(client, input.sql, maxReadRows, maxReadTimeInMs);

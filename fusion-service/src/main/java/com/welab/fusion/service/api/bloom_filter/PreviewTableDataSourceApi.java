@@ -17,7 +17,7 @@ package com.welab.fusion.service.api.bloom_filter;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.welab.fusion.core.io.FileSystem;
-import com.welab.fusion.service.api.data_source.AddDataSourceApi;
+import com.welab.fusion.service.api.data_source.SaveDataSourceApi;
 import com.welab.fusion.service.constans.AddMethod;
 import com.welab.fusion.service.service.BloomFilterService;
 import com.welab.wefe.common.fieldvalidate.annotation.Check;
@@ -45,7 +45,7 @@ public class PreviewTableDataSourceApi extends AbstractApi<PreviewTableDataSourc
         return success(output);
     }
 
-    public static class Input extends AddDataSourceApi.Input {
+    public static class Input extends SaveDataSourceApi.Input {
         @Check(require = true)
         public AddMethod addMethod;
 

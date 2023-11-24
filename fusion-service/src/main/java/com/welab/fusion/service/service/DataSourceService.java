@@ -16,9 +16,8 @@
 package com.welab.fusion.service.service;
 
 import com.welab.fusion.service.api.bloom_filter.AddBloomFilterApi;
-import com.welab.fusion.service.api.data_source.AddDataSourceApi;
+import com.welab.fusion.service.api.data_source.SaveDataSourceApi;
 import com.welab.fusion.service.api.data_source.TestDataSourceApi;
-import com.welab.fusion.service.api.data_source.UpdateApi;
 import com.welab.fusion.service.constans.AddMethod;
 import com.welab.fusion.service.database.entity.DataSourceDbModel;
 import com.welab.fusion.service.database.repository.DataSourceRepository;
@@ -32,6 +31,7 @@ import com.welab.wefe.common.data.source.SuperDataSourceClient;
 import com.welab.wefe.common.exception.StatusCodeWithException;
 import com.welab.wefe.common.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -49,48 +49,23 @@ public class DataSourceService extends AbstractService {
         return dataSourceRepository.findById(id).orElse(null);
     }
 
-    public String add(AddDataSourceApi.Input input) throws StatusCodeWithException {
-        JdbcDataSourceClient dataSourceClient = SuperDataSourceClient.create(input.databaseType.name(), input.dataSourceParams);
-        dataSourceClient.test();
-
-        if (dataSourceRepository.countByName(dataSourceClient.getParams().name) > 0) {
-            throw new StatusCodeWithException(StatusCode.PARAMETER_VALUE_INVALID, "此数据源名称已存在，请换一个数据源名称");
-        }
-
-        checkUniqueness(null, dataSourceClient.getParams());
-
-        DataSourceDbModel model = new DataSourceDbModel();
-        model.setName(dataSourceClient.getParams().name);
-        model.setDatabaseType(input.databaseType);
-
-
-        model.setDatabaseType(input.databaseType);
-        model.setHost(dataSourceClient.getParams().getHost());
-        model.setPort(dataSourceClient.getParams().getPort());
-        model.setConnectorConfig(dataSourceClient.getParams().toJson());
-
-        dataSourceRepository.save(model);
-
-        return model.getId();
-    }
-
     /**
      * 检查填写的 host:port 是否已添加过，禁止重复添加。
      */
     public void checkUniqueness(DataSourceDbModel oldModel, DataSourceParams params) throws StatusCodeWithException {
 
-        List<DataSourceDbModel> list = dataSourceRepository.findByHostAndPort(
+        DataSourceDbModel ont = dataSourceRepository.findByHostAndPort(
                 params.host,
                 params.port
         );
 
         // 查重无记录
-        if (list.isEmpty()) {
+        if (ont == null) {
             return;
         }
 
         // 查重查到自己
-        if (oldModel != null && list.size() == 1 && list.get(0).getId().equals(oldModel.getId())) {
+        if (oldModel != null && ont.getId().equals(oldModel.getId())) {
             return;
         }
 
@@ -116,52 +91,48 @@ public class DataSourceService extends AbstractService {
         client.test();
     }
 
-    public void update(UpdateApi.Input input) throws StatusCodeWithException {
-        JdbcDataSourceClient client = SuperDataSourceClient.create(
-                input.databaseType.name(),
-                input.dataSourceParams
+    /**
+     * 有则修改，无则添加。
+     */
+    public String save(SaveDataSourceApi.Input input) throws StatusCodeWithException {
+        JdbcDataSourceClient dataSourceClient = SuperDataSourceClient.create(input.databaseType.name(), input.dataSourceParams);
+        dataSourceClient.test();
+
+        DataSourceDbModel model = dataSourceRepository.findByHostAndPort(
+                dataSourceClient.getParams().getHost(),
+                dataSourceClient.getParams().getPort()
         );
-        client.test();
 
-        DataSourceDbModel model = dataSourceRepository.findById(input.id).orElse(null);
         if (model == null) {
-            return;
+            model = new DataSourceDbModel();
         }
 
-        DataSourceParams params = client.getParams();
-
-        checkUniqueness(model, params);
-        if ((!(model.getName().equals(params.getName())) && dataSourceRepository.countByName(params.getName()) > 0)) {
-            throw new StatusCodeWithException(StatusCode.PARAMETER_VALUE_INVALID, "此数据源名称已存在，请换一个数据源名称");
-        }
-
-        model.setName(params.getName());
-        model.setHost(params.getHost());
-        model.setPort(params.getPort());
-        model.setConnectorConfig(params.toJson());
+        model.setName(dataSourceClient.getParams().name);
+        model.setDatabaseType(input.databaseType);
+        model.setDatabaseType(input.databaseType);
+        model.setHost(dataSourceClient.getParams().getHost());
+        model.setPort(dataSourceClient.getParams().getPort());
+        model.setConnectorConfig(dataSourceClient.getParams().toJson());
 
         dataSourceRepository.save(model);
+        return model.getId();
     }
 
     /**
      * 由添加过滤器触发的创建数据源
      * 由于这里创建数据源是个顺带的操作，所以仅作尝试，失败时不抛出异常。
      */
-    public void tryAdd(AddBloomFilterApi.Input input) {
+    @Async
+    public void trySave(AddBloomFilterApi.Input input) {
         // 不是数据库类型的数据源，不创建。
         if (input.addMethod != AddMethod.Database) {
             return;
         }
 
-        // 指定了数据源id，说明已创建。
-        if (input.dataSourceId != null) {
-            return;
-        }
-
         try {
-            add(input);
+            save(input);
         } catch (StatusCodeWithException e) {
-            LOG.error(e.getClass().getSimpleName() + " 自动创建数据源失败：" + e.getMessage(), e);
+            LOG.error(e.getClass().getSimpleName() + " 自动保存数据源失败：" + e.getMessage(), e);
         }
     }
 }

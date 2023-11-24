@@ -36,6 +36,6 @@ public interface DataSourceRepository extends BaseRepository<DataSourceDbModel, 
     @Query(value = "select name from #{#entityName} where id=?1")
     String getNameById(String dataSourceId);
 
-    List<DataSourceDbModel> findByHostAndPort(String host, Integer port);
+    DataSourceDbModel findByHostAndPort(String host, Integer port);
 
 }
