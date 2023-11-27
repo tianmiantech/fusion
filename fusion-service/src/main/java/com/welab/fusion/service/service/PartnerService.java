@@ -100,4 +100,13 @@ public class PartnerService extends AbstractService {
         return ModelMapper.maps(list, PartnerOutputModel.class);
     }
 
+    public boolean delete(String name) {
+        PartnerDbModel model = partnerRepository.findByName(name);
+        if (model == null) {
+            return false;
+        }
+
+        partnerRepository.delete(model);
+        return true;
+    }
 }
