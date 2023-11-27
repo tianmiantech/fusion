@@ -63,18 +63,25 @@ public class PartnerService extends AbstractService {
 
         FusionConfigModel config = globalConfigService.getFusionConfig();
         if (StringUtil.isEmpty(config.publicServiceBaseUrl)) {
-            StatusCode.PARAMETER_VALUE_INVALID.throwException("未设置“对外服务地址”，请在全局配置中填写，供其它节点通信。");
+            StatusCode
+                    .PARAMETER_VALUE_INVALID
+                    .throwException("未设置“对外服务地址”，请在全局配置中填写，供其它节点通信。");
         }
 
         PartnerInputModel input = new PartnerInputModel();
         input.setName(MYSELF_NAME);
         input.setBaseUrl(config.publicServiceBaseUrl);
         input.setPublicKey(config.publicKey);
-        return add(input);
+        return save(input);
     }
 
-    public synchronized PartnerDbModel add(PartnerInputModel input) {
-        PartnerDbModel model = new PartnerDbModel();
+    public synchronized PartnerDbModel save(PartnerInputModel input) {
+        PartnerDbModel model = partnerRepository.findByName(input.getName());
+
+        // 有则更新，无则新增。
+        if (model == null) {
+            model = new PartnerDbModel();
+        }
         model.setName(input.getName());
         model.setBaseUrl(input.getBaseUrl());
         model.setPublicKey(input.getPublicKey());
@@ -92,4 +99,5 @@ public class PartnerService extends AbstractService {
         List<PartnerDbModel> list = partnerRepository.findAll(where);
         return ModelMapper.maps(list, PartnerOutputModel.class);
     }
+
 }

@@ -15,6 +15,10 @@
  */
 package com.welab.fusion.service.dto.entity;
 
+import com.welab.fusion.service.service.PartnerService;
+import com.welab.wefe.common.StatusCode;
+import com.welab.wefe.common.exception.StatusCodeWithException;
+import com.welab.wefe.common.fieldvalidate.annotation.Check;
 import com.welab.wefe.common.web.dto.AbstractApiInput;
 
 /**
@@ -22,18 +26,23 @@ import com.welab.wefe.common.web.dto.AbstractApiInput;
  * @date 2023/11/24
  */
 public class PartnerInputModel extends AbstractApiInput {
-    /**
-     * 合作方名称
-     */
+    @Check(name = "名称", require = true)
     private String name;
-    /**
-     * 公钥
-     */
+    @Check(name = "公钥", require = true)
     private String publicKey;
-    /**
-     * 服务端地址
-     */
+    @Check(name = "接口地址", require = true)
     private String baseUrl;
+
+    @Override
+    public void checkAndStandardize() throws StatusCodeWithException {
+        super.checkAndStandardize();
+
+        if (PartnerService.MYSELF_NAME.equals(name)) {
+            StatusCode
+                    .PARAMETER_VALUE_INVALID
+                    .throwException("名称不能为：" + PartnerService.MYSELF_NAME);
+        }
+    }
 
     // region getter/setter
 
