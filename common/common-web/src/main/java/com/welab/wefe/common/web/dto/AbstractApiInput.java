@@ -53,6 +53,24 @@ public class AbstractApiInput extends AbstractCheckModel {
     @JSONField(serialize = false)
     public HttpServletRequest request;
 
+    @Check(name = "被合作方调用时，合作方的信息")
+    @JSONField(serialize = false)
+    public PartnerCaller partnerCaller;
+
+    /**
+     * 请求是否来自己方前端
+     */
+    public boolean fromMyselfFrontEnd() {
+        return partnerCaller == null;
+    }
+
+    /**
+     * 请求是否来自合作方
+     */
+    public boolean fromPartner() {
+        return partnerCaller != null;
+    }
+
     @Override
     public Object clone() throws CloneNotSupportedException {
         return super.clone();

@@ -30,6 +30,8 @@ import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPrivateKey;
 import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPublicKey;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.jce.spec.ECParameterSpec;
+import org.bouncycastle.jce.spec.ECPrivateKeySpec;
+import org.bouncycastle.jce.spec.ECPublicKeySpec;
 import org.bouncycastle.math.ec.ECPoint;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
@@ -39,9 +41,6 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.spec.ECGenParameterSpec;
-
-import org.bouncycastle.jce.spec.ECPrivateKeySpec;
-import org.bouncycastle.jce.spec.ECPublicKeySpec;
 
 /**
  * 国密算法：非对称加密
@@ -125,15 +124,20 @@ public class Sm2 {
     /**
      * The private key signature
      */
-    public static String sign(String data, String privateKeyStr) throws Exception {
-        Signature signature = Signature.getInstance(
-                GMObjectIdentifiers.sm2sign_with_sm3.toString(), new BouncyCastleProvider());
+    public static String sign(String data, String privateKeyStr) {
+        try {
+            Signature signature = Signature.getInstance(
+                    GMObjectIdentifiers.sm2sign_with_sm3.toString(), new BouncyCastleProvider());
 
-        signature.initSign(getPrivateKey(privateKeyStr));
-        signature.update(data.getBytes(StandardCharsets.UTF_8));
-        byte[] signBytes = signature.sign();
-        // System.out.println(org.apache.commons.codec.binary.Hex.encodeHex(signBytes));
-        return Base64.encodeBase64String(signBytes);
+            signature.initSign(getPrivateKey(privateKeyStr));
+            signature.update(data.getBytes(StandardCharsets.UTF_8));
+            byte[] signBytes = signature.sign();
+            // System.out.println(org.apache.commons.codec.binary.Hex.encodeHex(signBytes));
+            return Base64.encodeBase64String(signBytes);
+        } catch (Exception e) {
+            LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);
+            throw new RuntimeException(e);
+        }
 
     }
 
@@ -151,17 +155,22 @@ public class Sm2 {
     /**
      * Encrypt data by public key
      */
-    public static String encryptByPublicKey(String plaintext, String publicKeyStr) throws Exception {
-        BCECPublicKey publicKey = (BCECPublicKey) getPublicKey(publicKeyStr);
-        ECParameterSpec ecParameterSpec = publicKey.getParameters();
-        ECDomainParameters ecDomainParameters = new ECDomainParameters(ecParameterSpec.getCurve(),
-                ecParameterSpec.getG(), ecParameterSpec.getN());
-        ECPublicKeyParameters ecPublicKeyParameters = new ECPublicKeyParameters(publicKey.getQ(), ecDomainParameters);
-        // SM2Engine sm2Engine = new SM2Engine(SM2Engine.Mode.C1C3C2);
-        SM2Engine sm2Engine = new SM2Engine();
-        sm2Engine.init(true, new ParametersWithRandom(ecPublicKeyParameters, new SecureRandom()));
-        byte[] data = plaintext.getBytes(StandardCharsets.UTF_8);
-        return new String(Base64.encodeBase64(sm2Engine.processBlock(data, 0, data.length)));
+    public static String encryptByPublicKey(String plaintext, String publicKeyStr) {
+        try {
+            BCECPublicKey publicKey = (BCECPublicKey) getPublicKey(publicKeyStr);
+            ECParameterSpec ecParameterSpec = publicKey.getParameters();
+            ECDomainParameters ecDomainParameters = new ECDomainParameters(ecParameterSpec.getCurve(),
+                    ecParameterSpec.getG(), ecParameterSpec.getN());
+            ECPublicKeyParameters ecPublicKeyParameters = new ECPublicKeyParameters(publicKey.getQ(), ecDomainParameters);
+            // SM2Engine sm2Engine = new SM2Engine(SM2Engine.Mode.C1C3C2);
+            SM2Engine sm2Engine = new SM2Engine();
+            sm2Engine.init(true, new ParametersWithRandom(ecPublicKeyParameters, new SecureRandom()));
+            byte[] data = plaintext.getBytes(StandardCharsets.UTF_8);
+            return new String(Base64.encodeBase64(sm2Engine.processBlock(data, 0, data.length)));
+        } catch (Exception e) {
+            LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);
+            throw new RuntimeException(e);
+        }
     }
 
     /**

@@ -17,11 +17,11 @@ package com.welab.fusion.service.service;
 
 import com.welab.fusion.service.api.job.CreateJobApi;
 import com.welab.fusion.service.api.job.SendJobApi;
+import com.welab.fusion.service.constans.JobMemberRole;
 import com.welab.fusion.service.database.entity.JobDbModel;
+import com.welab.fusion.service.database.entity.PartnerDbModel;
 import com.welab.fusion.service.database.repository.JobRepository;
-import com.welab.fusion.service.model.global_config.FusionConfigModel;
 import com.welab.fusion.service.service.base.AbstractService;
-import com.welab.wefe.common.exception.StatusCodeWithException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -35,11 +35,47 @@ public class JobService extends AbstractService {
     private JobRepository jobRepository;
     @Autowired
     private PartnerService partnerService;
+    @Autowired
+    private GatewayService gatewayService;
+    @Autowired
+    private JobMemberService jobMemberService;
 
-    public String createJob(CreateJobApi.Input input) {
-        FusionConfigModel config = globalConfigService.getFusionConfig();
+    /**
+     * 创建任务
+     */
+    public String createJob(CreateJobApi.Input input) throws Exception {
+        checkBeforeCreateJob(input);
+        // 自动保存合作方信息
+        partnerService.trySave(input.partnerCaller);
 
-        return null;
+        JobDbModel job = new JobDbModel();
+        if (input.fromPartner()) {
+            job.setId(input.jobId);
+
+            String promoterId = PartnerService.buildPartnerId(input.partnerCaller.baseUrl);
+            PartnerDbModel promoter = partnerService.findById(promoterId);
+
+            job.setPartnerId(promoterId);
+            if (promoter != null) {
+                job.setPartnerName(promoter.getName());
+            }
+        }
+        job.setRole(input.fromPartner() ? JobMemberRole.provider : JobMemberRole.promoter);
+        job.setRemark(input.remark);
+
+        if(input.fromMyselfFrontEnd()){
+            jobMemberService.addMyself(job.getId(), input);
+        }
+        else{
+            jobMemberService.addPromoter(input);
+        }
+        jobRepository.save(job);
+
+        return job.getId();
+    }
+
+    private void checkBeforeCreateJob(CreateJobApi.Input input) {
+
     }
 
     public void startJob(String jobId) {
@@ -50,14 +86,34 @@ public class JobService extends AbstractService {
         return jobRepository.findById(jobId).orElse(null);
     }
 
-    public void send(SendJobApi.Input input) throws StatusCodeWithException {
-        partnerService.test(input);
+    /**
+     * 发起方将任务发送到协作方
+     */
+    public void send(SendJobApi.Input input) throws Exception {
+        checkBeforeSendJob(input);
 
         JobDbModel job = findById(input.jobId);
-        if (job == null) {
-            return;
+
+        String providerId = PartnerService.buildPartnerId(input.partnerCaller.baseUrl);
+        PartnerDbModel promoter = partnerService.findById(providerId);
+
+        job.setPartnerId(providerId);
+        if (promoter != null) {
+            job.setPartnerName(promoter.getName());
         }
 
-        // TODO
+        CreateJobApi.Input createJobInput = new CreateJobApi.Input();
+        createJobInput.jobId = job.getId();
+
+
+        gatewayService.callOtherPartner(CreateJobApi.class, createJobInput);
+    }
+
+    /**
+     * 发送任务前的检查
+     */
+    private void checkBeforeSendJob(SendJobApi.Input input) throws Exception {
+        // 检查连通性
+        partnerService.testConnection(input);
     }
 }

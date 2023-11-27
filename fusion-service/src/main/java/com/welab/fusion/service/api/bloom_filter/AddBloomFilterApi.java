@@ -63,8 +63,8 @@ public class AddBloomFilterApi extends AbstractApi<AddBloomFilterApi.Input, AddB
             }
 
             if (addMethod == AddMethod.Database) {
-                if (StringUtils.isEmpty(dataSourceId) || MapUtils.isEmpty(dataSourceParams)) {
-                    StatusCode.PARAMETER_VALUE_INVALID.throwException("请设置数据源");
+                if (MapUtils.isEmpty(dataSourceParams)) {
+                    StatusCode.PARAMETER_VALUE_INVALID.throwException("请设置数据库连接信息");
                 }
 
                 if (StringUtils.isEmpty(sql)) {

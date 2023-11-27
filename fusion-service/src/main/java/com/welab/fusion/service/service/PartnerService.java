@@ -15,6 +15,7 @@
  */
 package com.welab.fusion.service.service;
 
+import com.welab.fusion.service.api.partner.TestConnectApi;
 import com.welab.fusion.service.database.base.MySpecification;
 import com.welab.fusion.service.database.base.Where;
 import com.welab.fusion.service.database.entity.PartnerDbModel;
@@ -25,15 +26,16 @@ import com.welab.fusion.service.model.global_config.FusionConfigModel;
 import com.welab.fusion.service.service.base.AbstractService;
 import com.welab.wefe.common.ModelMapper;
 import com.welab.wefe.common.StatusCode;
-import com.welab.wefe.common.exception.StatusCodeWithException;
-import com.welab.wefe.common.http.HttpRequest;
-import com.welab.wefe.common.http.HttpResponse;
 import com.welab.wefe.common.util.StringUtil;
 import com.welab.wefe.common.web.api.base.Api;
 import com.welab.wefe.common.web.api.service.AliveApi;
+import com.welab.wefe.common.web.dto.PartnerCaller;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 
 /**
@@ -48,8 +50,10 @@ public class PartnerService extends AbstractService {
     public static final String MYSELF_NAME = "myself";
     @Autowired
     private PartnerRepository partnerRepository;
+    @Autowired
+    private GatewayService gatewayService;
 
-    public PartnerDbModel getMyself() throws StatusCodeWithException {
+    public PartnerDbModel getMyself() throws Exception {
         PartnerDbModel myself = partnerRepository.findByName(MYSELF_NAME);
 
         if (myself == null) {
@@ -59,7 +63,7 @@ public class PartnerService extends AbstractService {
         return myself;
     }
 
-    public synchronized PartnerDbModel addMyself() throws StatusCodeWithException {
+    public synchronized PartnerDbModel addMyself() throws Exception {
         PartnerDbModel myself = partnerRepository.findByName(MYSELF_NAME);
         if (myself != null) {
             return myself;
@@ -79,19 +83,68 @@ public class PartnerService extends AbstractService {
         return save(input);
     }
 
-    public synchronized PartnerDbModel save(PartnerInputModel input) {
-        PartnerDbModel model = partnerRepository.findByName(input.getName());
+    /**
+     * 尝试保存合作方信息
+     */
+    @Async
+    public void trySave(PartnerCaller partnerCaller) throws Exception {
+        if (partnerCaller == null) {
+            return;
+        }
+
+        try {
+            save(null, partnerCaller.baseUrl, partnerCaller.publicKey);
+        } catch (Exception e) {
+            LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);
+        }
+    }
+
+    public PartnerDbModel save(PartnerInputModel input) throws Exception {
+        return save(input.getName(), input.getBaseUrl(), input.getPublicKey());
+    }
+
+    public synchronized PartnerDbModel save(String name, String baseUrl, String publicKey) throws Exception {
+        boolean hasName = StringUtil.isNotEmpty(name);
+
+        // 设置默认名称
+        if (!hasName) {
+            name = PartnerService.buildPartnerId(baseUrl);
+        }
+
+        PartnerDbModel model = findByUrl(baseUrl);
 
         // 有则更新，无则新增。
         if (model == null) {
             model = new PartnerDbModel();
         }
-        model.setName(input.getName());
-        model.setBaseUrl(input.getBaseUrl());
-        model.setPublicKey(input.getPublicKey());
+
+        /**
+         * 仅在以下两种情况下设置名称，避免在未指定名称时覆盖。
+         * 1. 输入了名称
+         * 2. 数据库中没有名称
+         */
+        if (hasName || StringUtil.isEmpty(model.getName())) {
+            model.setName(name);
+        }
+
+        model.setBaseUrl(baseUrl);
+        model.setPublicKey(publicKey);
         model.save();
 
         return model;
+    }
+
+    public static String buildPartnerId(String baseUrl) throws URISyntaxException {
+        URI uri = new URI(baseUrl);
+        return uri.getHost() + ":" + uri.getPort();
+    }
+
+    public PartnerDbModel findByUrl(String url) throws URISyntaxException {
+        return findById(buildPartnerId(url));
+    }
+
+    public PartnerDbModel findById(String id) {
+        return partnerRepository.findById(id).orElse(null);
     }
 
     public List<PartnerOutputModel> list(String name) {
@@ -104,29 +157,41 @@ public class PartnerService extends AbstractService {
         return ModelMapper.maps(list, PartnerOutputModel.class);
     }
 
-    public boolean delete(String name) {
-        PartnerDbModel model = partnerRepository.findByName(name);
-        if (model == null) {
-            return false;
-        }
-
-        partnerRepository.delete(model);
-        return true;
+    public void delete(String id) {
+        partnerRepository.deleteById(id);
     }
 
-    public void test(PartnerInputModel input) throws StatusCodeWithException {
-        String url = input.getBaseUrl() + "/" + AliveApi.class.getAnnotation(Api.class).path();
-        HttpResponse response = HttpRequest.create(url).get();
-        if (response.success()) {
-            return;
+    /**
+     * 测试双方的连通性
+     * 为保障双方的连通性，需要互相请求对方。
+     *
+     * 以 A 为测试方，B 为被测试方举例：
+     * 1. A 的前端请求自己后端的 TestConnectApi
+     * 2. A 的后端请求 B 的 TestConnectApi
+     * 3. B 后端请求 A 的 AliveApi（不请求 TestConnectApi 是为了避免死循环）
+     * 4. 如果都成功，则测试通过
+     */
+    public void testConnection(PartnerInputModel input) throws Exception {
+        // 请求来自己方前端，发起请求访问合作方的 TestConnectApi。
+        if (input.fromMyselfFrontEnd()) {
+            String url = input.getBaseUrl() + "/" + TestConnectApi.class.getAnnotation(Api.class).path();
+            gatewayService.requestOtherPartner(url, input.getPublicKey());
         }
 
-        StatusCode
-                .REMOTE_SERVICE_ERROR
-                .throwException(
-                        "访问[" + input.getName() + "]失败：" + response.getMessage()
-                                + System.lineSeparator()
-                                + url
-                );
+        // 别人请求我，我请求回去。
+        if (input.fromPartner()) {
+            String url = input.partnerCaller.baseUrl + "/" + AliveApi.class.getAnnotation(Api.class).path();
+            gatewayService.requestOtherPartner(url, input.partnerCaller.publicKey);
+        }
+
+        // 如果能联通，自动保存。
+        try {
+            save(input);
+        } catch (Exception e) {
+            LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);
+            // ignore
+        }
     }
+
+
 }

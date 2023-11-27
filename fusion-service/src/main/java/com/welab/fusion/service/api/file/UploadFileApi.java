@@ -156,7 +156,5 @@ public class UploadFileApi extends AbstractApi<UploadFileApi.Input, UploadFileAp
         public String identifier;
         @Check(name = "文件名", require = true)
         public String filename;
-        @Check(name = "文件用途", require = true)
-        public FileSystem.UseType uploadFileUseType;
     }
 }

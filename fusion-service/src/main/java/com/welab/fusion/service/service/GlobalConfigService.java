@@ -28,10 +28,11 @@ import com.welab.fusion.service.database.repository.GlobalConfigRepository;
 import com.welab.fusion.service.model.global_config.FusionConfigModel;
 import com.welab.fusion.service.model.global_config.base.AbstractConfigModel;
 import com.welab.fusion.service.model.global_config.base.ConfigModel;
-import com.welab.fusion.service.service.base.AbstractService;
 import com.welab.wefe.common.StatusCode;
 import com.welab.wefe.common.exception.StatusCodeWithException;
 import com.welab.wefe.common.web.TempSm2Cache;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -41,11 +42,14 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
+ * 由于 AbstractService 中包含了 GlobalConfigService，
+ * 所以 GlobalConfigService 不能继承 AbstractService，会导致循环引用。
+ *
  * @author zane
  */
 @Service
-public class GlobalConfigService extends AbstractService {
-
+public class GlobalConfigService {
+    protected final Logger LOG = LoggerFactory.getLogger(this.getClass());
     @Autowired
     protected GlobalConfigRepository globalConfigRepository;
 

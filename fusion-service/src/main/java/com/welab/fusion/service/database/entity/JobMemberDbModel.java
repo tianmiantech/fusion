@@ -36,8 +36,8 @@ import javax.persistence.Enumerated;
 @TypeDef(name = "json", typeClass = JsonStringType.class)
 public class JobMemberDbModel extends AbstractDbModel {
     private String jobId;
-    @Check(name = "合作方名称")
-    private String partnerName;
+    @Check(name = "合作方Id")
+    private String partnerId;
 
     @Enumerated(EnumType.STRING)
     private JobMemberRole role;
@@ -69,12 +69,12 @@ public class JobMemberDbModel extends AbstractDbModel {
         this.jobId = jobId;
     }
 
-    public String getPartnerName() {
-        return partnerName;
+    public String getPartnerId() {
+        return partnerId;
     }
 
-    public void setPartnerName(String partnerName) {
-        this.partnerName = partnerName;
+    public void setPartnerId(String partnerId) {
+        this.partnerId = partnerId;
     }
 
     public JobMemberRole getRole() {

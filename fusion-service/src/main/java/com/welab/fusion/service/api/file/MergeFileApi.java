@@ -44,19 +44,22 @@ public class MergeFileApi extends AbstractApi<MergeFileApi.Input, MergeFileApi.O
     @Override
     protected ApiResult<Output> handle(Input input) throws Exception {
 
-        String mergedFileName = UUID.randomUUID() + "-" + input.filename;
+        String mergedFileName = UUID.randomUUID()
+                .toString()
+                .replace("-", "")
+                + "-" + input.filename;
 
-        File dir = FileSystem.getBaseDir(input.uploadFileUseType)
+        File dir = FileSystem.getTempDir()
                 .resolve(input.identifier)
                 .toFile();
 
         if (!dir.exists()) {
             StatusCode.DATA_NOT_FOUND.throwException("文件不存在：" + input.identifier);
         }
-        
+
         File[] parts = dir.listFiles();
 
-        File mergedFile = FileSystem.getBaseDir(input.uploadFileUseType)
+        File mergedFile = FileSystem.getTempDir()
                 .resolve(mergedFileName)
                 .toFile();
 
@@ -66,7 +69,7 @@ public class MergeFileApi extends AbstractApi<MergeFileApi.Input, MergeFileApi.O
 
         try {
             for (int i = 1; i <= parts.length; i++) {
-                File part = FileSystem.getBaseDir(input.uploadFileUseType)
+                File part = FileSystem.getTempDir()
                         .resolve(input.identifier)
                         .resolve(i + ".part")
                         .toFile();
@@ -130,8 +133,6 @@ public class MergeFileApi extends AbstractApi<MergeFileApi.Input, MergeFileApi.O
         public String identifier;
         @Check(name = "文件名", require = true)
         public String filename;
-        @Check(name = "文件用途", require = true)
-        public FileSystem.UseType uploadFileUseType;
 
     }
 }

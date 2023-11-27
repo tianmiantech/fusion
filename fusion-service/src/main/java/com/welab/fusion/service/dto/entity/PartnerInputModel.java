@@ -19,6 +19,7 @@ import com.welab.fusion.service.service.PartnerService;
 import com.welab.wefe.common.StatusCode;
 import com.welab.wefe.common.exception.StatusCodeWithException;
 import com.welab.wefe.common.fieldvalidate.annotation.Check;
+import com.welab.wefe.common.util.StringUtil;
 import com.welab.wefe.common.web.dto.AbstractApiInput;
 
 /**
@@ -26,7 +27,7 @@ import com.welab.wefe.common.web.dto.AbstractApiInput;
  * @date 2023/11/24
  */
 public class PartnerInputModel extends AbstractApiInput {
-    @Check(name = "名称", require = true)
+    @Check(name = "名称")
     private String name;
     @Check(name = "公钥", require = true)
     private String publicKey;

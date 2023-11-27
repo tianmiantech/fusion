@@ -93,9 +93,7 @@ public class ApiExecutor {
         ApiResult<?> result = null;
         try {
 
-            // Checking login Status
-            //checkSessionToken(api, annotation);
-            // Check the permissions
+            // 检查访问权限
             checkApiPermission(httpServletRequest, annotation, params);
 
             // Doing things before the API is executed
@@ -181,27 +179,6 @@ public class ApiExecutor {
         Launcher.API_PERMISSION_POLICY.check(httpServletRequest, annotation, params);
     }
 
-    /**
-     * Checking login Status
-     */
-    private static void checkSessionToken(AbstractApi<?, ?> api, Api annotation) throws StatusCodeWithException {
-
-        // Skip interfaces that do not require login
-        if (annotation.allowAccessWithNothing()) {
-            return;
-        }
-
-        // If the login status check method is not set, the check is not performed.
-        if (Launcher.CHECK_SESSION_TOKEN_FUNCTION == null) {
-            return;
-        }
-
-        // Checking token Validity
-       /* String token = CurrentAccount.token();
-        if (!Launcher.CHECK_SESSION_TOKEN_FUNCTION.check(api, annotation, token)) {
-            throw new StatusCodeWithException(StatusCode.LOGIN_REQUIRED, "请登录后访问");
-        }*/
-    }
 
 
 }

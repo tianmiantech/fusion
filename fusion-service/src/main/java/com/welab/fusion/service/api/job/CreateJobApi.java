@@ -42,6 +42,10 @@ public class CreateJobApi extends AbstractApi<CreateJobApi.Input, CreateJobApi.O
     }
 
     public static class Input extends AbstractApiInput {
+        @Check(name = "任务Id", donotShow = true)
+        public String jobId;
+        @Check(name = "数据量", donotShow = true)
+        public long totalDataCount;
 
         @Check(name = "资源类型", desc = "数据源类型：数据集、过滤器")
         public DataResourceType dataResourceType;

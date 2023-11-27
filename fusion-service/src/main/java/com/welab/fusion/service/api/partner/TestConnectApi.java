@@ -15,35 +15,31 @@
  */
 package com.welab.fusion.service.api.partner;
 
+import com.welab.fusion.service.dto.entity.PartnerInputModel;
 import com.welab.fusion.service.service.PartnerService;
-import com.welab.wefe.common.fieldvalidate.annotation.Check;
 import com.welab.wefe.common.web.api.base.AbstractApi;
 import com.welab.wefe.common.web.api.base.Api;
-import com.welab.wefe.common.web.dto.AbstractApiInput;
 import com.welab.wefe.common.web.dto.ApiResult;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author zane.luo
- * @date 2023/11/24
+ * @date 2023/11/27
  */
-@Api(path = "partner/delete", name = "删除合作伙伴")
-public class DeletePartnerApi extends AbstractApi<DeletePartnerApi.Input, DeletePartnerApi.Output> {
+@Api(path = "partner/test_connect", name = "测试连通性", desc = "测试A|B双方互相发起请求的连通性")
+public class TestConnectApi extends AbstractApi<TestConnectApi.Input, TestConnectApi.Output> {
     @Autowired
     private PartnerService partnerService;
-
     @Override
-    protected ApiResult<Output> handle(DeletePartnerApi.Input input) throws Exception {
-        partnerService.delete(input.id);
-        return success(new Output());
+    protected ApiResult<TestConnectApi.Output> handle(TestConnectApi.Input input) throws Exception {
+        partnerService.testConnection(input);
+        return null;
+    }
+
+    public static class Input extends PartnerInputModel {
+
     }
 
     public static class Output {
-
-    }
-
-    public static class Input extends AbstractApiInput {
-        @Check(name = "合作方Id", require = true)
-        public String id;
     }
 }

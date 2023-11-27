@@ -34,7 +34,7 @@ import java.util.Map;
  * @author zane.luo
  * @date 2023/11/17
  */
-@Api(path = "bloom_filter/preview_table_data_source", name = "预览数据")
+@Api(path = "data_source/preview", name = "预览数据")
 public class PreviewTableDataSourceApi extends AbstractApi<PreviewTableDataSourceApi.Input, PreviewTableDataSourceApi.Output> {
     @Autowired
     private BloomFilterService bloomFilterService;
@@ -49,8 +49,6 @@ public class PreviewTableDataSourceApi extends AbstractApi<PreviewTableDataSourc
         @Check(require = true)
         public AddMethod addMethod;
 
-        @Check(name = "数据源id")
-        public String dataSourceId;
         @Check(name = "sql脚本", blockXss = false, oneSelectSql = true)
         public String sql;
 
