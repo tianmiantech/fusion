@@ -26,7 +26,11 @@ import com.welab.fusion.service.service.base.AbstractService;
 import com.welab.wefe.common.ModelMapper;
 import com.welab.wefe.common.StatusCode;
 import com.welab.wefe.common.exception.StatusCodeWithException;
+import com.welab.wefe.common.http.HttpRequest;
+import com.welab.wefe.common.http.HttpResponse;
 import com.welab.wefe.common.util.StringUtil;
+import com.welab.wefe.common.web.api.base.Api;
+import com.welab.wefe.common.web.api.service.AliveApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -108,5 +112,21 @@ public class PartnerService extends AbstractService {
 
         partnerRepository.delete(model);
         return true;
+    }
+
+    public void test(PartnerInputModel input) throws StatusCodeWithException {
+        String url = input.getBaseUrl() + "/" + AliveApi.class.getAnnotation(Api.class).path();
+        HttpResponse response = HttpRequest.create(url).get();
+        if (response.success()) {
+            return;
+        }
+
+        StatusCode
+                .REMOTE_SERVICE_ERROR
+                .throwException(
+                        "访问[" + input.getName() + "]失败：" + response.getMessage()
+                                + System.lineSeparator()
+                                + url
+                );
     }
 }

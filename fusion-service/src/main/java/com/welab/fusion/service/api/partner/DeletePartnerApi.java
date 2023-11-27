@@ -39,7 +39,7 @@ public class DeletePartnerApi extends AbstractApi<DeletePartnerApi.Input, Delete
     }
 
     public static class Output {
-        @Check(name = "是否已删除", require = true, desc = "如果指定的名称不存在，则返回 false")
+        @Check(name = "是否已删除", require = true, desc = "如果指定的名称不存在，返回 false")
         public boolean deleted;
 
         public static Output of(boolean deleted) {

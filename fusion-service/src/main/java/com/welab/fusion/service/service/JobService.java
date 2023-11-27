@@ -16,8 +16,13 @@
 package com.welab.fusion.service.service;
 
 import com.welab.fusion.service.api.job.CreateJobApi;
+import com.welab.fusion.service.api.job.SendJobApi;
+import com.welab.fusion.service.database.entity.JobDbModel;
+import com.welab.fusion.service.database.repository.JobRepository;
 import com.welab.fusion.service.model.global_config.FusionConfigModel;
 import com.welab.fusion.service.service.base.AbstractService;
+import com.welab.wefe.common.exception.StatusCodeWithException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -26,9 +31,33 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class JobService extends AbstractService {
+    @Autowired
+    private JobRepository jobRepository;
+    @Autowired
+    private PartnerService partnerService;
+
     public String createJob(CreateJobApi.Input input) {
         FusionConfigModel config = globalConfigService.getFusionConfig();
 
         return null;
+    }
+
+    public void startJob(String jobId) {
+        JobDbModel job = findById(jobId);
+    }
+
+    public JobDbModel findById(String jobId) {
+        return jobRepository.findById(jobId).orElse(null);
+    }
+
+    public void send(SendJobApi.Input input) throws StatusCodeWithException {
+        partnerService.test(input);
+
+        JobDbModel job = findById(input.jobId);
+        if (job == null) {
+            return;
+        }
+
+        // TODO
     }
 }
