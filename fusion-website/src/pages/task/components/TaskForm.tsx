@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, forwardRef, useImperativeHandle } from 'react';
-import { Input, Button, Form, Radio, Upload, Tooltip, Space, Row, Col } from 'antd';
+import { Input, Button, Form, Radio, Upload, Tooltip, Space, Row, Col,Alert,Spin } from 'antd';
 import type { UploadChangeParam } from 'antd/es/upload';
 import type { RcFile, UploadProps, UploadFile } from 'antd/es/upload/interface';
 import { FolderOpenOutlined, QuestionCircleOutlined } from '@ant-design/icons';
@@ -9,32 +9,88 @@ import HashForm from './HashForm/index';
 import DataSourceForm from './DataSourceForm';
 import BloomFilterManage from './BloomFilterManage';
 import { formRuleRequire } from '@/utils/common';
-
-interface FormData {
-  dataResourceType: string;
+import { getBaseURL,getToken } from '@/utils/request'
+import { useImmer } from 'use-immer';
+import lodash from 'lodash'
+import FileChunkUpload from '@/components/FileChunkUpload'
+interface DataInterface {
+  previewOpen:boolean,
+  BFManageOpen:boolean,
+  file:UploadFile<any>|null, //上传的文件的对象
+  fileUploadLoading:boolean, //文件上传loading状态
+  fileMessage:string, //文件上传提示
+  fileMessageType:"info" | "success" | "warning" | "error" //文件上传提示类型
 }
 
 const TaskForm = forwardRef((props, ref) => {
   const [formRef] = Form.useForm();
+
   const [fields, setFields] = useState([
     { name: ['dataResourceType'], value: 'DataSet' },
     { name: ['dataSetAddMethod'], value: 'file' },
     { name: ['hashValues'], value: [] }
   ]);
-  const [file, setFile] = useState<UploadFile>();
-  const [previewOpen, setPreviewOpen] = useState(false);
-  const [BFManageOpen, setBFManageOpen] = useState(false);
 
+  const [datas,setDatas] = useImmer<DataInterface>({
+    previewOpen:false,
+    BFManageOpen:false,
+    file:null,
+    fileUploadLoading:false,
+    fileMessage:'支持.csv .xls .xlsx 文件类型',
+    fileMessageType:'info'
+  })
+  
   const uploadProps:UploadProps = {
     name: 'file',
     maxCount: 1,
-    onChange(info:UploadChangeParam<UploadFile>) {
-      console.log('info', info);
-      if (info.file.status === 'done') {
-        setFile(info.file);
+    accept:".csv,application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    action:`${getBaseURL()}/file/upload`,
+    headers:{
+      'X-User-Token':getToken()
+    },
+    data(file){
+      return {
+        upload_file_use_type:'PsiBloomFilter',
+        filename:file.name
       }
+    },
+    onChange(info:UploadChangeParam<UploadFile>) {
+      onFileUploadChange(info)
     }
   };
+
+  const onFileUploadChange = (info:UploadChangeParam<UploadFile>)=>{
+    const status = lodash.get(info,'file.status')
+    if (status === 'uploading') {
+      setDatas(g=>{
+        g.fileUploadLoading = true
+      })
+    } else if (status === 'done') {
+      const response = lodash.get(info,'file.response')
+      const {code,message} = response
+      if(code !== 0){
+        const test = formRef.getFieldValue('uploadFile')
+        setDatas(g=>{
+          g.fileMessageType = 'error'
+          g.fileMessage = message||'上传出错,请稍后重试'
+          g.file = null
+        })
+      } else {
+        setDatas(g=>{
+          g.file = info.file
+        })
+      }
+      setDatas(g=>{
+        g.fileUploadLoading = false
+      })
+    } else if (status === 'error'){
+      setDatas(g=>{
+        g.fileUploadLoading = false
+        g.fileMessageType = 'error'
+        g.fileMessage= '文件上传失败，请检查后再继续'
+      })
+    }
+  } 
   
   const setHashKey = () => {
     formRef.setFieldsValue({
@@ -54,7 +110,7 @@ const TaskForm = forwardRef((props, ref) => {
   }));
 
   return (
-    <>
+    <Spin spinning={datas.fileUploadLoading}>
       <Row justify="center" className="form-scroll">
         <Col lg={{span: 16}} md={{span: 24}}>
           <Form
@@ -77,7 +133,7 @@ const TaskForm = forwardRef((props, ref) => {
                     return getFieldValue('dataResourceType') === 'BloomFilter' ?
                     <Button
                       style={{ marginLeft: 15 }}
-                      onClick={() => setBFManageOpen(true)}
+                      onClick={()=>{}}
                     >布隆过滤器管理</Button> : null
                   }
                 }
@@ -100,19 +156,23 @@ const TaskForm = forwardRef((props, ref) => {
                     <Form.Item noStyle shouldUpdate={(prev, cur) => prev.dataSetAddMethod !== cur.dataSetAddMethod }>
                       {({ getFieldValue }) => 
                         getFieldValue('dataSetAddMethod') === 'file' ?
+                        <>
+                        {/* <Alert style={{marginBottom:5}} type={datas.fileMessageType} message={datas.fileMessage}/>
                         <Space align="start">
                           <Upload {...uploadProps}>
                             <Button icon={<FolderOpenOutlined />}>选择文件</Button>
                           </Upload>
                           {
-                            file?.name ?
+                            datas.file?.name ?
                             <Button
                               icon={<FolderOpenOutlined />}
-                              onClick={() => setPreviewOpen(true)}
+                              onClick={() => {}}
                             >预览</Button> : ''
                           }
-                        </Space> :
-                        <DataSourceForm />
+                        </Space> */}
+                        <FileChunkUpload/>
+                        </> :
+                        <DataSourceForm formRef={formRef}/>
                       }
                     </Form.Item>
                   </Form.Item>
@@ -163,15 +223,15 @@ const TaskForm = forwardRef((props, ref) => {
       </Row>
       {/* 数据预览 */}
       <DataSetPreview
-        open={previewOpen}
-        onCancel={() => setPreviewOpen(false)}
+        open={datas.previewOpen}
+        onCancel={() => {setDatas(g=>{g.previewOpen = false})}}
       />
       {/* 布隆过滤器管理 */}
       <BloomFilterManage
-        open={BFManageOpen}
-        onClose={() => setBFManageOpen(false)}
+        open={datas.BFManageOpen}
+        onClose={() => {setDatas(g=>{g.BFManageOpen = false})}}
       />
-    </>
+    </Spin>
   );
 });
 
