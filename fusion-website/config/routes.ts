@@ -6,6 +6,16 @@
 //  }
 export default [
   {
+    path: '/login',
+    name: 'login',
+    component: './login',
+  },
+  {
+    path: '/register',
+    name: 'register',
+    component: './register',
+  },
+  {
     path: '/',
     component: '@/layouts/BasicLayout',
     routes: [
@@ -16,6 +26,7 @@ export default [
         path: '/home',
         component: './home',
       },
+      
       {
         name: 'task',
         path: '/task',

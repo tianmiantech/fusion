@@ -2,15 +2,23 @@ import { useEffect, useState, useRef, useMemo } from "react";
 import { Card, Row, Col, Button, Space } from 'antd';
 import { CheckCircleFilled } from '@ant-design/icons';
 import { useImmer } from 'use-immer';
-import { history } from 'umi';
+import { history } from '@umijs/max';
 import TaskForm from "./components/TaskForm";
 import ProviderForm from "./components/ProviderForm";
 import TaskDetail from "./components/TaskDetail";
 import RefuseModal from "./components/RefuseModal";
 import './index.less';
 
+interface ProvidersObj {
+  isReady:boolean
+}
+interface StateObj {
+  isReady: boolean,
+  myRole: string,
+  providers: ProvidersObj[]
+}
 const Task = () => {
-  const promoterTitle = <strong>发起方 10.10.105.22:90</strong>;
+  const promoterTitle = <strong>发起方</strong>;
   const cardStyles = {
     headStyle: {
       height: 50,
@@ -18,13 +26,13 @@ const Task = () => {
     },
     bodyStyle: {
       height: 'calc(100vh - 92px)',
-      overflowY: 'hidden',
-      position: 'relative'
+      OverflowY: 'hidden',
+      Position: 'relative'
     }
   }
 
   const taskFormRef = useRef();
-  const [state, setState] = useImmer({
+  const [state, setState] = useImmer<StateObj>({
     isReady: false,
     myRole: 'promoter',
     providers: []
@@ -55,7 +63,6 @@ const Task = () => {
     setState((g) => {
       g.providers[index].isReady = true;
     });
-    localStorage.setItem('hasTask', true);
     history.push('/task/detail');
   }
 

@@ -26,7 +26,7 @@ const Index = forwardRef((props,ref)=>{
     }
 
     return <TmDrawer 
-        title={'秘钥管理'} 
+        title={'环境信息'} 
         onClose={()=>{
             setVisible(false)
         }} 

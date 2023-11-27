@@ -17,11 +17,3 @@ export const encryMethodMap = new Map([
   ['SHA256', 'SHA256'],
   ['none', '无'],
 ]);
-
-// 数据源类型(后续改接口请求)
-export const dataBaseTypeMap = new Map([
-  ['Doris', 'Doris'],
-  ['ClickHouse', 'ClickHouse'],
-  ['MySQL', 'MySQL'],
-  ['Hive', 'Hive'],
-]);
