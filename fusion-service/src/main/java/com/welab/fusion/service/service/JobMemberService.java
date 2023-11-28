@@ -15,13 +15,17 @@
  */
 package com.welab.fusion.service.service;
 
+import com.welab.fusion.core.data_resource.base.DataResourceType;
 import com.welab.fusion.service.api.job.CreateJobApi;
 import com.welab.fusion.service.constans.JobMemberRole;
+import com.welab.fusion.service.database.base.MySpecification;
+import com.welab.fusion.service.database.base.Where;
+import com.welab.fusion.service.database.entity.BloomFilterDbModel;
 import com.welab.fusion.service.database.entity.JobMemberDbModel;
-import com.welab.fusion.service.database.entity.PartnerDbModel;
 import com.welab.fusion.service.database.repository.JobMemberRepository;
 import com.welab.fusion.service.service.base.AbstractService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.net.URISyntaxException;
@@ -37,22 +41,56 @@ public class JobMemberService extends AbstractService {
     @Autowired
     private PartnerService partnerService;
 
-    public void addMyself(String jobId, CreateJobApi.Input input) {
-        // TODO
-    }
 
+    /**
+     * 添加发起方
+     * 仅在创建任务时调用
+     */
     public void addPromoter(CreateJobApi.Input input) throws URISyntaxException {
-
-        PartnerDbModel promoter = partnerService.findByUrl(input.partnerCaller.baseUrl);
+        String partnerId = input.fromMyselfFrontEnd()
+                ? PartnerService.MYSELF_NAME
+                : partnerService.findByUrl(input.partnerCaller.baseUrl).getId();
 
         JobMemberDbModel model = new JobMemberDbModel();
         model.setJobId(input.jobId);
-        model.setPartnerId(promoter.getId());
+        model.setPartnerId(partnerId);
         model.setRole(JobMemberRole.promoter);
         model.setDataResourceType(input.dataResourceType);
         model.setTotalDataCount(input.totalDataCount);
-        model.setHashConfigs(input.hashConfig.toJson());
+        model.setHashConfig(input.hashConfig.toJson());
 
         model.save();
+    }
+
+    @Autowired
+    private BloomFilterService bloomFilterService;
+
+    @Async
+    public void updateTotalDataCount(CreateJobApi.Input input) {
+        long totalDataCount = 0;
+        if (input.dataResourceType == DataResourceType.PsiBloomFilter) {
+            BloomFilterDbModel bloomFilter = bloomFilterService.findOneById(input.bloomFilterResourceInput.bloomFilterId);
+            totalDataCount = bloomFilter.getTotalDataCount();
+        }
+
+        JobMemberDbModel model = findMyself(input.jobId);
+        if (model != null) {
+            model.setTotalDataCount(totalDataCount);
+            model.save();
+        }
+    }
+
+    public JobMemberDbModel findByPartnerId(String jobId, String partnerId) {
+        MySpecification<JobMemberDbModel> where = Where
+                .create()
+                .equal("jobId", jobId)
+                .equal("partnerId", partnerId)
+                .build();
+        return jobMemberRepository.findOne(where).orElse(null);
+
+    }
+
+    public JobMemberDbModel findMyself(String jobId) {
+        return findByPartnerId(jobId, PartnerService.MYSELF_NAME);
     }
 }

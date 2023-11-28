@@ -25,7 +25,7 @@ import com.welab.fusion.core.data_source.SqlTableDataSourceReader;
 import com.welab.fusion.core.hash.HashConfig;
 import com.welab.fusion.core.io.FileSystem;
 import com.welab.fusion.service.api.bloom_filter.AddBloomFilterApi;
-import com.welab.fusion.service.api.bloom_filter.PreviewTableDataSourceApi;
+import com.welab.fusion.service.api.data_source.PreviewTableDataSourceApi;
 import com.welab.fusion.service.api.bloom_filter.QueryBloomFilterApi;
 import com.welab.fusion.service.api.bloom_filter.UpdateBloomFilterApi;
 import com.welab.fusion.service.database.base.MySpecification;
@@ -39,7 +39,6 @@ import com.welab.fusion.service.service.base.AbstractService;
 import com.welab.wefe.common.CommonThreadPool;
 import com.welab.wefe.common.data.source.JdbcDataSourceClient;
 import com.welab.wefe.common.data.source.SuperDataSourceClient;
-import com.welab.wefe.common.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

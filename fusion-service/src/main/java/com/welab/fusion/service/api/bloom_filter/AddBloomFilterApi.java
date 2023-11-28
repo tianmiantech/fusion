@@ -16,6 +16,7 @@
 package com.welab.fusion.service.api.bloom_filter;
 
 import com.welab.fusion.core.hash.HashConfig;
+import com.welab.fusion.service.api.data_source.PreviewTableDataSourceApi;
 import com.welab.fusion.service.constans.AddMethod;
 import com.welab.fusion.core.progress.Progress;
 import com.welab.fusion.service.service.BloomFilterService;

@@ -61,10 +61,6 @@ public class SuperDataSourceClient {
 
         for (String typeName : annotation.typeNames()) {
             String type = typeName.toLowerCase();
-            if (CLASS_MAPS.containsKey(type)) {
-                throw new RuntimeException("数据源类型 " + type + " 已注册，无法重新注册。");
-            }
-
             CLASS_MAPS.put(type, clazz);
         }
     }

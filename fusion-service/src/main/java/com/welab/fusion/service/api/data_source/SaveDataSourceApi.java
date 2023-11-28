@@ -79,9 +79,11 @@ public class SaveDataSourceApi extends AbstractApi<SaveDataSourceApi.Input, Save
         public void checkAndStandardize() throws StatusCodeWithException {
             super.checkAndStandardize();
 
-            dataSourceParams.put("databaseType", databaseType.name());
-            // 参数解密
-            dataSourceParams = TempSm2Cache.decryptMap(dataSourceParams, JdbcDataSourceParams.class);
+            if (dataSourceParams != null) {
+                dataSourceParams.put("databaseType", databaseType.name());
+                // 参数解密
+                dataSourceParams = TempSm2Cache.decryptMap(dataSourceParams, JdbcDataSourceParams.class);
+            }
         }
     }
 

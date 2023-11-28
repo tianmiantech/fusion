@@ -19,6 +19,7 @@ import com.welab.fusion.service.api.job.CreateJobApi;
 import com.welab.fusion.service.api.job.SendJobApi;
 import com.welab.fusion.service.constans.JobMemberRole;
 import com.welab.fusion.service.database.entity.JobDbModel;
+import com.welab.fusion.service.database.entity.JobMemberDbModel;
 import com.welab.fusion.service.database.entity.PartnerDbModel;
 import com.welab.fusion.service.database.repository.JobRepository;
 import com.welab.fusion.service.service.base.AbstractService;
@@ -49,26 +50,25 @@ public class JobService extends AbstractService {
         partnerService.trySave(input.partnerCaller);
 
         JobDbModel job = new JobDbModel();
-        if (input.fromPartner()) {
-            job.setId(input.jobId);
+        // 来自自己前端，填充任务Id，便于其它方法他统一行为。
+        if (input.fromMyselfFrontEnd()) {
+            input.jobId = job.getId();
+        }
 
+        // 来自发起方，填充合作者信息。
+        if (input.fromPartner()) {
             String promoterId = PartnerService.buildPartnerId(input.partnerCaller.baseUrl);
             PartnerDbModel promoter = partnerService.findById(promoterId);
 
             job.setPartnerId(promoterId);
-            if (promoter != null) {
-                job.setPartnerName(promoter.getName());
-            }
+            job.setPartnerName(promoter.getName());
         }
+
+        job.setId(input.jobId);
         job.setRole(input.fromPartner() ? JobMemberRole.provider : JobMemberRole.promoter);
         job.setRemark(input.remark);
 
-        if(input.fromMyselfFrontEnd()){
-            jobMemberService.addMyself(job.getId(), input);
-        }
-        else{
-            jobMemberService.addPromoter(input);
-        }
+        jobMemberService.addPromoter(input);
         jobRepository.save(job);
 
         return job.getId();
@@ -89,22 +89,26 @@ public class JobService extends AbstractService {
     /**
      * 发起方将任务发送到协作方
      */
-    public void send(SendJobApi.Input input) throws Exception {
+    public void sendJobToProvider(SendJobApi.Input input) throws Exception {
         checkBeforeSendJob(input);
 
         JobDbModel job = findById(input.jobId);
 
+        // 补充合作方信息
         String providerId = PartnerService.buildPartnerId(input.partnerCaller.baseUrl);
-        PartnerDbModel promoter = partnerService.findById(providerId);
-
         job.setPartnerId(providerId);
-        if (promoter != null) {
-            job.setPartnerName(promoter.getName());
+        PartnerDbModel provider = partnerService.findById(providerId);
+        if (provider != null) {
+            job.setPartnerName(provider.getName());
         }
+
+        JobMemberDbModel promoter = jobMemberService.findMyself(job.getId());
 
         CreateJobApi.Input createJobInput = new CreateJobApi.Input();
         createJobInput.jobId = job.getId();
-
+        createJobInput.dataResourceType = promoter.getDataResourceType();
+        createJobInput.totalDataCount = promoter.getTotalDataCount();
+        createJobInput.hashConfig = promoter.getHashConfigModel();
 
         gatewayService.callOtherPartner(CreateJobApi.class, createJobInput);
     }

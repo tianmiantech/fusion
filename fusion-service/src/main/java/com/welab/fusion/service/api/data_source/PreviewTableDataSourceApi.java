@@ -13,11 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.welab.fusion.service.api.bloom_filter;
+package com.welab.fusion.service.api.data_source;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.welab.fusion.core.io.FileSystem;
-import com.welab.fusion.service.api.data_source.SaveDataSourceApi;
 import com.welab.fusion.service.constans.AddMethod;
 import com.welab.fusion.service.service.BloomFilterService;
 import com.welab.wefe.common.fieldvalidate.annotation.Check;

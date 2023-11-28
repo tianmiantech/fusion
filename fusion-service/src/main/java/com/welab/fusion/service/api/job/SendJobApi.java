@@ -34,7 +34,7 @@ public class SendJobApi extends AbstractApi<SendJobApi.Input, SendJobApi.Output>
 
     @Override
     protected ApiResult<SendJobApi.Output> handle(Input input) throws Exception {
-        jobService.send(input);
+        jobService.sendJobToProvider(input);
         return success();
     }
 

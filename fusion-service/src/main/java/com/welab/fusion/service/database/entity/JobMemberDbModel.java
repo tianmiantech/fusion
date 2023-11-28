@@ -16,8 +16,10 @@
 package com.welab.fusion.service.database.entity;
 
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.annotation.JSONField;
 import com.vladmihalcea.hibernate.type.json.JsonStringType;
 import com.welab.fusion.core.data_resource.base.DataResourceType;
+import com.welab.fusion.core.hash.HashConfig;
 import com.welab.fusion.service.constans.JobMemberRole;
 import com.welab.wefe.common.fieldvalidate.annotation.Check;
 import org.hibernate.annotations.Type;
@@ -49,7 +51,7 @@ public class JobMemberDbModel extends AbstractDbModel {
      */
     @Type(type = "json")
     @Column(columnDefinition = "json")
-    private JSONObject hashConfigs;
+    private JSONObject hashConfig;
 
     @Check(name = "过滤器Id")
     private String bloomFilterId;
@@ -58,6 +60,14 @@ public class JobMemberDbModel extends AbstractDbModel {
     @Type(type = "json")
     @Column(columnDefinition = "json")
     private JSONObject tableDataResourceInfo;
+
+    @JSONField(serialize = false)
+    public HashConfig getHashConfigModel() {
+        if (hashConfig == null) {
+            return null;
+        }
+        return hashConfig.toJavaObject(HashConfig.class);
+    }
 
     // region getter/setter
 
@@ -101,12 +111,12 @@ public class JobMemberDbModel extends AbstractDbModel {
         this.totalDataCount = totalDataCount;
     }
 
-    public JSONObject getHashConfigs() {
-        return hashConfigs;
+    public JSONObject getHashConfig() {
+        return hashConfig;
     }
 
-    public void setHashConfigs(JSONObject hashConfigs) {
-        this.hashConfigs = hashConfigs;
+    public void setHashConfig(JSONObject hashConfig) {
+        this.hashConfig = hashConfig;
     }
 
     public String getBloomFilterId() {

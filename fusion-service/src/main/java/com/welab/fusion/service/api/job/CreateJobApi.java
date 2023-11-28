@@ -17,7 +17,7 @@ package com.welab.fusion.service.api.job;
 
 import com.welab.fusion.core.data_resource.base.DataResourceType;
 import com.welab.fusion.core.hash.HashConfig;
-import com.welab.fusion.service.api.bloom_filter.PreviewTableDataSourceApi;
+import com.welab.fusion.service.api.data_source.PreviewTableDataSourceApi;
 import com.welab.fusion.service.service.JobService;
 import com.welab.wefe.common.fieldvalidate.annotation.Check;
 import com.welab.wefe.common.web.api.base.AbstractApi;
@@ -45,9 +45,9 @@ public class CreateJobApi extends AbstractApi<CreateJobApi.Input, CreateJobApi.O
         @Check(name = "任务Id", donotShow = true)
         public String jobId;
         @Check(name = "数据量", donotShow = true)
-        public long totalDataCount;
+        public long totalDataCount = -1;
 
-        @Check(name = "资源类型", desc = "数据源类型：数据集、过滤器")
+        @Check(name = "资源类型",require = true, desc = "数据源类型：数据集、过滤器")
         public DataResourceType dataResourceType;
 
         @Check(name = "输入的过滤器信息")
