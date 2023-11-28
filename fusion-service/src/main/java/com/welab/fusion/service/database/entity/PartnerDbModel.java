@@ -15,6 +15,8 @@
  */
 package com.welab.fusion.service.database.entity;
 
+import com.welab.wefe.common.web.dto.FusionNodeInfo;
+
 import javax.persistence.Entity;
 
 /**
@@ -35,6 +37,11 @@ public class PartnerDbModel extends AbstractDbModel {
      * 服务端地址
      */
     private String baseUrl;
+
+    public FusionNodeInfo toFusionNodeInfo() {
+
+        return FusionNodeInfo.of(publicKey, baseUrl);
+    }
 
     // region getter/setter
 
@@ -61,7 +68,6 @@ public class PartnerDbModel extends AbstractDbModel {
     public void setBaseUrl(String baseUrl) {
         this.baseUrl = baseUrl;
     }
-
 
     // endregion
 }

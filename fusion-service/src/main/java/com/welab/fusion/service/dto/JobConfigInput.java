@@ -13,20 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.welab.wefe.common.web.dto;
+package com.welab.fusion.service.dto;
+
+import com.welab.wefe.common.fieldvalidate.annotation.Check;
+import com.welab.wefe.common.web.dto.AbstractApiInput;
 
 /**
  * @author zane.luo
- * @date 2023/11/27
+ * @date 2023/11/28
  */
-public class PartnerCaller {
-    public String publicKey;
-    public String baseUrl;
-
-    public static PartnerCaller of(String publicKey, String baseUrl) {
-        PartnerCaller partnerCaller = new PartnerCaller();
-        partnerCaller.publicKey = publicKey;
-        partnerCaller.baseUrl = baseUrl;
-        return partnerCaller;
-    }
+public class JobConfigInput extends AbstractApiInput {
+    @Check(name = "任务Id", donotShow = true)
+    public String jobId;
+    @Check(name = "备注")
+    public String remark;
+    @Check(name = "资源信息")
+    public JobMemberDataResourceInput dataResource;
 }

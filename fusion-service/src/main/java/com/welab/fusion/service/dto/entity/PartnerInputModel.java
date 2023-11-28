@@ -21,6 +21,7 @@ import com.welab.wefe.common.exception.StatusCodeWithException;
 import com.welab.wefe.common.fieldvalidate.annotation.Check;
 import com.welab.wefe.common.util.StringUtil;
 import com.welab.wefe.common.web.dto.AbstractApiInput;
+import com.welab.wefe.common.web.dto.FusionNodeInfo;
 
 /**
  * @author zane.luo
@@ -43,6 +44,10 @@ public class PartnerInputModel extends AbstractApiInput {
                     .PARAMETER_VALUE_INVALID
                     .throwException("名称不能为：" + PartnerService.MYSELF_NAME);
         }
+    }
+
+    public FusionNodeInfo toFusionNodeInfo(){
+        return FusionNodeInfo.of(publicKey, baseUrl);
     }
 
     // region getter/setter

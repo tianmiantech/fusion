@@ -22,9 +22,13 @@ import com.welab.fusion.service.database.entity.JobDbModel;
 import com.welab.fusion.service.database.entity.JobMemberDbModel;
 import com.welab.fusion.service.database.entity.PartnerDbModel;
 import com.welab.fusion.service.database.repository.JobRepository;
+import com.welab.fusion.service.dto.JobConfigInput;
 import com.welab.fusion.service.service.base.AbstractService;
+import com.welab.wefe.common.web.dto.FusionNodeInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.net.URISyntaxException;
 
 /**
  * @author zane.luo
@@ -44,20 +48,21 @@ public class JobService extends AbstractService {
     /**
      * 创建任务
      */
-    public String createJob(CreateJobApi.Input input) throws Exception {
+    public String createJob(JobConfigInput input) throws Exception {
         checkBeforeCreateJob(input);
         // 自动保存合作方信息
-        partnerService.trySave(input.partnerCaller);
+        partnerService.trySave(input.caller);
 
         JobDbModel job = new JobDbModel();
-        // 来自自己前端，填充任务Id，便于其它方法他统一行为。
+        // 来自自己前端，填充任务Id，便于其它方法统一行为。
         if (input.fromMyselfFrontEnd()) {
             input.jobId = job.getId();
+            job.setPartnerId(PartnerService.MYSELF_NAME);
         }
 
         // 来自发起方，填充合作者信息。
         if (input.fromPartner()) {
-            String promoterId = PartnerService.buildPartnerId(input.partnerCaller.baseUrl);
+            String promoterId = PartnerService.buildPartnerId(input.caller.baseUrl);
             PartnerDbModel promoter = partnerService.findById(promoterId);
 
             job.setPartnerId(promoterId);
@@ -68,13 +73,45 @@ public class JobService extends AbstractService {
         job.setRole(input.fromPartner() ? JobMemberRole.provider : JobMemberRole.promoter);
         job.setRemark(input.remark);
 
-        jobMemberService.addPromoter(input);
+
         jobRepository.save(job);
 
+        saveJobMember(input);
         return job.getId();
     }
 
-    private void checkBeforeCreateJob(CreateJobApi.Input input) {
+    /**
+     * 启动任务
+     * 由协作方触发
+     */
+    public void start(JobConfigInput input) throws URISyntaxException {
+        JobDbModel job = findById(input.jobId);
+        job.setRemark(input.remark);
+        saveJobMember(input);
+
+        FusionNodeInfo target = partnerService
+                .findById(job.getPartnerId())
+                .toFusionNodeInfo();
+
+        // 同步给发起方
+        gatewayService.callOtherPartner(target, CreateJobApi.class, input);
+    }
+
+    /**
+     * 保存任务成员
+     *
+     * 注意：
+     * updateTotalDataCount() 为异步方法
+     * 不能在 JobMemberService 中调用，所以这里放在了 JobService 中。
+     */
+    private void saveJobMember(JobConfigInput input) throws URISyntaxException {
+        jobMemberService.addMember(input);
+
+        // 更新我方资源数据量
+        jobMemberService.updateTotalDataCount(input);
+    }
+
+    private void checkBeforeCreateJob(JobConfigInput input) {
 
     }
 
@@ -95,7 +132,7 @@ public class JobService extends AbstractService {
         JobDbModel job = findById(input.jobId);
 
         // 补充合作方信息
-        String providerId = PartnerService.buildPartnerId(input.partnerCaller.baseUrl);
+        String providerId = PartnerService.buildPartnerId(input.getBaseUrl());
         job.setPartnerId(providerId);
         PartnerDbModel provider = partnerService.findById(providerId);
         if (provider != null) {
@@ -104,13 +141,17 @@ public class JobService extends AbstractService {
 
         JobMemberDbModel promoter = jobMemberService.findMyself(job.getId());
 
-        CreateJobApi.Input createJobInput = new CreateJobApi.Input();
+        JobConfigInput createJobInput = new JobConfigInput();
         createJobInput.jobId = job.getId();
-        createJobInput.dataResourceType = promoter.getDataResourceType();
-        createJobInput.totalDataCount = promoter.getTotalDataCount();
-        createJobInput.hashConfig = promoter.getHashConfigModel();
+        createJobInput.dataResource.dataResourceType = promoter.getDataResourceType();
+        createJobInput.dataResource.totalDataCount = promoter.getTotalDataCount();
+        createJobInput.dataResource.hashConfig = promoter.getHashConfigModel();
 
-        gatewayService.callOtherPartner(CreateJobApi.class, createJobInput);
+        gatewayService.callOtherPartner(
+                input.toFusionNodeInfo(),
+                CreateJobApi.class,
+                createJobInput
+        );
     }
 
     /**
@@ -120,4 +161,5 @@ public class JobService extends AbstractService {
         // 检查连通性
         partnerService.testConnection(input);
     }
+
 }

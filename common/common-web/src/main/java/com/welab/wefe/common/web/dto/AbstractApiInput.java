@@ -55,20 +55,20 @@ public class AbstractApiInput extends AbstractCheckModel {
 
     @Check(name = "被合作方调用时，合作方的信息")
     @JSONField(serialize = false)
-    public PartnerCaller partnerCaller;
+    public FusionNodeInfo caller;
 
     /**
      * 请求是否来自己方前端
      */
     public boolean fromMyselfFrontEnd() {
-        return partnerCaller == null;
+        return caller == null;
     }
 
     /**
      * 请求是否来自合作方
      */
     public boolean fromPartner() {
-        return partnerCaller != null;
+        return caller != null;
     }
 
     @Override

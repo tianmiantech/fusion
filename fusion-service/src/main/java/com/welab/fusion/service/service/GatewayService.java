@@ -17,7 +17,6 @@ package com.welab.fusion.service.service;
 
 import cn.hutool.crypto.digest.SM3;
 import com.alibaba.fastjson.JSONObject;
-import com.welab.fusion.service.api.job.CreateJobApi;
 import com.welab.fusion.service.model.global_config.FusionConfigModel;
 import com.welab.fusion.service.service.base.AbstractService;
 import com.welab.wefe.common.StatusCode;
@@ -28,7 +27,7 @@ import com.welab.wefe.common.http.HttpResponse;
 import com.welab.wefe.common.util.StringUtil;
 import com.welab.wefe.common.web.api.base.AbstractApi;
 import com.welab.wefe.common.web.dto.AbstractApiInput;
-import com.welab.wefe.common.web.dto.PartnerCaller;
+import com.welab.wefe.common.web.dto.FusionNodeInfo;
 import org.springframework.stereotype.Service;
 
 /**
@@ -50,7 +49,7 @@ public class GatewayService extends AbstractService {
             StatusCode.PARAMETER_VALUE_INVALID.throwException("尚未设置我方“对外服务地址”，请在全局设置中设置。");
         }
 
-        PartnerCaller myself = PartnerCaller.of(config.publicKey, config.publicServiceBaseUrl);
+        FusionNodeInfo myself = FusionNodeInfo.of(config.publicKey, config.publicServiceBaseUrl);
 
         // 在请求参数中带上自己的身份信息
         JSONObject params = new JSONObject();
@@ -83,7 +82,9 @@ public class GatewayService extends AbstractService {
         return response;
     }
 
-    public void callOtherPartner(Class<? extends AbstractApi> apiClass, AbstractApiInput input) {
-
+    public void callOtherPartner(FusionNodeInfo target,Class<? extends AbstractApi> apiClass, AbstractApiInput input) {
+        if (input.fromPartner()) {
+            return;
+        }
     }
 }

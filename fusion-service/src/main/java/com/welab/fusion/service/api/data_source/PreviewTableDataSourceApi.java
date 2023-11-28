@@ -16,9 +16,15 @@
 package com.welab.fusion.service.api.data_source;
 
 import com.alibaba.fastjson.annotation.JSONField;
+import com.welab.fusion.core.data_source.AbstractTableDataSourceReader;
+import com.welab.fusion.core.data_source.CsvTableDataSourceReader;
+import com.welab.fusion.core.data_source.ExcelTableDataSourceReader;
+import com.welab.fusion.core.data_source.SqlTableDataSourceReader;
 import com.welab.fusion.core.io.FileSystem;
 import com.welab.fusion.service.constans.AddMethod;
 import com.welab.fusion.service.service.BloomFilterService;
+import com.welab.wefe.common.data.source.JdbcDataSourceClient;
+import com.welab.wefe.common.data.source.SuperDataSourceClient;
 import com.welab.wefe.common.fieldvalidate.annotation.Check;
 import com.welab.wefe.common.web.api.base.AbstractApi;
 import com.welab.wefe.common.web.api.base.Api;
@@ -60,6 +66,35 @@ public class PreviewTableDataSourceApi extends AbstractApi<PreviewTableDataSourc
                 return new File(dataSourceFile);
             } else {
                 return FileSystem.getTempDir().resolve(dataSourceFile).toFile();
+            }
+        }
+
+        public JdbcDataSourceClient createJdbcClient() {
+            if (addMethod != AddMethod.Database) {
+                throw new UnsupportedOperationException();
+            }
+            return SuperDataSourceClient.create(databaseType.name(), dataSourceParams);
+        }
+
+        public AbstractTableDataSourceReader createReader(long maxReadRows, long maxReadTimeInMs) throws Exception {
+            switch (addMethod) {
+                case Database:
+                    JdbcDataSourceClient client = createJdbcClient();
+                    client.test();
+
+                    return new SqlTableDataSourceReader(client, sql, maxReadRows, maxReadTimeInMs);
+
+                default:
+                    File file = getFile();
+
+                    if (!file.exists()) {
+                        throw new RuntimeException("未找到文件:" + file.getAbsolutePath());
+                    }
+
+                    boolean isCsv = file.getName().endsWith("csv");
+                    return isCsv
+                            ? new CsvTableDataSourceReader(file, maxReadRows, maxReadTimeInMs)
+                            : new ExcelTableDataSourceReader(file, maxReadRows, maxReadTimeInMs);
             }
         }
     }

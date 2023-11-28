@@ -15,49 +15,30 @@
  */
 package com.welab.fusion.service.api.job;
 
-import com.welab.fusion.service.api.data_source.PreviewTableDataSourceApi;
 import com.welab.fusion.service.dto.JobConfigInput;
+import com.welab.fusion.service.dto.entity.PartnerInputModel;
 import com.welab.fusion.service.service.JobService;
 import com.welab.wefe.common.fieldvalidate.annotation.Check;
 import com.welab.wefe.common.web.api.base.AbstractApi;
 import com.welab.wefe.common.web.api.base.Api;
-import com.welab.wefe.common.web.dto.AbstractApiInput;
 import com.welab.wefe.common.web.dto.ApiResult;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author zane.luo
- * @date 2023/11/20
+ * @date 2023/11/27
  */
-@Api(path = "job/create", name = "创建任务")
-public class CreateJobApi extends AbstractApi<JobConfigInput, CreateJobApi.Output> {
+@Api(path = "job/agree_and_start", name = "协作方填写资源信息并启动任务")
+public class StartJobApi extends AbstractApi<JobConfigInput, StartJobApi.Output> {
     @Autowired
     private JobService jobService;
 
     @Override
-    protected ApiResult<CreateJobApi.Output> handle(JobConfigInput input) throws Exception {
-        String jobId = jobService.createJob(input);
-        return success(Output.of(jobId));
-    }
-
-
-    public static class BloomFilterResourceInput extends AbstractApiInput {
-        @Check(name = "过滤器Id")
-        public String bloomFilterId;
-    }
-
-    public static class TableDataResourceInput extends PreviewTableDataSourceApi.Input {
-
+    protected ApiResult<StartJobApi.Output> handle(JobConfigInput input) throws Exception {
+        jobService.start(input);
+        return success();
     }
 
     public static class Output {
-        @Check(name = "任务Id")
-        public String jobId;
-
-        public static Output of(String jobId) {
-            Output output = new Output();
-            output.jobId = jobId;
-            return output;
-        }
     }
 }

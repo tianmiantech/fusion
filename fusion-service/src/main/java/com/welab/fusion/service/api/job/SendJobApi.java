@@ -27,7 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author zane.luo
  * @date 2023/11/27
  */
-@Api(path = "job/send", name = "发送任务到协作方")
+@Api(path = "job/send_to_provider", name = "发送任务到协作方")
 public class SendJobApi extends AbstractApi<SendJobApi.Input, SendJobApi.Output> {
     @Autowired
     private JobService jobService;

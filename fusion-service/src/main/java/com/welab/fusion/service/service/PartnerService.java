@@ -29,9 +29,8 @@ import com.welab.wefe.common.StatusCode;
 import com.welab.wefe.common.util.StringUtil;
 import com.welab.wefe.common.web.api.base.Api;
 import com.welab.wefe.common.web.api.service.AliveApi;
-import com.welab.wefe.common.web.dto.PartnerCaller;
+import com.welab.wefe.common.web.dto.FusionNodeInfo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.net.URI;
@@ -86,8 +85,7 @@ public class PartnerService extends AbstractService {
     /**
      * 尝试保存合作方信息
      */
-    @Async
-    public void trySave(PartnerCaller partnerCaller) throws Exception {
+    public void trySave(FusionNodeInfo partnerCaller) throws Exception {
         if (partnerCaller == null) {
             return;
         }
@@ -180,8 +178,8 @@ public class PartnerService extends AbstractService {
 
         // 别人请求我，我请求回去。
         if (input.fromPartner()) {
-            String url = input.partnerCaller.baseUrl + "/" + AliveApi.class.getAnnotation(Api.class).path();
-            gatewayService.requestOtherPartner(url, input.partnerCaller.publicKey);
+            String url = input.caller.baseUrl + "/" + AliveApi.class.getAnnotation(Api.class).path();
+            gatewayService.requestOtherPartner(url, input.caller.publicKey);
         }
 
         // 如果能联通，自动保存。

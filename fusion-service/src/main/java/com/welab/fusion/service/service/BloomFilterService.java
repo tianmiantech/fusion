@@ -73,7 +73,7 @@ public class BloomFilterService extends AbstractService {
 
         Progress progress = ProgressManager.startNew(model.getId());
         CommonThreadPool.run(() -> {
-            try (AbstractTableDataSourceReader reader = createReader(input, -1, -1)){
+            try (AbstractTableDataSourceReader reader = input.createReader(-1, -1)) {
                 create(model, progress, reader, input.hashConfig);
                 model.save();
                 progress.success();
@@ -114,33 +114,11 @@ public class BloomFilterService extends AbstractService {
         }
     }
 
-    public AbstractTableDataSourceReader createReader(PreviewTableDataSourceApi.Input input, long maxReadRows, long maxReadTimeInMs) throws Exception {
-        switch (input.addMethod) {
-            case Database:
-                JdbcDataSourceClient client = SuperDataSourceClient.create(input.databaseType.name(), input.dataSourceParams);
-                client.test();
-
-                return new SqlTableDataSourceReader(client, input.sql, maxReadRows, maxReadTimeInMs);
-
-            default:
-                File file = input.getFile();
-
-                if (!file.exists()) {
-                    throw new RuntimeException("未找到文件:" + file.getAbsolutePath());
-                }
-
-                boolean isCsv = file.getName().endsWith("csv");
-                return isCsv
-                        ? new CsvTableDataSourceReader(file, maxReadRows, maxReadTimeInMs)
-                        : new ExcelTableDataSourceReader(file, maxReadRows, maxReadTimeInMs);
-        }
-    }
-
     /**
      * 预览数据源中的数据
      */
     public PreviewTableDataSourceApi.Output previewTableDataSource(PreviewTableDataSourceApi.Input input) throws Exception {
-        AbstractTableDataSourceReader reader = createReader(input, 100, -1);
+        AbstractTableDataSourceReader reader = input.createReader(100, -1);
 
         PreviewTableDataSourceApi.Output output = new PreviewTableDataSourceApi.Output();
         output.header = reader.getHeader();
