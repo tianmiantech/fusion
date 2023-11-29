@@ -1,0 +1,19 @@
+.rsu-btn {
+  position: relative;
+  display: inline-block;
+  padding: 4px 8px;
+  color: #666;
+  font-size: 100%;
+  line-height: 1.4;
+  background: none;
+  border: 1px solid #666;
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+.rsu-btn-hidden {
+  display: none;
+}
+.rsu-btn:hover {
+  background-color: white;
+}

@@ -8,6 +8,8 @@ import ProviderForm from "./components/ProviderForm";
 import TaskDetail from "./components/TaskDetail";
 import RefuseModal from "./components/RefuseModal";
 import './index.less';
+import { useModel } from "@umijs/max";
+
 
 interface ProvidersObj {
   isReady:boolean
@@ -17,7 +19,15 @@ interface StateObj {
   myRole: string,
   providers: ProvidersObj[]
 }
+
+interface taskFormRefInterface {
+  submitFormData: () => Promise<any>
+}
+
 const Task = () => {
+
+  const {taskFormData} = useModel('task.useTaskForm')
+
   const promoterTitle = <strong>发起方</strong>;
   const cardStyles = {
     headStyle: {
@@ -31,7 +41,7 @@ const Task = () => {
     }
   }
 
-  const taskFormRef = useRef();
+  const taskFormRef = useRef<taskFormRefInterface>();
   const [state, setState] = useImmer<StateObj>({
     isReady: false,
     myRole: 'promoter',
@@ -41,14 +51,7 @@ const Task = () => {
   const [refuseOpen, setRefuseOpen] = useState(false);
 
   const savePromoterForm = () => {
-    setState((g) => {
-      g.isReady = true;
-      if (g.providers.length === 0) {
-        g.providers.push({
-          isReady: false
-        })
-      }
-    });
+    taskFormRef.current?.submitFormData()
   }
 
   const addProvider = () => {
@@ -88,7 +91,7 @@ const Task = () => {
             }
             <Row className="operation-area">
               {
-                state.isReady ?
+                taskFormData.job_id ?
                 <>
                   <CheckCircleFilled style={{ fontSize: 24, color: '#52c41a' }} />
                   <span>已保存，待发起任务</span>
@@ -99,7 +102,7 @@ const Task = () => {
           </Card>
         </Col>
         {
-          (state.isReady && state.providers.length) ?
+          (taskFormData.job_id && state.providers.length) ?
           state.providers.map((provider, index) => {
             return (
               <Col key={index} span={24 / (state.providers.length + 1)}>
