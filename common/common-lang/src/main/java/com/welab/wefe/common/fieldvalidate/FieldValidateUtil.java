@@ -26,6 +26,7 @@ import com.welab.wefe.common.util.StringUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Field;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -87,6 +88,12 @@ public class FieldValidateUtil {
              */
             boolean emptyIsNotOk = check.require() && (value == null || "".equals(value));
 
+            if (value instanceof List) {
+                emptyIsNotOk = check.require() && ((List) value).isEmpty();
+            }
+            if (value instanceof Map) {
+                emptyIsNotOk = check.require() && ((Map) value).isEmpty();
+            }
             if (emptyIsNotOk) {
                 String message = String.format("%s can not be empty!", field.getName());
                 if (StringUtil.isNotEmpty(check.messageOnEmpty())) {

@@ -16,6 +16,8 @@
 package com.welab.fusion.core.hash;
 
 import com.alibaba.fastjson.JSONObject;
+import com.welab.wefe.common.fieldvalidate.AbstractCheckModel;
+import com.welab.wefe.common.fieldvalidate.annotation.Check;
 import com.welab.wefe.common.util.JObject;
 
 import java.util.ArrayList;
@@ -28,7 +30,8 @@ import java.util.stream.Collectors;
  * @author zane.luo
  * @date 2023/11/14
  */
-public class HashConfig {
+public class HashConfig extends AbstractCheckModel {
+    @Check(name = "主键 hash 方案", require = true)
     public List<HashConfigItem> list = new ArrayList<>();
 
     public static HashConfig of(HashConfigItem... items) {
