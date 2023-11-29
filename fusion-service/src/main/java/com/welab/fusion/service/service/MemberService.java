@@ -15,13 +15,13 @@
  */
 package com.welab.fusion.service.service;
 
-import com.welab.fusion.service.api.partner.TestConnectApi;
+import com.welab.fusion.service.api.member.TestConnectApi;
 import com.welab.fusion.service.database.base.MySpecification;
 import com.welab.fusion.service.database.base.Where;
-import com.welab.fusion.service.database.entity.PartnerDbModel;
-import com.welab.fusion.service.database.repository.PartnerRepository;
-import com.welab.fusion.service.dto.entity.PartnerInputModel;
-import com.welab.fusion.service.dto.entity.PartnerOutputModel;
+import com.welab.fusion.service.database.entity.MemberDbModel;
+import com.welab.fusion.service.database.repository.MemberRepository;
+import com.welab.fusion.service.dto.entity.MemberInputModel;
+import com.welab.fusion.service.dto.entity.MemberOutputModel;
 import com.welab.fusion.service.model.global_config.FusionConfigModel;
 import com.welab.fusion.service.service.base.AbstractService;
 import com.welab.wefe.common.ModelMapper;
@@ -42,18 +42,18 @@ import java.util.List;
  * @date 2023/11/20
  */
 @Service
-public class PartnerService extends AbstractService {
+public class MemberService extends AbstractService {
     /**
-     * 为保持一致性，自己也作为一个 partner 储存在数据库中，其 name 固定。
+     * 为保持一致性，自己也作为一个 member 储存在数据库中，其 name 固定。
      */
     public static final String MYSELF_NAME = "myself";
     @Autowired
-    private PartnerRepository partnerRepository;
+    private MemberRepository memberRepository;
     @Autowired
     private GatewayService gatewayService;
 
-    public PartnerDbModel getMyself() throws Exception {
-        PartnerDbModel myself = partnerRepository.findByName(MYSELF_NAME);
+    public MemberDbModel getMyself() throws Exception {
+        MemberDbModel myself = memberRepository.findByName(MYSELF_NAME);
 
         if (myself == null) {
             myself = addMyself();
@@ -62,8 +62,8 @@ public class PartnerService extends AbstractService {
         return myself;
     }
 
-    public synchronized PartnerDbModel addMyself() throws Exception {
-        PartnerDbModel myself = partnerRepository.findByName(MYSELF_NAME);
+    public synchronized MemberDbModel addMyself() throws Exception {
+        MemberDbModel myself = memberRepository.findByName(MYSELF_NAME);
         if (myself != null) {
             return myself;
         }
@@ -75,7 +75,7 @@ public class PartnerService extends AbstractService {
                     .throwException("未设置“对外服务地址”，请在全局配置中填写，供其它节点通信。");
         }
 
-        PartnerInputModel input = new PartnerInputModel();
+        MemberInputModel input = new MemberInputModel();
         input.setName(MYSELF_NAME);
         input.setBaseUrl(config.publicServiceBaseUrl);
         input.setPublicKey(config.publicKey);
@@ -85,35 +85,35 @@ public class PartnerService extends AbstractService {
     /**
      * 尝试保存合作方信息
      */
-    public void trySave(FusionNodeInfo partnerCaller) throws Exception {
-        if (partnerCaller == null) {
+    public void trySave(FusionNodeInfo caller) throws Exception {
+        if (caller == null) {
             return;
         }
 
         try {
-            save(null, partnerCaller.baseUrl, partnerCaller.publicKey);
+            save(null, caller.baseUrl, caller.publicKey);
         } catch (Exception e) {
             LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);
         }
     }
 
-    public PartnerDbModel save(PartnerInputModel input) throws Exception {
+    public MemberDbModel save(MemberInputModel input) throws Exception {
         return save(input.getName(), input.getBaseUrl(), input.getPublicKey());
     }
 
-    public synchronized PartnerDbModel save(String name, String baseUrl, String publicKey) throws Exception {
+    public synchronized MemberDbModel save(String name, String baseUrl, String publicKey) throws Exception {
         boolean hasName = StringUtil.isNotEmpty(name);
 
         // 设置默认名称
         if (!hasName) {
-            name = PartnerService.buildPartnerId(baseUrl);
+            name = MemberService.buildMemberId(baseUrl);
         }
 
-        PartnerDbModel model = findByUrl(baseUrl);
+        MemberDbModel model = findByUrl(baseUrl);
 
         // 有则更新，无则新增。
         if (model == null) {
-            model = new PartnerDbModel();
+            model = new MemberDbModel();
         }
 
         /**
@@ -132,31 +132,31 @@ public class PartnerService extends AbstractService {
         return model;
     }
 
-    public static String buildPartnerId(String baseUrl) throws URISyntaxException {
+    public static String buildMemberId(String baseUrl) throws URISyntaxException {
         URI uri = new URI(baseUrl);
         return uri.getHost() + ":" + uri.getPort();
     }
 
-    public PartnerDbModel findByUrl(String url) throws URISyntaxException {
-        return findById(buildPartnerId(url));
+    public MemberDbModel findByUrl(String url) throws URISyntaxException {
+        return findById(buildMemberId(url));
     }
 
-    public PartnerDbModel findById(String id) {
-        return partnerRepository.findById(id).orElse(null);
+    public MemberDbModel findById(String id) {
+        return memberRepository.findById(id).orElse(null);
     }
 
-    public List<PartnerOutputModel> list(String name) {
-        MySpecification<PartnerDbModel> where = Where
+    public List<MemberOutputModel> list(String name) {
+        MySpecification<MemberDbModel> where = Where
                 .create()
                 .contains("name", name)
                 .build();
 
-        List<PartnerDbModel> list = partnerRepository.findAll(where);
-        return ModelMapper.maps(list, PartnerOutputModel.class);
+        List<MemberDbModel> list = memberRepository.findAll(where);
+        return ModelMapper.maps(list, MemberOutputModel.class);
     }
 
     public void delete(String id) {
-        partnerRepository.deleteById(id);
+        memberRepository.deleteById(id);
     }
 
     /**
@@ -169,17 +169,17 @@ public class PartnerService extends AbstractService {
      * 3. B 后端请求 A 的 AliveApi（不请求 TestConnectApi 是为了避免死循环）
      * 4. 如果都成功，则测试通过
      */
-    public void testConnection(PartnerInputModel input) throws Exception {
+    public void testConnection(MemberInputModel input) throws Exception {
         // 请求来自己方前端，发起请求访问合作方的 TestConnectApi。
         if (input.fromMyselfFrontEnd()) {
             String url = input.getBaseUrl() + "/" + TestConnectApi.class.getAnnotation(Api.class).path();
-            gatewayService.requestOtherPartner(url, input.getPublicKey());
+            gatewayService.requestOtherFusionNode(url, input.getPublicKey());
         }
 
         // 别人请求我，我请求回去。
-        if (input.fromPartner()) {
+        if (input.fromOtherFusionNode()) {
             String url = input.caller.baseUrl + "/" + AliveApi.class.getAnnotation(Api.class).path();
-            gatewayService.requestOtherPartner(url, input.caller.publicKey);
+            gatewayService.requestOtherFusionNode(url, input.caller.publicKey);
         }
 
         // 如果能联通，自动保存。

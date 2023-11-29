@@ -23,52 +23,6 @@ package com.welab.wefe.common.web.dto;
  * @author Jervis
  **/
 public class SignedApiInput extends AbstractApiInput {
-
-    //TODO 后续该字段会删掉
-    private String memberId;
-    //TODO 后续该字段会删掉
-    private String customerId;
-    private String partnerCode;
-    private String sign;
-    private String data;
-
-    public String getMemberId() {
-        return memberId;
-    }
-
-    public void setMemberId(String memberId) {
-        this.memberId = memberId;
-    }
-
-    public String getSign() {
-        return sign;
-    }
-
-    public void setSign(String sign) {
-        this.sign = sign;
-    }
-
-    public String getData() {
-        return data;
-    }
-
-    public void setData(String data) {
-        this.data = data;
-    }
-
-	public String getCustomerId() {
-		return customerId;
-	}
-
-	public void setCustomerId(String customerId) {
-		this.customerId = customerId;
-	}
-
-    public String getPartnerCode() {
-        return partnerCode;
-    }
-
-    public void setPartnerCode(String partnerCode) {
-        this.partnerCode = partnerCode;
-    }
+    public String sign;
+    public String data;
 }

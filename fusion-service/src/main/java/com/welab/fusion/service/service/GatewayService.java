@@ -43,7 +43,7 @@ public class GatewayService extends AbstractService {
      * @param targetUrl        目标地址
      * @param partnerPublicKey 合作方公钥
      */
-    public HttpResponse requestOtherPartner(String targetUrl, String partnerPublicKey) throws StatusCodeWithException {
+    public HttpResponse requestOtherFusionNode(String targetUrl, String partnerPublicKey) throws StatusCodeWithException {
         FusionConfigModel config = globalConfigService.getFusionConfig();
         if (StringUtil.isEmpty(config.publicServiceBaseUrl)) {
             StatusCode.PARAMETER_VALUE_INVALID.throwException("尚未设置我方“对外服务地址”，请在全局设置中设置。");
@@ -82,8 +82,8 @@ public class GatewayService extends AbstractService {
         return response;
     }
 
-    public void callOtherPartner(FusionNodeInfo target,Class<? extends AbstractApi> apiClass, AbstractApiInput input) {
-        if (input.fromPartner()) {
+    public void callOtherFusionNode(FusionNodeInfo target, Class<? extends AbstractApi> apiClass, AbstractApiInput input) {
+        if (input.fromOtherFusionNode()) {
             return;
         }
     }

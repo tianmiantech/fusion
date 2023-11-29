@@ -39,7 +39,7 @@ import javax.persistence.Enumerated;
 public class JobMemberDbModel extends AbstractDbModel {
     private String jobId;
     @Check(name = "合作方Id")
-    private String partnerId;
+    private String memberId;
 
     @Enumerated(EnumType.STRING)
     private JobMemberRole role;
@@ -79,12 +79,12 @@ public class JobMemberDbModel extends AbstractDbModel {
         this.jobId = jobId;
     }
 
-    public String getPartnerId() {
-        return partnerId;
+    public String getMemberId() {
+        return memberId;
     }
 
-    public void setPartnerId(String partnerId) {
-        this.partnerId = partnerId;
+    public void setMemberId(String partnerId) {
+        this.memberId = partnerId;
     }
 
     public JobMemberRole getRole() {

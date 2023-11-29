@@ -16,7 +16,7 @@
 
 package com.welab.fusion.service.database.repository;
 
-import com.welab.fusion.service.database.entity.PartnerDbModel;
+import com.welab.fusion.service.database.entity.MemberDbModel;
 import com.welab.fusion.service.database.repository.base.BaseRepository;
 import org.springframework.stereotype.Repository;
 
@@ -25,6 +25,6 @@ import org.springframework.stereotype.Repository;
  * @date 2023/11/20
  */
 @Repository
-public interface PartnerRepository extends BaseRepository<PartnerDbModel, String> {
-    PartnerDbModel findByName(String name);
+public interface MemberRepository extends BaseRepository<MemberDbModel, String> {
+    MemberDbModel findByName(String name);
 }

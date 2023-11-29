@@ -20,7 +20,7 @@ import com.welab.fusion.service.api.job.SendJobApi;
 import com.welab.fusion.service.constans.JobMemberRole;
 import com.welab.fusion.service.database.entity.JobDbModel;
 import com.welab.fusion.service.database.entity.JobMemberDbModel;
-import com.welab.fusion.service.database.entity.PartnerDbModel;
+import com.welab.fusion.service.database.entity.MemberDbModel;
 import com.welab.fusion.service.database.repository.JobRepository;
 import com.welab.fusion.service.dto.JobConfigInput;
 import com.welab.fusion.service.service.base.AbstractService;
@@ -39,7 +39,7 @@ public class JobService extends AbstractService {
     @Autowired
     private JobRepository jobRepository;
     @Autowired
-    private PartnerService partnerService;
+    private MemberService memberService;
     @Autowired
     private GatewayService gatewayService;
     @Autowired
@@ -51,26 +51,26 @@ public class JobService extends AbstractService {
     public String createJob(JobConfigInput input) throws Exception {
         checkBeforeCreateJob(input);
         // 自动保存合作方信息
-        partnerService.trySave(input.caller);
+        memberService.trySave(input.caller);
 
         JobDbModel job = new JobDbModel();
         // 来自自己前端，填充任务Id，便于其它方法统一行为。
         if (input.fromMyselfFrontEnd()) {
             input.jobId = job.getId();
-            job.setPartnerId(PartnerService.MYSELF_NAME);
+            job.setPartnerMemberId(MemberService.MYSELF_NAME);
         }
 
         // 来自发起方，填充合作者信息。
-        if (input.fromPartner()) {
-            String promoterId = PartnerService.buildPartnerId(input.caller.baseUrl);
-            PartnerDbModel promoter = partnerService.findById(promoterId);
+        if (input.fromOtherFusionNode()) {
+            String promoterId = MemberService.buildMemberId(input.caller.baseUrl);
+            MemberDbModel promoter = memberService.findById(promoterId);
 
-            job.setPartnerId(promoterId);
+            job.setPartnerMemberId(promoterId);
             job.setPartnerName(promoter.getName());
         }
 
         job.setId(input.jobId);
-        job.setRole(input.fromPartner() ? JobMemberRole.provider : JobMemberRole.promoter);
+        job.setRole(input.fromOtherFusionNode() ? JobMemberRole.provider : JobMemberRole.promoter);
         job.setRemark(input.remark);
 
 
@@ -89,12 +89,16 @@ public class JobService extends AbstractService {
         job.setRemark(input.remark);
         saveJobMember(input);
 
-        FusionNodeInfo target = partnerService
-                .findById(job.getPartnerId())
+        FusionNodeInfo target = memberService
+                .findById(job.getPartnerMemberId())
                 .toFusionNodeInfo();
 
         // 同步给发起方
-        gatewayService.callOtherPartner(target, CreateJobApi.class, input);
+        gatewayService.callOtherFusionNode(target, CreateJobApi.class, input);
+    }
+
+    public void startJob(String jobId) {
+        JobDbModel job = findById(jobId);
     }
 
     /**
@@ -115,10 +119,6 @@ public class JobService extends AbstractService {
 
     }
 
-    public void startJob(String jobId) {
-        JobDbModel job = findById(jobId);
-    }
-
     public JobDbModel findById(String jobId) {
         return jobRepository.findById(jobId).orElse(null);
     }
@@ -132,9 +132,9 @@ public class JobService extends AbstractService {
         JobDbModel job = findById(input.jobId);
 
         // 补充合作方信息
-        String providerId = PartnerService.buildPartnerId(input.getBaseUrl());
-        job.setPartnerId(providerId);
-        PartnerDbModel provider = partnerService.findById(providerId);
+        String providerId = MemberService.buildMemberId(input.getBaseUrl());
+        job.setPartnerMemberId(providerId);
+        MemberDbModel provider = memberService.findById(providerId);
         if (provider != null) {
             job.setPartnerName(provider.getName());
         }
@@ -147,7 +147,7 @@ public class JobService extends AbstractService {
         createJobInput.dataResource.totalDataCount = promoter.getTotalDataCount();
         createJobInput.dataResource.hashConfig = promoter.getHashConfigModel();
 
-        gatewayService.callOtherPartner(
+        gatewayService.callOtherFusionNode(
                 input.toFusionNodeInfo(),
                 CreateJobApi.class,
                 createJobInput
@@ -159,7 +159,7 @@ public class JobService extends AbstractService {
      */
     private void checkBeforeSendJob(SendJobApi.Input input) throws Exception {
         // 检查连通性
-        partnerService.testConnection(input);
+        memberService.testConnection(input);
     }
 
 }

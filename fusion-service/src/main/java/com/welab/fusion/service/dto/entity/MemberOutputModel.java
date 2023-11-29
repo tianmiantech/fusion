@@ -15,40 +15,23 @@
  */
 package com.welab.fusion.service.dto.entity;
 
-import com.welab.fusion.service.service.PartnerService;
-import com.welab.wefe.common.StatusCode;
-import com.welab.wefe.common.exception.StatusCodeWithException;
-import com.welab.wefe.common.fieldvalidate.annotation.Check;
-import com.welab.wefe.common.util.StringUtil;
-import com.welab.wefe.common.web.dto.AbstractApiInput;
-import com.welab.wefe.common.web.dto.FusionNodeInfo;
-
 /**
  * @author zane.luo
  * @date 2023/11/24
  */
-public class PartnerInputModel extends AbstractApiInput {
-    @Check(name = "名称")
+public class MemberOutputModel extends AbstractOutputModel{
+    /**
+     * 合作方名称
+     */
     private String name;
-    @Check(name = "公钥", require = true)
+    /**
+     * 公钥
+     */
     private String publicKey;
-    @Check(name = "接口地址", require = true)
+    /**
+     * 服务端地址
+     */
     private String baseUrl;
-
-    @Override
-    public void checkAndStandardize() throws StatusCodeWithException {
-        super.checkAndStandardize();
-
-        if (PartnerService.MYSELF_NAME.equals(name)) {
-            StatusCode
-                    .PARAMETER_VALUE_INVALID
-                    .throwException("名称不能为：" + PartnerService.MYSELF_NAME);
-        }
-    }
-
-    public FusionNodeInfo toFusionNodeInfo(){
-        return FusionNodeInfo.of(publicKey, baseUrl);
-    }
 
     // region getter/setter
 

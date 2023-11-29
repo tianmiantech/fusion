@@ -15,7 +15,7 @@
  */
 package com.welab.fusion.service.api.job;
 
-import com.welab.fusion.service.dto.entity.PartnerInputModel;
+import com.welab.fusion.service.dto.entity.MemberInputModel;
 import com.welab.fusion.service.service.JobService;
 import com.welab.wefe.common.fieldvalidate.annotation.Check;
 import com.welab.wefe.common.web.api.base.AbstractApi;
@@ -38,7 +38,7 @@ public class SendJobApi extends AbstractApi<SendJobApi.Input, SendJobApi.Output>
         return success();
     }
 
-    public static class Input extends PartnerInputModel {
+    public static class Input extends MemberInputModel {
         @Check(name = "任务ID", require = true)
         public String jobId;
     }

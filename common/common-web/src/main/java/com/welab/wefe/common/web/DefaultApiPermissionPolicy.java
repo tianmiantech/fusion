@@ -67,16 +67,16 @@ public class DefaultApiPermissionPolicy implements ApiPermissionPolicyFunction {
     private boolean checkSign(JSONObject params) throws Exception {
         SignedApiInput signedApiInput = params.toJavaObject(SignedApiInput.class);
 
-        if (StringUtils.isEmpty(signedApiInput.getSign())) {
+        if (StringUtils.isEmpty(signedApiInput.sign)) {
             StatusCode.CHECK_SIGN_ERROR.throwException("验签失败：签名为空");
         }
 
-        String[] arr = signedApiInput.getSign().split("_");
+        String[] arr = signedApiInput.sign.split("_");
         String hash = arr[0];
         String ciphertext = arr[1];
 
         // 检查 hash
-        String dataHash = SM3.create().digestHex(signedApiInput.getData().getBytes(StandardCharsets.UTF_8));
+        String dataHash = SM3.create().digestHex(signedApiInput.data.getBytes(StandardCharsets.UTF_8));
         if (!hash.equals(dataHash)) {
             StatusCode.CHECK_SIGN_ERROR.throwException("验签失败！");
         }
@@ -89,7 +89,7 @@ public class DefaultApiPermissionPolicy implements ApiPermissionPolicyFunction {
 
         // 签名成功，将 params 中的 data 作为 api 的实际参数。
         params.clear();
-        JSONObject data = JSONObject.parseObject(signedApiInput.getData());
+        JSONObject data = JSONObject.parseObject(signedApiInput.data);
         params.putAll(data);
 
         return true;

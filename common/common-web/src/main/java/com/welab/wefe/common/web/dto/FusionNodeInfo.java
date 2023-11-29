@@ -24,9 +24,9 @@ public class FusionNodeInfo {
     public String baseUrl;
 
     public static FusionNodeInfo of(String publicKey, String baseUrl) {
-        FusionNodeInfo partnerCaller = new FusionNodeInfo();
-        partnerCaller.publicKey = publicKey;
-        partnerCaller.baseUrl = baseUrl;
-        return partnerCaller;
+        FusionNodeInfo info = new FusionNodeInfo();
+        info.publicKey = publicKey;
+        info.baseUrl = baseUrl;
+        return info;
     }
 }

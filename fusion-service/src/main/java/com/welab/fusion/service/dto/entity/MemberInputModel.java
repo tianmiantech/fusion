@@ -13,33 +13,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.welab.fusion.service.database.entity;
+package com.welab.fusion.service.dto.entity;
 
+import com.welab.fusion.service.service.MemberService;
+import com.welab.wefe.common.StatusCode;
+import com.welab.wefe.common.exception.StatusCodeWithException;
+import com.welab.wefe.common.fieldvalidate.annotation.Check;
+import com.welab.wefe.common.web.dto.AbstractApiInput;
 import com.welab.wefe.common.web.dto.FusionNodeInfo;
-
-import javax.persistence.Entity;
 
 /**
  * @author zane.luo
- * @date 2023/11/20
+ * @date 2023/11/24
  */
-@Entity(name = "partner")
-public class PartnerDbModel extends AbstractDbModel {
-    /**
-     * 合作方名称
-     */
+public class MemberInputModel extends AbstractApiInput {
+    @Check(name = "名称")
     private String name;
-    /**
-     * 公钥
-     */
+    @Check(name = "公钥", require = true)
     private String publicKey;
-    /**
-     * 服务端地址
-     */
+    @Check(name = "接口地址", require = true)
     private String baseUrl;
 
-    public FusionNodeInfo toFusionNodeInfo() {
+    @Override
+    public void checkAndStandardize() throws StatusCodeWithException {
+        super.checkAndStandardize();
 
+        if (MemberService.MYSELF_NAME.equals(name)) {
+            StatusCode
+                    .PARAMETER_VALUE_INVALID
+                    .throwException("名称不能为：" + MemberService.MYSELF_NAME);
+        }
+    }
+
+    public FusionNodeInfo toFusionNodeInfo(){
         return FusionNodeInfo.of(publicKey, baseUrl);
     }
 
@@ -68,6 +74,7 @@ public class PartnerDbModel extends AbstractDbModel {
     public void setBaseUrl(String baseUrl) {
         this.baseUrl = baseUrl;
     }
+
 
     // endregion
 }

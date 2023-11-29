@@ -25,7 +25,7 @@ import java.util.List;
  * @date 2023/11/13
  */
 public class JobFunctions {
-    public GetPartnerProgressFunction getPartnerProgressFunction;
+    public GetOtherFusionNodeProgressFunction getOtherFusionNodeProgressFunction;
     public SavePsiBloomFilterFunction savePsiBloomFilterFunction;
     public DownloadPsiBloomFilterFunction downloadPsiBloomFilterFunction;
     public EncryptPsiRecordsFunction encryptPsiRecordsFunction;
@@ -33,7 +33,7 @@ public class JobFunctions {
 
     public void check() {
         List<Tuple2> list = Arrays.asList(
-                Tuple2.of(getPartnerProgressFunction, GetPartnerProgressFunction.class),
+                Tuple2.of(getOtherFusionNodeProgressFunction, GetOtherFusionNodeProgressFunction.class),
                 Tuple2.of(savePsiBloomFilterFunction, SavePsiBloomFilterFunction.class),
                 Tuple2.of(downloadPsiBloomFilterFunction, DownloadPsiBloomFilterFunction.class),
                 Tuple2.of(encryptPsiRecordsFunction, EncryptPsiRecordsFunction.class),

@@ -49,7 +49,7 @@ public class CsvTableDataSourceReader extends AbstractTableDataSourceReader {
 
     public CsvTableDataSourceReader(File file, long maxReadRows, long maxReadTimeInMs) throws Exception {
         super(maxReadRows, maxReadTimeInMs);
-        if (!file.exists()) {
+        if (!file.isFile() || !file.exists()) {
             throw new RuntimeException("文件不存在：" + file.getAbsolutePath());
         }
 

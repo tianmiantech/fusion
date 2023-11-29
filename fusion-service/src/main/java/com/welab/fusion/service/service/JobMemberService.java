@@ -42,7 +42,7 @@ public class JobMemberService extends AbstractService {
     @Autowired
     private JobMemberRepository jobMemberRepository;
     @Autowired
-    private PartnerService partnerService;
+    private MemberService memberService;
     @Autowired
     private BloomFilterService bloomFilterService;
 
@@ -51,13 +51,13 @@ public class JobMemberService extends AbstractService {
      * 仅在创建任务时调用
      */
     public void addMember(JobConfigInput input) throws URISyntaxException {
-        String partnerId = input.fromMyselfFrontEnd()
-                ? PartnerService.MYSELF_NAME
-                : partnerService.findByUrl(input.caller.baseUrl).getId();
+        String memberId = input.fromMyselfFrontEnd()
+                ? MemberService.MYSELF_NAME
+                : memberService.findByUrl(input.caller.baseUrl).getId();
 
         JobMemberDbModel model = new JobMemberDbModel();
         model.setJobId(input.jobId);
-        model.setPartnerId(partnerId);
+        model.setMemberId(memberId);
         model.setRole(JobMemberRole.promoter);
         model.setDataResourceType(input.dataResource.dataResourceType);
         model.setTotalDataCount(input.dataResource.totalDataCount);
@@ -71,7 +71,7 @@ public class JobMemberService extends AbstractService {
      */
     @Async
     public void updateTotalDataCount(JobConfigInput input) {
-        if (input.fromPartner()) {
+        if (input.fromOtherFusionNode()) {
             return;
         }
 
@@ -111,6 +111,6 @@ public class JobMemberService extends AbstractService {
     }
 
     public JobMemberDbModel findMyself(String jobId) {
-        return findByPartnerId(jobId, PartnerService.MYSELF_NAME);
+        return findByPartnerId(jobId, MemberService.MYSELF_NAME);
     }
 }

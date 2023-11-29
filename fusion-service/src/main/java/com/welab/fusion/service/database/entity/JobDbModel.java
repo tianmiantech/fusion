@@ -29,9 +29,9 @@ import javax.persistence.Enumerated;
 @Entity(name = "job")
 public class JobDbModel extends AbstractDbModel {
     @Check(name = "创建任务的合作方ID")
-    private String creatorPartnerId;
+    private String creatorMemberId;
     @Check(name = "合作方唯一标识")
-    private String partnerId;
+    private String partnerMemberId;
     @Check(name = "合作方名称")
     private String partnerName;
 
@@ -43,20 +43,20 @@ public class JobDbModel extends AbstractDbModel {
     // region getter/setter
 
 
-    public String getCreatorPartnerId() {
-        return creatorPartnerId;
+    public String getCreatorMemberId() {
+        return creatorMemberId;
     }
 
-    public void setCreatorPartnerId(String creatorPartnerId) {
-        this.creatorPartnerId = creatorPartnerId;
+    public void setCreatorMemberId(String creatorMemberId) {
+        this.creatorMemberId = creatorMemberId;
     }
 
-    public String getPartnerId() {
-        return partnerId;
+    public String getPartnerMemberId() {
+        return partnerMemberId;
     }
 
-    public void setPartnerId(String partnerId) {
-        this.partnerId = partnerId;
+    public void setPartnerMemberId(String partnerMemberId) {
+        this.partnerMemberId = partnerMemberId;
     }
 
     public String getPartnerName() {

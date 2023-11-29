@@ -22,6 +22,6 @@ import com.welab.fusion.core.progress.JobProgress;
  * @date 2023/11/15
  */
 @FunctionalInterface
-public interface GetPartnerProgressFunction {
+public interface GetOtherFusionNodeProgressFunction {
     JobProgress get() throws Exception;
 }

@@ -65,9 +65,9 @@ public class AbstractApiInput extends AbstractCheckModel {
     }
 
     /**
-     * 请求是否来自合作方
+     * 请求是否来自其它合作节点
      */
-    public boolean fromPartner() {
+    public boolean fromOtherFusionNode() {
         return caller != null;
     }
 

@@ -13,13 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.welab.fusion.service.dto.entity;
+package com.welab.fusion.service.database.entity;
+
+import com.welab.wefe.common.web.dto.FusionNodeInfo;
+
+import javax.persistence.Entity;
 
 /**
  * @author zane.luo
- * @date 2023/11/24
+ * @date 2023/11/20
  */
-public class PartnerOutputModel extends AbstractOutputModel{
+@Entity(name = "member")
+public class MemberDbModel extends AbstractDbModel {
     /**
      * 合作方名称
      */
@@ -32,6 +37,11 @@ public class PartnerOutputModel extends AbstractOutputModel{
      * 服务端地址
      */
     private String baseUrl;
+
+    public FusionNodeInfo toFusionNodeInfo() {
+
+        return FusionNodeInfo.of(publicKey, baseUrl);
+    }
 
     // region getter/setter
 
@@ -58,7 +68,6 @@ public class PartnerOutputModel extends AbstractOutputModel{
     public void setBaseUrl(String baseUrl) {
         this.baseUrl = baseUrl;
     }
-
 
     // endregion
 }

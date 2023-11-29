@@ -225,7 +225,7 @@ public class FusionJob implements Closeable {
      * 获取合作伙伴的任务进度
      */
     private JobProgress getPartnerProgress() throws Exception {
-        return jobFunctions.getPartnerProgressFunction.get();
+        return jobFunctions.getOtherFusionNodeProgressFunction.get();
     }
 
     /**

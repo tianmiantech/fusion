@@ -16,9 +16,7 @@
 package com.welab.fusion.service.api.job;
 
 import com.welab.fusion.service.dto.JobConfigInput;
-import com.welab.fusion.service.dto.entity.PartnerInputModel;
 import com.welab.fusion.service.service.JobService;
-import com.welab.wefe.common.fieldvalidate.annotation.Check;
 import com.welab.wefe.common.web.api.base.AbstractApi;
 import com.welab.wefe.common.web.api.base.Api;
 import com.welab.wefe.common.web.dto.ApiResult;

@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.welab.fusion.service.api.partner;
+package com.welab.fusion.service.api.member;
 
-import com.welab.fusion.service.dto.entity.PartnerInputModel;
-import com.welab.fusion.service.service.PartnerService;
+import com.welab.fusion.service.service.MemberService;
+import com.welab.wefe.common.fieldvalidate.annotation.Check;
 import com.welab.wefe.common.web.api.base.AbstractApi;
 import com.welab.wefe.common.web.api.base.Api;
+import com.welab.wefe.common.web.dto.AbstractApiInput;
 import com.welab.wefe.common.web.dto.ApiResult;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -26,24 +27,23 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author zane.luo
  * @date 2023/11/24
  */
-@Api(path = "partner/save", name = "添加或更新合作伙伴")
-public class SavePartnerApi extends AbstractApi<PartnerInputModel, SavePartnerApi.Output> {
+@Api(path = "member/delete", name = "删除合作伙伴")
+public class DeleteMemberApi extends AbstractApi<DeleteMemberApi.Input, DeleteMemberApi.Output> {
     @Autowired
-    private PartnerService partnerService;
+    private MemberService memberService;
 
     @Override
-    protected ApiResult<SavePartnerApi.Output> handle(PartnerInputModel input) throws Exception {
-        String id = partnerService.save(input).getId();
-        return success(Output.of(id));
+    protected ApiResult<Output> handle(DeleteMemberApi.Input input) throws Exception {
+        memberService.delete(input.id);
+        return success(new Output());
     }
 
     public static class Output {
-        public String id;
 
-        public static Output of(String id) {
-            Output output = new Output();
-            output.id = id;
-            return output;
-        }
+    }
+
+    public static class Input extends AbstractApiInput {
+        @Check(name = "合作方Id", require = true)
+        public String id;
     }
 }
