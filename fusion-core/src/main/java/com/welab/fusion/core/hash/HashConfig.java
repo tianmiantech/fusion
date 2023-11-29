@@ -15,53 +15,39 @@
  */
 package com.welab.fusion.core.hash;
 
+import com.alibaba.fastjson.JSONObject;
+import com.welab.wefe.common.util.JObject;
+
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author zane.luo
- * @date 2023/11/8
+ * @date 2023/11/14
  */
 public class HashConfig {
-    public List<String> columns;
-    public HashMethod options;
+    public List<HashConfigItem> list = new ArrayList<>();
 
-    public String hash(Map<String, Object> data) {
-        String values = buildHashString(data);
-        if (values == null) {
-            return null;
-        }
-
-        return options.hash(values);
-    }
-
-    private String buildHashString(Map<String, Object> data) {
-        // 提升性能，少创建一个 StringBuilder。
-        if (columns.size() == 1) {
-            Object value = data.get(columns.get(0));
-            if (value == null) {
-                return null;
-            }
-            return value.toString();
-        }
-
-        StringBuilder builder = new StringBuilder(32);
-        for (String column : columns) {
-            Object value = data.get(column);
-            if (value == null) {
-                return null;
-            }
-            builder.append(value);
-        }
-
-        return builder.toString();
-    }
-
-    public static HashConfig of(HashMethod options,String... columns) {
+    public static HashConfig of(HashConfigItem... items) {
         HashConfig config = new HashConfig();
-        config.columns = Arrays.asList(columns);
-        config.options = options;
+        config.list = Arrays.asList(items);
         return config;
+    }
+
+    public String hash(LinkedHashMap<String, Object> row) {
+        return list.stream()
+                .map(x -> x.hash(row))
+                .collect(Collectors.joining());
+    }
+
+    public JSONObject toJson() {
+        return JObject.create(this);
+    }
+
+    public boolean isEmpty() {
+        return list.isEmpty();
     }
 }

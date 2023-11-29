@@ -44,16 +44,6 @@ public enum DatabaseType {
     Kafka,
     Doris;
 
-    /**
-     * Presto 支持的数据库类型
-     * <p>
-     * 如果支持，则意味着可以刷新元数据、添加 sql_table、参与联邦 SQL 任务。
-     */
-    public static List<DatabaseType> PRESTO_SUPPORT_DATABASE_TYPES = Arrays.asList(
-            MySQL,
-            Hive,
-            ClickHouse
-    );
 
     /**
      * 程序本地支持的数据库类型
@@ -67,18 +57,7 @@ public enum DatabaseType {
     );
 
 
-    public boolean supportPresto() {
-        return PRESTO_SUPPORT_DATABASE_TYPES.contains(this);
-    }
-
     public boolean supportLocal() {
         return LOCAL_SUPPORT_DATABASE_TYPES.contains(this);
-    }
-
-    public static Collection<DatabaseType> allSupport() {
-        Set<DatabaseType> set = new HashSet<>(PRESTO_SUPPORT_DATABASE_TYPES.size() + LOCAL_SUPPORT_DATABASE_TYPES.size());
-        set.addAll(PRESTO_SUPPORT_DATABASE_TYPES);
-        set.addAll(LOCAL_SUPPORT_DATABASE_TYPES);
-        return set;
     }
 }

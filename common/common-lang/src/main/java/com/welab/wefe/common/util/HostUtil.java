@@ -16,6 +16,8 @@
 
 package com.welab.wefe.common.util;
 
+import com.welab.wefe.common.http.HttpRequest;
+import com.welab.wefe.common.http.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,5 +79,18 @@ public class HostUtil {
             LOG.error(e.getMessage(), e);
         }
         return UNKNOWN;
+    }
+
+    /**
+     * 获取本机在互联网中的公网 IP
+     */
+    public static String getInternetIp() {
+        for (int i = 0; i < 10; i++) {
+            HttpResponse response = HttpRequest.create("https://icanhazip.com/").get();
+            if (response.success()) {
+                return response.getBodyAsString().trim();
+            }
+        }
+        return "";
     }
 }

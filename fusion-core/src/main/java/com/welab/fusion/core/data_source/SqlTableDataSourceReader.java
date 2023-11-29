@@ -39,6 +39,11 @@ public class SqlTableDataSourceReader extends AbstractTableDataSourceReader {
     private JdbcScanner scanner;
 
     public SqlTableDataSourceReader(JdbcDataSourceClient<?> jdbcClient, String sql) throws Exception {
+        this(jdbcClient, sql, -1, -1);
+    }
+
+    public SqlTableDataSourceReader(JdbcDataSourceClient<?> jdbcClient, String sql, long maxReadRows, long maxReadTimeInMs) throws Exception {
+        super(maxReadRows, maxReadTimeInMs);
         this.jdbcClient = jdbcClient;
         this.sql = sql;
         this.scanner = jdbcClient.createScanner(sql);

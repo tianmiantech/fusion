@@ -42,6 +42,9 @@ public class ExcelReader implements Closeable {
     }
 
     public ExcelReader(File file) throws IOException {
+        if (!file.isFile() || !file.exists()) {
+            throw new RuntimeException("文件不存在：" + file.getAbsolutePath());
+        }
         workbook = WorkbookFactory.create(file, null, true);
     }
 

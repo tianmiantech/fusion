@@ -17,10 +17,15 @@
 package com.welab.wefe.common.web.controller;
 
 import cn.hutool.core.util.StrUtil;
+import com.welab.wefe.common.util.StringUtil;
+import com.welab.wefe.common.util.UrlUtil;
 import com.welab.wefe.common.util.enums.ContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,6 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.InputStream;
+import java.net.URI;
 
 /**
  * 响应前端资源
@@ -39,17 +45,30 @@ public class WebsiteController {
 
     private static final Logger LOG = LoggerFactory.getLogger(WebsiteController.class);
 
+    @Value("${server.servlet.context-path:}")
+    private String contextPath;
+
     @RequestMapping("/website/**")
     public ResponseEntity<?> response(HttpServletRequest request) {
         String resourceName = extractResourceName(request);
+        LOG.info("website resourceName:{}", resourceName);
 
-        InputStream inputStream = Thread.currentThread()
-                .getContextClassLoader()
-                .getResourceAsStream(resourceName);
+        InputStream inputStream = getClass().getClassLoader().getResourceAsStream(resourceName);
+
 
         // 404
         if (inputStream == null) {
-            return ResponseEntity.notFound().build();
+
+            // 404 的时候跳转到首页，并拼接当前的请求路径到 redirect 参数供前端使用。
+            String redirectUrl = request.getRequestURI();
+            if (StringUtil.isNotEmpty(request.getQueryString())) {
+                redirectUrl += "?" + request.getQueryString();
+            }
+            String location = contextPath + "/website/index.html?redirect=" + UrlUtil.encode(redirectUrl);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setLocation(URI.create(location));
+            return new ResponseEntity<>(headers, HttpStatus.SEE_OTHER);
         }
 
         return ResponseEntity

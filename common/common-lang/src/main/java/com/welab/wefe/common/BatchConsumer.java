@@ -169,6 +169,7 @@ public class BatchConsumer<T> implements AutoCloseable {
                 e.printStackTrace();
             }
         }
+        LOG.info("end wait for queue clean");
     }
 
     /**

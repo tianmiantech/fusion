@@ -40,10 +40,6 @@ public class Launcher {
      * API permission check policy
      */
     public static ApiPermissionPolicyFunction API_PERMISSION_POLICY;
-    /**
-     * Token Check Policy
-     */
-    public static CheckSessionTokenFunction CHECK_SESSION_TOKEN_FUNCTION;
     public static String API_PACKAGE_PATH;
 
     /**
@@ -150,14 +146,6 @@ public class Launcher {
      */
     public Launcher apiPermissionPolicy(ApiPermissionPolicyFunction func) {
         API_PERMISSION_POLICY = func;
-        return this;
-    }
-
-    /**
-     * Example Set the session id check method
-     */
-    public Launcher checkSessionTokenFunction(CheckSessionTokenFunction func) {
-        CHECK_SESSION_TOKEN_FUNCTION = func;
         return this;
     }
 

@@ -35,6 +35,9 @@ public enum HashMethod {
      */
     NONE;
 
+    /**
+     * 对字符串进行 hash
+     */
     public String hash(String str) {
         if (StringUtil.isEmpty(str)) {
             return "";

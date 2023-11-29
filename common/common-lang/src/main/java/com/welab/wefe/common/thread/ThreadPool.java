@@ -45,7 +45,7 @@ public class ThreadPool {
         );
     }
 
-    public void run(Runnable someThing) {
+    public void execute(Runnable someThing) {
         THREAD_POOL.execute(someThing);
     }
 
@@ -61,7 +61,7 @@ public class ThreadPool {
     /**
      * Add an asynchronous task, and the accounting amount will be reduced after the task is executed
      */
-    public void run(Runnable someThing, CountDownLatch countDownLatch) {
+    public void execute(Runnable someThing, CountDownLatch countDownLatch) {
         THREAD_POOL.execute(() -> {
             try {
                 someThing.run();
@@ -77,5 +77,13 @@ public class ThreadPool {
 
     public int size() {
         return THREAD_POOL.getQueue().size();
+    }
+
+    public void shutdown() {
+        THREAD_POOL.shutdown();
+    }
+
+    public void shutdownNow() {
+        THREAD_POOL.shutdownNow();
     }
 }

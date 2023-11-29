@@ -22,6 +22,7 @@ import com.alibaba.fastjson.annotation.JSONField;
 import com.welab.wefe.common.Stopwatch;
 import com.welab.wefe.common.fieldvalidate.AbstractCheckModel;
 import com.welab.wefe.common.fieldvalidate.annotation.Check;
+import com.welab.wefe.common.util.JObject;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -31,7 +32,7 @@ import javax.servlet.http.HttpServletRequest;
  *
  * @author Zane
  */
-public class AbstractApiInput extends AbstractCheckModel {
+public abstract class AbstractApiInput extends AbstractCheckModel {
 
     /**
      * 用于调试 api 耗时
@@ -53,9 +54,30 @@ public class AbstractApiInput extends AbstractCheckModel {
     @JSONField(serialize = false)
     public HttpServletRequest request;
 
+    @Check(name = "被合作方调用时，合作方的信息")
+    @JSONField(serialize = false)
+    public FusionNodeInfo caller;
+
+    /**
+     * 请求是否来自己方前端
+     */
+    public boolean fromMyselfFrontEnd() {
+        return caller == null;
+    }
+
+    /**
+     * 请求是否来自其它合作节点
+     */
+    public boolean fromOtherFusionNode() {
+        return caller != null;
+    }
+
     @Override
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
     }
 
+    public JSONObject toJson() {
+        return JObject.create(this);
+    }
 }

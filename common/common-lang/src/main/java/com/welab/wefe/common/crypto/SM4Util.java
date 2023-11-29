@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.welab.wefe.common.util;
+package com.welab.wefe.common.crypto;
 
 import cn.hutool.core.codec.Base64;
 import org.apache.commons.codec.binary.Hex;
@@ -32,7 +32,7 @@ import java.security.Security;
 import java.util.Arrays;
 
 /**
- * GM sm4
+ * 国密算法：对称加密
  */
 public class SM4Util {
     private static final String ENCODING = "UTF-8";
@@ -89,8 +89,8 @@ public class SM4Util {
     /**
      * sm4 decrypt
      *
-     * @param hexKey Hexadecimal key（ignore case）
-     * @param ciphertext   ciphertext
+     * @param hexKey     Hexadecimal key（ignore case）
+     * @param ciphertext ciphertext
      * @return plaintext
      * @throws Exception
      * @explain Encryption mode：CBC
@@ -103,7 +103,7 @@ public class SM4Util {
     }
 
     public static Cipher createCipher(byte[] key, int mode, AlgorithmParameters iv) throws Exception {
-       return generateCbcCipher(ALGORITHM_NAME, mode, key, iv);
+        return generateCbcCipher(ALGORITHM_NAME, mode, key, iv);
     }
 
     public static AlgorithmParameters generateIV(byte[] iv) throws Exception {
@@ -131,8 +131,8 @@ public class SM4Util {
     /**
      * sm4 decrypt
      *
-     * @param hexKey Hexadecimal key（ignore case）
-     * @param ciphertext   ciphertext
+     * @param hexKey     Hexadecimal key（ignore case）
+     * @param ciphertext ciphertext
      * @return plaintext
      * @throws Exception
      * @explain Encryption mode：CBC

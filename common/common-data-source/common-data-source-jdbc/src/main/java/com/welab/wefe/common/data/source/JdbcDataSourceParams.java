@@ -16,6 +16,8 @@
 package com.welab.wefe.common.data.source;
 
 import com.welab.wefe.common.fieldvalidate.annotation.Check;
+import com.welab.wefe.common.fieldvalidate.secret.MaskStrategy;
+import com.welab.wefe.common.fieldvalidate.secret.Secret;
 
 /**
  * @author zane.luo
@@ -29,6 +31,7 @@ public class JdbcDataSourceParams extends DataSourceParams {
     public String userName;
 
     @Check(name = "密碼")
+    @Secret(maskStrategy = MaskStrategy.PASSWORD)
     public String password;
 
     public static JdbcDataSourceParams of(String host, Integer port, String userName, String password, String databaseName) {

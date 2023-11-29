@@ -15,13 +15,39 @@
  */
 package com.welab.fusion.core.Job;
 
+import com.alibaba.fastjson.annotation.JSONField;
+import com.welab.fusion.core.bloom_filter.PsiBloomFilter;
 import com.welab.fusion.core.data_resource.base.DataResourceInfo;
+import com.welab.fusion.core.data_source.AbstractTableDataSourceReader;
 
 /**
  * @author zane.luo
  * @date 2023/11/10
  */
 public class JobMember {
+    public String memberId;
     public String memberName;
     public DataResourceInfo dataResourceInfo;
+
+    @JSONField(serialize = false)
+    public AbstractTableDataSourceReader tableDataResourceReader;
+
+    @JSONField(serialize = false)
+    public PsiBloomFilter psiBloomFilter;
+
+    public static JobMember of(String memberId, String memberName, DataResourceInfo dataResourceInfo) {
+        JobMember jobMember = new JobMember();
+        jobMember.memberId = memberId;
+        jobMember.memberName = memberName;
+        jobMember.dataResourceInfo = dataResourceInfo;
+        return jobMember;
+    }
+
+    public static JobMember of(String memberId, String memberName, PsiBloomFilter psiBloomFilter) {
+        JobMember jobMember = new JobMember();
+        jobMember.memberId = memberId;
+        jobMember.memberName = memberName;
+        jobMember.psiBloomFilter = psiBloomFilter;
+        return jobMember;
+    }
 }

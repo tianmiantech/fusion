@@ -17,15 +17,21 @@ package com.welab.fusion.core.data_resource.base;
 
 import com.welab.fusion.core.hash.HashConfig;
 
-import java.util.List;
-
 /**
  * @author zane.luo
  * @date 2023/11/10
  */
-public abstract class DataResourceInfo {
-    public String name;
+public class DataResourceInfo {
     public long dataCount;
     public DataResourceType dataResourceType;
-    public List<HashConfig> hashConfigList;
+    public HashConfig hashConfig;
+
+    public static DataResourceInfo of(DataResourceType dataResourceType, long dataCount, HashConfig hashConfig) {
+        DataResourceInfo dataResourceInfo = new DataResourceInfo();
+        dataResourceInfo.dataCount = dataCount;
+        dataResourceInfo.dataResourceType = dataResourceType;
+        dataResourceInfo.hashConfig = hashConfig;
+        return dataResourceInfo;
+    }
+
 }

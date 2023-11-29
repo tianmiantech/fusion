@@ -13,39 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.welab.fusion.service.api.account;
+package com.welab.fusion.service.api.job;
 
-import com.welab.fusion.service.service.AccountService;
+import com.welab.fusion.service.dto.entity.MemberInputModel;
+import com.welab.fusion.service.service.JobService;
 import com.welab.wefe.common.fieldvalidate.annotation.Check;
 import com.welab.wefe.common.web.api.base.AbstractApi;
 import com.welab.wefe.common.web.api.base.Api;
-import com.welab.wefe.common.web.dto.AbstractApiInput;
 import com.welab.wefe.common.web.dto.ApiResult;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author zane.luo
- * @date 2023/11/7
+ * @date 2023/11/27
  */
-@Api(path = "account/init_super_admin", name = "初始化超级管理员账号")
-public class InitSuperAdminAccountApi extends AbstractApi<InitSuperAdminAccountApi.Input, InitSuperAdminAccountApi.Output> {
+@Api(path = "job/send_to_provider", name = "发送任务到协作方")
+public class SendJobApi extends AbstractApi<SendJobApi.Input, SendJobApi.Output> {
     @Autowired
-    private AccountService accountService;
+    private JobService jobService;
 
     @Override
-    protected ApiResult<InitSuperAdminAccountApi.Output> handle(InitSuperAdminAccountApi.Input input) throws Exception {
-        accountService.initSuperAdminAccount(input.username, input.password);
+    protected ApiResult<SendJobApi.Output> handle(Input input) throws Exception {
+        jobService.sendJobToProvider(input);
         return success();
     }
 
-    public static class Input extends AbstractApiInput {
-        @Check(require = true)
-        public String username;
-        @Check(require = true)
-        public String password;
+    public static class Input extends MemberInputModel {
+        @Check(name = "任务ID", require = true)
+        public String jobId;
     }
 
     public static class Output {
-
     }
 }

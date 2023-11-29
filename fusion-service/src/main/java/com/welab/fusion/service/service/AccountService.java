@@ -49,16 +49,7 @@ public class AccountService extends AbstractService {
         return ModelMapper.maps(list, AccountOutputModel.class);
     }
 
-    public synchronized AccountDbModel initSuperAdminAccount(String username, String password) throws StatusCodeWithException {
-
-        if (!list().isEmpty()) {
-            StatusCode.PERMISSION_DENIED.throwException("系统已初始化，无法重复初始化");
-        }
-
-        return add(username, password);
-    }
-
-    private synchronized AccountDbModel add(String username, String password) throws StatusCodeWithException {
+    public synchronized AccountDbModel add(String username, String password) throws StatusCodeWithException {
 
         AccountDbModel byUsername = accountRepository.findByUsername(username);
 

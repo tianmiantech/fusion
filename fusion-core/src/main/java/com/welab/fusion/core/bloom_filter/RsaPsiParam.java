@@ -18,8 +18,11 @@ package com.welab.fusion.core.bloom_filter;
 import com.welab.wefe.common.crypto.Rsa;
 
 import java.math.BigInteger;
+import java.util.Objects;
 
 /**
+ * 包含 RSA 公钥和私钥参数
+ *
  * @author zane.luo
  * @date 2023/11/8
  */
@@ -27,14 +30,18 @@ public class RsaPsiParam {
     /**
      * RSA 公钥参数
      */
+    // E
     public BigInteger publicExponent;
+    // N
     public BigInteger publicModulus;
-
     /**
      * RSA 私钥参数
      */
+    // D
     public BigInteger privateExponent;
-    public  BigInteger privatePrimeP;
+    // P
+    public BigInteger privatePrimeP;
+    // Q
     public BigInteger privatePrimeQ;
 
 
@@ -48,9 +55,27 @@ public class RsaPsiParam {
     private BigInteger eq;
 
     /**
+     * 抹除私钥相关信息
+     */
+    public void cleanPrivateKey() {
+        privateExponent = null;
+        privatePrimeP = null;
+        privatePrimeQ = null;
+
+        cp = null;
+        cq = null;
+        ep = null;
+        eq = null;
+    }
+
+    /**
      * 预处理，提前计算出后续需要使用的值。
      */
-    private void preproccess(){
+    public void preproccess() {
+        if (privatePrimeQ == null || privatePrimeP == null || privateExponent == null) {
+            return;
+        }
+
         this.cp = privatePrimeQ.modInverse(privatePrimeP).multiply(privatePrimeQ);
         this.cq = privatePrimeP.modInverse(privatePrimeQ).multiply(privatePrimeP);
         this.ep = privateExponent.remainder(privatePrimeP.subtract(BigInteger.valueOf(1)));
@@ -71,6 +96,17 @@ public class RsaPsiParam {
         return param;
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(
+                publicExponent,
+                publicModulus,
+                privateExponent,
+                privatePrimeP,
+                privatePrimeQ
+        );
+    }
+
     // region getter/setter
 
     public BigInteger getCp() {
@@ -88,7 +124,6 @@ public class RsaPsiParam {
     public BigInteger getEq() {
         return eq;
     }
-
 
     // endregion
 }

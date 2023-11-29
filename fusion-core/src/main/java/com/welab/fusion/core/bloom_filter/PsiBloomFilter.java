@@ -21,7 +21,11 @@ import com.alibaba.fastjson.annotation.JSONField;
 import com.google.common.hash.BloomFilter;
 import com.google.common.hash.Funnels;
 import com.welab.fusion.core.hash.HashConfig;
+import com.welab.fusion.core.hash.HashConfigItem;
+import com.welab.fusion.core.io.FileSystem;
 import com.welab.wefe.common.TimeSpan;
+import com.welab.wefe.common.file.compression.impl.Zip;
+import com.welab.wefe.common.util.JObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +33,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -42,14 +47,20 @@ public class PsiBloomFilter {
     protected final Logger LOG = LoggerFactory.getLogger(this.getClass());
     private static final String META_FILE_NAME = "PsiBloomFilter.json";
     private static final String DATA_FILE_NAME = "PsiBloomFilter.data";
-    public List<HashConfig> hashConfigList;
+    private static final String ZIP_FILE_NAME = "PsiBloomFilter.zip";
+    public String id;
+    public HashConfig hashConfig;
     public RsaPsiParam rsaPsiParam;
     /**
      * 过滤器中已插入的元素数量
      */
     public long insertedElementCount;
     @JSONField(serialize = false)
-    public BloomFilter<String> bloomFilter;
+    private BloomFilter<String> bloomFilter;
+    /**
+     * 文件所在目录，用于从磁盘中加载时使用。
+     */
+    private Path dir;
 
     /**
      * 从磁盘中加载 PsiBloomFilter 对象
@@ -59,26 +70,42 @@ public class PsiBloomFilter {
         File metaFile = dir.resolve(META_FILE_NAME).toFile();
         String json = FileUtil.readString(metaFile, StandardCharsets.UTF_8);
         PsiBloomFilter result = JSON.parseObject(json).toJavaObject(PsiBloomFilter.class);
+        result.rsaPsiParam.preproccess();
+
+        dir = dir;
+
+        return result;
+    }
+
+    public static File getDataFile(Path dir) {
+        return dir.resolve(DATA_FILE_NAME).toFile();
+    }
+
+    /**
+     * 为避免资源浪费，过滤器文件在需要用到的时候才加载。
+     */
+    private synchronized void loadDataFile() {
+        if (this.bloomFilter != null) {
+            return;
+        }
 
         // 加载过滤器
         File bfFile = dir.resolve(DATA_FILE_NAME).toFile();
         try (FileInputStream inputStream = new FileInputStream(bfFile)) {
-            result.bloomFilter = BloomFilter.readFrom(
+            this.bloomFilter = BloomFilter.readFrom(
                     inputStream,
                     Funnels.stringFunnel(StandardCharsets.UTF_8)
             );
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-
-        return result;
     }
 
-    public static PsiBloomFilter of(List<HashConfig> hashConfigs, RsaPsiParam rsaPsiParam, long insertedElementCount, BloomFilter<String> bloomFilter) {
+    public static PsiBloomFilter of(String id, HashConfig hashConfig, RsaPsiParam rsaPsiParam, BloomFilter<String> bloomFilter) {
         PsiBloomFilter psiBloomFilter = new PsiBloomFilter();
-        psiBloomFilter.hashConfigList = hashConfigs;
+        psiBloomFilter.id = id;
+        psiBloomFilter.hashConfig = hashConfig;
         psiBloomFilter.rsaPsiParam = rsaPsiParam;
-        psiBloomFilter.insertedElementCount = insertedElementCount;
         psiBloomFilter.bloomFilter = bloomFilter;
         return psiBloomFilter;
     }
@@ -90,7 +117,6 @@ public class PsiBloomFilter {
         LOG.info("start to sink PsiBloomFilter to disk. dir:{}", dir);
         long start = System.currentTimeMillis();
         dir.toFile().mkdirs();
-
         // 输出过滤器
         File bfFile = dir.resolve(DATA_FILE_NAME).toFile();
         try (FileOutputStream outputStream = new FileOutputStream(bfFile)) {
@@ -109,5 +135,42 @@ public class PsiBloomFilter {
 
         long spend = System.currentTimeMillis() - start;
         LOG.info("sink PsiBloomFilter to disk success({}). dir:{}", TimeSpan.fromMs(spend), dir);
+    }
+
+    public boolean contains(BigInteger x) {
+        return getBloomFilter().mightContain(x.toString());
+    }
+
+    /**
+     * 将 meta 文件与 data 文件打包成 zip 文件
+     *
+     * 这里要注意： meta 文件中的 RsaPsiParam 对象包含私钥信息，打包前要删除。
+     */
+    public File zip() throws IOException {
+        Path dir = FileSystem.PsiBloomFilter.getPath(id);
+
+        // 抹除私钥信息，只保留公钥信息。
+        // 为了避免影响旧对象，先拷贝一个新的。
+        PsiBloomFilter newPsiBloomFilter = JObject.create(this).toJavaObject(PsiBloomFilter.class);
+        newPsiBloomFilter.rsaPsiParam.cleanPrivateKey();
+
+        // 抹除后输出到临时目录
+        File tempMetaFile = dir.resolve("temp").resolve(META_FILE_NAME).toFile();
+        tempMetaFile.getParentFile().mkdirs();
+        Files.write(tempMetaFile.toPath(), JSON.toJSONBytes(newPsiBloomFilter));
+
+        // 压缩文件
+        File dataFile = dir.resolve(DATA_FILE_NAME).toFile();
+        File zipFile = dir.resolve(ZIP_FILE_NAME).toFile();
+        Zip.to(zipFile, tempMetaFile, dataFile);
+
+        return zipFile;
+    }
+
+    public BloomFilter<String> getBloomFilter() {
+        if (bloomFilter == null) {
+            loadDataFile();
+        }
+        return bloomFilter;
     }
 }

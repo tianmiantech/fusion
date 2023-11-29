@@ -60,7 +60,7 @@ public enum StatusCode {
     SQL_ERROR(10030, "SQL执行失败"),
     INVALID_MEMBER(10031, "非法成员 (%s)"),
     FILE_IO_READ_ERROR(10035, "文件读取失败"),
-    RSA_ERROR(10036, "Rsa 错误"),
+    CHECK_SIGN_ERROR(10036, "验签失败"),
     DUPLICATE_RESOURCE_ERROR(10037, "资源重复"),
 
 

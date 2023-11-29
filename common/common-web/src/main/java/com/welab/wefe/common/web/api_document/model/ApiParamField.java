@@ -16,12 +16,14 @@
 package com.welab.wefe.common.web.api_document.model;
 
 import com.welab.wefe.common.fieldvalidate.annotation.Check;
+import com.welab.wefe.common.tuple.Tuple2;
 import com.welab.wefe.common.util.ClassUtils;
 import com.welab.wefe.common.util.StringUtil;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author zane
@@ -32,18 +34,29 @@ public class ApiParamField {
     public String desc = "";
     public String regex = "";
     public String typeName = "";
+    public Class<?> typeClass;
     public String comment = "";
     public String require = "";
     public boolean isList;
+    public boolean isMap;
 
     public ApiParamField(Field field) {
         name = StringUtil.stringToUnderLineLowerCase(field.getName());
 
-        typeName = StringUtil.substringAfterLast(field.getType().getCanonicalName(), ".");
+        typeName = field.getType().getSimpleName();
+        typeClass = field.getType();
         isList = field.getType().equals(List.class);
+        isMap = field.getType().equals(Map.class);
         if (isList) {
-            Type listFieldGenericType = ClassUtils.getListFieldGenericType(field);
-            typeName = "List<" + ClassUtils.getTypeSimpleName(listFieldGenericType.getClass()) + ">";
+            Type genericType = ClassUtils.getListFieldGenericType(field);
+            typeName = "List<" + ClassUtils.getTypeSimpleName(genericType) + ">";
+        }
+
+        if (isMap) {
+            Tuple2<Type, Type> tuple2 = ClassUtils.getMapFieldGenericType(field);
+            String key = ClassUtils.getTypeSimpleName(tuple2.getValue1());
+            String value = ClassUtils.getTypeSimpleName(tuple2.getValue2());
+            typeName = "Map<" + key + "," + value + ">";
         }
 
         Check annotation = field.getAnnotation(Check.class);

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Documentation</title>
+    <style>
+        h1 {
+            text-align: center;
+        }
+
+        .group-title {
+            border-bottom: 1px solid #999;
+            color: red;
+            margin-top: 50px;
+            margin-bottom: -20px;
+            cursor: pointer;
+            font-family: cursive;
+            text-transform: uppercase;
+            text-shadow: 1px 1px 2px black;
+        }
+
+        .api-item {
+            border: 1px solid #000;
+            margin-top: 25px;
+        }
+
+        .api-name {
+            color: black;
+            background-color: #ccc;
+            padding: 15px 15px;
+            margin: 0;
+            cursor: pointer;
+            text-shadow: 1px 1px 2px #fff;
+        }
+
+        .api-desc {
+            text-indent: 30px;
+        }
+
+        .api-params {
+            padding: 8px;
+            /*display: none;*/
+        }
+        .api-param-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .api-param-table caption{
+            font-weight: bold;
+            color: blue;
+        }
+
+        .api-param-table th,
+        .api-param-table td {
+            border: 1px solid blue;
+            padding: 3px 8px;
+        }
+        .goto-top {
+            position: fixed;
+            right: 10px;
+            bottom: 50px;
+            border: 1px solid #333;
+            padding: 3px;
+            height: 40px;
+            width: 40px;
+            line-height: 40px;
+            text-align: center;
+            font-weight: bold;
+            text-decoration: none;
+            z-index: 1024;
+        }
+        .goto-top:visited {
+            color: black;
+        }
+        #type-dic-map{
+            border: 1px solid #000;
+            margin-top: 20px;
+        }
+        #type-dic-map h2{
+            background-color: #999;
+            color: blue;
+            padding: 15px 15px;
+            margin: 0;
+        }
+        .enum-dic-panel {
+            width: 200px;
+            border: 1px solid #999;
+            float: left;
+            margin: 5px 5px;
+        }
+        .enum-title{
+            font-weight: bold;
+            text-align: center;
+        }
+        .clear-both{
+            height: 0px;
+            clear: both;
+        }
+        .class-type-dic-list{
+            padding: 8px;
+        }
+    </style>
+</head>
+<body>
+<h1>API Documentation</h1>
+$content$
+<a href='#' class="goto-top">TOP</a>
+<script src='https://code.jquery.com/jquery-3.6.0.min.js'></script>
+<script>
+    $(".group-title").click(function(){
+        var group = $(this).attr("value");
+        $(".api-item[value=" + group + "]").toggle();
+    });
+    $(".api-name").click(function(){
+        $(this).parent().find(".api-params").toggle();
+    });
+</script>
+</body>
+</html>

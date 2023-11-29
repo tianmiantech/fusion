@@ -56,6 +56,10 @@ public abstract class AbstractDbModel implements Serializable {
         repository.save(this);
     }
 
+    public void setUpdatedTimeNow() {
+        this.updatedTime = new Date();
+    }
+
     /**
      * 转换为其它实体
      */

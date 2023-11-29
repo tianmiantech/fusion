@@ -43,13 +43,25 @@ public class CsvTableDataSourceReader extends AbstractTableDataSourceReader {
     private long totalRowCount;
     private final File file;
 
-    public CsvTableDataSourceReader(File file) throws IOException {
+    public CsvTableDataSourceReader(File file) throws Exception {
+        this(file, -1, -1);
+    }
+
+    public CsvTableDataSourceReader(File file, long maxReadRows, long maxReadTimeInMs) throws Exception {
+        super(maxReadRows, maxReadTimeInMs);
+        if (!file.isFile() || !file.exists()) {
+            throw new RuntimeException("文件不存在：" + file.getAbsolutePath());
+        }
+
         this.file = file;
 
         CsvReader reader = new CsvReader();
         reader.setContainsHeader(false);
         reader.setSkipEmptyRows(true);
         this.parser = reader.parse(file, StandardCharsets.UTF_8);
+
+        // 主动调用一次，避免外部使用时只接 readRow() 功能导致第一行数据读到列头。
+        getHeader();
     }
 
     @Override
@@ -88,7 +100,7 @@ public class CsvTableDataSourceReader extends AbstractTableDataSourceReader {
                 return null;
             }
 
-            for (int i = 0; i < header.size(); i++) {
+            for (int i = 0; i < getHeader().size(); i++) {
                 String value = "";
                 if (row.getFieldCount() > i) {
                     value = row.getField(i);
@@ -97,6 +109,7 @@ public class CsvTableDataSourceReader extends AbstractTableDataSourceReader {
             }
 
         } catch (Exception e) {
+            LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);
             throw new StatusCodeWithException(StatusCode.SYSTEM_ERROR, "读取数据源中的第" + (readDataRows + 1) + "行失败：" + e.getMessage());
         }
 

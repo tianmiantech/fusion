@@ -38,6 +38,53 @@
             <version>1.0.0</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>com.vladmihalcea</groupId>
+            <artifactId>hibernate-types-52</artifactId>
+            <version>2.4.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.welab.wefe</groupId>
+            <artifactId>common-data-source-mysql</artifactId>
+            <version>1.0.0</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.welab.wefe</groupId>
+            <artifactId>common-data-source-jdbc</artifactId>
+            <version>1.0.0</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.welab.wefe</groupId>
+            <artifactId>common-data-source-hive</artifactId>
+            <version>1.0.0</version>
+            <scope>compile</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>jetty-all</artifactId>
+                    <groupId>org.eclipse.jetty.aggregate</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.welab.wefe</groupId>
+            <artifactId>common-data-source-impala</artifactId>
+            <version>1.0.0</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.welab.wefe</groupId>
+            <artifactId>common-data-source-doris</artifactId>
+            <version>1.0.0</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.welab.wefe</groupId>
+            <artifactId>fusion-core</artifactId>
+            <version>1.0.0</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
     <build>
