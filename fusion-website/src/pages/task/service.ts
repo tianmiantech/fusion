@@ -1,5 +1,5 @@
 import {request}from '@/utils/request'
-
+import {HashFormValue} from './components/HashForm/index'
 /**
  * 获取可用的数据源类型
  * @returns 
@@ -27,3 +27,29 @@ export interface TestDataSourceInterface {
 export const testDataSource = (parmas:TestDataSourceInterface)=>{
     return request.post('/data_source/test',parmas)
 } 
+
+export interface CreateJobInterface {
+    remark?:string,
+    data_resource:{
+        bloom_filter_resource_input?:{
+            bloom_filter_id:string
+        },
+        table_data_resource_input?:{
+            add_method:'HttpUpload'|'LocalFile'|'Database',
+            sql?:string,
+            data_source_file?:string,
+            database_type?:'MySQL'|'PostgreSQL'|'Hive'|'ClickHouse'|'Oracle'|'SQLServer'|'MongoDB'|'Redis'|'HBase'|'Cassandra'|'Doris'|'ElastiSearch'|'Kafka'|'Kudu',
+            data_source_params?:Map<String,Object>
+        },
+        data_resource_type:'TableDataSource'|'PsiBloomFilter'
+        hash_config?:{list:HashFormValue[]}
+    },
+}
+/**
+ * 创建任务
+ * @param parmas 
+ * @returns 
+ */
+export const createJob = (parmas:CreateJobInterface) => {
+    return request.post('/job/create',parmas)
+}

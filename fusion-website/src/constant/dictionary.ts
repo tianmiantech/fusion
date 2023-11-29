@@ -1,7 +1,7 @@
 // 样本类型
 export const dataResourceTypeMap = new Map([
-  ['DataSet', '数据集'],
-  ['BloomFilter', '布隆过滤器'],
+  ['TableDataSource', '数据集'],
+  ['PsiBloomFilter', '布隆过滤器'],
 ]);
 
 // 样本选择方式
