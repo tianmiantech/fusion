@@ -16,6 +16,7 @@
 package com.welab.fusion.service.service;
 
 import com.welab.fusion.service.api.job.CreateJobApi;
+import com.welab.fusion.service.api.job.DisagreeJobApi;
 import com.welab.fusion.service.api.job.SendJobApi;
 import com.welab.fusion.service.constans.JobMemberRole;
 import com.welab.fusion.service.database.entity.JobDbModel;
@@ -162,4 +163,10 @@ public class JobService extends AbstractService {
         memberService.testConnection(input);
     }
 
+    /**
+     * 协作方拒绝任务
+     */
+    public void disagree(DisagreeJobApi.Input input) {
+
+    }
 }

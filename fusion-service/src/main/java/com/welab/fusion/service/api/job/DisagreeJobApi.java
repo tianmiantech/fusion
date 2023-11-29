@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.welab.fusion.service.api.service;
+package com.welab.fusion.service.api.job;
 
-import com.welab.fusion.service.service.InitService;
+import com.welab.fusion.service.service.JobService;
 import com.welab.wefe.common.fieldvalidate.annotation.Check;
 import com.welab.wefe.common.web.api.base.AbstractApi;
 import com.welab.wefe.common.web.api.base.Api;
@@ -25,27 +25,24 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author zane.luo
- * @date 2023/11/7
+ * @date 2023/11/27
  */
-@Api(path = "service/init", name = "注册超级管理员账号，初始化服务。", allowAccessWithNothing = true)
-public class InitServiceApi extends AbstractApi<InitServiceApi.Input, InitServiceApi.Output> {
+@Api(path = "job/disagree", name = "协作方拒绝任务")
+public class DisagreeJobApi extends AbstractApi<DisagreeJobApi.Input, DisagreeJobApi.Output> {
     @Autowired
-    private InitService initService;
+    private JobService jobService;
 
     @Override
-    protected ApiResult<InitServiceApi.Output> handle(InitServiceApi.Input input) throws Exception {
-        initService.init(input.username, input.password);
+    protected ApiResult<Output> handle(DisagreeJobApi.Input input) throws Exception {
+        jobService.disagree(input);
         return success();
     }
 
-    public static class Input extends AbstractApiInput {
-        @Check(require = true)
-        public String username;
-        @Check(require = true)
-        public String password;
+    public static class Output {
     }
 
-    public static class Output {
-
+    public static class Input extends AbstractApiInput {
+        @Check(name = "拒绝的原因")
+        public String reason;
     }
 }
