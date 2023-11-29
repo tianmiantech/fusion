@@ -28,12 +28,12 @@ import javax.persistence.Enumerated;
  */
 @Entity(name = "job")
 public class JobDbModel extends AbstractDbModel {
-    @Check(name = "创建任务的合作方ID")
+    @Check(name = "创建任务的成员ID")
     private String creatorMemberId;
-    @Check(name = "合作方唯一标识")
+    @Check(name = "合作方ID")
     private String partnerMemberId;
     @Check(name = "合作方名称")
-    private String partnerName;
+    private String partnerMemberName;
 
     @Enumerated(EnumType.STRING)
     private JobMemberRole role;
@@ -59,12 +59,12 @@ public class JobDbModel extends AbstractDbModel {
         this.partnerMemberId = partnerMemberId;
     }
 
-    public String getPartnerName() {
-        return partnerName;
+    public String getPartnerMemberName() {
+        return partnerMemberName;
     }
 
-    public void setPartnerName(String partnerName) {
-        this.partnerName = partnerName;
+    public void setPartnerMemberName(String partnerMemberName) {
+        this.partnerMemberName = partnerMemberName;
     }
 
     public JobMemberRole getRole() {

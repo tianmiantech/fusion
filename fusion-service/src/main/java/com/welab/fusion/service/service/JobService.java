@@ -66,7 +66,7 @@ public class JobService extends AbstractService {
             MemberDbModel promoter = memberService.findById(promoterId);
 
             job.setPartnerMemberId(promoterId);
-            job.setPartnerName(promoter.getName());
+            job.setPartnerMemberName(promoter.getName());
         }
 
         job.setId(input.jobId);
@@ -136,7 +136,7 @@ public class JobService extends AbstractService {
         job.setPartnerMemberId(providerId);
         MemberDbModel provider = memberService.findById(providerId);
         if (provider != null) {
-            job.setPartnerName(provider.getName());
+            job.setPartnerMemberName(provider.getName());
         }
 
         JobMemberDbModel promoter = jobMemberService.findMyself(job.getId());
