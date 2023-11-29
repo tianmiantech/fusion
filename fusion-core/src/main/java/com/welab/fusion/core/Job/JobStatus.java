@@ -23,6 +23,14 @@ import com.welab.fusion.core.progress.ProgressStatus;
  */
 public enum JobStatus {
     /**
+     * 编辑中
+     */
+    editing,
+    /**
+     * 审核不通过
+     */
+    disagree,
+    /**
      * 待执行
      */
     wait_run,

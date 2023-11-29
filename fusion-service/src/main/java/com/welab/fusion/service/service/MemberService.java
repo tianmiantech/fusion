@@ -192,4 +192,7 @@ public class MemberService extends AbstractService {
     }
 
 
+    public FusionNodeInfo getPartnerFusionNodeInfo(String memberId) {
+        return findById(memberId).toFusionNodeInfo();
+    }
 }

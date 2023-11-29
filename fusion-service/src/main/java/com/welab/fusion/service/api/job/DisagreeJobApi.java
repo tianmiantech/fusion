@@ -42,6 +42,8 @@ public class DisagreeJobApi extends AbstractApi<DisagreeJobApi.Input, DisagreeJo
     }
 
     public static class Input extends AbstractApiInput {
+        @Check(require = true)
+        public String jobId;
         @Check(name = "拒绝的原因")
         public String reason;
     }

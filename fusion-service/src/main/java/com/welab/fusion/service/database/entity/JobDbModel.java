@@ -15,8 +15,10 @@
  */
 package com.welab.fusion.service.database.entity;
 
+import com.welab.fusion.core.Job.JobStatus;
 import com.welab.fusion.service.constans.JobMemberRole;
 import com.welab.wefe.common.fieldvalidate.annotation.Check;
+import com.welab.wefe.common.web.dto.FusionNodeInfo;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -39,9 +41,10 @@ public class JobDbModel extends AbstractDbModel {
     private JobMemberRole role;
 
     private String remark;
+   private JobStatus status;
+    private String message;
 
     // region getter/setter
-
 
     public String getCreatorMemberId() {
         return creatorMemberId;
@@ -83,6 +86,21 @@ public class JobDbModel extends AbstractDbModel {
         this.remark = remark;
     }
 
+    public JobStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(JobStatus status) {
+        this.status = status;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
 
     // endregion
 }

@@ -15,6 +15,7 @@
  */
 package com.welab.fusion.service.service;
 
+import com.welab.fusion.core.Job.JobStatus;
 import com.welab.fusion.service.api.job.CreateJobApi;
 import com.welab.fusion.service.api.job.DisagreeJobApi;
 import com.welab.fusion.service.api.job.SendJobApi;
@@ -73,7 +74,7 @@ public class JobService extends AbstractService {
         job.setId(input.jobId);
         job.setRole(input.fromOtherFusionNode() ? JobMemberRole.provider : JobMemberRole.promoter);
         job.setRemark(input.remark);
-
+        job.setStatus(JobStatus.editing);
 
         jobRepository.save(job);
 
@@ -167,6 +168,16 @@ public class JobService extends AbstractService {
      * 协作方拒绝任务
      */
     public void disagree(DisagreeJobApi.Input input) {
-
+        JobDbModel job = findById(input.jobId);
+        job.setStatus(JobStatus.disagree);
+        job.setMessage(input.reason);
+        job.setUpdatedTimeNow();
+        job.save();
+        
+        gatewayService.callOtherFusionNode(
+                memberService.getPartnerFusionNodeInfo(job.getPartnerMemberId()),
+                DisagreeJobApi.class,
+                input
+        );
     }
 }

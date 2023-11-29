@@ -63,7 +63,7 @@ public class FusionService implements ApplicationContextAware {
                 .instance()
                 //.apiLogger(new BoardApiLogger())
                 .apiPackageClass(FusionService.class)
-                .apiPermissionPolicy(new DefaultApiPermissionPolicy(()-> CacheObjects.getPrivateKey()))
+                .apiPermissionPolicy(new DefaultApiPermissionPolicy(CacheObjects::getPrivateKey))
                 .launch(FusionService.class, args);
     }
 
