@@ -19,16 +19,15 @@ import com.welab.fusion.core.Job.FusionJob;
 import com.welab.fusion.core.Job.JobMember;
 import com.welab.fusion.core.Job.JobStatus;
 import com.welab.fusion.core.data_resource.base.DataResourceInfo;
-import com.welab.fusion.service.api.job.CreateJobApi;
-import com.welab.fusion.service.api.job.DisagreeJobApi;
-import com.welab.fusion.service.api.job.SendJobApi;
-import com.welab.fusion.service.api.job.StartJobApi;
+import com.welab.fusion.service.api.job.*;
 import com.welab.fusion.service.constans.JobMemberRole;
 import com.welab.fusion.service.database.entity.JobDbModel;
 import com.welab.fusion.service.database.entity.JobMemberDbModel;
 import com.welab.fusion.service.database.entity.MemberDbModel;
 import com.welab.fusion.service.database.repository.JobRepository;
 import com.welab.fusion.service.dto.JobConfigInput;
+import com.welab.fusion.service.dto.entity.JobMemberOutputModel;
+import com.welab.fusion.service.dto.entity.JobOutputModel;
 import com.welab.fusion.service.job_function.MyJobFunctions;
 import com.welab.fusion.service.model.FusionJobManager;
 import com.welab.fusion.service.service.base.AbstractService;
@@ -222,6 +221,24 @@ public class JobService extends AbstractService {
                 memberService.getPartnerFusionNodeInfo(job.getPartnerMemberId()),
                 DisagreeJobApi.class,
                 input
+        );
+    }
+
+    public JobOutputModel detail(DetailJobApi.Input input) {
+        JobDbModel job = findById(input.id);
+
+        JobMemberDbModel myselfJobInfo = jobMemberService.findMyself(job.getId());
+        MemberDbModel myselfInfo = memberService.findById(myselfJobInfo.getMemberId());
+        JobMemberOutputModel.of(myselfInfo, myselfJobInfo);
+
+
+        JobMemberDbModel partnerJobInfo = jobMemberService.findByPartnerId(job.getId(), job.getPartnerMemberId());
+        MemberDbModel partnerInfo = memberService.findById(partnerJobInfo.getMemberId());
+
+        return JobOutputModel.of(
+                job,
+                JobMemberOutputModel.of(myselfInfo, myselfJobInfo),
+                JobMemberOutputModel.of(partnerInfo, partnerJobInfo)
         );
     }
 }

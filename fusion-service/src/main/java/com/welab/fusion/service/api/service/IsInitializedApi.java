@@ -26,7 +26,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * @author Zane
  */
-@Api(path = "service/is_initialized", name = "服务是否已初始化", desc = "服务在初始化之前无法访问任何功能模块")
+@Api(
+        path = "service/is_initialized",
+        allowAccessWithNothing = true,
+        name = "服务是否已初始化",
+        desc = "服务在初始化之前无法访问任何功能模块"
+)
 public class IsInitializedApi extends AbstractNoneInputApi<IsInitializedApi.Output> {
 
     @Autowired
