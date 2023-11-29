@@ -26,7 +26,6 @@ import com.welab.fusion.service.database.repository.JobMemberRepository;
 import com.welab.fusion.service.dto.JobConfigInput;
 import com.welab.fusion.service.dto.JobMemberDataResourceInput;
 import com.welab.fusion.service.service.base.AbstractService;
-import com.welab.wefe.common.data.source.JdbcDataSourceClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -61,9 +60,9 @@ public class JobMemberService extends AbstractService {
         model.setMemberId(memberId);
         model.setRole(JobMemberRole.promoter);
         model.setDataResourceType(input.dataResource.dataResourceType);
+        model.setTableDataResourceInfo(input.dataResource.tableDataResourceInput.toJson());
         model.setTotalDataCount(input.dataResource.totalDataCount);
         model.setHashConfig(input.dataResource.hashConfig.toJson());
-
         model.save();
     }
 
@@ -101,6 +100,9 @@ public class JobMemberService extends AbstractService {
     }
 
     public JobMemberDbModel findByMemberId(String jobId, String memberId) {
+        if (jobId == null || memberId == null) {
+            return null;
+        }
         MySpecification<JobMemberDbModel> where = Where
                 .create()
                 .equal("jobId", jobId)

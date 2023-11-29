@@ -141,6 +141,9 @@ public class MemberService extends AbstractService {
     }
 
     public MemberDbModel findById(String id) {
+        if (id == null) {
+            return null;
+        }
         return memberRepository.findById(id).orElse(null);
     }
 

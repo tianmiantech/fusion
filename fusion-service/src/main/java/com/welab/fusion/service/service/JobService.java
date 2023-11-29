@@ -234,7 +234,7 @@ public class JobService extends AbstractService {
 
 
         JobMemberDbModel partnerJobInfo = jobMemberService.findByMemberId(job.getId(), job.getPartnerMemberId());
-        MemberDbModel partnerInfo = memberService.findById(partnerJobInfo.getMemberId());
+        MemberDbModel partnerInfo = memberService.findById(job.getPartnerMemberId());
 
         return JobOutputModel.of(
                 job,
