@@ -22,6 +22,7 @@ import com.alibaba.fastjson.annotation.JSONField;
 import com.welab.wefe.common.Stopwatch;
 import com.welab.wefe.common.fieldvalidate.AbstractCheckModel;
 import com.welab.wefe.common.fieldvalidate.annotation.Check;
+import com.welab.wefe.common.util.JObject;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -31,7 +32,7 @@ import javax.servlet.http.HttpServletRequest;
  *
  * @author Zane
  */
-public class AbstractApiInput extends AbstractCheckModel {
+public abstract class AbstractApiInput extends AbstractCheckModel {
 
     /**
      * 用于调试 api 耗时
@@ -76,4 +77,7 @@ public class AbstractApiInput extends AbstractCheckModel {
         return super.clone();
     }
 
+    public JSONObject toJson() {
+        return JObject.create(this);
+    }
 }

@@ -27,7 +27,6 @@ import com.welab.fusion.service.service.base.AbstractService;
 import com.welab.wefe.common.ModelMapper;
 import com.welab.wefe.common.StatusCode;
 import com.welab.wefe.common.util.StringUtil;
-import com.welab.wefe.common.web.api.base.Api;
 import com.welab.wefe.common.web.api.service.AliveApi;
 import com.welab.wefe.common.web.dto.FusionNodeInfo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -172,14 +171,18 @@ public class MemberService extends AbstractService {
     public void testConnection(MemberInputModel input) throws Exception {
         // 请求来自己方前端，发起请求访问合作方的 TestConnectApi。
         if (input.fromMyselfFrontEnd()) {
-            String url = input.getBaseUrl() + "/" + TestConnectApi.class.getAnnotation(Api.class).path();
-            gatewayService.requestOtherFusionNode(url, input.getPublicKey());
+            gatewayService.callOtherFusionNode(
+                    FusionNodeInfo.of(input.getBaseUrl(), input.getPublicKey()),
+                    TestConnectApi.class
+            );
         }
 
         // 别人请求我，我请求回去。
         if (input.fromOtherFusionNode()) {
-            String url = input.caller.baseUrl + "/" + AliveApi.class.getAnnotation(Api.class).path();
-            gatewayService.requestOtherFusionNode(url, input.caller.publicKey);
+            gatewayService.callOtherFusionNode(
+                    FusionNodeInfo.of(input.caller.publicKey, input.caller.baseUrl),
+                    AliveApi.class
+            );
         }
 
         // 如果能联通，自动保存。

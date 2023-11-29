@@ -19,6 +19,7 @@ import com.welab.fusion.core.Job.JobStatus;
 import com.welab.fusion.service.api.job.CreateJobApi;
 import com.welab.fusion.service.api.job.DisagreeJobApi;
 import com.welab.fusion.service.api.job.SendJobApi;
+import com.welab.fusion.service.api.job.StartJobApi;
 import com.welab.fusion.service.constans.JobMemberRole;
 import com.welab.fusion.service.database.entity.JobDbModel;
 import com.welab.fusion.service.database.entity.JobMemberDbModel;
@@ -26,6 +27,8 @@ import com.welab.fusion.service.database.entity.MemberDbModel;
 import com.welab.fusion.service.database.repository.JobRepository;
 import com.welab.fusion.service.dto.JobConfigInput;
 import com.welab.fusion.service.service.base.AbstractService;
+import com.welab.wefe.common.StatusCode;
+import com.welab.wefe.common.exception.StatusCodeWithException;
 import com.welab.wefe.common.web.dto.FusionNodeInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -86,8 +89,12 @@ public class JobService extends AbstractService {
      * 启动任务
      * 由协作方触发
      */
-    public void start(JobConfigInput input) throws URISyntaxException {
+    public void startJob(JobConfigInput input) throws URISyntaxException, StatusCodeWithException {
         JobDbModel job = findById(input.jobId);
+        if (job == null) {
+            StatusCode.PARAMETER_VALUE_INVALID.throwException("任务已被删除，请重新创建。");
+        }
+
         job.setRemark(input.remark);
         saveJobMember(input);
 
@@ -96,12 +103,9 @@ public class JobService extends AbstractService {
                 .toFusionNodeInfo();
 
         // 同步给发起方
-        gatewayService.callOtherFusionNode(target, CreateJobApi.class, input);
+        gatewayService.callOtherFusionNode(target, StartJobApi.class, input);
     }
 
-    public void startJob(String jobId) {
-        JobDbModel job = findById(jobId);
-    }
 
     /**
      * 保存任务成员
@@ -167,13 +171,26 @@ public class JobService extends AbstractService {
     /**
      * 协作方拒绝任务
      */
-    public void disagree(DisagreeJobApi.Input input) {
+    public void disagree(DisagreeJobApi.Input input) throws StatusCodeWithException {
+        String message = input.fromMyselfFrontEnd()
+                ? "我方拒绝了任务：" + input.reason
+                : "协作方拒绝了任务：" + input.reason;
+
         JobDbModel job = findById(input.jobId);
+
+        if (job == null) {
+            StatusCode.PARAMETER_VALUE_INVALID.throwException("任务已被删除，请重新创建。");
+        }
+
+        if (job.getStatus() != JobStatus.editing) {
+            throw new RuntimeException("任务已经被处理，不能重复处理，请尝试新建任务。");
+        }
+
         job.setStatus(JobStatus.disagree);
-        job.setMessage(input.reason);
+        job.setMessage(message);
         job.setUpdatedTimeNow();
         job.save();
-        
+
         gatewayService.callOtherFusionNode(
                 memberService.getPartnerFusionNodeInfo(job.getPartnerMemberId()),
                 DisagreeJobApi.class,

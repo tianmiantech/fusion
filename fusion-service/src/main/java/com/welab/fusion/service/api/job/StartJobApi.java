@@ -33,7 +33,7 @@ public class StartJobApi extends AbstractApi<JobConfigInput, StartJobApi.Output>
 
     @Override
     protected ApiResult<StartJobApi.Output> handle(JobConfigInput input) throws Exception {
-        jobService.start(input);
+        jobService.startJob(input);
         return success();
     }
 
