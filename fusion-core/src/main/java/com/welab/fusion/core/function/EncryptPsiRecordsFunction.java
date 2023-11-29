@@ -26,11 +26,10 @@ public interface EncryptPsiRecordsFunction {
     /**
      * 加密数据
      *
-     * @param memberId         合作方id
-     * @param psiBloomFilterId 过滤器id
-     * @param bucket           待加密的数据
+     * @param partnerId 合作方id
+     * @param bucket    待加密的数据
      * @return 加密后的数据
      */
-    List<String> encrypt(String memberId, String psiBloomFilterId, List<String> bucket) throws Exception;
+    List<String> encrypt(String jobId, String partnerId, List<String> bucket) throws Exception;
 
 }

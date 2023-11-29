@@ -16,6 +16,8 @@
 package com.welab.fusion.service.dto;
 
 import com.welab.wefe.common.fieldvalidate.annotation.Check;
+import com.welab.wefe.common.fieldvalidate.secret.MaskStrategy;
+import com.welab.wefe.common.fieldvalidate.secret.Secret;
 import com.welab.wefe.common.web.dto.AbstractApiInput;
 
 /**
@@ -26,6 +28,7 @@ public class JobConfigInput extends AbstractApiInput {
     @Check(name = "任务Id", donotShow = true)
     public String jobId;
     @Check(name = "备注")
+    @Secret(maskStrategy = MaskStrategy.BLOCK)
     public String remark;
     @Check(name = "资源信息")
     public JobMemberDataResourceInput dataResource;

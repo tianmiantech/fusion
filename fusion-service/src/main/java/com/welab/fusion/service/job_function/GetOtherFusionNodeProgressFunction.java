@@ -13,24 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.welab.fusion.core.function;
+package com.welab.fusion.service.job_function;
 
-import java.io.File;
-import java.util.function.Consumer;
+import com.welab.fusion.core.progress.JobProgress;
 
 /**
  * @author zane.luo
- * @date 2023/11/13
+ * @date 2023/11/29
  */
-public interface DownloadPsiBloomFilterFunction {
-    /**
-     * 从合作方下载过滤器
-     *
-     * @param jobId                任务Id
-     * @param memberId             合作方id
-     * @param totalSizeConsumer    用于更新总大小的消费者
-     * @param downloadSizeConsumer 用于更新已下载大小的消费者
-     * @return 下载的文件
-     */
-    File download(String jobId, String memberId, Consumer<Long> totalSizeConsumer, Consumer<Long> downloadSizeConsumer) throws Exception;
+public class GetOtherFusionNodeProgressFunction implements com.welab.fusion.core.function.GetOtherFusionNodeProgressFunction {
+    @Override
+    public JobProgress get() throws Exception {
+        return null;
+    }
 }

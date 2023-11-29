@@ -45,7 +45,5 @@ public class JobFunctions {
                 throw new RuntimeException("JobFunction 中未设置 " + tuple2.getValue2());
             }
         }
-
-
     }
 }

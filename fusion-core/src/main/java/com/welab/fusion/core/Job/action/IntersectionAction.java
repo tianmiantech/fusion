@@ -20,8 +20,8 @@ import com.welab.fusion.core.Job.FusionJob;
 import com.welab.fusion.core.Job.FusionJobRole;
 import com.welab.fusion.core.Job.FusionResult;
 import com.welab.fusion.core.Job.JobPhase;
-import com.welab.fusion.core.psi.PsiUtils;
 import com.welab.fusion.core.psi.PsiRecord;
+import com.welab.fusion.core.psi.PsiUtils;
 import com.welab.wefe.common.BatchConsumer;
 
 import java.io.File;
@@ -64,8 +64,8 @@ public class IntersectionAction extends AbstractJobPhaseAction {
             try {
                 // 将数据发送到过滤器方加密
                 List<String> encryptedList = job.getJobFunctions().encryptPsiRecordsFunction.encrypt(
+                        job.getJobId(),
                         job.getPartner().memberId,
-                        job.getPartner().dataResourceInfo.id,
                         records.stream().map(x -> x.encodedKey).collect(Collectors.toList())
                 );
 

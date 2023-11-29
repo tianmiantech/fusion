@@ -78,8 +78,8 @@ public class FusionJobTest {
         CsvTableDataSourceReader readerA = new CsvTableDataSourceReader(file);
         CsvTableDataSourceReader readerB = new CsvTableDataSourceReader(file);
 
-        DataResourceInfo dataResourceInfoA = DataResourceInfo.of("dataResourceInfoA", file.getName(), readerA.getTotalDataRowCount(), DataResourceType.TableDataSource, hashConfig);
-        DataResourceInfo dataResourceInfoB = DataResourceInfo.of("dataResourceInfoB", file.getName(), readerB.getTotalDataRowCount(), DataResourceType.TableDataSource, hashConfig);
+        DataResourceInfo dataResourceInfoA = DataResourceInfo.of(DataResourceType.TableDataSource, readerA.getTotalDataRowCount(), hashConfig);
+        DataResourceInfo dataResourceInfoB = DataResourceInfo.of(DataResourceType.TableDataSource, readerB.getTotalDataRowCount(), hashConfig);
 
 
         memberA = JobMember.of("memberA", "memberA", dataResourceInfoA);

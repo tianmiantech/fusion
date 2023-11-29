@@ -26,6 +26,8 @@ import com.welab.fusion.service.service.BloomFilterService;
 import com.welab.wefe.common.data.source.JdbcDataSourceClient;
 import com.welab.wefe.common.data.source.SuperDataSourceClient;
 import com.welab.wefe.common.fieldvalidate.annotation.Check;
+import com.welab.wefe.common.fieldvalidate.secret.MaskStrategy;
+import com.welab.wefe.common.fieldvalidate.secret.Secret;
 import com.welab.wefe.common.web.api.base.AbstractApi;
 import com.welab.wefe.common.web.api.base.Api;
 import com.welab.wefe.common.web.dto.ApiResult;
@@ -54,10 +56,12 @@ public class PreviewTableDataSourceApi extends AbstractApi<PreviewTableDataSourc
         @Check(require = true)
         public AddMethod addMethod;
 
+        @Secret(maskStrategy = MaskStrategy.BLOCK)
         @Check(name = "sql脚本", blockXss = false, oneSelectSql = true)
         public String sql;
 
         @Check(name = "数据源文件")
+        @Secret(maskStrategy = MaskStrategy.BLOCK)
         public String dataSourceFile;
 
         @JSONField(serialize = false)

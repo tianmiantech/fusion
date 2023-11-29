@@ -22,6 +22,7 @@ import com.welab.fusion.core.bloom_filter.PsiBloomFilter;
 import com.welab.fusion.core.function.DownloadPsiBloomFilterFunction;
 import com.welab.fusion.core.io.FileSystem;
 import com.welab.wefe.common.file.decompression.SuperDecompressor;
+import com.welab.wefe.common.util.FileUtil;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -46,8 +47,8 @@ public class DownloadPsiBloomFilterAction extends AbstractJobPhaseAction {
 
         // 从合作方下载过滤器
         File file = function.download(
+                job.getJobId(),
                 job.getPartner().memberId,
-                job.getPartner().dataResourceInfo.id,
                 size -> {
                     phaseProgress.updateTotalWorkload(size);
                 },
@@ -56,7 +57,7 @@ public class DownloadPsiBloomFilterAction extends AbstractJobPhaseAction {
                 });
 
         // file 解压至 dir
-        Path dir = FileSystem.PsiBloomFilter.getPath(job.getPartner().memberId + "-" + job.getPartner().dataResourceInfo.id);
+        Path dir = FileSystem.PsiBloomFilter.getPath(job.getPartner().memberId + "-" + FileUtil.getFileNameWithoutSuffix(file.getName()));
         SuperDecompressor.decompression(file, dir.toAbsolutePath().toString(), false);
 
         // 加载过滤器

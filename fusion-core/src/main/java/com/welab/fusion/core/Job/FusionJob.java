@@ -72,7 +72,7 @@ public class FusionJob implements Closeable {
      * 此方法会执行一些事前检查后进入异步执行
      * 使用异步线程调度任务，使其按顺序执行各阶段动作，并在必要时结束任务。
      */
-    public void start() throws Exception {
+    public void start() {
         checkBeforeFusion();
         startSchedule();
     }
@@ -244,9 +244,11 @@ public class FusionJob implements Closeable {
         });
     }
 
-    private void checkBeforeFusion() throws Exception {
+    private void checkBeforeFusion() {
         if (myself.dataResourceInfo.dataResourceType == DataResourceType.PsiBloomFilter && partner.dataResourceInfo.dataResourceType == DataResourceType.PsiBloomFilter) {
-            throw new Exception("不能双方都使用布隆过滤器，建议数据量大的一方使用布隆过滤器。");
+            finishJobOnException(
+                    new Exception("不能双方都使用布隆过滤器，建议数据量大的一方使用布隆过滤器。")
+            );
         }
     }
 

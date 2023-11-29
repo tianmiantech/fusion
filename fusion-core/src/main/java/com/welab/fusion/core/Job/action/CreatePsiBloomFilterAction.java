@@ -24,6 +24,8 @@ import com.welab.fusion.core.data_resource.base.DataResourceType;
 import com.welab.fusion.core.data_source.AbstractTableDataSourceReader;
 import com.welab.fusion.core.hash.HashConfig;
 
+import java.util.UUID;
+
 /**
  * @author zane.luo
  * @date 2023/11/13
@@ -34,8 +36,13 @@ public class CreatePsiBloomFilterAction extends AbstractJobPhaseAction {
         AbstractTableDataSourceReader reader = job.getMyself().tableDataResourceReader;
         HashConfig hashConfig = job.getMyself().dataResourceInfo.hashConfig;
 
-        // 生成过滤器，这里使用数据源的 Id 作为生成后的过滤器 Id。
-        try (PsiBloomFilterCreator creator = new PsiBloomFilterCreator(job.getMyself().dataResourceInfo.id, reader, hashConfig, phaseProgress)) {
+        // 生成过滤器
+        try (PsiBloomFilterCreator creator = new PsiBloomFilterCreator(
+                UUID.randomUUID().toString().replace("-", ""),
+                reader,
+                hashConfig,
+                phaseProgress)
+        ) {
             PsiBloomFilter psiBloomFilter = creator.create();
 
             // 保存对象至上下文对象，供后续阶段使用。
@@ -44,8 +51,6 @@ public class CreatePsiBloomFilterAction extends AbstractJobPhaseAction {
             // 保存过滤器
             job.getJobFunctions().savePsiBloomFilterFunction.save(psiBloomFilter);
         }
-
-
     }
 
     @Override

@@ -15,7 +15,10 @@
  */
 package com.welab.fusion.service.service;
 
+import com.welab.fusion.core.Job.FusionJob;
+import com.welab.fusion.core.Job.JobMember;
 import com.welab.fusion.core.Job.JobStatus;
+import com.welab.fusion.core.data_resource.base.DataResourceInfo;
 import com.welab.fusion.service.api.job.CreateJobApi;
 import com.welab.fusion.service.api.job.DisagreeJobApi;
 import com.welab.fusion.service.api.job.SendJobApi;
@@ -26,6 +29,8 @@ import com.welab.fusion.service.database.entity.JobMemberDbModel;
 import com.welab.fusion.service.database.entity.MemberDbModel;
 import com.welab.fusion.service.database.repository.JobRepository;
 import com.welab.fusion.service.dto.JobConfigInput;
+import com.welab.fusion.service.job_function.MyJobFunctions;
+import com.welab.fusion.service.model.FusionJobManager;
 import com.welab.fusion.service.service.base.AbstractService;
 import com.welab.wefe.common.StatusCode;
 import com.welab.wefe.common.exception.StatusCodeWithException;
@@ -89,13 +94,16 @@ public class JobService extends AbstractService {
      * 启动任务
      * 由协作方触发
      */
-    public void startJob(JobConfigInput input) throws URISyntaxException, StatusCodeWithException {
+    public void startJob(JobConfigInput input) throws Exception {
         JobDbModel job = findById(input.jobId);
         if (job == null) {
             StatusCode.PARAMETER_VALUE_INVALID.throwException("任务已被删除，请重新创建。");
         }
 
-        job.setRemark(input.remark);
+        job.setStatus(JobStatus.running);
+        if (input.fromMyselfFrontEnd()) {
+            job.setRemark(input.remark);
+        }
         saveJobMember(input);
 
         FusionNodeInfo target = memberService
@@ -104,6 +112,25 @@ public class JobService extends AbstractService {
 
         // 同步给发起方
         gatewayService.callOtherFusionNode(target, StartJobApi.class, input);
+
+
+        // 创建任务并启动
+        FusionJob fusionJob = createFusionJob(job);
+        FusionJobManager.start(fusionJob);
+    }
+
+    private FusionJob createFusionJob(JobDbModel job) throws Exception {
+        JobMemberDbModel myselfJobInfo = jobMemberService.findMyself(job.getId());
+        MemberDbModel myselfInfo = memberService.findById(myselfJobInfo.getMemberId());
+        DataResourceInfo myselfDataResourceInfo = DataResourceInfo.of(myselfJobInfo.getDataResourceType(), myselfJobInfo.getTotalDataCount(), myselfJobInfo.getHashConfigModel());
+        JobMember myself = JobMember.of(myselfInfo.getId(), myselfInfo.getName(), myselfDataResourceInfo);
+
+        JobMemberDbModel partnerJobInfo = jobMemberService.findByPartnerId(job.getId(), job.getPartnerMemberId());
+        MemberDbModel partnerInfo = memberService.findById(partnerJobInfo.getMemberId());
+        DataResourceInfo partnerDataResourceInfo = DataResourceInfo.of(partnerJobInfo.getDataResourceType(), partnerJobInfo.getTotalDataCount(), partnerJobInfo.getHashConfigModel());
+        JobMember partner = JobMember.of(partnerInfo.getId(), partnerInfo.getName(), partnerDataResourceInfo);
+
+        return new FusionJob(job.getId(), myself, partner, MyJobFunctions.INSTANCE);
     }
 
 
