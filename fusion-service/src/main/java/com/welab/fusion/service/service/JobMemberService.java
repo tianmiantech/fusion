@@ -16,6 +16,7 @@
 package com.welab.fusion.service.service;
 
 import com.welab.fusion.core.data_resource.base.DataResourceType;
+import com.welab.fusion.core.data_source.AbstractTableDataSourceReader;
 import com.welab.fusion.service.constans.JobMemberRole;
 import com.welab.fusion.service.database.base.MySpecification;
 import com.welab.fusion.service.database.base.Where;
@@ -84,9 +85,8 @@ public class JobMemberService extends AbstractService {
         }
         // 如果是数据库，则从数据库中获取数据量
         else {
-            try {
-                JdbcDataSourceClient jdbcClient = dataResource.tableDataResourceInput.createJdbcClient();
-                totalDataCount = jdbcClient.selectRowCount(dataResource.tableDataResourceInput.sql);
+            try (AbstractTableDataSourceReader reader = input.dataResource.tableDataResourceInput.createReader(-1, -1)) {
+                totalDataCount = reader.getTotalDataRowCount();
             } catch (Exception e) {
                 LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);
             }
@@ -100,17 +100,17 @@ public class JobMemberService extends AbstractService {
         }
     }
 
-    public JobMemberDbModel findByPartnerId(String jobId, String partnerId) {
+    public JobMemberDbModel findByMemberId(String jobId, String memberId) {
         MySpecification<JobMemberDbModel> where = Where
                 .create()
                 .equal("jobId", jobId)
-                .equal("partnerId", partnerId)
+                .equal("memberId", memberId)
                 .build();
         return jobMemberRepository.findOne(where).orElse(null);
 
     }
 
     public JobMemberDbModel findMyself(String jobId) {
-        return findByPartnerId(jobId, MemberService.MYSELF_NAME);
+        return findByMemberId(jobId, MemberService.MYSELF_NAME);
     }
 }

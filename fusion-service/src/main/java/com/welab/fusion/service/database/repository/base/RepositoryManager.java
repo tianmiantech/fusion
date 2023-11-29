@@ -16,6 +16,7 @@
 package com.welab.fusion.service.database.repository.base;
 
 import com.welab.fusion.service.database.entity.AbstractDbModel;
+import com.welab.fusion.service.database.repository.Flag;
 import com.welab.wefe.common.util.ClassUtils;
 import com.welab.wefe.common.util.ReflectionsUtil;
 import com.welab.wefe.common.web.Launcher;
@@ -38,7 +39,7 @@ public class RepositoryManager {
     public static <T extends BaseRepository> T get(Class<? extends AbstractDbModel> mysqlModelClass) {
         if (MAP.isEmpty()) {
             List<Class<?>> list = ReflectionsUtil
-                    .getClassesImplementing(BaseRepository.class, "com.welab.wefe")
+                    .getClassesImplementing(BaseRepository.class, Flag.class.getPackage().getName())
                     .stream()
                     .filter(x -> x.isInterface())
                     .collect(Collectors.toList());

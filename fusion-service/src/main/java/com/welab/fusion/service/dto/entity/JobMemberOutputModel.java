@@ -51,8 +51,14 @@ public class JobMemberOutputModel extends AbstractOutputModel {
     private JSONObject tableDataResourceInfo;
 
     public static JobMemberOutputModel of(MemberDbModel member, JobMemberDbModel jobMember) {
+        if (jobMember == null) {
+            return null;
+        }
+
         JobMemberOutputModel output = jobMember.mapTo(JobMemberOutputModel.class);
-        output.memberName = member.getName();
+        if (member != null) {
+            output.memberName = member.getName();
+        }
         return output;
     }
 

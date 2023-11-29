@@ -66,7 +66,7 @@ public class JobService extends AbstractService {
         // 来自自己前端，填充任务Id，便于其它方法统一行为。
         if (input.fromMyselfFrontEnd()) {
             input.jobId = job.getId();
-            job.setPartnerMemberId(MemberService.MYSELF_NAME);
+            job.setCreatorMemberId(MemberService.MYSELF_NAME);
         }
 
         // 来自发起方，填充合作者信息。
@@ -74,6 +74,7 @@ public class JobService extends AbstractService {
             String promoterId = MemberService.buildMemberId(input.caller.baseUrl);
             MemberDbModel promoter = memberService.findById(promoterId);
 
+            job.setCreatorMemberId(promoterId);
             job.setPartnerMemberId(promoterId);
             job.setPartnerMemberName(promoter.getName());
         }
@@ -124,7 +125,7 @@ public class JobService extends AbstractService {
         DataResourceInfo myselfDataResourceInfo = DataResourceInfo.of(myselfJobInfo.getDataResourceType(), myselfJobInfo.getTotalDataCount(), myselfJobInfo.getHashConfigModel());
         JobMember myself = JobMember.of(myselfInfo.getId(), myselfInfo.getName(), myselfDataResourceInfo);
 
-        JobMemberDbModel partnerJobInfo = jobMemberService.findByPartnerId(job.getId(), job.getPartnerMemberId());
+        JobMemberDbModel partnerJobInfo = jobMemberService.findByMemberId(job.getId(), job.getPartnerMemberId());
         MemberDbModel partnerInfo = memberService.findById(partnerJobInfo.getMemberId());
         DataResourceInfo partnerDataResourceInfo = DataResourceInfo.of(partnerJobInfo.getDataResourceType(), partnerJobInfo.getTotalDataCount(), partnerJobInfo.getHashConfigModel());
         JobMember partner = JobMember.of(partnerInfo.getId(), partnerInfo.getName(), partnerDataResourceInfo);
@@ -232,7 +233,7 @@ public class JobService extends AbstractService {
         JobMemberOutputModel.of(myselfInfo, myselfJobInfo);
 
 
-        JobMemberDbModel partnerJobInfo = jobMemberService.findByPartnerId(job.getId(), job.getPartnerMemberId());
+        JobMemberDbModel partnerJobInfo = jobMemberService.findByMemberId(job.getId(), job.getPartnerMemberId());
         MemberDbModel partnerInfo = memberService.findById(partnerJobInfo.getMemberId());
 
         return JobOutputModel.of(
