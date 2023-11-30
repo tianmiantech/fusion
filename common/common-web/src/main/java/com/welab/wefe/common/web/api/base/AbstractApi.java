@@ -99,6 +99,7 @@ public abstract class AbstractApi<In extends AbstractApiInput, Out> {
 
             // Implement the API
             ApiResult<Out> result = handle(apiInput);
+            // 按照约定，接口返回值不能为 null，否则被视为接口调用失败。
             if (result == null) {
                 result = fail("null of api result");
             }
