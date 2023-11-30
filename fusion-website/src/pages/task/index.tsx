@@ -4,7 +4,7 @@ import { CheckCircleFilled } from '@ant-design/icons';
 import { useImmer } from 'use-immer';
 import { history } from '@umijs/max';
 import JobForm from "./components/JobForm";
-import ProviderForm from "./components/ProviderForm";
+import MemberForm from "./components/MemberForm";
 import TaskDetail from "./components/TaskDetail";
 import RefuseModal from "./components/RefuseModal";
 import './index.less';
@@ -62,7 +62,7 @@ const Task = () => {
             size="small"
             {...cardStyles}
           >
-              <ProviderForm /> 
+              <MemberForm /> 
           </Card>
         </Col>
         }

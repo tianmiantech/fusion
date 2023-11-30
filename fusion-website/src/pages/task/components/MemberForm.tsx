@@ -1,20 +1,28 @@
 import React, { useState,forwardRef,useImperativeHandle } from 'react';
-import { Form, Input, Button, Row, Col,Tooltip, Spin } from 'antd';
+import { Form, Input, Button, Row, Col,Tooltip, Spin, message } from 'antd';
 import { FolderOpenOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import { useModel } from '@umijs/max';
 import { useRequest } from "ahooks";
 import {testPartnerConntent,TestPartnerConntentRequestInterface,sendJobToProvider,SendTaskToProviderRequestInterface} from '../service'
 
-const ProviderForm = forwardRef((props, ref) => {
+const MemberForm = forwardRef((props, ref) => {
+
+  const [isTestConnect,setIsTestConnect] = useState(false)
 
   const {jobFormData} = useModel('task.useJobForm')
   const [formRef] = Form.useForm();
 
   //测试协作方连通性
-  const {run:runTestPartnerConntent,loading } = useRequest(async (params:TestPartnerConntentRequestInterface)=>{
+  const {run:runTestPartnerConntent,loading:testPartnerConntentLoading } = useRequest(async (params:TestPartnerConntentRequestInterface)=>{
     const reponse = await testPartnerConntent(params)
-
+    const {code} = reponse
+    if(code === 0){
+      setIsTestConnect(true)
+      message.success('连接成功')
+    }
   },{manual:true})
+
+
 
   //发送任务到协作方
   const {run:runSendJobToProvider,loading:loadingSendJobToProvider } = useRequest(async (params:SendTaskToProviderRequestInterface)=>{
@@ -25,6 +33,9 @@ const ProviderForm = forwardRef((props, ref) => {
 
 
   const testPartnerConntention = ()=>{
+    if(!isTestConnect){
+      message.warn('请测试连通性')
+    }
     formRef.validateFields().then(async (values)=>{
       runTestPartnerConntent(values)
     })
@@ -45,7 +56,7 @@ const ProviderForm = forwardRef((props, ref) => {
     <>
       <Row justify="center" className="form-scroll">
         <Col lg={{span: 16}} md={{span: 24}}>
-          <Spin spinning={loading||loadingSendJobToProvider}>
+          <Spin spinning={testPartnerConntentLoading||loadingSendJobToProvider}>
           <Form
             form={formRef}
             layout="vertical"
@@ -79,10 +90,10 @@ const ProviderForm = forwardRef((props, ref) => {
         </Col>
       </Row>
       <Row className="operation-area">
-          <Button type="primary" onClick={submitData}>发起任务</Button> 
+          <Button type="primary" disabled={testPartnerConntentLoading||loadingSendJobToProvider} onClick={submitData}>发起任务</Button> 
       </Row>
     </>
   );
 });
 
-export default ProviderForm;
+export default MemberForm;

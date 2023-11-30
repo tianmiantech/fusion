@@ -3,7 +3,7 @@ import { axiosInstance, iam } from '@tianmiantech/request';
 import utils from '@tianmiantech/util';
 import { getTokenName } from './index';
 
-const { getToken:getTokenByName, createUUID, formatDate } = utils;
+const { getToken:getTokenByName, createUUID, formatDate,sleep,removeCookie } = utils;
 const HOST_ENV = process.env.HOST_ENV;
 
 const { generateOnTokenInvalid, invalidTokenCodes } = iam;
@@ -32,7 +32,19 @@ export const request = axiosInstance({
   baseURL:getBaseURL(),
   invalidTokenCodes:['401'],
   successCode:0,
-  onTokenInvalid: generateOnTokenInvalid(message, getTokenName()),
+  onTokenInvalid: async (response:any) => {
+    const { code, message: msg } = response.data;
+    console.log("window.location.pathname",window.location.pathname);
+    
+    if (window.location.pathname.match('/login')|| window.location.pathname.match('/register')) {
+      return;
+    }
+    removeCookie(getTokenName())
+    await sleep(1e3);
+    const redirectUrl = location.href;
+    const reLoginUrl = `/login?redirect=${redirectUrl}`;
+    location.href = reLoginUrl;
+  },
   getHeaders: () => ({
     'x-user-token': getTokenByName(getTokenName()),
     'x-req-rd': createUUID(),

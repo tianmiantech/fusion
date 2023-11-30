@@ -13,7 +13,6 @@ export const dataSetAddMethodMap = new Map([
 // 加密方式
 export const encryMethodMap = new Map([
   ['MD5', 'MD5'],
-  ['SHA1', 'SHA1'],
   ['SHA256', 'SHA256'],
-  ['none', '无'],
+  ['none', '不哈希'],
 ]);

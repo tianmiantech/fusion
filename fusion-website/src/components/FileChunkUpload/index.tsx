@@ -27,11 +27,14 @@ interface FileChunkUploadInterface {
   uploadFinishCallBack?:Function
   value?:FileChunkUploadValue,
   onChange?: (value:FileChunkUploadValue) => void;
+  disabled?:boolean
 }
 
 const Index= forwardRef((props:FileChunkUploadInterface,ref) => {
 
-  const {uploadFinishCallBack,onChange,value={}} = props;
+  const {uploadFinishCallBack,onChange,value={},disabled} = props;
+  console.log("FileChunkUploadInterface",disabled);
+  
   const uploader = useRef<UploaderInterfaceRef>(null);
   const [uploadData,setUploadData] = useImmer({
     filename:'',

@@ -83,3 +83,8 @@ export interface SendTaskToProviderRequestInterface {
 export const sendJobToProvider = (parmas:SendTaskToProviderRequestInterface) => {
     return request.post('/job/send_to_provider',parmas)
 }
+
+export const getMemberList = (name?:string)=>{
+    return request.get('/member/list',{name})
+}
+
