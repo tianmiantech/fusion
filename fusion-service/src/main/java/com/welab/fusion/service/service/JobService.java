@@ -21,12 +21,15 @@ import com.welab.fusion.core.Job.JobStatus;
 import com.welab.fusion.core.data_resource.base.DataResourceInfo;
 import com.welab.fusion.service.api.job.*;
 import com.welab.fusion.service.constans.JobMemberRole;
+import com.welab.fusion.service.database.base.MySpecification;
+import com.welab.fusion.service.database.base.Where;
 import com.welab.fusion.service.database.entity.JobDbModel;
 import com.welab.fusion.service.database.entity.JobMemberDbModel;
 import com.welab.fusion.service.database.entity.MemberDbModel;
 import com.welab.fusion.service.database.repository.JobRepository;
 import com.welab.fusion.service.dto.JobConfigInput;
 import com.welab.fusion.service.dto.JobMemberDataResourceInput;
+import com.welab.fusion.service.dto.base.PagingOutput;
 import com.welab.fusion.service.dto.entity.JobMemberOutputModel;
 import com.welab.fusion.service.dto.entity.JobOutputModel;
 import com.welab.fusion.service.job_function.MyJobFunctions;
@@ -39,6 +42,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.net.URISyntaxException;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author zane.luo
@@ -232,6 +238,10 @@ public class JobService extends AbstractService {
     public JobOutputModel detail(DetailJobApi.Input input) {
         JobDbModel job = findById(input.id);
 
+        return jobToOutputModel(job);
+    }
+
+    private JobOutputModel jobToOutputModel(JobDbModel job) {
         JobMemberDbModel myselfJobInfo = jobMemberService.findMyself(job.getId());
         MemberDbModel myselfInfo = memberService.findById(myselfJobInfo.getMemberId());
         JobMemberOutputModel.of(myselfInfo, myselfJobInfo);
@@ -245,5 +255,22 @@ public class JobService extends AbstractService {
                 JobMemberOutputModel.of(myselfInfo, myselfJobInfo),
                 JobMemberOutputModel.of(partnerInfo, partnerJobInfo)
         );
+    }
+
+    public PagingOutput<JobOutputModel> query(QueryJobApi.Input input) {
+        MySpecification<JobDbModel> where = Where.create()
+                .equal("id", input.jobId)
+                .equal("status", input.status)
+                .equal("role", input.role)
+                .build();
+        PagingOutput<JobDbModel> paging = jobRepository.paging(where, input);
+
+        // 转换类型
+        List<JobOutputModel> list = paging.getList()
+                .stream()
+                .map(this::jobToOutputModel)
+                .collect(Collectors.toList());
+
+        return PagingOutput.of(paging.getTotal(), list);
     }
 }
