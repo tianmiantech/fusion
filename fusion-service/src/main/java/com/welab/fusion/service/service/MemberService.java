@@ -108,11 +108,13 @@ public class MemberService extends AbstractService {
             name = MemberService.buildMemberId(baseUrl);
         }
 
-        MemberDbModel model = findByUrl(baseUrl);
+        String memberId = buildMemberId(baseUrl);
+        MemberDbModel model = findById(memberId);
 
         // 有则更新，无则新增。
         if (model == null) {
             model = new MemberDbModel();
+            model.setId(memberId);
         }
 
         /**
