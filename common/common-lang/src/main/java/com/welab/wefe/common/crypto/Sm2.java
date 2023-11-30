@@ -169,25 +169,30 @@ public class Sm2 {
             return new String(Base64.encodeBase64(sm2Engine.processBlock(data, 0, data.length)));
         } catch (Exception e) {
             LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);
-            throw new RuntimeException(e);
+            throw new RuntimeException("加密失败，请检查秘钥是否正确。");
         }
     }
 
     /**
      * Decrypt by private key
      */
-    public static String decryptByPrivateKey(String ciphertext, String privateKeyStr) throws Exception {
-        BCECPrivateKey privateKey = (BCECPrivateKey) getPrivateKey(privateKeyStr);
-        ECParameterSpec ecParameterSpec = privateKey.getParameters();
-        ECDomainParameters ecDomainParameters = new ECDomainParameters(ecParameterSpec.getCurve(),
-                ecParameterSpec.getG(), ecParameterSpec.getN());
-        ECPrivateKeyParameters ecPrivateKeyParameters = new ECPrivateKeyParameters(privateKey.getD(),
-                ecDomainParameters);
-        // SM2Engine sm2Engine = new SM2Engine(SM2Engine.Mode.C1C3C2);
-        SM2Engine sm2Engine = new SM2Engine();
-        sm2Engine.init(false, ecPrivateKeyParameters);
-        byte[] data = Base64.decodeBase64(ciphertext.getBytes(StandardCharsets.UTF_8));
-        return new String(sm2Engine.processBlock(data, 0, data.length), StandardCharsets.UTF_8);
+    public static String decryptByPrivateKey(String ciphertext, String privateKeyStr) {
+        try {
+            BCECPrivateKey privateKey = (BCECPrivateKey) getPrivateKey(privateKeyStr);
+            ECParameterSpec ecParameterSpec = privateKey.getParameters();
+            ECDomainParameters ecDomainParameters = new ECDomainParameters(ecParameterSpec.getCurve(),
+                    ecParameterSpec.getG(), ecParameterSpec.getN());
+            ECPrivateKeyParameters ecPrivateKeyParameters = new ECPrivateKeyParameters(privateKey.getD(),
+                    ecDomainParameters);
+            // SM2Engine sm2Engine = new SM2Engine(SM2Engine.Mode.C1C3C2);
+            SM2Engine sm2Engine = new SM2Engine();
+            sm2Engine.init(false, ecPrivateKeyParameters);
+            byte[] data = Base64.decodeBase64(ciphertext.getBytes(StandardCharsets.UTF_8));
+            return new String(sm2Engine.processBlock(data, 0, data.length), StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);
+            throw new RuntimeException("解密失败，请检查秘钥和密文是否正确。");
+        }
     }
 
     /**
@@ -204,5 +209,13 @@ public class Sm2 {
         sm2Engine.init(false, ecPrivateKeyParameters);
         byte[] data = Hex.decode(ciphertext.getBytes(StandardCharsets.UTF_8));
         return new String(sm2Engine.processBlock(data, 0, data.length), StandardCharsets.UTF_8);
+    }
+
+    public static void main(String[] args) throws Exception {
+        Sm2KeyPair keyPair = generateKeyPair();
+        String encrypted = encryptByPublicKey("123456", keyPair.publicKey);
+        System.out.println(encrypted);
+        String decrypted = decryptByPrivateKey(encrypted, keyPair.privateKey);
+        System.out.println(decrypted);
     }
 }

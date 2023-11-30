@@ -13,26 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.welab.fusion.service.model;
-
-import com.welab.fusion.service.model.global_config.FusionConfigModel;
-import com.welab.fusion.service.service.GlobalConfigService;
-import com.welab.wefe.common.web.Launcher;
+package com.welab.fusion.service.api.download.base;
 
 /**
  * @author zane.luo
- * @date 2023/11/27
+ * @date 2023/11/30
  */
-public class CacheObjects {
-
-    /**
-     * 获取私钥
-     */
-    public static String getPrivateKey() {
-        FusionConfigModel config = Launcher.getBean(GlobalConfigService.class).getFusionConfig();
-        if (!config.isInitialized) {
-            throw new RuntimeException("Fusion service is not initialized");
-        }
-        return config.privateKey;
-    }
+public enum FileType {
+    BloomFilter,
+    FusionResult
 }

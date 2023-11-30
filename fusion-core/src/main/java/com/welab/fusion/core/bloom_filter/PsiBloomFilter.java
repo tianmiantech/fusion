@@ -148,6 +148,12 @@ public class PsiBloomFilter {
      */
     public File zip() throws IOException {
         Path dir = FileSystem.PsiBloomFilter.getPath(id);
+        File zipFile = dir.resolve(ZIP_FILE_NAME).toFile();
+
+        // 已存在，不反复压缩。
+        if(zipFile.exists()){
+            return zipFile;
+        }
 
         // 抹除私钥信息，只保留公钥信息。
         // 为了避免影响旧对象，先拷贝一个新的。
@@ -161,7 +167,6 @@ public class PsiBloomFilter {
 
         // 压缩文件
         File dataFile = dir.resolve(DATA_FILE_NAME).toFile();
-        File zipFile = dir.resolve(ZIP_FILE_NAME).toFile();
         Zip.to(zipFile, tempMetaFile, dataFile);
 
         return zipFile;

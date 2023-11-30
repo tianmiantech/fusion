@@ -66,6 +66,13 @@ public class FileSystem {
     }
 
     /**
+     * 处于安全考虑，不对外输出绝对路径，而是输出相对路径。
+     */
+    public static String getRelativePath(File file) {
+        return ROOT_DIR.relativize(file.toPath()).toString();
+    }
+
+    /**
      * 文件用途
      */
     public enum UseType {

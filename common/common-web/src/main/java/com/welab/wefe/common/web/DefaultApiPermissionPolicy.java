@@ -58,7 +58,7 @@ public class DefaultApiPermissionPolicy implements ApiPermissionPolicyFunction {
         }
 
         // 检查 token
-        if (CurrentAccount.get() != null) {
+        if (CurrentAccount.get() == null) {
             StatusCode.LOGIN_REQUIRED.throwException("请登录后访问");
         }
 

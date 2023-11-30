@@ -34,6 +34,13 @@ public class MemberInputModel extends AbstractApiInput {
     @Check(name = "接口地址", require = true)
     private String baseUrl;
 
+    public static MemberInputModel of(String publicKey, String baseUrl) {
+        MemberInputModel input = new MemberInputModel();
+        input.publicKey = publicKey;
+        input.baseUrl = baseUrl;
+        return input;
+    }
+
     @Override
     public void checkAndStandardize() throws StatusCodeWithException {
         super.checkAndStandardize();
@@ -45,7 +52,7 @@ public class MemberInputModel extends AbstractApiInput {
         }
     }
 
-    public FusionNodeInfo toFusionNodeInfo(){
+    public FusionNodeInfo toFusionNodeInfo() {
         return FusionNodeInfo.of(publicKey, baseUrl);
     }
 

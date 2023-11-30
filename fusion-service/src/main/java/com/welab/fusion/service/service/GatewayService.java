@@ -28,10 +28,7 @@ import com.welab.wefe.common.util.JObject;
 import com.welab.wefe.common.util.StringUtil;
 import com.welab.wefe.common.web.api.base.AbstractApi;
 import com.welab.wefe.common.web.api.base.Api;
-import com.welab.wefe.common.web.dto.AbstractApiInput;
-import com.welab.wefe.common.web.dto.ApiResult;
-import com.welab.wefe.common.web.dto.FusionNodeInfo;
-import com.welab.wefe.common.web.dto.NoneApiInput;
+import com.welab.wefe.common.web.dto.*;
 import org.springframework.stereotype.Service;
 
 /**
@@ -71,14 +68,14 @@ public class GatewayService extends AbstractService {
         sign += "_" + Sm2.encryptByPublicKey(sign, partnerPublicKey);
 
         // 重新组装签名后的参数
-        JSONObject signedParams = new JSONObject();
-        signedParams.put("data", data);
-        signedParams.put("sign", sign);
+        SignedApiInput signedApiInput = new SignedApiInput();
+        signedApiInput.sign = sign;
+        signedApiInput.data = data;
 
         HttpResponse response = HttpRequest
                 .create(targetUrl)
-                .setBody(signedParams.toJSONString())
-                .post();
+                .setBody(signedApiInput.toJSONString())
+                .postJson();
 
         if (!response.success()) {
             StatusCode

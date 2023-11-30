@@ -26,10 +26,11 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author zane.luo
  * @date 2023/11/27
  */
-@Api(path = "member/test_connect", name = "测试连通性", desc = "测试A|B双方互相发起请求的连通性")
+@Api(path = "member/test_connect", name = "测试连通性", allowAccessWithSign = true, desc = "测试A|B双方互相发起请求的连通性")
 public class TestConnectApi extends AbstractApi<TestConnectApi.Input, TestConnectApi.Output> {
     @Autowired
     private MemberService memberService;
+
     @Override
     protected ApiResult<TestConnectApi.Output> handle(TestConnectApi.Input input) throws Exception {
         memberService.testConnection(input);
