@@ -37,6 +37,7 @@ import com.welab.fusion.service.model.FusionJobManager;
 import com.welab.fusion.service.service.base.AbstractService;
 import com.welab.wefe.common.StatusCode;
 import com.welab.wefe.common.exception.StatusCodeWithException;
+import com.welab.wefe.common.util.StringUtil;
 import com.welab.wefe.common.web.dto.FusionNodeInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,7 +45,6 @@ import org.springframework.stereotype.Service;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @author zane.luo
@@ -235,20 +235,29 @@ public class JobService extends AbstractService {
         );
     }
 
-    public JobOutputModel detail(DetailJobApi.Input input) {
+    public JobOutputModel detail(DetailJobApi.Input input) throws StatusCodeWithException {
         JobDbModel job = findById(input.id);
-
+        if (job == null) {
+            StatusCode.PARAMETER_VALUE_INVALID.throwException("错误的任务Id，任务不存在：" + input.id);
+        }
         return jobToOutputModel(job);
     }
 
     private JobOutputModel jobToOutputModel(JobDbModel job) {
         JobMemberDbModel myselfJobInfo = jobMemberService.findMyself(job.getId());
-        MemberDbModel myselfInfo = memberService.findById(myselfJobInfo.getMemberId());
-        JobMemberOutputModel.of(myselfInfo, myselfJobInfo);
+        MemberDbModel myselfInfo = null;
+        try {
+            myselfInfo = memberService.getMyself();
+        } catch (Exception e) {
+            // ignore
+        }
 
-
-        JobMemberDbModel partnerJobInfo = jobMemberService.findByMemberId(job.getId(), job.getPartnerMemberId());
-        MemberDbModel partnerInfo = memberService.findById(job.getPartnerMemberId());
+        JobMemberDbModel partnerJobInfo = null;
+        MemberDbModel partnerInfo = null;
+        if (StringUtil.isNotEmpty(job.getPartnerMemberId())) {
+            jobMemberService.findByMemberId(job.getId(), job.getPartnerMemberId());
+            memberService.findById(job.getPartnerMemberId());
+        }
 
         return JobOutputModel.of(
                 job,
