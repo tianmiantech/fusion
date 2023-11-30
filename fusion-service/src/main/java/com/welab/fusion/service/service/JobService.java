@@ -26,6 +26,7 @@ import com.welab.fusion.service.database.entity.JobMemberDbModel;
 import com.welab.fusion.service.database.entity.MemberDbModel;
 import com.welab.fusion.service.database.repository.JobRepository;
 import com.welab.fusion.service.dto.JobConfigInput;
+import com.welab.fusion.service.dto.JobMemberDataResourceInput;
 import com.welab.fusion.service.dto.entity.JobMemberOutputModel;
 import com.welab.fusion.service.dto.entity.JobOutputModel;
 import com.welab.fusion.service.job_function.MyJobFunctions;
@@ -174,11 +175,14 @@ public class JobService extends AbstractService {
 
         JobMemberDbModel promoter = jobMemberService.findMyself(job.getId());
 
+        JobMemberDataResourceInput dataResource = new JobMemberDataResourceInput();
+        dataResource.dataResourceType = promoter.getDataResourceType();
+        dataResource.totalDataCount = promoter.getTotalDataCount();
+        dataResource.hashConfig = promoter.getHashConfigModel();
+
         JobConfigInput createJobInput = new JobConfigInput();
         createJobInput.jobId = job.getId();
-        createJobInput.dataResource.dataResourceType = promoter.getDataResourceType();
-        createJobInput.dataResource.totalDataCount = promoter.getTotalDataCount();
-        createJobInput.dataResource.hashConfig = promoter.getHashConfigModel();
+        createJobInput.dataResource = dataResource;
 
         gatewayService.callOtherFusionNode(
                 input.toFusionNodeInfo(),
