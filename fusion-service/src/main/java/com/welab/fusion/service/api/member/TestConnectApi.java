@@ -34,7 +34,7 @@ public class TestConnectApi extends AbstractApi<TestConnectApi.Input, TestConnec
     @Override
     protected ApiResult<TestConnectApi.Output> handle(TestConnectApi.Input input) throws Exception {
         memberService.testConnection(input);
-        return null;
+        return success();
     }
 
     public static class Input extends MemberInputModel {
