@@ -42,6 +42,8 @@ public class SaveMyPsiBloomFilterFunction implements com.welab.fusion.core.funct
 
     @Override
     public void save(String jobId, PsiBloomFilter psiBloomFilter) throws Exception {
+        int key = psiBloomFilter.hashCode();
+
         // 更新自己的数据源类型
         JobMemberDbModel myself = jobMemberService.findMyself(jobId);
         myself.setDataResourceType(DataResourceType.PsiBloomFilter);
@@ -49,14 +51,16 @@ public class SaveMyPsiBloomFilterFunction implements com.welab.fusion.core.funct
         myself.setUpdatedTimeNow();
         myself.save();
 
-
+        /**
+         * 暂时不考虑去重
+         * 以后稳定了再考虑
+         */
         // 避免储存重复的过滤器
-        int key = psiBloomFilter.hashCode();
-        BloomFilterDbModel existed = bloomFilterService.findAutoGenerateByKey(key);
-        if (existed != null) {
-            LOG.info("过滤器已存在，不重复储存。 job_id：{}，bloom_filter_id:{}，key{}", jobId, psiBloomFilter.id, key);
-            return;
-        }
+        // BloomFilterDbModel existed = bloomFilterService.findAutoGenerateByKey(key);
+        // if (existed != null) {
+        //     LOG.info("过滤器已存在，不重复储存。 job_id：{}，bloom_filter_id:{}，key{}", jobId, psiBloomFilter.id, key);
+        //     return;
+        // }
 
         LOG.info("开始保存过滤器文件，job_id：{}，bloom_filter_id:{}", jobId, psiBloomFilter.id);
         long startTime = System.currentTimeMillis();
