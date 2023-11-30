@@ -1,16 +1,16 @@
-import {createJob,CreateJobInterface} from '../service'
+import {createJob,CreateJobRequestInterface} from '../service'
 import { useRequest } from "ahooks";
 import { useImmer } from 'use-immer';
 import lodash from 'lodash'
 
-const useTaskForm = ()=>{
+const useJobForm = ()=>{
 
-    const [taskFormData,setTaskFormData] = useImmer({
+    const [jobFormData,setTaskFormData] = useImmer({
         job_id:''//创建任务成功的id,
 
     })
 
-    const {run:runCreateJob,loading:createJobloading} = useRequest(async (params:CreateJobInterface)=>{
+    const {run:runCreateJob,loading:createJobloading} = useRequest(async (params:CreateJobRequestInterface)=>{
         const reponse = await createJob(params)
         const {code,data} = reponse;
         if(code === 0){
@@ -26,9 +26,9 @@ const useTaskForm = ()=>{
         manual:true
     })
     return {
-        taskFormData,
+        jobFormData,
         runCreateJob,
         createJobloading
     }
 }
-export default useTaskForm
+export default useJobForm
