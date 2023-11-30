@@ -60,7 +60,7 @@ public class GatewayService extends AbstractService {
         FusionNodeInfo myself = FusionNodeInfo.of(config.publicKey, config.publicServiceBaseUrl);
 
         // 在请求参数中带上自己的身份信息
-        params.put("partnerCaller", myself);
+        params.put("caller", myself);
 
         // 使用对方的公钥加密替代签名
         String data = params.toJSONString();
