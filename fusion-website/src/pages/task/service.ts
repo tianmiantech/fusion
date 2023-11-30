@@ -28,7 +28,7 @@ export const testDataSource = (parmas:TestDataSourceInterface)=>{
     return request.post('/data_source/test',parmas)
 } 
 
-export interface CreateJobInterface {
+export interface CreateJobRequestInterface {
     remark?:string,
     data_resource:{
         bloom_filter_resource_input?:{
@@ -50,6 +50,36 @@ export interface CreateJobInterface {
  * @param parmas 
  * @returns 
  */
-export const createJob = (parmas:CreateJobInterface) => {
+export const createJob = (parmas:CreateJobRequestInterface) => {
     return request.post('/job/create',parmas)
+}
+
+
+export interface TestPartnerConntentRequestInterface {
+    base_url:string,
+    name:string,
+    public_key:string
+}
+/**
+ * 测试协作方是否能联通
+ * @param parmas 
+ * @returns 
+ */
+export const testPartnerConntent = (parmas:TestPartnerConntentRequestInterface) => {
+    return request.post('/member/test_connect',parmas)
+}
+
+export interface SendTaskToProviderRequestInterface {
+    job_id:string,
+    base_url:string,
+    name?:string
+    public_key:string
+}
+/**
+ * 发送任务到协作方
+ * @param parmas 
+ * @returns 
+ */
+export const sendJobToProvider = (parmas:SendTaskToProviderRequestInterface) => {
+    return request.post('/job/send_to_provider',parmas)
 }
