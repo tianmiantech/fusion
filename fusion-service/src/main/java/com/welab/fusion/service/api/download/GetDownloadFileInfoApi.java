@@ -23,6 +23,7 @@ import com.welab.fusion.service.api.download.base.DownloadConfig;
 import com.welab.fusion.service.api.download.base.FileType;
 import com.welab.fusion.service.service.JobMemberService;
 import com.welab.wefe.common.fieldvalidate.annotation.Check;
+import com.welab.wefe.common.util.JObject;
 import com.welab.wefe.common.web.api.base.AbstractApi;
 import com.welab.wefe.common.web.api.base.Api;
 import com.welab.wefe.common.web.dto.AbstractApiInput;
@@ -30,7 +31,6 @@ import com.welab.wefe.common.web.dto.ApiResult;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 
@@ -56,8 +56,10 @@ public class GetDownloadFileInfoApi extends AbstractApi<GetDownloadFileInfoApi.I
                 String bloomFilterId = jobMemberService.findMyself(jobId).getBloomFilterId();
                 Path dir = FileSystem.PsiBloomFilter.getPath(bloomFilterId);
                 return PsiBloomFilter.of(dir).zip();
+
+            default:
+                return null;
         }
-        return null;
     }
 
     public static class Input extends AbstractApiInput {
@@ -65,13 +67,22 @@ public class GetDownloadFileInfoApi extends AbstractApi<GetDownloadFileInfoApi.I
         public FileType fileType;
         @Check(name = "业务数据", require = true, desc = "用于服务端定位被下载的文件，例如job_id、bloom_filter_id")
         public JSONObject bizData;
+
+        public static Input of(FileType fileType, JObject bizData) {
+            Input input = new Input();
+            input.fileType = fileType;
+            input.bizData = bizData;
+            return input;
+        }
     }
 
     public static class Output {
+        @Check(name = "文件名", require = true)
+        public String filename;
         @Check(name = "文件路径", require = true)
         public String filePath;
         @Check(name = "文件大小（byte）", require = true)
-        public long fileSize;
+        public long fileLength;
         @Check(name = "分片大小", require = true)
         public long chunkSizeInMb = DownloadConfig.CHUNK_SIZE_IN_MB;
         @Check(name = "分片数量", require = true)
@@ -79,9 +90,10 @@ public class GetDownloadFileInfoApi extends AbstractApi<GetDownloadFileInfoApi.I
 
         public static Output of(File file) {
             Output output = new Output();
+            output.filename = file.getName();
             output.filePath = FileSystem.getRelativePath(file);
-            output.fileSize = file.length();
-            output.chunkCount = (int) Math.ceil(output.fileSize / (double) (output.chunkSizeInMb * 1024 * 1024));
+            output.fileLength = file.length();
+            output.chunkCount = (int) Math.ceil(output.fileLength / (double) (output.chunkSizeInMb * 1024 * 1024));
             return output;
         }
 

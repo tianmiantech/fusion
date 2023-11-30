@@ -21,11 +21,17 @@ import com.welab.fusion.service.api.download.base.DownloadConfig;
 import com.welab.wefe.common.StatusCode;
 import com.welab.wefe.common.exception.StatusCodeWithException;
 import com.welab.wefe.common.fieldvalidate.annotation.Check;
+import com.welab.wefe.common.util.UrlUtil;
 import com.welab.wefe.common.web.api.base.AbstractApi;
 import com.welab.wefe.common.web.api.base.Api;
 import com.welab.wefe.common.web.dto.AbstractApiInput;
 import com.welab.wefe.common.web.dto.ApiResult;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 
@@ -34,22 +40,38 @@ import java.io.FileInputStream;
  * @date 2023/11/30
  */
 @Api(path = "download/chunk", name = "下载文件分片")
-public class DownloadChunkApi extends AbstractApi<DownloadChunkApi.Input, DownloadChunkApi.Output> {
+public class DownloadChunkApi extends AbstractApi<DownloadChunkApi.Input, ResponseEntity<?>> {
     @Override
-    protected ApiResult<DownloadChunkApi.Output> handle(DownloadChunkApi.Input input) throws Exception {
+    protected ApiResult<ResponseEntity<?>> handle(DownloadChunkApi.Input input) throws Exception {
         File file = input.getFile();
-        // 根据 input 指定的分片号对 file 进行分片
-        FileInputStream fileInputStream = new FileInputStream(file);
-        fileInputStream.skip(input.chunkIndex * DownloadConfig.CHUNK_SIZE_IN_MB * 1024 * 1024);
-// byte[] bytes = new byte[DownloadConfig.CHUNK_SIZE_IN_MB * 1024 * 1024];
+        byte[] buffer = new byte[DownloadConfig.CHUNK_SIZE_IN_MB * 1024 * 1024];
 
-        // return ResponseEntity
-        //         .ok()
-        //         .contentType(MediaType.parseMediaType(ContentType.of(resourceName)))
-        //         .body(new InputStreamResource(
-        //                 inputStream
-        //         ));
-        return null;
+        try (BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(file))) {
+            // 根据 input 指定的分片号对 file 进行分片
+            inputStream.skip(input.chunkIndex * DownloadConfig.CHUNK_SIZE_IN_MB * 1024 * 1024);
+            int readLength = inputStream.read(buffer);
+
+            // 修正 buffer 长度
+            if (readLength > 0 && readLength < buffer.length) {
+                byte[] newBuffer = new byte[readLength];
+                System.arraycopy(buffer, 0, newBuffer, 0, readLength);
+                buffer = newBuffer;
+            }
+
+        }
+
+        String filename = file.getName() + "-" + input.chunkIndex + ".part";
+        filename = UrlUtil.encode(filename);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Disposition", "attachment; filename=" + filename);
+
+        ResponseEntity<ByteArrayResource> response = ResponseEntity
+                .ok()
+                .headers(headers)
+                .contentLength(buffer.length)
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(new ByteArrayResource(buffer));
+        return success(response);
     }
 
     public static class Input extends AbstractApiInput {
@@ -71,9 +93,13 @@ public class DownloadChunkApi extends AbstractApi<DownloadChunkApi.Input, Downlo
         public File getFile() throws StatusCodeWithException {
             return FileSystem.getRootDir().resolve(filePath).toFile();
         }
+
+        public static Input of(String filePath, int chunkIndex) {
+            Input input = new Input();
+            input.filePath = filePath;
+            input.chunkIndex = chunkIndex;
+            return input;
+        }
     }
 
-    public static class Output {
-
-    }
 }

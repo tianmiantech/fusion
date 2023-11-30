@@ -41,17 +41,17 @@ public class GatewayService extends AbstractService {
     /**
      * 请求合作方接口
      */
-    private HttpResponse requestOtherFusionNode(String targetUrl, String partnerPublicKey) throws StatusCodeWithException {
-        return requestOtherFusionNode(targetUrl, partnerPublicKey, new JSONObject());
+    private HttpResponse requestOtherFusionNode(FusionNodeInfo target, Class<? extends AbstractApi> apiClass) throws StatusCodeWithException {
+        return requestOtherFusionNode(target, apiClass, new JSONObject());
     }
 
     /**
      * 请求合作方接口
      *
-     * @param targetUrl        目标地址
-     * @param partnerPublicKey 合作方公钥
+     * @param target   目标节点信息
+     * @param apiClass 目标接口
      */
-    private HttpResponse requestOtherFusionNode(String targetUrl, String partnerPublicKey, JSONObject params) throws StatusCodeWithException {
+    public HttpResponse requestOtherFusionNode(FusionNodeInfo target, Class<? extends AbstractApi> apiClass, JSONObject params) throws StatusCodeWithException {
         FusionConfigModel config = globalConfigService.getFusionConfig();
         if (StringUtil.isEmpty(config.publicServiceBaseUrl)) {
             StatusCode.PARAMETER_VALUE_INVALID.throwException("尚未设置我方“对外服务地址”，请在全局设置中设置。");
@@ -65,15 +65,16 @@ public class GatewayService extends AbstractService {
         // 使用对方的公钥加密替代签名
         String data = params.toJSONString();
         String sign = SM3.create().digestHex(data);
-        sign += "_" + Sm2.encryptByPublicKey(sign, partnerPublicKey);
+        sign += "_" + Sm2.encryptByPublicKey(sign, target.publicKey);
 
         // 重新组装签名后的参数
         SignedApiInput signedApiInput = new SignedApiInput();
         signedApiInput.sign = sign;
         signedApiInput.data = data;
 
+        String url = target.baseUrl + "/" + apiClass.getAnnotation(Api.class).path();
         HttpResponse response = HttpRequest
-                .create(targetUrl)
+                .create(url)
                 .setBody(signedApiInput.toJSONString())
                 .postJson();
 
@@ -83,7 +84,7 @@ public class GatewayService extends AbstractService {
                     .throwException(
                             "合作方异常：" + response.getMessage()
                                     + System.lineSeparator()
-                                    + targetUrl
+                                    + url
                     );
         }
         return response;
@@ -116,9 +117,7 @@ public class GatewayService extends AbstractService {
             return null;
         }
 
-        String url = target.baseUrl + "/" + apiClass.getAnnotation(Api.class).path();
-
-        HttpResponse httpResponse = requestOtherFusionNode(url, target.publicKey, input.toJson());
+        HttpResponse httpResponse = requestOtherFusionNode(target, apiClass, input.toJson());
         JSONObject json = httpResponse.getBodyAsJson();
         ApiResult apiResult = json.toJavaObject(ApiResult.class);
         if (apiResult.code != 0) {

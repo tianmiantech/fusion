@@ -27,9 +27,6 @@ import com.welab.wefe.common.TimeSpan;
 import com.welab.wefe.common.exception.StatusCodeWithException;
 import com.welab.wefe.common.web.api.base.AbstractApi;
 import com.welab.wefe.common.web.api.base.Api;
-import com.welab.wefe.common.web.api.base.FlowLimitByIp;
-import com.welab.wefe.common.web.api.base.FlowLimitByMobile;
-import com.welab.wefe.common.web.config.CommonConfig;
 import com.welab.wefe.common.web.dto.ApiResult;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -105,7 +102,10 @@ public class ApiExecutor {
             result = api.execute(httpServletRequest.getMethod(), params, httpServletRequest, files);
 
         } catch (StatusCodeWithException e) {
-            LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);
+            boolean skipLog = e.getStatusCode() == StatusCode.LOGIN_REQUIRED;
+            if (!skipLog) {
+                LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);
+            }
             result = api.fail(e.getStatusCode().getCode(), e.getMessage());
         } catch (Exception e) {
             LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);
@@ -178,7 +178,6 @@ public class ApiExecutor {
 
         Launcher.API_PERMISSION_POLICY.check(httpServletRequest, annotation, params);
     }
-
 
 
 }
