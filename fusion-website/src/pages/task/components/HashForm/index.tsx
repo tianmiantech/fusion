@@ -91,6 +91,7 @@ const HashForm = (props:HashFormPropsInterface) => {
             </Tooltip>
           </>
         }
+        required
       >
         <HashKeyForm />
       </Form.Item>

@@ -2,7 +2,7 @@ import {useRef} from 'react'
 import { Layout, Space } from 'antd';
 import styles from './index.less'
 import {SettingOutlined,PlusOutlined,BarsOutlined } from "@ant-design/icons"
-import SecretKeyDrawer from '../SecretKeyDrawer'
+import GlobalConfigDrawer from '../GlobalConfigDrawer'
 import HistoryListDrawer from '../HistoryListDrawer'
 import { useLocation,history } from 'umi';
 const { Header, Footer, Sider, Content } = Layout;
@@ -43,7 +43,7 @@ const Index =()=>{
                 {renderRightContent()}
             </div>
         </div>
-        <SecretKeyDrawer ref={secretKeyDrawerRef}/>
+        <GlobalConfigDrawer ref={secretKeyDrawerRef}/>
         <HistoryListDrawer ref={historyListRef}/>
     </Header>
 }
