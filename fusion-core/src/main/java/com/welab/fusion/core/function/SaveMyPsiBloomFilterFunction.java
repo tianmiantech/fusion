@@ -15,13 +15,19 @@
  */
 package com.welab.fusion.core.function;
 
-import com.welab.fusion.core.progress.JobProgress;
+import com.welab.fusion.core.bloom_filter.PsiBloomFilter;
+import com.welab.wefe.common.exception.StatusCodeWithException;
+
+import java.io.IOException;
 
 /**
  * @author zane.luo
- * @date 2023/11/15
+ * @date 2023/11/13
  */
 @FunctionalInterface
-public interface GetOtherFusionNodeProgressFunction {
-    JobProgress get() throws Exception;
+public interface SaveMyPsiBloomFilterFunction {
+    /**
+     * 保存我方新生成的 PSI 过滤器
+     */
+    void save(String jobId, PsiBloomFilter psiBloomFilter) throws StatusCodeWithException, IOException, Exception;
 }

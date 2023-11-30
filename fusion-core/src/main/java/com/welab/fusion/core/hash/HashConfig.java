@@ -20,10 +20,7 @@ import com.welab.wefe.common.fieldvalidate.AbstractCheckModel;
 import com.welab.wefe.common.fieldvalidate.annotation.Check;
 import com.welab.wefe.common.util.JObject;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -52,5 +49,10 @@ public class HashConfig extends AbstractCheckModel {
 
     public boolean isEmpty() {
         return list.isEmpty();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(list);
     }
 }

@@ -70,6 +70,11 @@ public class BloomFilterDbModel extends AbstractDbModel {
      */
     private String sql;
 
+    /**
+     * 唯一标识，用于去重。
+     */
+    private String key;
+
     // region getter/setter
 
     public String getName() {
@@ -134,6 +139,14 @@ public class BloomFilterDbModel extends AbstractDbModel {
 
     public void setSql(String sql) {
         this.sql = sql;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 
     // endregion

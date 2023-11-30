@@ -16,19 +16,23 @@
 package com.welab.fusion.core.test.function;
 
 import com.welab.fusion.core.bloom_filter.PsiBloomFilter;
-import com.welab.fusion.core.function.SavePsiBloomFilterFunction;
+import com.welab.fusion.core.function.DownloadPartnerPsiBloomFilterFunction;
 import com.welab.fusion.core.io.FileSystem;
 
+import java.io.File;
 import java.nio.file.Path;
+import java.util.function.Consumer;
 
 /**
  * @author zane.luo
  * @date 2023/11/15
  */
-public class SavePsiBloomFilterFunctionImpl implements SavePsiBloomFilterFunction {
+public class DownloadPartnerPsiBloomFilterFunctionImpl implements DownloadPartnerPsiBloomFilterFunction {
     @Override
-    public void save(PsiBloomFilter psiBloomFilter) {
-        Path dir = FileSystem.PsiBloomFilter.getPath(psiBloomFilter.id);
-        psiBloomFilter.sink(dir);
+    public File download(String memberId, String partnerId, Consumer<Long> totalSizeConsumer, Consumer<Long> downloadSizeConsumer) throws Exception {
+        Path dir = FileSystem.PsiBloomFilter.getPath(partnerId);
+        PsiBloomFilter psiBloomFilter = PsiBloomFilter.of(dir);
+
+        return psiBloomFilter.zip();
     }
 }

@@ -40,7 +40,7 @@ import java.util.function.Consumer;
  * @author zane.luo
  * @date 2023/11/29
  */
-public class DownloadPsiBloomFilterFunction implements com.welab.fusion.core.function.DownloadPsiBloomFilterFunction {
+public class DownloadPartnerPsiBloomFilterFunction implements com.welab.fusion.core.function.DownloadPartnerPsiBloomFilterFunction {
     protected final Logger LOG = LoggerFactory.getLogger(this.getClass());
     private static final MemberService memberService = Launcher.getBean(MemberService.class);
     private static final GatewayService gatewayService = Launcher.getBean(GatewayService.class);

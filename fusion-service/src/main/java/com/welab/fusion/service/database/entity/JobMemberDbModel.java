@@ -20,6 +20,7 @@ import com.alibaba.fastjson.annotation.JSONField;
 import com.vladmihalcea.hibernate.type.json.JsonStringType;
 import com.welab.fusion.core.data_resource.base.DataResourceType;
 import com.welab.fusion.core.hash.HashConfig;
+import com.welab.fusion.service.api.job.CreateJobApi;
 import com.welab.fusion.service.constans.JobMemberRole;
 import com.welab.wefe.common.fieldvalidate.annotation.Check;
 import org.hibernate.annotations.Type;
@@ -67,6 +68,11 @@ public class JobMemberDbModel extends AbstractDbModel {
             return null;
         }
         return hashConfig.toJavaObject(HashConfig.class);
+    }
+
+    @JSONField(serialize = false)
+    public CreateJobApi.TableDataResourceInput getTableDataResourceInfoModel() {
+        return this.tableDataResourceInfo.toJavaObject(CreateJobApi.TableDataResourceInput.class);
     }
 
     // region getter/setter
@@ -134,7 +140,6 @@ public class JobMemberDbModel extends AbstractDbModel {
     public void setTableDataResourceInfo(JSONObject tableDataResourceInfo) {
         this.tableDataResourceInfo = tableDataResourceInfo;
     }
-
 
     // endregion
 }

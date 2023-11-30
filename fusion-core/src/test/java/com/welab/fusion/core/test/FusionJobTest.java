@@ -29,8 +29,8 @@ import com.welab.fusion.core.hash.HashConfigItem;
 import com.welab.fusion.core.hash.HashMethod;
 import com.welab.fusion.core.io.FileSystem;
 import com.welab.fusion.core.psi.PsiUtils;
-import com.welab.fusion.core.test.function.DownloadPsiBloomFilterFunctionImpl;
-import com.welab.fusion.core.test.function.SavePsiBloomFilterFunctionImpl;
+import com.welab.fusion.core.test.function.DownloadPartnerPsiBloomFilterFunctionImpl;
+import com.welab.fusion.core.test.function.SaveMyPsiBloomFilterFunctionImpl;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -94,22 +94,22 @@ public class FusionJobTest {
 
     private static JobFunctions createAJobFunctions() {
         JobFunctions jobFunctions = createJobFunctions();
-        jobFunctions.getOtherFusionNodeProgressFunction = () -> memberBJob.getMyProgress();
+        jobFunctions.getPartnerProgressFunction = () -> memberBJob.getMyProgress();
 
         return jobFunctions;
     }
 
     private static JobFunctions createBJobFunctions() {
         JobFunctions jobFunctions = createJobFunctions();
-        jobFunctions.getOtherFusionNodeProgressFunction = () -> memberAJob.getMyProgress();
+        jobFunctions.getPartnerProgressFunction = () -> memberAJob.getMyProgress();
 
         return jobFunctions;
     }
 
     private static JobFunctions createJobFunctions() {
         JobFunctions jobFunctions = new JobFunctions();
-        jobFunctions.downloadPsiBloomFilterFunction = new DownloadPsiBloomFilterFunctionImpl();
-        jobFunctions.savePsiBloomFilterFunction = new SavePsiBloomFilterFunctionImpl();
+        jobFunctions.downloadPartnerPsiBloomFilterFunction = new DownloadPartnerPsiBloomFilterFunctionImpl();
+        jobFunctions.saveMyPsiBloomFilterFunction = new SaveMyPsiBloomFilterFunctionImpl();
 
         jobFunctions.encryptPsiRecordsFunction = (String memberId, String psiBloomFilterId, List<String> bucket) -> {
             Path dir = FileSystem.PsiBloomFilter.getPath(psiBloomFilterId);

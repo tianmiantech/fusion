@@ -38,6 +38,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author zane.luo
@@ -149,7 +150,7 @@ public class PsiBloomFilter {
         File zipFile = dir.resolve(ZIP_FILE_NAME).toFile();
 
         // 已存在，不反复压缩。
-        if(zipFile.exists()){
+        if (zipFile.exists()) {
             return zipFile;
         }
 
@@ -175,5 +176,10 @@ public class PsiBloomFilter {
             loadDataFile();
         }
         return bloomFilter;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(hashConfig, rsaPsiParam, bloomFilter);
     }
 }

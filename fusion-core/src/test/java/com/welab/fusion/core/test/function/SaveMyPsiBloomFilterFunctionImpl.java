@@ -13,17 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.welab.fusion.service.job_function;
+package com.welab.fusion.core.test.function;
 
-import com.welab.fusion.core.progress.JobProgress;
+import com.welab.fusion.core.bloom_filter.PsiBloomFilter;
+import com.welab.fusion.core.function.SaveMyPsiBloomFilterFunction;
+import com.welab.fusion.core.io.FileSystem;
+
+import java.nio.file.Path;
 
 /**
  * @author zane.luo
- * @date 2023/11/29
+ * @date 2023/11/15
  */
-public class GetOtherFusionNodeProgressFunction implements com.welab.fusion.core.function.GetOtherFusionNodeProgressFunction {
+public class SaveMyPsiBloomFilterFunctionImpl implements SaveMyPsiBloomFilterFunction {
     @Override
-    public JobProgress get() throws Exception {
-        return null;
+    public void save(String jobId,PsiBloomFilter psiBloomFilter) {
+        Path dir = FileSystem.PsiBloomFilter.getPath(psiBloomFilter.id);
+        psiBloomFilter.sink(dir);
     }
 }

@@ -15,16 +15,15 @@
  */
 package com.welab.fusion.service.job_function;
 
-import com.welab.fusion.core.bloom_filter.PsiBloomFilter;
-import com.welab.wefe.common.exception.StatusCodeWithException;
+import com.welab.fusion.core.progress.JobProgress;
 
 /**
  * @author zane.luo
  * @date 2023/11/29
  */
-public class SavePsiBloomFilterFunction implements com.welab.fusion.core.function.SavePsiBloomFilterFunction {
+public class GetPartnerProgressFunction implements com.welab.fusion.core.function.GetPartnerProgressFunction {
     @Override
-    public void save(PsiBloomFilter psiBloomFilter) throws StatusCodeWithException {
-
+    public JobProgress get() throws Exception {
+        return null;
     }
 }

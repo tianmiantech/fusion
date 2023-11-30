@@ -19,7 +19,7 @@ import com.welab.fusion.core.Job.FusionJob;
 import com.welab.fusion.core.Job.FusionJobRole;
 import com.welab.fusion.core.Job.JobPhase;
 import com.welab.fusion.core.bloom_filter.PsiBloomFilter;
-import com.welab.fusion.core.function.DownloadPsiBloomFilterFunction;
+import com.welab.fusion.core.function.DownloadPartnerPsiBloomFilterFunction;
 import com.welab.fusion.core.io.FileSystem;
 import com.welab.wefe.common.file.decompression.SuperDecompressor;
 import com.welab.wefe.common.util.FileUtil;
@@ -43,7 +43,7 @@ public class DownloadPsiBloomFilterAction extends AbstractJobPhaseAction {
 
     @Override
     protected void doAction() throws Exception {
-        DownloadPsiBloomFilterFunction function = job.getJobFunctions().downloadPsiBloomFilterFunction;
+        DownloadPartnerPsiBloomFilterFunction function = job.getJobFunctions().downloadPartnerPsiBloomFilterFunction;
 
         // 从合作方下载过滤器
         File file = function.download(

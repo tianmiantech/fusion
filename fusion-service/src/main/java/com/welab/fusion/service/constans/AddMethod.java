@@ -31,5 +31,6 @@ public enum AddMethod {
     /**
      *
      */
-    Database
+    Database,
+    AutoGenerate
 }

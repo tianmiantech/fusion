@@ -49,7 +49,7 @@ public class CreatePsiBloomFilterAction extends AbstractJobPhaseAction {
             job.getMyself().psiBloomFilter = psiBloomFilter;
 
             // 保存过滤器
-            job.getJobFunctions().savePsiBloomFilterFunction.save(psiBloomFilter);
+            job.getJobFunctions().saveMyPsiBloomFilterFunction.save(job.getJobId(), psiBloomFilter);
         }
     }
 

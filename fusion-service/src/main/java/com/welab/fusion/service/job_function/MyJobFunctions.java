@@ -25,6 +25,7 @@ public class MyJobFunctions extends JobFunctions {
     public static final MyJobFunctions INSTANCE = new MyJobFunctions();
 
     private MyJobFunctions() {
-
+        downloadPartnerPsiBloomFilterFunction = new DownloadPartnerPsiBloomFilterFunction();
+        encryptPsiRecordsFunction = new EncryptPsiRecordsFunction();
     }
 }

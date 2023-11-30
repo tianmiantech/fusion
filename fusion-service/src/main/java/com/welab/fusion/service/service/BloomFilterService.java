@@ -15,19 +15,17 @@
  */
 package com.welab.fusion.service.service;
 
-import com.welab.fusion.core.progress.Progress;
 import com.welab.fusion.core.bloom_filter.PsiBloomFilter;
 import com.welab.fusion.core.bloom_filter.PsiBloomFilterCreator;
 import com.welab.fusion.core.data_source.AbstractTableDataSourceReader;
-import com.welab.fusion.core.data_source.CsvTableDataSourceReader;
-import com.welab.fusion.core.data_source.ExcelTableDataSourceReader;
-import com.welab.fusion.core.data_source.SqlTableDataSourceReader;
 import com.welab.fusion.core.hash.HashConfig;
 import com.welab.fusion.core.io.FileSystem;
+import com.welab.fusion.core.progress.Progress;
 import com.welab.fusion.service.api.bloom_filter.AddBloomFilterApi;
-import com.welab.fusion.service.api.data_source.PreviewTableDataSourceApi;
 import com.welab.fusion.service.api.bloom_filter.QueryBloomFilterApi;
 import com.welab.fusion.service.api.bloom_filter.UpdateBloomFilterApi;
+import com.welab.fusion.service.api.data_source.PreviewTableDataSourceApi;
+import com.welab.fusion.service.constans.AddMethod;
 import com.welab.fusion.service.database.base.MySpecification;
 import com.welab.fusion.service.database.base.Where;
 import com.welab.fusion.service.database.entity.BloomFilterDbModel;
@@ -37,8 +35,6 @@ import com.welab.fusion.service.dto.entity.BloomFilterOutputModel;
 import com.welab.fusion.service.model.ProgressManager;
 import com.welab.fusion.service.service.base.AbstractService;
 import com.welab.wefe.common.CommonThreadPool;
-import com.welab.wefe.common.data.source.JdbcDataSourceClient;
-import com.welab.wefe.common.data.source.SuperDataSourceClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -108,6 +104,7 @@ public class BloomFilterService extends AbstractService {
             model.setTotalDataCount(dataSourceReader.getTotalDataRowCount());
             model.setStorageDir(sinkDir.toAbsolutePath().toString());
             model.setStorageSize(PsiBloomFilter.getDataFile(sinkDir).length());
+            model.setKey(psiBloomFilter.hashCode() + "");
         } catch (Exception e) {
             LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);
             throw e;
@@ -169,5 +166,13 @@ public class BloomFilterService extends AbstractService {
         model.setDescription(input.description);
         model.setUpdatedTime(new Date());
         model.save();
+    }
+
+    public BloomFilterDbModel findAutoGenerateByKey(int key) {
+        MySpecification<BloomFilterDbModel> where = Where.create()
+                .equal("addMethod", AddMethod.AutoGenerate)
+                .equal("key", key)
+                .build();
+        return bloomFilterRepository.findOne(where).orElse(null);
     }
 }
