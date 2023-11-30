@@ -81,7 +81,7 @@ public class GatewayService extends AbstractService {
             StatusCode
                     .REMOTE_SERVICE_ERROR
                     .throwException(
-                            "访问合作方失败：" + response.getMessage()
+                            "合作方异常：" + response.getMessage()
                                     + System.lineSeparator()
                                     + targetUrl
                     );

@@ -16,7 +16,9 @@
 package com.welab.fusion.service.api.account;
 
 import com.welab.fusion.service.dto.entity.AccountOutputModel;
+import com.welab.fusion.service.model.global_config.FusionConfigModel;
 import com.welab.fusion.service.service.AccountService;
+import com.welab.fusion.service.service.GlobalConfigService;
 import com.welab.wefe.common.fieldvalidate.annotation.Check;
 import com.welab.wefe.common.web.api.base.AbstractApi;
 import com.welab.wefe.common.web.api.base.Api;
@@ -39,9 +41,16 @@ public class LoginApi extends AbstractApi<LoginApi.Input, LoginApi.Output> {
 
     @Autowired
     private AccountService accountService;
+    @Autowired
+    private GlobalConfigService globalConfigService;
 
     @Override
     protected ApiResult<LoginApi.Output> handle(LoginApi.Input input) throws Exception {
+        FusionConfigModel config = globalConfigService.getFusionConfig();
+        if (!config.isInitialized) {
+            return fail("系统未初始化，请刷新页面并初始化系统");
+        }
+
         AccountOutputModel account = accountService.login(input.username, input.password);
         String token = CurrentAccount.token();
         return success(Output.of(token, account));
