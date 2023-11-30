@@ -29,8 +29,8 @@ import java.util.function.Consumer;
  */
 public class DownloadPsiBloomFilterFunctionImpl implements DownloadPsiBloomFilterFunction {
     @Override
-    public File download(String memberId, String psiBloomFilterId, Consumer<Long> totalSizeConsumer, Consumer<Long> downloadSizeConsumer) throws Exception {
-        Path dir = FileSystem.PsiBloomFilter.getPath(psiBloomFilterId);
+    public File download(String memberId, String partnerId, Consumer<Long> totalSizeConsumer, Consumer<Long> downloadSizeConsumer) throws Exception {
+        Path dir = FileSystem.PsiBloomFilter.getPath(partnerId);
         PsiBloomFilter psiBloomFilter = PsiBloomFilter.of(dir);
 
         return psiBloomFilter.zip();

@@ -39,7 +39,7 @@ import java.io.FileInputStream;
  * @author zane.luo
  * @date 2023/11/30
  */
-@Api(path = "download/chunk", name = "下载文件分片")
+@Api(path = "download/chunk", name = "下载文件分片", allowAccessWithSign = true)
 public class DownloadChunkApi extends AbstractApi<DownloadChunkApi.Input, ResponseEntity<?>> {
     @Override
     protected ApiResult<ResponseEntity<?>> handle(DownloadChunkApi.Input input) throws Exception {

@@ -46,11 +46,11 @@ public class DownloadPsiBloomFilterFunction implements com.welab.fusion.core.fun
     private static final GatewayService gatewayService = Launcher.getBean(GatewayService.class);
 
     @Override
-    public File download(String jobId, String memberId, Consumer<Long> totalSizeConsumer, Consumer<Long> downloadSizeConsumer) throws Exception {
-        LOG.info("开始下载过滤器文件，memberId：{}，jobId：{}", memberId, jobId);
+    public File download(String jobId, String partnerId, Consumer<Long> totalSizeConsumer, Consumer<Long> downloadSizeConsumer) throws Exception {
+        LOG.info("开始下载过滤器文件，memberId：{}，jobId：{}", partnerId, jobId);
 
         long start = System.currentTimeMillis();
-        FusionNodeInfo partner = memberService.findById(memberId).toFusionNodeInfo();
+        FusionNodeInfo partner = memberService.findById(partnerId).toFusionNodeInfo();
 
         GetDownloadFileInfoApi.Input input = GetDownloadFileInfoApi.Input.of(
                 FileType.BloomFilter,
@@ -65,7 +65,7 @@ public class DownloadPsiBloomFilterFunction implements com.welab.fusion.core.fun
         );
 
         // 为避免文件名相同造成覆盖，重新设计落地时的文件名。
-        String distFilename = "member_" + memberId + "-bf_" + fileInfo.filename;
+        String distFilename = "member_" + partnerId + "-bf_" + fileInfo.filename;
         Path distDir = FileSystem.getTempDir()
                 .resolve(
                         distFilename.replace(".", "_")
@@ -87,7 +87,7 @@ public class DownloadPsiBloomFilterFunction implements com.welab.fusion.core.fun
             );
         }
 
-        LOG.info("过滤器文件下载完成，memberId：{}，jobId：{}，耗时：{}ms", memberId, jobId, System.currentTimeMillis() - start);
+        LOG.info("过滤器文件下载完成，memberId：{}，jobId：{}，耗时：{}ms", partnerId, jobId, System.currentTimeMillis() - start);
 
         // 合并分片
         File[] parts = distDir.toFile().listFiles();

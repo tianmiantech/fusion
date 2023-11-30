@@ -27,10 +27,10 @@ public interface DownloadPsiBloomFilterFunction {
      * 从合作方下载过滤器
      *
      * @param jobId                任务Id
-     * @param memberId             合作方id
+     * @param partnerId            合作方id
      * @param totalSizeConsumer    用于更新总大小的消费者
      * @param downloadSizeConsumer 用于更新已下载大小的消费者
      * @return 下载的文件
      */
-    File download(String jobId, String memberId, Consumer<Long> totalSizeConsumer, Consumer<Long> downloadSizeConsumer) throws Exception;
+    File download(String jobId, String partnerId, Consumer<Long> totalSizeConsumer, Consumer<Long> downloadSizeConsumer) throws Exception;
 }

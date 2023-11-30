@@ -72,8 +72,6 @@ public class PsiBloomFilter {
         PsiBloomFilter result = JSON.parseObject(json).toJavaObject(PsiBloomFilter.class);
         result.rsaPsiParam.preproccess();
 
-        dir = dir;
-
         return result;
     }
 

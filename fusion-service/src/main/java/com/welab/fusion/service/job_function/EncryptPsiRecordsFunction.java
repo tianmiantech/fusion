@@ -15,6 +15,12 @@
  */
 package com.welab.fusion.service.job_function;
 
+import com.welab.fusion.service.api.job.EncryptPsiRecordsApi;
+import com.welab.fusion.service.service.GatewayService;
+import com.welab.fusion.service.service.MemberService;
+import com.welab.wefe.common.web.Launcher;
+import com.welab.wefe.common.web.dto.FusionNodeInfo;
+
 import java.util.List;
 
 /**
@@ -22,8 +28,20 @@ import java.util.List;
  * @date 2023/11/29
  */
 public class EncryptPsiRecordsFunction implements com.welab.fusion.core.function.EncryptPsiRecordsFunction {
+    private static final MemberService memberService = Launcher.getBean(MemberService.class);
+    private static final GatewayService gatewayService = Launcher.getBean(GatewayService.class);
+
     @Override
     public List<String> encrypt(String jobId, String partnerId, List<String> bucket) throws Exception {
-        return null;
+        FusionNodeInfo partner = memberService.findById(partnerId).toFusionNodeInfo();
+
+        EncryptPsiRecordsApi.Output output = gatewayService.callOtherFusionNode(
+                partner,
+                EncryptPsiRecordsApi.class,
+                EncryptPsiRecordsApi.Input.of(jobId, bucket),
+                EncryptPsiRecordsApi.Output.class
+        );
+
+        return output.bucket;
     }
 }

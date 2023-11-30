@@ -38,7 +38,7 @@ import java.nio.file.Path;
  * @author zane.luo
  * @date 2023/11/30
  */
-@Api(path = "download/get_file_info", name = "下载文件分片")
+@Api(path = "download/get_file_info", name = "下载文件分片", allowAccessWithSign = true)
 public class GetDownloadFileInfoApi extends AbstractApi<GetDownloadFileInfoApi.Input, GetDownloadFileInfoApi.Output> {
     @Autowired
     private JobMemberService jobMemberService;
