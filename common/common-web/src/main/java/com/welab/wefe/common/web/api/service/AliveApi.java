@@ -29,7 +29,7 @@ public class AliveApi extends AbstractNoneInputApi<Object> {
 
     @Override
     protected ApiResult<Object> handle() throws StatusCodeWithException {
-        return success();
+        return success(new Object());
     }
 
 }
