@@ -174,18 +174,19 @@ public class MemberService extends AbstractService {
     public void testConnection(MemberInputModel input) throws Exception {
         // 请求来自己方前端，发起请求访问合作方的 TestConnectApi。
         if (input.fromMyselfFrontEnd()) {
+            MemberDbModel myself = getMyself();
             gatewayService.callOtherFusionNode(
                     FusionNodeInfo.of(input.getPublicKey(), input.getBaseUrl()),
-                    TestConnectApi.class
+                    TestConnectApi.class,
+                    MemberInputModel.of(myself.getPublicKey(), myself.getBaseUrl())
             );
         }
-        MemberDbModel myself = getMyself();
+
         // 别人请求我，我请求回去。
         if (input.fromOtherFusionNode()) {
             gatewayService.callOtherFusionNode(
                     FusionNodeInfo.of(input.caller.publicKey, input.caller.baseUrl),
-                    AliveApi.class,
-                    MemberInputModel.of(myself.getPublicKey(), myself.getBaseUrl())
+                    AliveApi.class
             );
         }
 
