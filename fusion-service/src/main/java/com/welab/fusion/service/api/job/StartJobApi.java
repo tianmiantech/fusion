@@ -26,7 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author zane.luo
  * @date 2023/11/27
  */
-@Api(path = "job/agree_and_start", name = "协作方填写资源信息并启动任务")
+@Api(path = "job/agree_and_start", name = "协作方填写资源信息并启动任务", allowAccessWithSign = true)
 public class StartJobApi extends AbstractApi<JobConfigInput, StartJobApi.Output> {
     @Autowired
     private JobService jobService;
