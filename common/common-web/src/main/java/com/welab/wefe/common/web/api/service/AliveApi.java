@@ -24,7 +24,7 @@ import com.welab.wefe.common.web.dto.ApiResult;
 /**
  * @author zane
  */
-@Api(path = "service/alive", name = "用于测试连通性，或检查服务是否存活。", allowAccessWithNothing = false)
+@Api(path = "service/alive", name = "用于测试连通性，或检查服务是否存活。", allowAccessWithNothing = true)
 public class AliveApi extends AbstractNoneInputApi<Object> {
 
     @Override
