@@ -30,6 +30,6 @@ public class JobConfigInput extends AbstractApiInput {
     @Check(name = "备注")
     @Secret(maskStrategy = MaskStrategy.BLOCK)
     public String remark;
-    @Check(name = "资源信息")
+    @Check(name = "资源信息",require = true)
     public JobMemberDataResourceInput dataResource;
 }

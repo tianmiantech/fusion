@@ -60,7 +60,9 @@ public class JobMemberService extends AbstractService {
         model.setMemberId(memberId);
         model.setRole(JobMemberRole.promoter);
         model.setDataResourceType(input.dataResource.dataResourceType);
-        model.setTableDataResourceInfo(input.dataResource.tableDataResourceInput.toJson());
+        if (input.dataResource.tableDataResourceInput != null) {
+            model.setTableDataResourceInfo(input.dataResource.tableDataResourceInput.toJson());
+        }
         model.setTotalDataCount(input.dataResource.totalDataCount);
         model.setHashConfig(input.dataResource.hashConfig.toJson());
         model.save();
