@@ -36,13 +36,13 @@ public class JobOutputModel extends AbstractOutputModel {
     @Check(name = "求交结果")
     private String resultFilePath;
     @Check(name = "交集数量")
-    private long fusionCount;
+    private Long fusionCount;
     @Check(name = "任务开始时间")
     private Date startTime;
     @Check(name = "任务结束时间")
     private Date endTime;
     @Check(name = "任务耗时")
-    private long costTime;
+    private Long costTime;
     @Check(name = "任务状态")
     private JobStatus status;
     @Check(name = "任务状态对应的消息")
@@ -93,11 +93,11 @@ public class JobOutputModel extends AbstractOutputModel {
         this.resultFilePath = resultFilePath;
     }
 
-    public long getFusionCount() {
+    public Long getFusionCount() {
         return fusionCount;
     }
 
-    public void setFusionCount(long fusionCount) {
+    public void setFusionCount(Long fusionCount) {
         this.fusionCount = fusionCount;
     }
 
@@ -117,11 +117,11 @@ public class JobOutputModel extends AbstractOutputModel {
         this.endTime = endTime;
     }
 
-    public long getCostTime() {
+    public Long getCostTime() {
         return costTime;
     }
 
-    public void setCostTime(long costTime) {
+    public void setCostTime(Long costTime) {
         this.costTime = costTime;
     }
 
