@@ -1,7 +1,7 @@
 import {useState,useImperativeHandle,forwardRef} from 'react'
 import { Button, Drawer,Input,Spin } from 'antd'
 import { TmDrawer } from '@tianmiantech/pro';
-import History from '@/pages/home/History'
+import History from '@/pages/home/JobList'
 const Index = forwardRef((props,ref)=>{
     
     const [visible, setVisible] = useState(false);

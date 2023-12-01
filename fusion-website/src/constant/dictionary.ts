@@ -16,3 +16,9 @@ export const encryMethodMap = new Map([
   ['SHA256', 'SHA256'],
   ['none', '不哈希'],
 ]);
+
+// 角色类型
+export const RoleMap = new Map([
+  ['prompter', '发起方'],
+  ['provider', '协作方'],
+])
