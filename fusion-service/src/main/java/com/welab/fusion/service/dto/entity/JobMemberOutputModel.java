@@ -34,7 +34,10 @@ public class JobMemberOutputModel extends AbstractOutputModel {
     private String memberName;
     @Check(name = "成员Id")
     private String memberId;
-
+    @Check(name = "公钥")
+    private String publicKey;
+    @Check(name = "服务端地址")
+    private String baseUrl;
     @Enumerated(EnumType.STRING)
     private JobMemberRole role;
     @Enumerated(EnumType.STRING)
@@ -58,11 +61,21 @@ public class JobMemberOutputModel extends AbstractOutputModel {
         JobMemberOutputModel output = jobMember.mapTo(JobMemberOutputModel.class);
         if (member != null) {
             output.memberName = member.getName();
+            output.publicKey = member.getPublicKey();
+            output.baseUrl = member.getBaseUrl();
         }
         return output;
     }
 
     // region getter/setter
+
+    public String getMemberName() {
+        return memberName;
+    }
+
+    public void setMemberName(String memberName) {
+        this.memberName = memberName;
+    }
 
     public String getMemberId() {
         return memberId;
@@ -70,6 +83,22 @@ public class JobMemberOutputModel extends AbstractOutputModel {
 
     public void setMemberId(String memberId) {
         this.memberId = memberId;
+    }
+
+    public String getPublicKey() {
+        return publicKey;
+    }
+
+    public void setPublicKey(String publicKey) {
+        this.publicKey = publicKey;
+    }
+
+    public String getBaseUrl() {
+        return baseUrl;
+    }
+
+    public void setBaseUrl(String baseUrl) {
+        this.baseUrl = baseUrl;
     }
 
     public JobMemberRole getRole() {
@@ -119,7 +148,6 @@ public class JobMemberOutputModel extends AbstractOutputModel {
     public void setTableDataResourceInfo(JSONObject tableDataResourceInfo) {
         this.tableDataResourceInfo = tableDataResourceInfo;
     }
-
 
     // endregion
 }
