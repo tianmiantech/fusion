@@ -48,13 +48,13 @@ public class JobDbModel extends AbstractDbModel {
     @Check(name = "求交结果")
     private String resultFilePath;
     @Check(name = "交集数量")
-    private long fusionCount;
+    private Long fusionCount;
     @Check(name = "任务开始时间")
     private Date startTime;
     @Check(name = "任务结束时间")
     private Date endTime;
     @Check(name = "任务耗时")
-    private long costTime;
+    private Long costTime;
     @Check(name = "任务状态")
     private JobStatus status;
     private String message;
