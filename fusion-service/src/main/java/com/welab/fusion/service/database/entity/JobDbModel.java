@@ -121,11 +121,11 @@ public class JobDbModel extends AbstractDbModel {
         this.resultFilePath = resultFilePath;
     }
 
-    public long getFusionCount() {
+    public Long getFusionCount() {
         return fusionCount;
     }
 
-    public void setFusionCount(long fusionCount) {
+    public void setFusionCount(Long fusionCount) {
         this.fusionCount = fusionCount;
     }
 
@@ -145,11 +145,11 @@ public class JobDbModel extends AbstractDbModel {
         this.endTime = endTime;
     }
 
-    public long getCostTime() {
+    public Long getCostTime() {
         return costTime;
     }
 
-    public void setCostTime(long costTime) {
+    public void setCostTime(Long costTime) {
         this.costTime = costTime;
     }
 
