@@ -133,8 +133,13 @@ public class MemberService extends AbstractService {
         return model;
     }
 
-    public static String buildMemberId(String baseUrl) throws URISyntaxException {
-        URI uri = new URI(baseUrl);
+    public static String buildMemberId(String baseUrl) {
+        URI uri = null;
+        try {
+            uri = new URI(baseUrl);
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
         return uri.getHost() + ":" + uri.getPort();
     }
 

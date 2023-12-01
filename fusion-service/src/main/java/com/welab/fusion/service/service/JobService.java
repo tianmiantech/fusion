@@ -97,7 +97,13 @@ public class JobService extends AbstractService {
 
         jobRepository.save(job);
 
-        saveJobMember(input);
+        if (input.fromMyselfFrontEnd()) {
+            saveJobMember(JobMemberRole.promoter, input);
+        }
+        if (input.fromOtherFusionNode()) {
+            saveJobMember(JobMemberRole.provider, input);
+        }
+
         return job.getId();
     }
 
@@ -115,7 +121,7 @@ public class JobService extends AbstractService {
         if (input.fromMyselfFrontEnd()) {
             job.setRemark(input.remark);
         }
-        saveJobMember(input);
+        saveJobMember(job, input);
 
         FusionNodeInfo target = memberService
                 .findById(job.getPartnerMemberId())
@@ -152,8 +158,8 @@ public class JobService extends AbstractService {
      * updateTotalDataCount() 为异步方法
      * 不能在 JobMemberService 中调用，所以这里放在了 JobService 中。
      */
-    private void saveJobMember(JobConfigInput input) throws URISyntaxException {
-        jobMemberService.addMember(input);
+    private void saveJobMember(JobMemberRole role, JobConfigInput input) throws URISyntaxException {
+        jobMemberService.putMember(role, input);
 
         // 更新我方资源数据量
         jobMemberService.updateTotalDataCount(input);
@@ -182,6 +188,9 @@ public class JobService extends AbstractService {
         if (provider != null) {
             job.setPartnerMemberName(provider.getName());
         }
+
+        // 保存合作方信息
+        jobMemberService.addProvider(input);
 
         JobMemberDbModel promoter = jobMemberService.findMyself(job.getId());
 

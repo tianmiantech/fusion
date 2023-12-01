@@ -17,10 +17,12 @@ package com.welab.fusion.service.service;
 
 import com.welab.fusion.core.data_resource.base.DataResourceType;
 import com.welab.fusion.core.data_source.AbstractTableDataSourceReader;
+import com.welab.fusion.service.api.job.SendJobApi;
 import com.welab.fusion.service.constans.JobMemberRole;
 import com.welab.fusion.service.database.base.MySpecification;
 import com.welab.fusion.service.database.base.Where;
 import com.welab.fusion.service.database.entity.BloomFilterDbModel;
+import com.welab.fusion.service.database.entity.JobDbModel;
 import com.welab.fusion.service.database.entity.JobMemberDbModel;
 import com.welab.fusion.service.database.repository.JobMemberRepository;
 import com.welab.fusion.service.dto.JobConfigInput;
@@ -48,18 +50,34 @@ public class JobMemberService extends AbstractService {
     private BloomFilterService bloomFilterService;
 
     /**
-     * 添加发起方
-     * 仅在创建任务时调用
+     * 添加协作方
+     * 仅在推送任务到协作方时调用
      */
-    public void addMember(JobConfigInput input) throws URISyntaxException {
+    public void addProvider(SendJobApi.Input input) {
+        String providerId = MemberService.buildMemberId(input.getBaseUrl());
+
+        JobMemberDbModel model = new JobMemberDbModel();
+        model.setJobId(input.jobId);
+        model.setMemberId(providerId);
+        model.setRole(JobMemberRole.provider);
+        model.save();
+    }
+
+    /**
+     * 添加或更新成员信息
+     */
+    public void putMember(JobMemberRole role, JobConfigInput input) throws URISyntaxException {
         String memberId = input.fromMyselfFrontEnd()
                 ? MemberService.MYSELF_NAME
                 : memberService.findByUrl(input.caller.baseUrl).getId();
 
-        JobMemberDbModel model = new JobMemberDbModel();
+        JobMemberDbModel model = findByMemberId(input.jobId, memberId);
+        if (model == null) {
+            model = new JobMemberDbModel();
+        }
         model.setJobId(input.jobId);
         model.setMemberId(memberId);
-        model.setRole(JobMemberRole.promoter);
+        model.setRole(role);
         model.setDataResourceType(input.dataResource.dataResourceType);
         if (input.dataResource.tableDataResourceInfo != null) {
             model.setTableDataResourceInfo(input.dataResource.tableDataResourceInfo.toJson());
@@ -130,4 +148,5 @@ public class JobMemberService extends AbstractService {
         List<JobMemberDbModel> list = jobMemberRepository.findAll(where);
         jobMemberRepository.deleteAll(list);
     }
+
 }
