@@ -34,7 +34,7 @@ public class JobOutputModel extends AbstractOutputModel {
     @Check(name = "任务备注")
     private String remark;
     @Check(name = "求交结果")
-    private String resultFile;
+    private String resultFilePath;
     @Check(name = "交集数量")
     private long fusionCount;
     @Check(name = "任务开始时间")
@@ -85,12 +85,12 @@ public class JobOutputModel extends AbstractOutputModel {
         this.remark = remark;
     }
 
-    public String getResultFile() {
-        return resultFile;
+    public String getResultFilePath() {
+        return resultFilePath;
     }
 
-    public void setResultFile(String resultFile) {
-        this.resultFile = resultFile;
+    public void setResultFilePath(String resultFilePath) {
+        this.resultFilePath = resultFilePath;
     }
 
     public long getFusionCount() {

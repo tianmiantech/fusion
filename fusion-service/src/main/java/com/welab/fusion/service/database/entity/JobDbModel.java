@@ -15,13 +15,16 @@
  */
 package com.welab.fusion.service.database.entity;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.welab.fusion.core.Job.JobStatus;
 import com.welab.fusion.service.constans.JobMemberRole;
 import com.welab.wefe.common.fieldvalidate.annotation.Check;
+import com.welab.wefe.common.util.StringUtil;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import java.io.File;
 import java.util.Date;
 
 /**
@@ -43,7 +46,7 @@ public class JobDbModel extends AbstractDbModel {
     private String remark;
 
     @Check(name = "求交结果")
-    private String resultFile;
+    private String resultFilePath;
     @Check(name = "交集数量")
     private long fusionCount;
     @Check(name = "任务开始时间")
@@ -55,6 +58,18 @@ public class JobDbModel extends AbstractDbModel {
     @Check(name = "任务状态")
     private JobStatus status;
     private String message;
+
+    @JSONField(serialize = false)
+    public File getResultFile() {
+        if (StringUtil.isEmpty(resultFilePath)) {
+            return null;
+        }
+        File file = new File(resultFilePath);
+        if (!file.exists()) {
+            return null;
+        }
+        return file;
+    }
 
     // region getter/setter
 
@@ -98,12 +113,12 @@ public class JobDbModel extends AbstractDbModel {
         this.remark = remark;
     }
 
-    public String getResultFile() {
-        return resultFile;
+    public String getResultFilePath() {
+        return resultFilePath;
     }
 
-    public void setResultFile(String resultFile) {
-        this.resultFile = resultFile;
+    public void setResultFilePath(String resultFilePath) {
+        this.resultFilePath = resultFilePath;
     }
 
     public long getFusionCount() {

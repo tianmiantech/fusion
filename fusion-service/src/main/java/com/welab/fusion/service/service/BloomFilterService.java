@@ -115,14 +115,17 @@ public class BloomFilterService extends AbstractService {
      * 预览数据源中的数据
      */
     public PreviewTableDataSourceApi.Output previewTableDataSource(PreviewTableDataSourceApi.Input input) throws Exception {
-        AbstractTableDataSourceReader reader = input.createReader(100, -1);
+        try (AbstractTableDataSourceReader reader = input.createReader(100, -1)){
 
-        PreviewTableDataSourceApi.Output output = new PreviewTableDataSourceApi.Output();
-        output.header = reader.getHeader();
-        output.rows = new ArrayList<>(100);
+            PreviewTableDataSourceApi.Output output = new PreviewTableDataSourceApi.Output();
+            output.header = reader.getHeader();
+            output.rows = new ArrayList<>(100);
 
-        reader.readRows((index, row) -> output.rows.add(row));
-        return output;
+            reader.readRows((index, row) -> output.rows.add(row));
+            return output;
+        }
+
+
     }
 
     /**

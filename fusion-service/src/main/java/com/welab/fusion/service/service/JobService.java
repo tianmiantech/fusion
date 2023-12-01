@@ -39,7 +39,6 @@ import com.welab.wefe.common.StatusCode;
 import com.welab.wefe.common.exception.StatusCodeWithException;
 import com.welab.wefe.common.util.StringUtil;
 import com.welab.wefe.common.web.dto.FusionNodeInfo;
-import org.apache.hadoop.mapreduce.v2.api.records.JobId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -301,8 +300,8 @@ public class JobService extends AbstractService {
         }
 
         // 删除求交结果
-        if (StringUtil.isNotEmpty(job.getResultFile())) {
-            File file = new File(job.getResultFile());
+        if (StringUtil.isNotEmpty(job.getResultFilePath())) {
+            File file = new File(job.getResultFilePath());
             if (file.exists()) {
                 file.delete();
             }
