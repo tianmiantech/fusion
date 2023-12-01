@@ -32,6 +32,7 @@ import org.springframework.stereotype.Service;
 
 import java.net.URISyntaxException;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author zane.luo
@@ -116,5 +117,17 @@ public class JobMemberService extends AbstractService {
 
     public JobMemberDbModel findMyself(String jobId) {
         return findByMemberId(jobId, MemberService.MYSELF_NAME);
+    }
+
+    /**
+     * 请空任务中的成员列表
+     */
+    public void deleteByJobId(String id) {
+        MySpecification<JobMemberDbModel> where = Where.create()
+                .equal("jobId", id)
+                .build();
+
+        List<JobMemberDbModel> list = jobMemberRepository.findAll(where);
+        jobMemberRepository.deleteAll(list);
     }
 }

@@ -35,7 +35,7 @@ public class DownloadResultAction extends AbstractJobPhaseAction {
 
     @Override
     public JobPhase getPhase() {
-        return JobPhase.DownloadResult;
+        return JobPhase.SaveResult;
     }
 
     @Override

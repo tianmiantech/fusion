@@ -44,7 +44,7 @@ public enum JobPhase {
     /**
      * 下载结果
      */
-    DownloadResult(4);
+    SaveResult(4);
     private static final List<JobPhase> sortedList;
 
     static {

@@ -39,9 +39,11 @@ import com.welab.wefe.common.StatusCode;
 import com.welab.wefe.common.exception.StatusCodeWithException;
 import com.welab.wefe.common.util.StringUtil;
 import com.welab.wefe.common.web.dto.FusionNodeInfo;
+import org.apache.hadoop.mapreduce.v2.api.records.JobId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -281,5 +283,33 @@ public class JobService extends AbstractService {
                 .collect(Collectors.toList());
 
         return PagingOutput.of(paging.getTotal(), list);
+    }
+
+    /**
+     * 删除任务
+     * 1. 删除数据库记录
+     * 2. 删除求交结果
+     */
+    public void delete(String id) throws StatusCodeWithException {
+        JobDbModel job = findById(id);
+        if (job == null) {
+            return;
+        }
+
+        if (job.getStatus().isRunning()) {
+            StatusCode.PARAMETER_VALUE_INVALID.throwException("任务正在运行中，不能删除。");
+        }
+
+        // 删除求交结果
+        if (StringUtil.isNotEmpty(job.getResultFile())) {
+            File file = new File(job.getResultFile());
+            if (file.exists()) {
+                file.delete();
+            }
+        }
+
+        // 删除数据库记录
+        jobMemberService.deleteByJobId(id);
+        jobRepository.deleteById(id);
     }
 }
