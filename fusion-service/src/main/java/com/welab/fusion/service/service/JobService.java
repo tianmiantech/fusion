@@ -79,6 +79,9 @@ public class JobService extends AbstractService {
 
         // 来自发起方，填充合作者信息。
         if (input.fromOtherFusionNode()) {
+            if (findById(input.jobId) != null) {
+                StatusCode.PARAMETER_VALUE_INVALID.throwException("任务已存在，请勿重复创建。");
+            }
             String promoterId = MemberService.buildMemberId(input.caller.baseUrl);
             MemberDbModel promoter = memberService.findById(promoterId);
 
