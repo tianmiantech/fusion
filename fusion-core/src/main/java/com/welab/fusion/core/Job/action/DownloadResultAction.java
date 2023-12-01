@@ -30,7 +30,7 @@ public class DownloadResultAction extends AbstractJobPhaseAction {
     @Override
     protected void doAction() throws Exception {
         // 储存结果
-        job.getJobFunctions().saveFusionResultFunction.save(job.getJobResult());
+        job.getJobFunctions().saveFusionResultFunction.save(job.getJobId(), job.getJobResult());
     }
 
     @Override

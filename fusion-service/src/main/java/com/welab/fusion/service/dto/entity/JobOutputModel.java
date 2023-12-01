@@ -20,6 +20,8 @@ import com.welab.fusion.service.constans.JobMemberRole;
 import com.welab.fusion.service.database.entity.JobDbModel;
 import com.welab.wefe.common.fieldvalidate.annotation.Check;
 
+import java.util.Date;
+
 /**
  * @author zane.luo
  * @date 2023/11/29
@@ -31,6 +33,16 @@ public class JobOutputModel extends AbstractOutputModel {
     private JobMemberRole role;
     @Check(name = "任务备注")
     private String remark;
+    @Check(name = "求交结果")
+    private String resultFile;
+    @Check(name = "交集数量")
+    private long fusionCount;
+    @Check(name = "任务开始时间")
+    private Date startTime;
+    @Check(name = "任务结束时间")
+    private Date endTime;
+    @Check(name = "任务耗时")
+    private long costTime;
     @Check(name = "任务状态")
     private JobStatus status;
     @Check(name = "任务状态对应的消息")
@@ -71,6 +83,46 @@ public class JobOutputModel extends AbstractOutputModel {
 
     public void setRemark(String remark) {
         this.remark = remark;
+    }
+
+    public String getResultFile() {
+        return resultFile;
+    }
+
+    public void setResultFile(String resultFile) {
+        this.resultFile = resultFile;
+    }
+
+    public long getFusionCount() {
+        return fusionCount;
+    }
+
+    public void setFusionCount(long fusionCount) {
+        this.fusionCount = fusionCount;
+    }
+
+    public Date getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
+    }
+
+    public Date getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(Date endTime) {
+        this.endTime = endTime;
+    }
+
+    public long getCostTime() {
+        return costTime;
+    }
+
+    public void setCostTime(long costTime) {
+        this.costTime = costTime;
     }
 
     public JobStatus getStatus() {

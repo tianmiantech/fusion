@@ -18,11 +18,11 @@ package com.welab.fusion.service.database.entity;
 import com.welab.fusion.core.Job.JobStatus;
 import com.welab.fusion.service.constans.JobMemberRole;
 import com.welab.wefe.common.fieldvalidate.annotation.Check;
-import com.welab.wefe.common.web.dto.FusionNodeInfo;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import java.util.Date;
 
 /**
  * @author zane.luo
@@ -41,7 +41,19 @@ public class JobDbModel extends AbstractDbModel {
     private JobMemberRole role;
 
     private String remark;
-   private JobStatus status;
+
+    @Check(name = "求交结果")
+    private String resultFile;
+    @Check(name = "交集数量")
+    private long fusionCount;
+    @Check(name = "任务开始时间")
+    private Date startTime;
+    @Check(name = "任务结束时间")
+    private Date endTime;
+    @Check(name = "任务耗时")
+    private long costTime;
+    @Check(name = "任务状态")
+    private JobStatus status;
     private String message;
 
     // region getter/setter
@@ -84,6 +96,46 @@ public class JobDbModel extends AbstractDbModel {
 
     public void setRemark(String remark) {
         this.remark = remark;
+    }
+
+    public String getResultFile() {
+        return resultFile;
+    }
+
+    public void setResultFile(String resultFile) {
+        this.resultFile = resultFile;
+    }
+
+    public long getFusionCount() {
+        return fusionCount;
+    }
+
+    public void setFusionCount(long fusionCount) {
+        this.fusionCount = fusionCount;
+    }
+
+    public Date getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
+    }
+
+    public Date getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(Date endTime) {
+        this.endTime = endTime;
+    }
+
+    public long getCostTime() {
+        return costTime;
+    }
+
+    public void setCostTime(long costTime) {
+        this.costTime = costTime;
     }
 
     public JobStatus getStatus() {

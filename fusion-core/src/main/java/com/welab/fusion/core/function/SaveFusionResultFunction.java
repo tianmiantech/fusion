@@ -23,5 +23,5 @@ import com.welab.fusion.core.Job.FusionResult;
  */
 @FunctionalInterface
 public interface SaveFusionResultFunction {
-    void save(FusionResult result);
+    void save(String jobId, FusionResult result);
 }

@@ -23,7 +23,7 @@ import com.welab.fusion.core.Job.FusionResult;
  */
 public class SaveFusionResultFunction implements com.welab.fusion.core.function.SaveFusionResultFunction {
     @Override
-    public void save(FusionResult result) {
+    public void save(String jobId, FusionResult result) {
 
     }
 }
