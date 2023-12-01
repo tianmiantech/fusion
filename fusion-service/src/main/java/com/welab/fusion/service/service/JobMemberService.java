@@ -61,8 +61,8 @@ public class JobMemberService extends AbstractService {
         model.setMemberId(memberId);
         model.setRole(JobMemberRole.promoter);
         model.setDataResourceType(input.dataResource.dataResourceType);
-        if (input.dataResource.tableDataResourceInput != null) {
-            model.setTableDataResourceInfo(input.dataResource.tableDataResourceInput.toJson());
+        if (input.dataResource.tableDataResourceInfo != null) {
+            model.setTableDataResourceInfo(input.dataResource.tableDataResourceInfo.toJson());
         }
         model.setTotalDataCount(input.dataResource.totalDataCount);
         model.setHashConfig(input.dataResource.hashConfig.toJson());
@@ -87,7 +87,7 @@ public class JobMemberService extends AbstractService {
         }
         // 如果是数据库，则从数据库中获取数据量
         else {
-            try (AbstractTableDataSourceReader reader = input.dataResource.tableDataResourceInput.createReader(-1, -1)) {
+            try (AbstractTableDataSourceReader reader = input.dataResource.tableDataResourceInfo.createReader(-1, -1)) {
                 totalDataCount = reader.getTotalDataRowCount();
             } catch (Exception e) {
                 LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);

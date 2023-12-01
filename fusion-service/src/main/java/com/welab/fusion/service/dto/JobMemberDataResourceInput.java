@@ -35,7 +35,7 @@ public class JobMemberDataResourceInput extends AbstractApiInput {
     @Check(name = "输入的过滤器信息")
     public CreateJobApi.BloomFilterResourceInput bloomFilterResourceInput;
     @Check(name = "输入的数据集信息")
-    public CreateJobApi.TableDataResourceInput tableDataResourceInput;
+    public CreateJobApi.TableDataResourceInput tableDataResourceInfo;
 
     @Check(name = "主键 hash 方案", require = true)
     public HashConfig hashConfig;
