@@ -6,8 +6,8 @@ export const dataResourceTypeMap = new Map([
 
 // 样本选择方式
 export const dataSetAddMethodMap = new Map([
-  ['file', '选择文件'],
-  ['sql', '数据库'],
+  ['HttpUpload', '选择文件'],
+  ['Database', '数据库'],
 ]);
 
 // 加密方式
@@ -19,6 +19,24 @@ export const encryMethodMap = new Map([
 
 // 角色类型
 export const RoleMap = new Map([
-  ['prompter', '发起方'],
+  ['promoter', '发起方'],
   ['provider', '协作方'],
+])
+
+// 角色类型
+export const AddMethodMap = new Map([
+  ['HttpUpload', 'Http上传'],
+  ['LocalFile', '本地文件'],
+  ['Database', '数据库'],
+])
+
+// 任务状态
+export const JobStatus = new Map([
+  ['editing', '编辑中'],
+  ['disagree', '已拒绝'],
+  ['wait_run', '等待运行'],
+  ['running', '运行中'],
+  ['stop_on_running','终止运行'],
+  ['error_on_running','运行出错'],
+  ['success','运行成功']
 ])

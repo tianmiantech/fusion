@@ -3,9 +3,10 @@ import { Card, Row, Col } from 'antd';
 import { useImmer } from 'use-immer';
 import TaskDetail from "./components/TaskDetail";
 import TaskProgress from "./components/TaskProgress";
+import { useParams } from "@umijs/max";
 import './index.less';
 
-const Task = () => {
+const Detail = () => {
   const promoterTitle = <strong>发起方 10.10.105.22:90</strong>;
   const cardStyles = {
     headStyle: {
@@ -62,4 +63,4 @@ const Task = () => {
   );
 };
 
-export default Task;
+export default Detail;

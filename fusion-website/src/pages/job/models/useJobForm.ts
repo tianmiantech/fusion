@@ -5,16 +5,24 @@ import lodash from 'lodash'
 
 const useJobForm = ()=>{
 
-    const [jobFormData,setTaskFormData] = useImmer({
-        job_id:''//创建任务成功的id,
-
+    const [jobFormData,setJobFormData] = useImmer({
+        job_id:'',//创建任务成功的id
+        initialValues:{
+            remark:'',
+            status:"editing",
+            data_resource_type:'',
+            hash_config:{},
+            table_data_resource_info:{},
+            dataSetAddMethod:'HttpUpload',
+            bloom_filter_id:'',
+        }
     })
 
     const {run:runCreateJob,loading:createJobloading} = useRequest(async (params:CreateJobRequestInterface)=>{
         const reponse = await createJob(params)
         const {code,data} = reponse;
         if(code === 0){
-            setTaskFormData(draft=>{
+            setJobFormData(draft=>{
                 draft.job_id = lodash.get(data,'job_id');
             })
         }else{
@@ -26,6 +34,7 @@ const useJobForm = ()=>{
         manual:true
     })
     return {
+        setJobFormData,
         jobFormData,
         runCreateJob,
         createJobloading

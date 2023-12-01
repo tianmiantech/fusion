@@ -1,7 +1,7 @@
 import React, { useState,forwardRef,useImperativeHandle } from 'react';
 import { Form, Input, Button, Row, Col,Tooltip, Spin, message } from 'antd';
 import { FolderOpenOutlined, QuestionCircleOutlined } from '@ant-design/icons';
-import { useModel } from '@umijs/max';
+import { history, useModel } from '@umijs/max';
 import { useRequest } from "ahooks";
 import {testPartnerConntent,TestPartnerConntentRequestInterface,sendJobToProvider,SendTaskToProviderRequestInterface} from '../service'
 
@@ -9,7 +9,7 @@ const MemberForm = forwardRef((props, ref) => {
 
   const [isTestConnect,setIsTestConnect] = useState(false)
 
-  const {jobFormData} = useModel('task.useJobForm')
+  const {jobFormData} = useModel('job.useJobForm')
   const [formRef] = Form.useForm();
 
   //测试协作方连通性
@@ -27,15 +27,19 @@ const MemberForm = forwardRef((props, ref) => {
   //发送任务到协作方
   const {run:runSendJobToProvider,loading:loadingSendJobToProvider } = useRequest(async (params:SendTaskToProviderRequestInterface)=>{
     const reponse = await sendJobToProvider(params)
-    
+    const {code} = reponse;
+    if(code === 0) {
+      message.success('发送成功')
+      setTimeout(()=>{
+        history.back();
+      },800)
+    }
   },{manual:true})
 
 
 
   const testPartnerConntention = ()=>{
-    if(!isTestConnect){
-      message.warn('请测试连通性')
-    }
+   
     formRef.validateFields().then(async (values)=>{
       runTestPartnerConntent(values)
     })
@@ -46,6 +50,10 @@ const MemberForm = forwardRef((props, ref) => {
   }))
 
   const submitData =()=>{
+    if(!isTestConnect){
+      message.warn('请测试连通性')
+      return
+    }
     formRef.validateFields().then(async (values)=>{
       const requestParams = { ...values,job_id:jobFormData.job_id }
       runSendJobToProvider(requestParams)

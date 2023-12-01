@@ -8,17 +8,21 @@ import { useImmer } from 'use-immer';
 import styles from './index.less'
 import { getJobList } from "../service";
 import moment from "moment";
+import {dataResourceTypeMap,AddMethodMap,JobStatus} from '@/constant/dictionary'
+import lodash from 'lodash'
 
 interface RowProps {
     createTime:number,
-    role:'prompter'|'provider',
+    role:'promoter'|'provider',
+    creator_member_id:string,
     remark:string,
     partner:string,
+    id:string,
     myself:{
         created_time:number,
         data_resource_type:string,
         id:string,
-        role:'prompter'|'provider',
+        role:'promoter'|'provider',
         table_data_resource_info:Map<string,any>,
         total_data_count:number,
         updated_time:number
@@ -27,13 +31,15 @@ interface RowProps {
     status:string
 }
 
+const ROLE_TO_CN = {
+    'promoter':'我发起的',
+    'provider':'我参与的',
+ }
+
 const Index =()=>{
 
-    // 角色类型
-    const RoleMap = new Map([
-        ['prompter', '我发起的'],
-        ['provider', '我协作的'],
-    ])
+   // 角色类型
+
    
     const [jobListData,setJobListData] = useImmer({
         page_size:10,
@@ -46,7 +52,10 @@ const Index =()=>{
         const reponse = await getJobList(params)
         const {code,data} = reponse;
         if (code == 0) {
-            console.log("data",data);
+            setJobListData(draft=>{
+                const list = lodash.get(data,'list',[])
+                draft.dataSource = list;
+            })
             
         }
     },{manual:true})
@@ -68,18 +77,32 @@ const Index =()=>{
         width:200,
         render:(text:string,row:RowProps)=>{
             const { createTime = new Date(),role} = row;
-            return <><div> <Tag color={role==='prompter'?'success':'default'}>{RoleMap.get(role)}</Tag></div>
+            console.log("role",role);
+            console.log("ROLE_TO_CN",ROLE_TO_CN[role]);
+            
+            console.log("role-",ROLE_TO_CN[`${role}`]);
+            
+            return <><Tag color={role==='promoter'?'success':'default'}>{ROLE_TO_CN[`${role}`]}</Tag>
             <div>{moment(createTime).startOf('hour').fromNow()}</div>
             </>
         }
     },{
-        title: '我方数据',
+        title: '我方',
         dataIndex: 'myself',
         key: 'myself',
         width:400,
         render:(text:string,row:RowProps)=>{
             const { myself } = row;
-           return<>22</>
+            if(!myself)
+                return<>暂无内容</>
+            else {
+                const { data_resource_type,table_data_resource_info,total_data_count,updated_time } = myself||{};
+                const add_method = lodash.get(table_data_resource_info,'add_method')
+                return <>
+                    <div>数据类型/数据量：{dataResourceTypeMap.get(data_resource_type)}/{total_data_count}</div>
+                    <div>数据来源/更新时间：{AddMethodMap.get(add_method)}/{moment(updated_time).startOf('hour').fromNow()}</div>
+                </>
+            }
         }
     },{
         title: '协作方',
@@ -87,7 +110,7 @@ const Index =()=>{
         key: 'provider',
         width:400,
         render:(text:string,row:RowProps)=>{
-            return <>22</>
+            return <>暂无内容</>
         }
     },{
         title: '状态',
@@ -95,19 +118,21 @@ const Index =()=>{
         key: 'status',
         width:80,
         render:(text:string)=>{
-            return <Tag color="success">{text}</Tag>
+            return <Tag >{JobStatus.get(text)}</Tag>
         }
     }]
 
     const actionClickHandle = (key:string, record:RowProps, index:number)=>{
         if (key === 'detail') {
-            history.push('/task/detail');
+            console.log("record",record);
+            const {id} = record
+            history.push(`/job/detail/${id}`);
         }
     }
 
     const renderBtn = ()=>{
         return <Button type="primary" onClick={()=>{
-            history.push('/task')
+            history.push('/job/create')
         }}>发起任务</Button>
     }
 
@@ -126,10 +151,10 @@ const Index =()=>{
                 dataSource={jobListData.dataSource}
                 columns={columns}
                 pagination={{
-                page_size:jobListData.page_size,
-                current:jobListData.page_index,
-                showSizeChanger: false,
-                size: 'small',
+                    page_size:jobListData.page_size,
+                    current:jobListData.page_index,
+                    showSizeChanger: false,
+                    size: 'small',
                 }}
                 >
                 <TmTable.Table

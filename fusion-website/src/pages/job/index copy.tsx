@@ -24,9 +24,9 @@ interface taskFormRefInterface {
   submitFormData: () => Promise<any>
 }
 
-const Task = () => {
+const Job = () => {
 
-  const {taskFormData} = useModel('task.useTaskForm')
+  const {taskFormData} = useModel('job.useTaskForm')
 
   const promoterTitle = <strong>发起方</strong>;
   const cardStyles = {
@@ -66,7 +66,7 @@ const Task = () => {
     setState((g) => {
       g.providers[index].isReady = true;
     });
-    history.push('/task/detail');
+    history.push('/job/detail');
   }
 
   const switchProvider = () => {
@@ -156,4 +156,4 @@ const Task = () => {
   );
 };
 
-export default Task;
+export default Job;

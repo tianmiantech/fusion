@@ -33,7 +33,6 @@ interface FileChunkUploadInterface {
 const Index= forwardRef((props:FileChunkUploadInterface,ref) => {
 
   const {uploadFinishCallBack,onChange,value={},disabled} = props;
-  console.log("FileChunkUploadInterface",disabled);
   
   const uploader = useRef<UploaderInterfaceRef>(null);
   const [uploadData,setUploadData] = useImmer({

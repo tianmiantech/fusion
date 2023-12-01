@@ -24,9 +24,9 @@ interface JobFormRefInterface {
   submitFormData: () => Promise<any>
 }
 
-const Task = () => {
+const Job = () => {
 
-  const {jobFormData} = useModel('task.useJobForm')
+  const {jobFormData} = useModel('job.useJobForm')
 
   const promoterTitle = <strong>发起方</strong>;
   const cardStyles = {
@@ -71,4 +71,4 @@ const Task = () => {
   );
 };
 
-export default Task;
+export default Job;

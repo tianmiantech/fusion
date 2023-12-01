@@ -34,7 +34,7 @@ export interface CreateJobRequestInterface {
         bloom_filter_resource_input?:{
             bloom_filter_id:string
         },
-        table_data_resource_input?:{
+        table_data_resource_info?:{
             add_method:'HttpUpload'|'LocalFile'|'Database',
             sql?:string,
             data_source_file?:string,
@@ -87,4 +87,12 @@ export const sendJobToProvider = (parmas:SendTaskToProviderRequestInterface) => 
 export const getMemberList = (name?:string)=>{
     return request.get('/member/list',{name})
 }
+
+/**
+ * 获取任务详情
+ */
+export const getJobDetail = (id:string)=>{
+    return request.get('/job/detail',{id})
+}
+
 

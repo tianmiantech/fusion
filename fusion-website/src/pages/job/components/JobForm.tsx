@@ -25,7 +25,7 @@ interface UploadFinishCallBackInterface {
 
 const JobForm = forwardRef((props, ref) => {
 
-  const {runCreateJob,createJobloading,jobFormData} = useModel('task.useJobForm')
+  const {runCreateJob,createJobloading,jobFormData} = useModel('job.useJobForm')
 
 
   const [formRef] = Form.useForm();
@@ -46,24 +46,26 @@ const JobForm = forwardRef((props, ref) => {
     })
   }
 
+  useEffect(()=>{
+    console.log('jobFormData.initialValues',jobFormData.initialValues);
+    formRef.setFieldsValue({...jobFormData.initialValues})
+  },[jobFormData.initialValues])
+
+
   
 
   const submitFormData = async () => {
-    const {data_resource_type,dataSetAddMethod,hash_config,remark,table_data_resource_input} = await formRef.validateFields();
+    const {data_resource_type,dataSetAddMethod,hash_config,remark,table_data_resource_info} = await formRef.validateFields();
     const requestParams = {
       remark,
       data_resource:{
         data_resource_type,
-        table_data_resource_input,
-        hash_config:{
-          list:hash_config
-        }
+        table_data_resource_info,
+        hash_config
       }
     }
     runCreateJob(requestParams)
   }
-
-
 
   useImperativeHandle(ref, () => {
     return {
@@ -78,7 +80,7 @@ const JobForm = forwardRef((props, ref) => {
           <Col lg={{span: 16}} md={{span: 24}}>
             <Form
               form={formRef}
-              initialValues={{data_resource_type:'TableDataSource',dataSetAddMethod:'file'}}
+              initialValues={{data_resource_type:'TableDataSource',dataSetAddMethod:'HttpUpload'}}
               layout="vertical"
               disabled={jobFormData.job_id?true:false}
             >
@@ -115,9 +117,9 @@ const JobForm = forwardRef((props, ref) => {
               <Form.Item >
                 <Form.Item  noStyle shouldUpdate={(prev, cur) => prev.dataSetAddMethod !== cur.dataSetAddMethod }>
                   {({ getFieldValue }) => 
-                    getFieldValue('dataSetAddMethod') === 'file' ?
+                    getFieldValue('dataSetAddMethod') === 'HttpUpload' ?
                     <>
-                      <Form.Item name={'table_data_resource_input'}>
+                      <Form.Item name={'table_data_resource_info'}>
                         <FileChunkUpload uploadFinishCallBack={uploadFinishCallBack}/>
                       </Form.Item>
                     </> :
