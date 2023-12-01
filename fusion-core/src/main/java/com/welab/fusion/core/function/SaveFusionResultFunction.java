@@ -15,6 +15,7 @@
  */
 package com.welab.fusion.core.function;
 
+import com.welab.fusion.core.Job.FusionJobRole;
 import com.welab.fusion.core.Job.FusionResult;
 
 /**
@@ -23,5 +24,5 @@ import com.welab.fusion.core.Job.FusionResult;
  */
 @FunctionalInterface
 public interface SaveFusionResultFunction {
-    void save(String jobId, FusionResult result);
+    void save(String jobId, FusionJobRole myRole, FusionResult result);
 }

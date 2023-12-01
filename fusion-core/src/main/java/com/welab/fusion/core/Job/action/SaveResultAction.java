@@ -22,15 +22,15 @@ import com.welab.fusion.core.Job.JobPhase;
  * @author zane.luo
  * @date 2023/11/13
  */
-public class DownloadResultAction extends AbstractJobPhaseAction {
-    public DownloadResultAction(FusionJob job) {
+public class SaveResultAction extends AbstractJobPhaseAction {
+    public SaveResultAction(FusionJob job) {
         super(job);
     }
 
     @Override
     protected void doAction() throws Exception {
         // 储存结果
-        job.getJobFunctions().saveFusionResultFunction.save(job.getJobId(), job.getJobResult());
+        job.getJobFunctions().saveFusionResultFunction.save(job.getJobId(),job.getMyJobRole(), job.getJobResult());
     }
 
     @Override

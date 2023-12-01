@@ -15,6 +15,7 @@
  */
 package com.welab.fusion.service.job_function;
 
+import com.welab.fusion.core.Job.FusionJobRole;
 import com.welab.fusion.core.Job.FusionResult;
 
 /**
@@ -23,7 +24,33 @@ import com.welab.fusion.core.Job.FusionResult;
  */
 public class SaveFusionResultFunction implements com.welab.fusion.core.function.SaveFusionResultFunction {
     @Override
-    public void save(String jobId, FusionResult result) {
+    public void save(String jobId, FusionJobRole myRole, FusionResult result) {
+        switch (myRole) {
+            case psi_bool_filter_provider:
+                saveFusionResult(jobId, result);
+                break;
+            case table_data_resource_provider:
+                FusionResult fusionResult = downloadFusionResult(jobId);
+                saveFusionResult(jobId,fusionResult);
+                break;
+            default:
+                return;
+        }
+    }
+
+    /**
+     *
+     * @param jobId
+     * @return
+     */
+    private FusionResult downloadFusionResult(String jobId) {
+        return null;
+    }
+
+    /**
+     * 保存融合结果
+     */
+    private void saveFusionResult(String jobId, FusionResult result) {
 
     }
 }

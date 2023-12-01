@@ -111,4 +111,10 @@ public class FileSystem {
         }
 
     }
+
+    public static class FusionResult {
+        public static File getFile(String jobId) {
+            return getBaseDir(UseType.FusionResult).resolve(jobId + ".csv").toFile();
+        }
+    }
 }

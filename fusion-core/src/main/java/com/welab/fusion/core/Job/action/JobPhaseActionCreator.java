@@ -33,7 +33,7 @@ public class JobPhaseActionCreator {
         map.put(JobPhase.CreatePsiBloomFilter, CreatePsiBloomFilterAction.class);
         map.put(JobPhase.DownloadPsiBloomFilter, DownloadPsiBloomFilterAction.class);
         map.put(JobPhase.Intersection, IntersectionAction.class);
-        map.put(JobPhase.SaveResult, DownloadResultAction.class);
+        map.put(JobPhase.SaveResult, SaveResultAction.class);
 
     }
 

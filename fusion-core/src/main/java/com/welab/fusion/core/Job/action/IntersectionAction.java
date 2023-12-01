@@ -20,6 +20,7 @@ import com.welab.fusion.core.Job.FusionJob;
 import com.welab.fusion.core.Job.FusionJobRole;
 import com.welab.fusion.core.Job.FusionResult;
 import com.welab.fusion.core.Job.JobPhase;
+import com.welab.fusion.core.io.FileSystem;
 import com.welab.fusion.core.psi.PsiRecord;
 import com.welab.fusion.core.psi.PsiUtils;
 import com.welab.wefe.common.BatchConsumer;
@@ -57,7 +58,7 @@ public class IntersectionAction extends AbstractJobPhaseAction {
         FusionResult result = job.getJobResult();
         LongAdder progress = new LongAdder();
         LongAdder fruitCount = new LongAdder();
-        File resultFile = new File("");
+        File resultFile = FileSystem.FusionResult.getFile(job.getJobId());
 
         // 批处理
         BatchConsumer<PsiRecord> consumer = new BatchConsumer<>(batchSize, 5_000, records -> {
@@ -68,7 +69,6 @@ public class IntersectionAction extends AbstractJobPhaseAction {
                         job.getPartner().memberId,
                         records.stream().map(x -> x.encodedKey).collect(Collectors.toList())
                 );
-
 
                 // 碰撞，并获取交集。
                 List<PsiRecord> fruit = PsiUtils.match(
