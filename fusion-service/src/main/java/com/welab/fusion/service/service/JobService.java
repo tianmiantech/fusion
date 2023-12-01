@@ -121,7 +121,14 @@ public class JobService extends AbstractService {
         if (input.fromMyselfFrontEnd()) {
             job.setRemark(input.remark);
         }
-        saveJobMember(job, input);
+
+        if (input.fromOtherFusionNode()) {
+            saveJobMember(JobMemberRole.provider, input);
+        }
+        if (input.fromMyselfFrontEnd()) {
+            saveJobMember(JobMemberRole.promoter, input);
+        }
+
 
         FusionNodeInfo target = memberService
                 .findById(job.getPartnerMemberId())
