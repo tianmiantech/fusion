@@ -275,22 +275,22 @@ public abstract class AbstractApi<In extends AbstractApiInput, Out> {
         return result;
     }
 
-    public Class<?> getInputClass() {
-        return getInputClass(getClass());
+    public Class<In> getInputClass() {
+        return getInputClass((Class<? extends AbstractApi<In, Out>>) this.getClass());
     }
 
     /**
      * Gets the input parameter type of the current API
      */
-    private Class<?> getInputClass(Class<? extends AbstractApi> apiClass) {
+    private Class<In> getInputClass(Class<? extends AbstractApi<In, Out>> apiClass) {
         while (!(apiClass.getGenericSuperclass() instanceof ParameterizedType)) {
-            apiClass = (Class<? extends AbstractApi>) apiClass.getSuperclass();
+            apiClass = (Class<? extends AbstractApi<In, Out>>) apiClass.getSuperclass();
         }
 
         Type[] types = ((ParameterizedType) apiClass.getGenericSuperclass()).getActualTypeArguments();
         if (types.length > 0) {
             try {
-                Class<?> type = (Class<?>) types[0];
+                Class<In> type = (Class<In>) types[0];
                 if (AbstractApiInput.class.isAssignableFrom(type)) {
                     return type;
                 }
@@ -300,18 +300,18 @@ public abstract class AbstractApi<In extends AbstractApiInput, Out> {
             }
         }
 
-        return getInputClass((Class<? extends AbstractApi>) apiClass.getSuperclass());
+        return getInputClass((Class<? extends AbstractApi<In, Out>>) apiClass.getSuperclass());
     }
 
     public Class<?> getOutputClass() {
-        return getOutputClass(getClass());
+        return getOutputClass((Class<? extends AbstractApi<In, Out>>) getClass());
     }
 
-    private Class<?> getOutputClass(Class<? extends AbstractApi> apiClass) {
+    private Class<Out> getOutputClass(Class<? extends AbstractApi<In, Out>> apiClass) {
 
         // 循环，直到找到泛型参数。
         while (!(apiClass.getGenericSuperclass() instanceof ParameterizedType)) {
-            apiClass = (Class<? extends AbstractApi>) apiClass.getSuperclass();
+            apiClass = (Class<? extends AbstractApi<In, Out>>) apiClass.getSuperclass();
         }
 
         // 获取泛型类型列表
@@ -320,26 +320,26 @@ public abstract class AbstractApi<In extends AbstractApiInput, Out> {
         if (tTypes.length == 2) {
             Type tType = tTypes[1];
             return tType instanceof ParameterizedTypeImpl
-                    ? ((ParameterizedTypeImpl) tType).getRawType()
-                    : (Class<?>) tType;
+                    ? (Class<Out>) ((ParameterizedTypeImpl) tType).getRawType()
+                    : (Class<Out>) tType;
         }
 
         // 如果泛型类型只有一个，可能是IN，也可能是OUT，需要判断。
         if (tTypes.length == 1) {
             Type tType = tTypes[0];
-            Class<?> tClass = tType instanceof ParameterizedTypeImpl
-                    ? ((ParameterizedTypeImpl) tType).getRawType()
-                    : (Class<?>) tType;
+            Class<Out> tClass = tType instanceof ParameterizedTypeImpl
+                    ? (Class<Out>) ((ParameterizedTypeImpl) tType).getRawType()
+                    : (Class<Out>) tType;
 
             // 如果是 IN，递归继续寻找。
             if (AbstractApiInput.class.isAssignableFrom(tClass)) {
-                apiClass = (Class<? extends AbstractApi>) apiClass.getSuperclass();
+                apiClass = (Class<? extends AbstractApi<In, Out>>) apiClass.getSuperclass();
                 return getOutputClass(apiClass);
             } else {
                 return tClass;
             }
         }
 
-        return null;
+        throw new RuntimeException("意料之外的泛型数量");
     }
 }
