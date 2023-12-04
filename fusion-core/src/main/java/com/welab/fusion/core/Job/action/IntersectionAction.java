@@ -20,6 +20,7 @@ import com.welab.fusion.core.Job.FusionJob;
 import com.welab.fusion.core.Job.FusionJobRole;
 import com.welab.fusion.core.Job.FusionResult;
 import com.welab.fusion.core.Job.JobPhase;
+import com.welab.fusion.core.hash.HashConfig;
 import com.welab.fusion.core.io.FileSystem;
 import com.welab.fusion.core.psi.PsiRecord;
 import com.welab.fusion.core.psi.PsiUtils;
@@ -27,6 +28,9 @@ import com.welab.wefe.common.BatchConsumer;
 
 import java.io.File;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.concurrent.atomic.LongAdder;
 import java.util.stream.Collectors;
@@ -60,6 +64,16 @@ public class IntersectionAction extends AbstractJobPhaseAction {
         LongAdder fruitCount = new LongAdder();
         File resultFile = FileSystem.FusionResult.getFile(job.getJobId());
 
+        HashConfig hashConfig = job.getMyself().dataResourceInfo.hashConfig;
+
+
+        Files.write(
+                resultFile.toPath(),
+                hashConfig.getIdHeadersForCsv().getBytes(StandardCharsets.UTF_8),
+                StandardOpenOption.CREATE
+        );
+
+
         // 批处理
         BatchConsumer<PsiRecord> consumer = new BatchConsumer<>(batchSize, 5_000, records -> {
             try {
@@ -76,6 +90,18 @@ public class IntersectionAction extends AbstractJobPhaseAction {
                         records,
                         encryptedList,
                         publicModulus
+                );
+
+                List<String> lines = fruit.stream()
+                        .map(x -> hashConfig.getIdValuesForCsv(x.row))
+                        .collect(Collectors.toList());
+
+                // 向 resultFile 中写入交集数据
+                Files.write(
+                        resultFile.toPath(),
+                        lines,
+                        StandardCharsets.UTF_8,
+                        StandardOpenOption.APPEND
                 );
 
                 // 更新进度

@@ -28,5 +28,5 @@ import java.util.function.Consumer;
  */
 @FunctionalInterface
 public interface SaveFusionResultFunction {
-    void save(String jobId, FusionJobRole myRole, FusionResult result, Consumer<Long> totalSizeConsumer, Consumer<Long> downloadSizeConsumer) throws IOException, StatusCodeWithException;
+    void save(String jobId, FusionJobRole myRole, FusionResult result, Consumer<Long> totalSizeConsumer, Consumer<Long> downloadSizeConsumer) throws Exception;
 }

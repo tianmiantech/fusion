@@ -17,18 +17,20 @@ package com.welab.fusion.service.job_function;
 
 import com.welab.fusion.core.Job.FusionJobRole;
 import com.welab.fusion.core.Job.FusionResult;
+import com.welab.fusion.core.Job.JobStatus;
+import com.welab.fusion.core.data_source.CsvTableDataSourceReader;
 import com.welab.fusion.core.io.FileSystem;
 import com.welab.fusion.service.api.download.Downloader;
 import com.welab.fusion.service.api.download.base.FileType;
 import com.welab.fusion.service.database.entity.JobDbModel;
 import com.welab.fusion.service.service.JobService;
-import com.welab.wefe.common.exception.StatusCodeWithException;
 import com.welab.wefe.common.util.JObject;
 import com.welab.wefe.common.web.Launcher;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.function.Consumer;
+
+import static com.welab.fusion.core.Job.FusionJobRole.psi_bool_filter_provider;
 
 /**
  * @author zane.luo
@@ -38,29 +40,21 @@ public class SaveFusionResultFunction implements com.welab.fusion.core.function.
     private static final JobService jobService = Launcher.getBean(JobService.class);
 
     @Override
-    public void save(String jobId, FusionJobRole myRole, FusionResult result, Consumer<Long> totalSizeConsumer, Consumer<Long> downloadSizeConsumer) throws IOException, StatusCodeWithException {
+    public void save(String jobId, FusionJobRole myRole, FusionResult result, Consumer<Long> totalSizeConsumer, Consumer<Long> downloadSizeConsumer) throws Exception {
         JobDbModel job = jobService.findById(jobId);
 
-        switch (myRole) {
-            // 如果我是过滤器提供方，则需要从协作方下载求交结果。
-            case psi_bool_filter_provider:
-                FusionResult fusionResult = downloadFusionResult(job, totalSizeConsumer, downloadSizeConsumer);
-                saveFusionResult(job, fusionResult);
-                break;
-
-            // 如果我是数据提供方，则我已经有了求交结果，直接保存即可。
-            case table_data_resource_provider:
-                saveFusionResult(job, result);
-                break;
-            default:
-                return;
+        // 如果我是过滤器提供方，则需要从协作方下载求交结果。
+        if (myRole == psi_bool_filter_provider) {
+            downloadFusionResult(job, result, totalSizeConsumer, downloadSizeConsumer);
         }
+
+        saveFusionResult(job, result);
     }
 
     /**
      * 从协作方下载融合结果
      */
-    private FusionResult downloadFusionResult(JobDbModel job, Consumer<Long> totalSizeConsumer, Consumer<Long> downloadSizeConsumer) throws IOException, StatusCodeWithException {
+    private FusionResult downloadFusionResult(JobDbModel job, FusionResult result, Consumer<Long> totalSizeConsumer, Consumer<Long> downloadSizeConsumer) throws Exception {
         Downloader downloader = new Downloader(
                 job.getId(),
                 job.getPartnerMemberId(),
@@ -75,13 +69,28 @@ public class SaveFusionResultFunction implements com.welab.fusion.core.function.
         downloader.setCompletedSizeConsumer(downloadSizeConsumer);
 
         File file = downloader.download();
-        return null;
+
+        result.resultFile = file;
+        try (CsvTableDataSourceReader reader = new CsvTableDataSourceReader(file)) {
+            result.fusionCount = reader.getTotalDataRowCount();
+        }
+
+        return result;
     }
 
     /**
      * 保存融合结果到本地
      */
     private void saveFusionResult(JobDbModel job, FusionResult result) {
+        job.setStartTime(result.startTime);
+        job.setEndTime(result.endTime);
+        job.setCostTime(result.costTime);
+        job.setFusionCount(result.fusionCount);
+        job.setStatus(JobStatus.success);
+        job.setMessage("success");
+        job.setUpdatedTimeNow();
+        job.setResultFilePath(result.resultFile.getAbsolutePath());
 
+        job.save();
     }
 }

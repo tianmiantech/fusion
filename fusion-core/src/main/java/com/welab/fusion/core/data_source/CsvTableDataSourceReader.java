@@ -18,9 +18,11 @@ package com.welab.fusion.core.data_source;
 
 import com.welab.wefe.common.StatusCode;
 import com.welab.wefe.common.exception.StatusCodeWithException;
+import com.welab.wefe.common.util.StringUtil;
 import de.siegmar.fastcsv.reader.CsvParser;
 import de.siegmar.fastcsv.reader.CsvReader;
 import de.siegmar.fastcsv.reader.CsvRow;
+import org.apache.commons.io.input.ReversedLinesFileReader;
 
 import java.io.File;
 import java.io.FileReader;
@@ -75,15 +77,25 @@ public class CsvTableDataSourceReader extends AbstractTableDataSourceReader {
     public long doGetTotalDataRowCount() {
 
         // Get the number of file lines
-        try {
-            FileReader fr = new FileReader(file);
-            LineNumberReader lnr = new LineNumberReader(fr);
-            lnr.skip(Long.MAX_VALUE);
-            totalRowCount = lnr.getLineNumber() - 1L;
-            lnr.close();
-            fr.close();
+        try (LineNumberReader lineNumberReader = new LineNumberReader(new FileReader(file))) {
+            lineNumberReader.skip(Long.MAX_VALUE);
+            // 计算行数时，不包含列头。
+            totalRowCount = lineNumberReader.getLineNumber() - 1L;
         } catch (IOException e) {
+            LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);
             return 0;
+        }
+
+        // 如果最后一行是空行，行数减一。
+        if (totalRowCount > 0) {
+            try (ReversedLinesFileReader reversedLinesReader = new ReversedLinesFileReader(file, StandardCharsets.UTF_8)) {
+                String lastLine = reversedLinesReader.readLine();
+                if (StringUtil.isBlank(lastLine)) {
+                    totalRowCount--;
+                }
+            } catch (Exception e) {
+                LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);
+            }
         }
 
         return totalRowCount;
