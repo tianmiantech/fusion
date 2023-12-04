@@ -21,6 +21,8 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
+ * 任务执行过程中各种动作的抽象声明
+ *
  * @author zane.luo
  * @date 2023/11/13
  */

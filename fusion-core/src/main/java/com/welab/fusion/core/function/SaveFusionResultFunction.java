@@ -17,6 +17,10 @@ package com.welab.fusion.core.function;
 
 import com.welab.fusion.core.Job.FusionJobRole;
 import com.welab.fusion.core.Job.FusionResult;
+import com.welab.wefe.common.exception.StatusCodeWithException;
+
+import java.io.IOException;
+import java.util.function.Consumer;
 
 /**
  * @author zane.luo
@@ -24,5 +28,5 @@ import com.welab.fusion.core.Job.FusionResult;
  */
 @FunctionalInterface
 public interface SaveFusionResultFunction {
-    void save(String jobId, FusionJobRole myRole, FusionResult result);
+    void save(String jobId, FusionJobRole myRole, FusionResult result, Consumer<Long> totalSizeConsumer, Consumer<Long> downloadSizeConsumer) throws IOException, StatusCodeWithException;
 }

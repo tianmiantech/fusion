@@ -15,15 +15,13 @@
  */
 package com.welab.fusion.service.api.download;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.welab.fusion.core.bloom_filter.PsiBloomFilter;
 import com.welab.fusion.core.io.FileSystem;
-import com.welab.fusion.service.api.download.base.DownloadConfig;
+import com.welab.fusion.service.api.download.base.FileInfo;
 import com.welab.fusion.service.api.download.base.FileType;
 import com.welab.fusion.service.service.JobMemberService;
 import com.welab.wefe.common.fieldvalidate.annotation.Check;
-import com.welab.wefe.common.util.JObject;
 import com.welab.wefe.common.web.api.base.AbstractApi;
 import com.welab.wefe.common.web.api.base.Api;
 import com.welab.wefe.common.web.dto.AbstractApiInput;
@@ -39,14 +37,14 @@ import java.nio.file.Path;
  * @date 2023/11/30
  */
 @Api(path = "download/get_file_info", name = "下载文件分片", allowAccessWithSign = true)
-public class GetDownloadFileInfoApi extends AbstractApi<GetDownloadFileInfoApi.Input, GetDownloadFileInfoApi.Output> {
+public class GetDownloadFileInfoApi extends AbstractApi<GetDownloadFileInfoApi.Input, FileInfo> {
     @Autowired
     private JobMemberService jobMemberService;
 
     @Override
-    protected ApiResult<GetDownloadFileInfoApi.Output> handle(GetDownloadFileInfoApi.Input input) throws Exception {
+    protected ApiResult<FileInfo> handle(GetDownloadFileInfoApi.Input input) throws Exception {
         File file = findFile(input);
-        return success(Output.of(file));
+        return success(FileInfo.of(file));
     }
 
     private File findFile(Input input) throws IOException {
@@ -68,7 +66,7 @@ public class GetDownloadFileInfoApi extends AbstractApi<GetDownloadFileInfoApi.I
         @Check(name = "业务数据", require = true, desc = "用于服务端定位被下载的文件，例如job_id、bloom_filter_id")
         public JSONObject bizData;
 
-        public static Input of(FileType fileType, JObject bizData) {
+        public static Input of(FileType fileType, JSONObject bizData) {
             Input input = new Input();
             input.fileType = fileType;
             input.bizData = bizData;
@@ -76,31 +74,5 @@ public class GetDownloadFileInfoApi extends AbstractApi<GetDownloadFileInfoApi.I
         }
     }
 
-    public static class Output {
-        @Check(name = "文件名", require = true)
-        public String filename;
-        @Check(name = "文件路径", require = true)
-        public String filePath;
-        @Check(name = "文件大小（byte）", require = true)
-        public long fileLength;
-        @Check(name = "分片大小", require = true)
-        public long chunkSizeInMb = DownloadConfig.CHUNK_SIZE_IN_MB;
-        @Check(name = "分片数量", require = true)
-        public int chunkCount;
 
-        public static Output of(File file) {
-            Output output = new Output();
-            output.filename = file.getName();
-            output.filePath = FileSystem.getRelativePath(file);
-            output.fileLength = file.length();
-            output.chunkCount = (int) Math.ceil(output.fileLength / (double) (output.chunkSizeInMb * 1024 * 1024));
-            return output;
-        }
-
-        public static void main(String[] args) throws IOException {
-            FileSystem.init("D:\\data\\wefe");
-            File file = new File("D:\\data\\wefe\\ivenn_10w_20210319_vert_promoter.csv");
-            System.out.println(JSON.toJSONString(of(file), true));
-        }
-    }
 }

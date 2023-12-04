@@ -18,6 +18,8 @@ package com.welab.fusion.service.job_function;
 import com.welab.fusion.core.function.JobFunctions;
 
 /**
+ * fusion-service 中的 JobFunctions
+ *
  * @author zane.luo
  * @date 2023/11/29
  */
@@ -27,5 +29,8 @@ public class MyJobFunctions extends JobFunctions {
     private MyJobFunctions() {
         downloadPartnerPsiBloomFilterFunction = new DownloadPartnerPsiBloomFilterFunction();
         encryptPsiRecordsFunction = new EncryptPsiRecordsFunction();
+        getPartnerProgressFunction = new GetPartnerProgressFunction();
+        saveFusionResultFunction = new SaveFusionResultFunction();
+        saveMyPsiBloomFilterFunction = new SaveMyPsiBloomFilterFunction();
     }
 }
