@@ -127,7 +127,7 @@ public class GatewayService extends AbstractService {
             return null;
         }
 
-        Class<?> resultClass = Launcher.getBean(apiClass).getOutputClass();
+        Class<OUT> resultClass = Launcher.getBean(apiClass).getOutputClass();
         if(resultClass == null){
             return null;
         }

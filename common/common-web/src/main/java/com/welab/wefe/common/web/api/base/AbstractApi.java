@@ -303,7 +303,7 @@ public abstract class AbstractApi<In extends AbstractApiInput, Out> {
         return getInputClass((Class<? extends AbstractApi<In, Out>>) apiClass.getSuperclass());
     }
 
-    public Class<?> getOutputClass() {
+    public Class<Out> getOutputClass() {
         return getOutputClass((Class<? extends AbstractApi<In, Out>>) getClass());
     }
 
