@@ -5,7 +5,7 @@ import { useImmer } from 'use-immer';
 import { history } from '@umijs/max';
 import TaskForm from "./components/JobForm";
 import ProviderForm from "./components/SendJobForm";
-import TaskDetail from "./components/TaskDetail";
+import TaskDetail from "./components/Provider/PrompoterDetail";
 import RefuseModal from "./components/RefuseModal";
 import './index.less';
 import { useModel } from "@umijs/max";

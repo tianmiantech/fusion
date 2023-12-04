@@ -5,7 +5,7 @@ import { useImmer } from 'use-immer';
 import { history } from '@umijs/max';
 import JobForm from "../JobForm";
 import SendJobForm from "../SendJobForm";
-import TaskDetail from "../TaskDetail";
+import TaskDetail from "../Provider/PrompoterDetail";
 import RefuseModal from "../RefuseModal";
 import lodash from 'lodash'
 import JobCard from '../JobCard'
@@ -21,7 +21,7 @@ const Index = forwardRef((props:PromoterPropsInterface,ref) => {
   const { detailData } = useDetail()
 
   const renderCardTitlte = () => {
-    if (detailData.jobId && detailData.jobDetailData.status ==='editing') {
+    if (detailData.jobId && detailData.jobDetailData?.status ==='editing') {
       return <>发起方<span style={{fontSize:12,color:'gray'}}>（已保存，待发起任务,发起任务后 数据将不可更改）</span></>
     }
     return <>发起方</>

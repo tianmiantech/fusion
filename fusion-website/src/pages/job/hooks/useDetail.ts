@@ -8,7 +8,7 @@ import { useRequest } from "ahooks";
 import { getJobDetail } from "../service";
 
 interface useDetailDataInterface {
-    role:'promoter'|'provider',
+    role:'promoter'|'provider'|'',
     status?:string,// 审核状态
     jobId?:string,
     jobDetailData:any,
@@ -17,7 +17,7 @@ interface useDetailDataInterface {
 const useDetail = ()=>{
     
     const [detailData, setDetailData] = useImmer<useDetailDataInterface>({
-        role:'promoter',
+        role:'',
         jobDetailData:null,
         jobId:''
     });

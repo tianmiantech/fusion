@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef, useMemo } from "react";
-import { Card, Row, Col } from 'antd';
+import { Card, Row, Spin } from 'antd';
 import { useImmer } from 'use-immer';
-import TaskDetail from "./components/TaskDetail";
+import TaskDetail from "./components/Provider/PrompoterDetail";
 import TaskProgress from "./components/TaskProgress";
 
 import { useRequest } from "ahooks";
@@ -18,6 +18,8 @@ const Detail = () => {
   const { id:jobId } = useParams<{id: string}>();
 
   const {detailData,setDetailData} = useDetail();
+
+  const [role,setRole] = useState<string>('');
   
   useEffect(()=>{
     if(jobId){
@@ -27,12 +29,24 @@ const Detail = () => {
     }
   },[jobId])
   
+  useEffect(()=>{
+    if(detailData.role){
+      setRole(detailData.role)
+    }
+  },[role])
 
-  
+const renderDetail = ()=>{
+  if(detailData.role === 'promoter'){
+    return <Promoter />
+  }else if(detailData.role === 'provider'){
+    return <Provider />
+  } else
+  return <Spin></Spin>;
+}
 
   return (
     <>
-     {detailData.role === 'promoter'?<Promoter />:<Provider/>}
+     {renderDetail()}
     </>
   );
 };

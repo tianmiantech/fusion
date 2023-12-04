@@ -73,7 +73,7 @@ const JobForm = forwardRef((props:JobFormPropsInterface, ref) => {
     bloom_filter_id:string,
    */
   useEffect(()=>{
-    if(detailData.jobDetailData){
+    if(detailData.role==='promoter' && detailData.jobDetailData){
       const dataSetAddMethod = lodash.get(detailData,'jobDetailData.myself.table_data_resource_info.add_method');
       formRef.setFieldsValue({
         remark:detailData.jobDetailData.remark,
@@ -84,7 +84,6 @@ const JobForm = forwardRef((props:JobFormPropsInterface, ref) => {
         dataSetAddMethod:dataSetAddMethod
       })
     }
-    console.log("detailData.status!=='editing'",detailData);
   },[detailData.jobDetailData])
 
 
