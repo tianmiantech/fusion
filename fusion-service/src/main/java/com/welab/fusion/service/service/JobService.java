@@ -195,10 +195,13 @@ public class JobService extends AbstractService {
         if (provider != null) {
             job.setPartnerMemberName(provider.getName());
         }
+        job.setStatus(JobStatus.auditing);
+        job.save();
 
         // 保存合作方信息
         jobMemberService.addProvider(input);
 
+        // 发送任务到协作方
         JobMemberDbModel promoter = jobMemberService.findMyself(job.getId());
 
         JobMemberDataResourceInput dataResource = new JobMemberDataResourceInput();

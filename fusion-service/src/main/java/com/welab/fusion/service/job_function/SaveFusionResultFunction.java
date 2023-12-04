@@ -82,14 +82,9 @@ public class SaveFusionResultFunction implements com.welab.fusion.core.function.
      * 保存求交结果到本地
      */
     private void saveFusionResult(JobDbModel job, FusionResult result) {
-        job.setStartTime(result.startTime);
-        job.setEndTime(result.endTime);
-        job.setCostTime(result.costTime);
         job.setFusionCount(result.fusionCount);
-        job.setStatus(JobStatus.success);
-        job.setMessage("success");
-        job.setUpdatedTimeNow();
         job.setResultFilePath(result.resultFile.getAbsolutePath());
+        job.setUpdatedTimeNow();
 
         job.save();
     }

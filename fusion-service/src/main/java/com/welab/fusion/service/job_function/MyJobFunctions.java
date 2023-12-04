@@ -32,5 +32,6 @@ public class MyJobFunctions extends JobFunctions {
         getPartnerProgressFunction = new GetPartnerProgressFunction();
         saveFusionResultFunction = new SaveFusionResultFunction();
         saveMyPsiBloomFilterFunction = new SaveMyPsiBloomFilterFunction();
+        finishJobFunction = new FinishJobFunction();
     }
 }

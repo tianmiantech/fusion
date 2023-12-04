@@ -95,6 +95,7 @@ public class JobProgress {
      */
     public void finish(JobStatus status, String message) {
         getCurrentPhaseProgress().finish(status, message);
+
     }
 
     /**

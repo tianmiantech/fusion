@@ -27,6 +27,10 @@ public enum JobStatus {
      */
     editing,
     /**
+     * 审核中
+     */
+    auditing,
+    /**
      * 审核不通过
      */
     disagree,

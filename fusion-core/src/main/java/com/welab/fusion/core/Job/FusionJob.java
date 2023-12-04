@@ -219,6 +219,12 @@ public class FusionJob implements Closeable {
     private void finishJob(JobStatus status, String message) {
         LOG.info("任务结束，状态：{}，消息：{}", status, message);
         myProgress.finish(status, message);
+        try {
+            jobFunctions.finishJobFunction.finish(jobId, myProgress);
+            close();
+        } catch (Exception e) {
+            LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);
+        }
     }
 
     /**

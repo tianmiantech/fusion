@@ -32,6 +32,7 @@ public class JobFunctions {
     public DownloadPartnerPsiBloomFilterFunction downloadPartnerPsiBloomFilterFunction;
     public EncryptPsiRecordsFunction encryptPsiRecordsFunction;
     public SaveFusionResultFunction saveFusionResultFunction;
+    public FinishJobFunction finishJobFunction;
 
     public void check() {
         List<Tuple2> list = Arrays.asList(
@@ -39,7 +40,8 @@ public class JobFunctions {
                 Tuple2.of(saveMyPsiBloomFilterFunction, SaveMyPsiBloomFilterFunction.class),
                 Tuple2.of(downloadPartnerPsiBloomFilterFunction, DownloadPartnerPsiBloomFilterFunction.class),
                 Tuple2.of(encryptPsiRecordsFunction, EncryptPsiRecordsFunction.class),
-                Tuple2.of(saveFusionResultFunction, SaveFusionResultFunction.class)
+                Tuple2.of(saveFusionResultFunction, SaveFusionResultFunction.class),
+                Tuple2.of(finishJobFunction, FinishJobFunction.class)
         );
 
         for (Tuple2 tuple2 : list) {
