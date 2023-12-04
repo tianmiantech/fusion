@@ -82,7 +82,7 @@ public class FileSystem {
         Temp,
         PsiBloomFilter,
         /**
-         * 融合结果
+         * 求交结果
          */
         FusionResult
     }

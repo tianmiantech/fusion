@@ -52,7 +52,7 @@ public class SaveFusionResultFunction implements com.welab.fusion.core.function.
     }
 
     /**
-     * 从协作方下载融合结果
+     * 从协作方下载求交结果
      */
     private FusionResult downloadFusionResult(JobDbModel job, FusionResult result, Consumer<Long> totalSizeConsumer, Consumer<Long> downloadSizeConsumer) throws Exception {
         Downloader downloader = new Downloader(
@@ -79,7 +79,7 @@ public class SaveFusionResultFunction implements com.welab.fusion.core.function.
     }
 
     /**
-     * 保存融合结果到本地
+     * 保存求交结果到本地
      */
     private void saveFusionResult(JobDbModel job, FusionResult result) {
         job.setStartTime(result.startTime);

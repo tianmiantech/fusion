@@ -16,6 +16,7 @@
 package com.welab.fusion.core.Job.action;
 
 import com.welab.fusion.core.Job.FusionJob;
+import com.welab.fusion.core.Job.FusionJobRole;
 import com.welab.fusion.core.Job.JobPhase;
 
 /**
@@ -29,8 +30,22 @@ public class SaveResultAction extends AbstractJobPhaseAction {
 
     @Override
     protected void doAction() throws Exception {
+        if (job.getMyJobRole() == FusionJobRole.psi_bool_filter_provider) {
+            phaseProgress.setMessage("正在从合作方下载求交结果...");
+        }else{
+            phaseProgress.setMessage("正在保存求交结果...");
+        }
+
         // 储存结果
-        job.getJobFunctions().saveFusionResultFunction.save(job.getJobId(),job.getMyJobRole(), job.getJobResult());
+        job.getJobFunctions().saveFusionResultFunction.save(
+                job.getJobId(),
+                job.getMyJobRole(),
+                job.getJobResult(),
+                totalSize -> phaseProgress.updateTotalWorkload(totalSize),
+                downloadSize -> phaseProgress.updateCompletedWorkload(downloadSize)
+        );
+
+        phaseProgress.setMessage("保存完毕");
     }
 
     @Override

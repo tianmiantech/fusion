@@ -37,7 +37,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Api(
         path = "job/encrypt_psi_records",
-        name = "使用过滤器配套的秘钥加密融合数据",
+        name = "使用过滤器配套的秘钥加密求交数据",
         desc = "在算法执行过程中，使用数据集的一方会把 Id 加密后发送给过滤器方进行加密。",
         allowAccessWithSign = true)
 public class EncryptPsiRecordsApi extends AbstractApi<EncryptPsiRecordsApi.Input, EncryptPsiRecordsApi.Output> {
