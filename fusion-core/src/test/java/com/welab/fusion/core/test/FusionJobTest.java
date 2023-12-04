@@ -17,6 +17,8 @@ package com.welab.fusion.core.test;
 
 import com.alibaba.fastjson.JSON;
 import com.welab.fusion.core.Job.FusionJob;
+import com.welab.fusion.core.Job.FusionJobRole;
+import com.welab.fusion.core.Job.FusionResult;
 import com.welab.fusion.core.Job.JobMember;
 import com.welab.fusion.core.bloom_filter.PsiBloomFilter;
 import com.welab.fusion.core.bloom_filter.PsiBloomFilterCreator;
@@ -36,6 +38,7 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 /**
  * @author zane.luo
@@ -117,7 +120,7 @@ public class FusionJobTest {
             return PsiUtils.encryptPsiRecords(psiBloomFilter, bucket);
         };
 
-        jobFunctions.saveFusionResultFunction = (result) -> {
+        jobFunctions.saveFusionResultFunction = (jobId, myRole, result, totalSizeConsumer, downloadSizeConsumer) -> {
             System.out.println(JSON.toJSONString(result, true));
         };
         return jobFunctions;

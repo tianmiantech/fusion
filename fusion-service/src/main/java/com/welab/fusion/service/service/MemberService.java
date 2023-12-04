@@ -51,8 +51,6 @@ public class MemberService extends AbstractService {
     private MemberRepository memberRepository;
     @Autowired
     private GatewayService gatewayService;
-    @Autowired
-    private JobService jobService;
 
     public MemberDbModel getMyself() throws Exception {
         MemberDbModel myself = memberRepository.findByName(MYSELF_NAME);
@@ -207,14 +205,6 @@ public class MemberService extends AbstractService {
             LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);
             // ignore
         }
-    }
-
-    /**
-     * 不论己方为何角色，返回合作方信息。
-     */
-    public MemberDbModel findPartner(String jobId) {
-        JobDbModel job = jobService.findById(jobId);
-        return findById(job.getPartnerMemberId());
     }
 
     public FusionNodeInfo getPartnerFusionNodeInfo(String memberId) {

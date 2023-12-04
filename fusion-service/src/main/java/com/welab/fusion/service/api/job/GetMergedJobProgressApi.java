@@ -38,15 +38,13 @@ public class GetMergedJobProgressApi extends AbstractApi<GetMergedJobProgressApi
     @Autowired
     private JobService jobService;
     @Autowired
-    private MemberService memberService;
-    @Autowired
     private GatewayService gatewayService;
     @Override
     protected ApiResult<Output> handle(GetMergedJobProgressApi.Input input) throws Exception {
 
         JobProgress myselfProgress = jobService.getMyJobProgress(input.jobId);
 
-        FusionNodeInfo partner = memberService.findPartner(input.jobId).toFusionNodeInfo();
+        FusionNodeInfo partner = jobService.findPartner(input.jobId).toFusionNodeInfo();
         JobProgress partnerProgress = gatewayService.callOtherFusionNode(
                 partner,
                 GetMyJobProgressApi.class,

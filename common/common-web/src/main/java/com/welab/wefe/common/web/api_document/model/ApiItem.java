@@ -16,15 +16,9 @@
 package com.welab.wefe.common.web.api_document.model;
 
 import com.welab.wefe.common.util.StringUtil;
+import com.welab.wefe.common.web.Launcher;
+import com.welab.wefe.common.web.api.base.AbstractApi;
 import com.welab.wefe.common.web.api.base.Api;
-import com.welab.wefe.common.web.dto.AbstractApiInput;
-import com.welab.wefe.common.web.dto.NoneApiInput;
-import com.welab.wefe.common.web.dto.NoneApiOutput;
-import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
-import sun.reflect.generics.reflectiveObjects.TypeVariableImpl;
-
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 
 /**
  * @author zane
@@ -32,7 +26,7 @@ import java.lang.reflect.Type;
  */
 public class ApiItem {
     public Api annotation;
-    public Class<?> apiClass;
+    public Class<? extends AbstractApi> apiClass;
     public String path;
     public String id;
     public String name;
@@ -41,7 +35,7 @@ public class ApiItem {
     public ApiParam input;
     public ApiParam output;
 
-    public ApiItem(Class<?> apiClass) {
+    public ApiItem(Class<? extends AbstractApi> apiClass) {
         this.apiClass = apiClass;
         this.annotation = apiClass.getAnnotation(Api.class);
         this.path = StringUtil
@@ -54,43 +48,50 @@ public class ApiItem {
         this.group = path.contains("/")
                 ? StringUtil.substringBefore(path, "/")
                 : "system";
+        AbstractApi bean = Launcher.getBean(apiClass);
 
-        // Gets a list of generic types for the API
-        while (!(apiClass.getGenericSuperclass() instanceof ParameterizedType)) {
-            apiClass = apiClass.getSuperclass();
+        this.input = new ApiParam(bean.getInputClass());
+        if(bean.getOutputClass()==null){
+            System.out.println();
         }
-
-        Type[] types = ((ParameterizedType) apiClass.getGenericSuperclass()).getActualTypeArguments();
-
-        // Gets the input and output types
-        for (Type type : types) {
-            Class<?> tClazz;
-            if (type instanceof ParameterizedTypeImpl) {
-                tClazz = ((ParameterizedTypeImpl) type).getRawType();
-            } else if (type instanceof TypeVariableImpl) {
-                tClazz = null;
-            } else {
-                tClazz = (Class<?>) type;
-            }
-
-            if (tClazz == null) {
-                continue;
-            }
-
-            if (AbstractApiInput.class.isAssignableFrom(tClazz)) {
-                if (tClazz == NoneApiInput.class) {
-                    this.input = null;
-                } else {
-                    this.input = new ApiParam(tClazz);
-                }
-            } else {
-                if (tClazz == NoneApiOutput.class) {
-                    this.output = null;
-                } else {
-                    this.output = new ApiParam(tClazz);
-                }
-            }
-        }
+        this.output = new ApiParam(bean.getOutputClass());
+        //
+        // // Gets a list of generic types for the API
+        // while (!(apiClass.getGenericSuperclass() instanceof ParameterizedType)) {
+        //     apiClass = apiClass.getSuperclass();
+        // }
+        //
+        // Type[] types = ((ParameterizedType) apiClass.getGenericSuperclass()).getActualTypeArguments();
+        //
+        // // Gets the input and output types
+        // for (Type type : types) {
+        //     Class<?> tClazz;
+        //     if (type instanceof ParameterizedTypeImpl) {
+        //         tClazz = ((ParameterizedTypeImpl) type).getRawType();
+        //     } else if (type instanceof TypeVariableImpl) {
+        //         tClazz = null;
+        //     } else {
+        //         tClazz = (Class<?>) type;
+        //     }
+        //
+        //     if (tClazz == null) {
+        //         continue;
+        //     }
+        //
+        //     if (AbstractApiInput.class.isAssignableFrom(tClazz)) {
+        //         if (tClazz == NoneApiInput.class) {
+        //             this.input = null;
+        //         } else {
+        //             this.input = new ApiParam(tClazz);
+        //         }
+        //     } else {
+        //         if (tClazz == NoneApiOutput.class) {
+        //             this.output = null;
+        //         } else {
+        //             this.output = new ApiParam(tClazz);
+        //         }
+        //     }
+        // }
     }
 
     public String group() {

@@ -175,8 +175,7 @@ public class Downloader {
         FileInfo fileInfo = gatewayService.callOtherFusionNode(
                 partner,
                 GetDownloadFileInfoApi.class,
-                GetDownloadFileInfoApi.Input.of(fileType, bizData),
-                FileInfo.class
+                GetDownloadFileInfoApi.Input.of(fileType, bizData)
         );
         return fileInfo;
     }

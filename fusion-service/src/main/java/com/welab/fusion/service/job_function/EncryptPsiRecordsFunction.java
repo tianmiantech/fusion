@@ -38,8 +38,7 @@ public class EncryptPsiRecordsFunction implements com.welab.fusion.core.function
         EncryptPsiRecordsApi.Output output = gatewayService.callOtherFusionNode(
                 partner,
                 EncryptPsiRecordsApi.class,
-                EncryptPsiRecordsApi.Input.of(jobId, bucket),
-                EncryptPsiRecordsApi.Output.class
+                EncryptPsiRecordsApi.Input.of(jobId, bucket)
         );
 
         return output.bucket;

@@ -346,4 +346,12 @@ public class JobService extends AbstractService {
 
         return findById(jobId).getProgressModel();
     }
+
+    /**
+     * 不论己方为何角色，返回合作方信息。
+     */
+    public MemberDbModel findPartner(String jobId) {
+        JobDbModel job = findById(jobId);
+        return memberService.findById(job.getPartnerMemberId());
+    }
 }

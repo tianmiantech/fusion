@@ -17,6 +17,7 @@ package com.welab.wefe.common.web.api_document;
 
 import com.welab.wefe.common.util.ReflectionsUtil;
 import com.welab.wefe.common.web.Launcher;
+import com.welab.wefe.common.web.api.base.AbstractApi;
 import com.welab.wefe.common.web.api.base.Api;
 import com.welab.wefe.common.web.api_document.model.ApiItem;
 import org.slf4j.Logger;
@@ -41,7 +42,7 @@ public abstract class AbstractApiDocumentFormatter {
                 .getClassesWithAnnotation(Launcher.API_PACKAGE_PATH, Api.class)
                 .stream()
                 .filter(x -> !Modifier.isAbstract(x.getModifiers()))
-                .map(ApiItem::new)
+                .map(x -> new ApiItem((Class<? extends AbstractApi>) x))
                 .sorted(Comparator.comparing(x -> x.path))
                 .forEach(API_LIST::add);
     }

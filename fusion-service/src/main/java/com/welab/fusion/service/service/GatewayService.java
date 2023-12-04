@@ -27,6 +27,7 @@ import com.welab.wefe.common.http.HttpResponse;
 import com.welab.wefe.common.util.ClassUtils;
 import com.welab.wefe.common.util.JObject;
 import com.welab.wefe.common.util.StringUtil;
+import com.welab.wefe.common.web.Launcher;
 import com.welab.wefe.common.web.api.base.AbstractApi;
 import com.welab.wefe.common.web.api.base.Api;
 import com.welab.wefe.common.web.dto.*;
@@ -126,7 +127,10 @@ public class GatewayService extends AbstractService {
             return null;
         }
 
-        Class<?> resultClass = AbstractApi.getOutputClass(apiClass);
+        Class<?> resultClass = Launcher.getBean(apiClass).getOutputClass();
+        if(resultClass == null){
+            return null;
+        }
 
         if (resultClass == JSONObject.class) {
             return (OUT) data;

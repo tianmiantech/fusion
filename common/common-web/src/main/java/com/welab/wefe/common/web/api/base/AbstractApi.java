@@ -25,7 +25,6 @@ import com.welab.wefe.common.web.TempSm2Cache;
 import com.welab.wefe.common.web.dto.AbstractApiInput;
 import com.welab.wefe.common.web.dto.AbstractWithFilesApiInput;
 import com.welab.wefe.common.web.dto.ApiResult;
-import com.welab.wefe.common.web.dto.NoneApiOutput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
@@ -35,7 +34,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.multipart.MultipartFile;
 import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
-import sun.reflect.generics.reflectiveObjects.TypeVariableImpl;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
@@ -146,7 +144,7 @@ public abstract class AbstractApi<In extends AbstractApiInput, Out> {
      * 将入参由 JSON 转换为实体
      */
     private In getInput(String method, JSONObject requestParams, HttpServletRequest request) throws Exception {
-        Class<In> apiInputClass = (Class<In>) getInputClass(this.getClass());
+        Class<In> apiInputClass = (Class<In>) getInputClass();
 
         In apiInput = TempSm2Cache.decrypt(requestParams, apiInputClass);
         apiInput.method = method.toUpperCase();
@@ -155,31 +153,6 @@ public abstract class AbstractApi<In extends AbstractApiInput, Out> {
         // The parameter checking
         apiInput.checkAndStandardize();
         return apiInput;
-    }
-
-    /**
-     * Gets the input parameter type of the current API
-     */
-    public static Class<?> getInputClass(Class<? extends AbstractApi> clazz) {
-
-        while (!(clazz.getGenericSuperclass() instanceof ParameterizedType)) {
-            clazz = (Class<? extends AbstractApi>) clazz.getSuperclass();
-        }
-
-        Type[] types = ((ParameterizedType) clazz.getGenericSuperclass()).getActualTypeArguments();
-        if (types.length > 0) {
-            try {
-                Class<?> type = (Class<?>) types[0];
-                if (AbstractApiInput.class.isAssignableFrom(type)) {
-                    return type;
-                }
-            } catch (ClassCastException e) {
-                // 当此处发生异常时，通常是因为接口中的泛型参数不是AbstractApiInput的子类。
-                // 这里不用做任何处理，下面的代码会尝试从父类中继续寻找。
-            }
-        }
-
-        return getInputClass((Class<? extends AbstractApi>) clazz.getSuperclass());
     }
 
     /**
@@ -302,27 +275,71 @@ public abstract class AbstractApi<In extends AbstractApiInput, Out> {
         return result;
     }
 
-    public static Class<?> getOutputClass(Class<? extends AbstractApi<?, ?>> apiClass) {
-        // Gets a list of generic types for the API
+    public Class<?> getInputClass() {
+        return getInputClass(getClass());
+    }
+
+    /**
+     * Gets the input parameter type of the current API
+     */
+    private Class<?> getInputClass(Class<? extends AbstractApi> apiClass) {
         while (!(apiClass.getGenericSuperclass() instanceof ParameterizedType)) {
-            apiClass = (Class<? extends AbstractApi<?, ?>>) apiClass.getSuperclass();
+            apiClass = (Class<? extends AbstractApi>) apiClass.getSuperclass();
         }
 
         Type[] types = ((ParameterizedType) apiClass.getGenericSuperclass()).getActualTypeArguments();
+        if (types.length > 0) {
+            try {
+                Class<?> type = (Class<?>) types[0];
+                if (AbstractApiInput.class.isAssignableFrom(type)) {
+                    return type;
+                }
+            } catch (ClassCastException e) {
+                // 当此处发生异常时，通常是因为接口中的泛型参数不是AbstractApiInput的子类。
+                // 这里不用做任何处理，下面的代码会尝试从父类中继续寻找。
+            }
+        }
 
-        Type type = types[1];
-        Class<?> tClazz;
-        if (type instanceof ParameterizedTypeImpl) {
-            tClazz = ((ParameterizedTypeImpl) type).getRawType();
-        } else if (type instanceof TypeVariableImpl) {
-            tClazz = null;
-        } else {
-            tClazz = (Class<?>) type;
+        return getInputClass((Class<? extends AbstractApi>) apiClass.getSuperclass());
+    }
+
+    public Class<?> getOutputClass() {
+        return getOutputClass(getClass());
+    }
+
+    private Class<?> getOutputClass(Class<? extends AbstractApi> apiClass) {
+
+        // 循环，直到找到泛型参数。
+        while (!(apiClass.getGenericSuperclass() instanceof ParameterizedType)) {
+            apiClass = (Class<? extends AbstractApi>) apiClass.getSuperclass();
         }
-        if (tClazz == NoneApiOutput.class) {
-            return null;
-        } else {
-            return tClazz;
+
+        // 获取泛型类型列表
+        Type[] tTypes = ((ParameterizedType) apiClass.getGenericSuperclass()).getActualTypeArguments();
+
+        if (tTypes.length == 2) {
+            Type tType = tTypes[1];
+            return tType instanceof ParameterizedTypeImpl
+                    ? ((ParameterizedTypeImpl) tType).getRawType()
+                    : (Class<?>) tType;
         }
+
+        // 如果泛型类型只有一个，可能是IN，也可能是OUT，需要判断。
+        if (tTypes.length == 1) {
+            Type tType = tTypes[0];
+            Class<?> tClass = tType instanceof ParameterizedTypeImpl
+                    ? ((ParameterizedTypeImpl) tType).getRawType()
+                    : (Class<?>) tType;
+
+            // 如果是 IN，递归继续寻找。
+            if (AbstractApiInput.class.isAssignableFrom(tClass)) {
+                apiClass = (Class<? extends AbstractApi>) apiClass.getSuperclass();
+                return getOutputClass(apiClass);
+            } else {
+                return tClass;
+            }
+        }
+
+        return null;
     }
 }
