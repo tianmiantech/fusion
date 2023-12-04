@@ -11,7 +11,7 @@ import FileChunkUpload from '@/components/FileChunkUpload'
 import { useModel } from '@umijs/max';
 import { CheckCircleFilled } from '@ant-design/icons';
 import './index.less'
-import {createJob,CreateJobRequestInterface} from '../../service'
+
 import lodash from 'lodash'
 import { useRequest } from 'ahooks';
 import useDetail from "../../hooks/useDetail";
@@ -28,12 +28,13 @@ interface UploadFinishCallBackInterface {
   dataourceColumnList:string[]
 }
 interface JobFormPropsInterface {
-
+  loading?:boolean,
+  renderFormAction?:()=>React.ReactNode, //表单提交按钮，发起方，协作方不一样，交给各组装
 }
 
 
 const JobForm = forwardRef((props:JobFormPropsInterface, ref) => {
-
+  const { loading,renderFormAction} = props
   const [formRef] = Form.useForm();
   const {detailData,setDetailData} = useDetail();
 
@@ -43,16 +44,7 @@ const JobForm = forwardRef((props:JobFormPropsInterface, ref) => {
     dataourceColumnList:[]
   })
 
-  const {run:runCreateJob,loading:createJobloading} = useRequest(async (params:CreateJobRequestInterface)=>{
-    const reponse = await createJob(params)
-    const {code,data} = reponse;
-    if(code === 0){
-      message.success('保存成功')
-      setDetailData(g=>{
-        g.jobId = lodash.get(data,'job_id');
-      })
-    }  
-  },{ manual:true})
+ 
   
   const uploadFinishCallBack = (parma:UploadFinishCallBackInterface)=>{
     const {uploadFileName,dataourceColumnList} = parma
@@ -87,25 +79,10 @@ const JobForm = forwardRef((props:JobFormPropsInterface, ref) => {
   },[detailData.jobDetailData])
 
 
-  const submitFormData = async () => {
-    const {data_resource_type,dataSetAddMethod,hash_config,remark,table_data_resource_info} = await formRef.validateFields();
-    const requestParams = {
-      remark,
-      data_resource:{
-        data_resource_type,
-        table_data_resource_info,
-        hash_config
-      }
-    }
-    runCreateJob(requestParams)
-  }
-
+ 
   useImperativeHandle(ref, () => {
     return {
-      getJobFormData:()=>{
-        return jobFormData
-      },
-      setJobFormData
+      validateFields:formRef.validateFields
     }
   });
 
@@ -114,7 +91,7 @@ const JobForm = forwardRef((props:JobFormPropsInterface, ref) => {
   }
 
   return <>
-      <Spin spinning={createJobloading} >
+      <Spin spinning={loading} >
       <Row justify="center" className="form-scroll">
           <Col lg={{span: 16}} md={{span: 24}}>
             <Form
@@ -178,7 +155,7 @@ const JobForm = forwardRef((props:JobFormPropsInterface, ref) => {
       </Row>
       </Spin>
       <Row className="operation-area">
-        <Button loading={createJobloading} disabled={checkFormDisable()} type="primary" onClick={submitFormData}>{detailData.jobId?'更新':'保存'}</Button>
+       {renderFormAction && renderFormAction()}
       </Row>
       {/* 布隆过滤器管理 */}
       <BloomFilterManage
