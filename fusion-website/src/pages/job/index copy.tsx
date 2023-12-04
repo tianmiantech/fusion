@@ -4,7 +4,7 @@ import { CheckCircleFilled } from '@ant-design/icons';
 import { useImmer } from 'use-immer';
 import { history } from '@umijs/max';
 import TaskForm from "./components/JobForm";
-import ProviderForm from "./components/MemberForm";
+import ProviderForm from "./components/SendJobForm";
 import TaskDetail from "./components/TaskDetail";
 import RefuseModal from "./components/RefuseModal";
 import './index.less';

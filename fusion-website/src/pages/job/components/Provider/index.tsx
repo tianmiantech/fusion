@@ -7,9 +7,9 @@ import JobForm from "../JobForm";
 import SendJobForm from "../SendJobForm";
 import TaskDetail from "../TaskDetail";
 import RefuseModal from "../RefuseModal";
+import './index.less';
 import lodash from 'lodash'
 import JobCard from '../JobCard'
-import useDetail from "../../hooks/useDetail";
 interface PromoterPropsInterface {
   detailData?:any
 }
@@ -17,34 +17,44 @@ interface PromoterPropsInterface {
  * 发起方Job页面
  */
 const Index = forwardRef((props:PromoterPropsInterface,ref) => {
+ 
+  const {detailData={}} = props
 
-  const { detailData } = useDetail()
+  const jobRef = useRef<any>();
 
-  const renderCardTitlte = () => {
-    if (detailData.jobId && detailData.jobDetailData.status ==='editing') {
-      return <>发起方<span style={{fontSize:12,color:'gray'}}>（已保存，待发起任务,发起任务后 数据将不可更改）</span></>
+  useEffect(()=>{
+    if(detailData){
+      const {role,status,id,remark,myself={},partner } = detailData
+      const {bloom_filter_id,data_resource_type,hash_config,table_data_resource_info}= myself
+      const add_method = lodash.get(table_data_resource_info,'add_method');
+      jobRef.current?.setJobFormData((draft:any)=>{
+        draft.job_id = id;
+        draft.role = role
+        draft.initialValues = {
+          remark,status,bloom_filter_id,data_resource_type,hash_config,table_data_resource_info,dataSetAddMethod:add_method}
+      })
     }
-    return <>发起方</>
-  }
+  },[
+    detailData
+  ])
 
   return (
     <>
       <Row>
-        <Col span={24 / ((detailData.jobId?1:0) + 1)}>
+        <Col span={12}>
           <JobCard
-            title={renderCardTitlte()}
+            title={'发起方'}
           >
-            <JobForm/>
+            <JobForm ref={jobRef}/>
           </JobCard>
         </Col>
-        { detailData.jobId && <Col span={24 / ((detailData.jobId?1:0) + 1)}>
+        <Col span={12}>
           <JobCard
             title={'协作方'}
           >
-              <SendJobForm /> 
+             <JobForm/>
           </JobCard>
         </Col>
-        }
       </Row>
     </>
   );

@@ -1,16 +1,28 @@
-import React, { useState,forwardRef,useImperativeHandle } from 'react';
+import React, { useState,forwardRef,useImperativeHandle,useEffect } from 'react';
 import { Form, Input, Button, Row, Col,Tooltip, Spin, message } from 'antd';
 import { FolderOpenOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import { history, useModel } from '@umijs/max';
 import { useRequest } from "ahooks";
 import {testPartnerConntent,TestPartnerConntentRequestInterface,sendJobToProvider,SendTaskToProviderRequestInterface} from '../service'
+import useDetail from '../hooks/useDetail';
 
-const MemberForm = forwardRef((props, ref) => {
+const SendJobForm = forwardRef((props, ref) => {
 
   const [isTestConnect,setIsTestConnect] = useState(false)
 
-  const {jobFormData} = useModel('job.useJobForm')
   const [formRef] = Form.useForm();
+
+  const {detailData} = useDetail()
+
+  useEffect(()=>{
+    if(detailData.jobDetailData){
+      formRef.setFieldsValue({
+        name:detailData.jobDetailData['partner'].member_name,
+        base_url:detailData.jobDetailData['partner'].base_url,
+        public_key:detailData.jobDetailData['partner'].public_key
+      })
+    }
+  },[detailData.jobDetailData])
 
   //测试协作方连通性
   const {run:runTestPartnerConntent,loading:testPartnerConntentLoading } = useRequest(async (params:TestPartnerConntentRequestInterface)=>{
@@ -30,16 +42,15 @@ const MemberForm = forwardRef((props, ref) => {
     const {code} = reponse;
     if(code === 0) {
       message.success('发送成功')
-      setTimeout(()=>{
-        history.back();
-      },800)
+      // setTimeout(()=>{
+      //   history.back();
+      // },800)
     }
   },{manual:true})
 
 
-
+  //测试连通性
   const testPartnerConntention = ()=>{
-   
     formRef.validateFields().then(async (values)=>{
       runTestPartnerConntent(values)
     })
@@ -55,10 +66,13 @@ const MemberForm = forwardRef((props, ref) => {
       return
     }
     formRef.validateFields().then(async (values)=>{
-      const requestParams = { ...values,job_id:jobFormData.job_id }
+      const requestParams = { ...values,job_id:detailData.jobId }
       runSendJobToProvider(requestParams)
     })
   };
+  const checkFormDisable = ()=>{
+    return  !(!detailData.jobDetailData || detailData.jobDetailData.status==='editing')
+  }
 
   return (
     <>
@@ -68,6 +82,7 @@ const MemberForm = forwardRef((props, ref) => {
           <Form
             form={formRef}
             layout="vertical"
+            disabled={checkFormDisable()}
           >
             <Form.Item name="name" label="协作方名称">
               <Input placeholder='请输入' />
@@ -98,10 +113,10 @@ const MemberForm = forwardRef((props, ref) => {
         </Col>
       </Row>
       <Row className="operation-area">
-          <Button type="primary" disabled={testPartnerConntentLoading||loadingSendJobToProvider} onClick={submitData}>发起任务</Button> 
+          <Button type="primary" disabled={testPartnerConntentLoading||loadingSendJobToProvider || checkFormDisable()} onClick={submitData}>发起任务</Button> 
       </Row>
     </>
   );
 });
 
-export default MemberForm;
+export default SendJobForm;

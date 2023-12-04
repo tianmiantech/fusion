@@ -33,6 +33,7 @@ export const AddMethodMap = new Map([
 // 任务状态
 export const JobStatus = new Map([
   ['editing', '编辑中'],
+  ['auditing', '审批中'],
   ['disagree', '已拒绝'],
   ['wait_run', '等待运行'],
   ['running', '运行中'],
