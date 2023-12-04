@@ -15,12 +15,16 @@
  */
 package com.welab.fusion.service.database.entity;
 
+import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.welab.fusion.core.Job.JobStatus;
+import com.welab.fusion.core.progress.JobProgress;
 import com.welab.fusion.service.constans.JobMemberRole;
 import com.welab.wefe.common.fieldvalidate.annotation.Check;
 import com.welab.wefe.common.util.StringUtil;
+import org.hibernate.annotations.Type;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -59,6 +63,10 @@ public class JobDbModel extends AbstractDbModel {
     private JobStatus status;
     private String message;
 
+    @Type(type = "json")
+    @Column(columnDefinition = "json")
+    private JSONObject progressDetail;
+
     @JSONField(serialize = false)
     public File getResultFile() {
         if (StringUtil.isEmpty(resultFilePath)) {
@@ -69,6 +77,15 @@ public class JobDbModel extends AbstractDbModel {
             return null;
         }
         return file;
+    }
+
+    @JSONField(serialize = false)
+    public JobProgress getProgressModel() {
+        if (progressDetail == null) {
+            return new JobProgress();
+        }
+
+        return progressDetail.toJavaObject(JobProgress.class);
     }
 
     // region getter/setter
@@ -167,6 +184,14 @@ public class JobDbModel extends AbstractDbModel {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public JSONObject getProgressDetail() {
+        return progressDetail;
+    }
+
+    public void setProgressDetail(JSONObject progressDetail) {
+        this.progressDetail = progressDetail;
     }
 
     // endregion

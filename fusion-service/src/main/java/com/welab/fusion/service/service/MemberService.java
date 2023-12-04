@@ -18,6 +18,7 @@ package com.welab.fusion.service.service;
 import com.welab.fusion.service.api.member.TestConnectApi;
 import com.welab.fusion.service.database.base.MySpecification;
 import com.welab.fusion.service.database.base.Where;
+import com.welab.fusion.service.database.entity.JobDbModel;
 import com.welab.fusion.service.database.entity.MemberDbModel;
 import com.welab.fusion.service.database.repository.MemberRepository;
 import com.welab.fusion.service.dto.entity.MemberInputModel;
@@ -50,6 +51,8 @@ public class MemberService extends AbstractService {
     private MemberRepository memberRepository;
     @Autowired
     private GatewayService gatewayService;
+    @Autowired
+    private JobService jobService;
 
     public MemberDbModel getMyself() throws Exception {
         MemberDbModel myself = memberRepository.findByName(MYSELF_NAME);
@@ -180,7 +183,7 @@ public class MemberService extends AbstractService {
      */
     public void testConnection(MemberInputModel input) throws Exception {
         // 请求来自己方前端，发起请求访问合作方的 TestConnectApi。
-        if (input.fromMyselfFrontEnd()) {
+        if (input.isRequestFromMyself()) {
             MemberDbModel myself = getMyself();
             gatewayService.callOtherFusionNode(
                     FusionNodeInfo.of(input.getPublicKey(), input.getBaseUrl()),
@@ -190,7 +193,7 @@ public class MemberService extends AbstractService {
         }
 
         // 别人请求我，我请求回去。
-        if (input.fromOtherFusionNode()) {
+        if (input.isRequestFromPartner()) {
             gatewayService.callOtherFusionNode(
                     FusionNodeInfo.of(input.caller.publicKey, input.caller.baseUrl),
                     AliveApi.class
@@ -206,6 +209,13 @@ public class MemberService extends AbstractService {
         }
     }
 
+    /**
+     * 不论己方为何角色，返回合作方信息。
+     */
+    public MemberDbModel findPartner(String jobId) {
+        JobDbModel job = jobService.findById(jobId);
+        return findById(job.getPartnerMemberId());
+    }
 
     public FusionNodeInfo getPartnerFusionNodeInfo(String memberId) {
         return findById(memberId).toFusionNodeInfo();

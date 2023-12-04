@@ -15,8 +15,10 @@
  */
 package com.welab.fusion.core.progress;
 
+import com.alibaba.fastjson.JSONObject;
 import com.welab.fusion.core.Job.JobPhase;
 import com.welab.fusion.core.Job.JobStatus;
+import com.welab.wefe.common.util.JObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,10 +28,10 @@ import java.util.List;
  * @date 2023/11/10
  */
 public class JobProgress {
-    public List<JobPhaseProgress> jobPhaseProgressList = new ArrayList<>();
+    public List<JobPhaseProgress> phases = new ArrayList<>();
 
     public void addPhaseProgress(JobPhaseProgress phaseProgress) {
-        jobPhaseProgressList.add(phaseProgress);
+        phases.add(phaseProgress);
     }
 
     /**
@@ -66,7 +68,7 @@ public class JobProgress {
      * 获取当前进度的状态
      */
     public JobStatus getCurrentPhaseStatus() {
-        if (jobPhaseProgressList.isEmpty()) {
+        if (phases.isEmpty()) {
             return JobStatus.wait_run;
         }
 
@@ -77,10 +79,10 @@ public class JobProgress {
      * 获取当前阶段的进度
      */
     public JobPhaseProgress getCurrentPhaseProgress() {
-        if (jobPhaseProgressList.isEmpty()) {
+        if (phases.isEmpty()) {
             return null;
         }
-        return jobPhaseProgressList.get(jobPhaseProgressList.size() - 1);
+        return phases.get(phases.size() - 1);
     }
 
     /**
@@ -106,6 +108,10 @@ public class JobProgress {
     }
 
     public boolean isEmpty() {
-        return jobPhaseProgressList.isEmpty();
+        return phases.isEmpty();
+    }
+
+    public JSONObject toJson() {
+        return JObject.create(this);
     }
 }

@@ -24,6 +24,7 @@ import com.welab.wefe.common.crypto.Sm2;
 import com.welab.wefe.common.exception.StatusCodeWithException;
 import com.welab.wefe.common.http.HttpRequest;
 import com.welab.wefe.common.http.HttpResponse;
+import com.welab.wefe.common.util.ClassUtils;
 import com.welab.wefe.common.util.JObject;
 import com.welab.wefe.common.util.StringUtil;
 import com.welab.wefe.common.web.api.base.AbstractApi;
@@ -93,16 +94,10 @@ public class GatewayService extends AbstractService {
     /**
      * 调用其他节点接口
      */
-    public void callOtherFusionNode(FusionNodeInfo target, Class<? extends AbstractApi> apiClass) throws StatusCodeWithException {
-        callOtherFusionNode(target, apiClass, new NoneApiInput(), JObject.class);
+    public <IN extends AbstractApiInput, OUT> void callOtherFusionNode(FusionNodeInfo target, Class<? extends AbstractApi<IN, OUT>> apiClass) throws StatusCodeWithException {
+        callOtherFusionNode(target, apiClass, new NoneApiInput());
     }
 
-    /**
-     * 调用其他节点接口
-     */
-    public void callOtherFusionNode(FusionNodeInfo target, Class<? extends AbstractApi> apiClass, AbstractApiInput input) throws StatusCodeWithException {
-        callOtherFusionNode(target, apiClass, input, JObject.class);
-    }
 
     /**
      * 调用其他节点接口
@@ -110,10 +105,9 @@ public class GatewayService extends AbstractService {
      * @param target      目标节点间
      * @param apiClass    接口
      * @param input       请求参数
-     * @param resultClass 返回值类型
      */
-    public <T> T callOtherFusionNode(FusionNodeInfo target, Class<? extends AbstractApi> apiClass, AbstractApiInput input, Class<T> resultClass) throws StatusCodeWithException {
-        if (input.fromOtherFusionNode()) {
+    public <IN extends AbstractApiInput, OUT> OUT callOtherFusionNode(FusionNodeInfo target, Class<? extends AbstractApi<IN, OUT>> apiClass, AbstractApiInput input) throws StatusCodeWithException {
+        if (input.isRequestFromPartner()) {
             return null;
         }
 
@@ -132,13 +126,15 @@ public class GatewayService extends AbstractService {
             return null;
         }
 
+        Class<?> resultClass = AbstractApi.getOutputClass(apiClass);
+
         if (resultClass == JSONObject.class) {
-            return (T) data;
+            return (OUT) data;
         }
         if (resultClass == JObject.class) {
-            return (T) JObject.create(data);
+            return (OUT) JObject.create(data);
         }
 
-        return data.toJavaObject(resultClass);
+        return (OUT) data.toJavaObject(resultClass);
     }
 }

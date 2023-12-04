@@ -55,9 +55,18 @@ public class JobPhaseProgress extends Progress {
         return jobPhase;
     }
 
+    public void setJobPhase(JobPhase jobPhase) {
+        this.jobPhase = jobPhase;
+    }
+
     public JobStatus getJobStatus() {
         return jobStatus;
     }
+
+    public void setJobStatus(JobStatus jobStatus) {
+        this.jobStatus = jobStatus;
+    }
+
 
     // endregion
 }

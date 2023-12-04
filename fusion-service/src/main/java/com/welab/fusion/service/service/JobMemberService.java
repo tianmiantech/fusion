@@ -67,7 +67,7 @@ public class JobMemberService extends AbstractService {
      * 添加或更新成员信息
      */
     public void putMember(JobMemberRole role, JobConfigInput input) throws URISyntaxException {
-        String memberId = input.fromMyselfFrontEnd()
+        String memberId = input.isRequestFromMyself()
                 ? MemberService.MYSELF_NAME
                 : memberService.findByUrl(input.caller.baseUrl).getId();
 
@@ -92,7 +92,7 @@ public class JobMemberService extends AbstractService {
      */
     @Async
     public void updateTotalDataCount(JobConfigInput input) {
-        if (input.fromOtherFusionNode()) {
+        if (input.isRequestFromPartner()) {
             return;
         }
 

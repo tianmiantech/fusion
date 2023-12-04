@@ -19,6 +19,7 @@ import com.welab.fusion.core.Job.FusionJob;
 import com.welab.fusion.core.Job.JobMember;
 import com.welab.fusion.core.Job.JobStatus;
 import com.welab.fusion.core.data_resource.base.DataResourceInfo;
+import com.welab.fusion.core.progress.JobProgress;
 import com.welab.fusion.service.api.job.*;
 import com.welab.fusion.service.constans.JobMemberRole;
 import com.welab.fusion.service.database.base.MySpecification;
@@ -72,13 +73,13 @@ public class JobService extends AbstractService {
 
         JobDbModel job = new JobDbModel();
         // 来自自己前端，填充任务Id，便于其它方法统一行为。
-        if (input.fromMyselfFrontEnd()) {
+        if (input.isRequestFromMyself()) {
             input.jobId = job.getId();
             job.setCreatorMemberId(MemberService.MYSELF_NAME);
         }
 
         // 来自发起方，填充合作者信息。
-        if (input.fromOtherFusionNode()) {
+        if (input.isRequestFromPartner()) {
             if (findById(input.jobId) != null) {
                 StatusCode.PARAMETER_VALUE_INVALID.throwException("任务已存在，请勿重复创建。");
             }
@@ -91,16 +92,16 @@ public class JobService extends AbstractService {
         }
 
         job.setId(input.jobId);
-        job.setRole(input.fromOtherFusionNode() ? JobMemberRole.provider : JobMemberRole.promoter);
+        job.setRole(input.isRequestFromPartner() ? JobMemberRole.provider : JobMemberRole.promoter);
         job.setRemark(input.remark);
         job.setStatus(JobStatus.editing);
 
         jobRepository.save(job);
 
-        if (input.fromMyselfFrontEnd()) {
+        if (input.isRequestFromMyself()) {
             saveJobMember(JobMemberRole.promoter, input);
         }
-        if (input.fromOtherFusionNode()) {
+        if (input.isRequestFromPartner()) {
             saveJobMember(JobMemberRole.provider, input);
         }
 
@@ -118,14 +119,14 @@ public class JobService extends AbstractService {
         }
 
         job.setStatus(JobStatus.running);
-        if (input.fromMyselfFrontEnd()) {
+        if (input.isRequestFromMyself()) {
             job.setRemark(input.remark);
         }
 
-        if (input.fromOtherFusionNode()) {
+        if (input.isRequestFromPartner()) {
             saveJobMember(JobMemberRole.provider, input);
         }
-        if (input.fromMyselfFrontEnd()) {
+        if (input.isRequestFromMyself()) {
             saveJobMember(JobMemberRole.promoter, input);
         }
 
@@ -232,7 +233,7 @@ public class JobService extends AbstractService {
      * 协作方拒绝任务
      */
     public void disagree(DisagreeJobApi.Input input) throws StatusCodeWithException {
-        String message = input.fromMyselfFrontEnd()
+        String message = input.isRequestFromMyself()
                 ? "我方拒绝了任务：" + input.reason
                 : "协作方拒绝了任务：" + input.reason;
 
@@ -332,5 +333,17 @@ public class JobService extends AbstractService {
         // 删除数据库记录
         jobMemberService.deleteByJobId(id);
         jobRepository.deleteById(id);
+    }
+
+    /**
+     * 获取我方任务进度
+     */
+    public JobProgress getMyJobProgress(String jobId) {
+        FusionJob job = FusionJobManager.get(jobId);
+        if (job != null) {
+            return job.getMyProgress();
+        }
+
+        return findById(jobId).getProgressModel();
     }
 }

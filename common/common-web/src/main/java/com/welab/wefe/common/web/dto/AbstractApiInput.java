@@ -59,16 +59,16 @@ public abstract class AbstractApiInput extends AbstractCheckModel {
     public FusionNodeInfo caller;
 
     /**
-     * 请求是否来自己方前端
+     * 请求是否来自己方
      */
-    public boolean fromMyselfFrontEnd() {
+    public boolean isRequestFromMyself() {
         return caller == null;
     }
 
     /**
      * 请求是否来自其它合作节点
      */
-    public boolean fromOtherFusionNode() {
+    public boolean isRequestFromPartner() {
         return caller != null;
     }
 

@@ -18,6 +18,7 @@ package com.welab.fusion.service.job_function;
 
 import com.welab.fusion.core.progress.JobProgress;
 import com.welab.fusion.service.database.entity.JobDbModel;
+import com.welab.fusion.service.model.FusionJobManager;
 import com.welab.fusion.service.service.JobService;
 import com.welab.wefe.common.web.Launcher;
 
@@ -38,8 +39,11 @@ public class FinishJobFunction implements com.welab.fusion.core.function.FinishJ
         job.setCostTime(job.getEndTime().getTime() - job.getStartTime().getTime());
         job.setStatus(progress.getJobStatus());
         job.setMessage(progress.getMessage());
+        job.setProgressDetail(progress.toJson());
         job.setUpdatedTimeNow();
 
         job.save();
+
+        FusionJobManager.remove(jobId);
     }
 }
