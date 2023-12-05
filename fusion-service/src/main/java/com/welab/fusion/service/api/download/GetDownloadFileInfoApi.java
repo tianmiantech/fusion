@@ -20,6 +20,7 @@ import com.welab.fusion.core.io.FileSystem;
 import com.welab.fusion.service.api.download.base.FileInfo;
 import com.welab.fusion.service.api.download.base.FileType;
 import com.welab.fusion.service.service.JobMemberService;
+import com.welab.wefe.common.StatusCode;
 import com.welab.wefe.common.fieldvalidate.annotation.Check;
 import com.welab.wefe.common.web.api.base.AbstractApi;
 import com.welab.wefe.common.web.api.base.Api;
@@ -43,6 +44,10 @@ public class GetDownloadFileInfoApi extends AbstractApi<GetDownloadFileInfoApi.I
     @Override
     protected ApiResult<FileInfo> handle(GetDownloadFileInfoApi.Input input) throws Exception {
         File file = findFile(input);
+        if (file == null) {
+            StatusCode.PARAMETER_VALUE_INVALID
+                    .throwException("未找到 " + input.fileType + " 文件，任务Id：" + input.jobId);
+        }
         return success(FileInfo.of(file));
     }
 
@@ -52,7 +57,8 @@ public class GetDownloadFileInfoApi extends AbstractApi<GetDownloadFileInfoApi.I
                 String bloomFilterId = jobMemberService.findMyself(input.jobId).getBloomFilterId();
                 Path dir = FileSystem.PsiBloomFilter.getPath(bloomFilterId);
                 return PsiBloomFilter.of(dir).zip();
-
+            case FusionResult:
+                return FileSystem.FusionResult.getFile(input.jobId);
             default:
                 return null;
         }
