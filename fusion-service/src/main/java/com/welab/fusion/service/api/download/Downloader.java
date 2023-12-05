@@ -79,17 +79,18 @@ public class Downloader {
 
         // 为避免文件名相同造成覆盖，重新设计落地时的文件名。
         Path distFilePath = distFilePathGetter.apply(fileInfo);
-        Path distDir = FileSystem.getTempDir()
+        // 先将分片下载到临时目录，合并分片后再移动到目标目录。
+        Path tempDir = FileSystem.getTempDir()
                 .resolve(
                         distFilePath.toFile().getName().replace(".", "_")
                 );
-        distDir.toFile().mkdirs();
+        tempDir.toFile().mkdirs();
 
         // 分片下载
-        downloadChunks(fileInfo, partner, distDir);
+        downloadChunks(fileInfo, partner, tempDir);
 
         // 合并分片
-        File file = mergeChunks(distDir, distFilePath, fileInfo);
+        File file = mergeChunks(tempDir, distFilePath, fileInfo);
 
         LOG.info("从合作方下载 {} 文件完成，memberId：{}，jobId：{}，耗时：{}ms", fileType, partnerId, jobId, System.currentTimeMillis() - start);
 
