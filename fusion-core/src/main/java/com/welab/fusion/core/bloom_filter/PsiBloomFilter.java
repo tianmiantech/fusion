@@ -21,7 +21,6 @@ import com.alibaba.fastjson.annotation.JSONField;
 import com.google.common.hash.BloomFilter;
 import com.google.common.hash.Funnels;
 import com.welab.fusion.core.hash.HashConfig;
-import com.welab.fusion.core.hash.HashConfigItem;
 import com.welab.fusion.core.io.FileSystem;
 import com.welab.wefe.common.TimeSpan;
 import com.welab.wefe.common.file.compression.impl.Zip;
@@ -37,7 +36,6 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -72,7 +70,7 @@ public class PsiBloomFilter {
         String json = FileUtil.readString(metaFile, StandardCharsets.UTF_8);
         PsiBloomFilter result = JSON.parseObject(json).toJavaObject(PsiBloomFilter.class);
         result.rsaPsiParam.preproccess();
-
+        result.dir = dir;
         return result;
     }
 
