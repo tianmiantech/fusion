@@ -84,6 +84,7 @@ public class Downloader {
                 .resolve(
                         distFilePath.toFile().getName().replace(".", "_")
                 );
+        tempDir.toFile().delete();
         tempDir.toFile().mkdirs();
 
         // 分片下载
