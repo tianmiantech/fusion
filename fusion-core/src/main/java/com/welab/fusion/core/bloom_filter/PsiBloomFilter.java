@@ -39,6 +39,10 @@ import java.nio.file.Path;
 import java.util.Objects;
 
 /**
+ * 过滤器持久化时会储存两个文件
+ * 1. 描述过滤器的元数据，储存为 json 文件。
+ * 2. 过滤器数据，储存为二进制文件。
+ *
  * @author zane.luo
  * @date 2023/11/8
  */
