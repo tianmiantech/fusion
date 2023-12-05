@@ -95,4 +95,20 @@ export const getJobDetail = (id:string)=>{
     return request.get('/job/detail',{id})
 }
 
+/**
+ * 协作方同意任务
+ */
+export const agreeAndStart = (param:CreateJobRequestInterface)=>{
+    return request.post('/job/agree_and_start',param)
+}
+
+export interface DisagreeJobRequestInterface {
+    job_id:string,
+    reason?:string
+}
+export const disagreeJob = (param:DisagreeJobRequestInterface)=>{
+    return request.post('/job/disagree',param)
+}
+
+
 

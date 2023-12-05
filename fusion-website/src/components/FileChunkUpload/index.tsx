@@ -53,7 +53,7 @@ const Index= forwardRef((props:FileChunkUploadInterface,ref) => {
 
   
   const optionsConfig ={
-    target:`http://172.31.21.36:8080/fusion/file/upload`,
+    target:`${getBaseURL()}/file/upload`,
     chunkSize:4*1024*1024,
     simultaneousUploads:4,
     headers:{
