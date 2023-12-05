@@ -17,8 +17,8 @@ package com.welab.fusion.core.Job.action;
 
 import com.welab.fusion.core.Job.FusionJob;
 import com.welab.fusion.core.Job.JobPhase;
-import com.welab.fusion.core.progress.JobPhaseProgress;
 import com.welab.fusion.core.Job.JobStatus;
+import com.welab.fusion.core.progress.JobPhaseProgress;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,6 +74,8 @@ public abstract class AbstractJobPhaseAction {
                     getPhase(),
                     skipThisAction ? 1 : getTotalWorkload()
             );
+
+            phaseProgress.setMessage("开始执行阶段动作: " + getPhase());
 
             // 添加当前阶段进度到总进度
             job.getMyProgress().addPhaseProgress(phaseProgress);

@@ -36,6 +36,7 @@ public class CreatePsiBloomFilterAction extends AbstractJobPhaseAction {
         AbstractTableDataSourceReader reader = job.getMyself().tableDataResourceReader;
         HashConfig hashConfig = job.getMyself().dataResourceInfo.hashConfig;
 
+        phaseProgress.setMessage("正在生成过滤器...");
         // 生成过滤器
         try (PsiBloomFilterCreator creator = new PsiBloomFilterCreator(
                 UUID.randomUUID().toString().replace("-", ""),
@@ -49,6 +50,7 @@ public class CreatePsiBloomFilterAction extends AbstractJobPhaseAction {
             job.getMyself().psiBloomFilter = psiBloomFilter;
 
             // 保存过滤器
+            phaseProgress.setMessage("过滤器生成完毕，正在保存...");
             job.getJobFunctions().saveMyPsiBloomFilterFunction.save(job.getJobId(), psiBloomFilter);
         }
     }

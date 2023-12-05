@@ -41,7 +41,10 @@ public class ConfirmMemberRoleAction extends AbstractJobPhaseAction {
 
     @Override
     public void doAction() throws Exception {
-        job.setMyRole(consultMyRole());
+        FusionJobRole role = consultMyRole();
+        job.setMyRole(role);
+
+        phaseProgress.setMessage("协商完毕，我方角色：" + role);
     }
 
     @Override

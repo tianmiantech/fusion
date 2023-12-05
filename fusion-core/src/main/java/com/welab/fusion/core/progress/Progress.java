@@ -15,11 +15,14 @@
  */
 package com.welab.fusion.core.progress;
 
+import cn.hutool.core.date.DateUtil;
 import com.welab.wefe.common.Convert;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -54,6 +57,10 @@ public class Progress {
      */
     protected Date endTime;
     protected String message;
+    /**
+     * message 记录
+     */
+    private List<String> logs = new ArrayList<>();
     private ProgressStatus status;
 
     public static Progress of(String modelId, long totalWorkload) {
@@ -143,6 +150,16 @@ public class Progress {
         this.totalWorkload = totalWorkload;
     }
 
+    public void setMessage(String message) {
+        this.message = message;
+
+        synchronized (logs) {
+            if (logs.size() > 100) {
+                logs.remove(0);
+            }
+            logs.add("[" + DateUtil.now() + "] " + message);
+        }
+    }
 
     // region getter/setter
 
@@ -190,10 +207,6 @@ public class Progress {
         return message;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
     public long getSpeedInSecond() {
         return speedInSecond;
     }
@@ -202,5 +215,12 @@ public class Progress {
         return status;
     }
 
-    // endregion
+    public List<String> getLogs() {
+        return logs;
+    }
+
+    public void setLogs(List<String> logs) {
+        this.logs = logs;
+    }
+// endregion
 }

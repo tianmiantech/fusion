@@ -58,21 +58,29 @@ public class DownloadPsiBloomFilterAction extends AbstractJobPhaseAction {
                     phaseProgress.updateCompletedWorkload(size);
                 });
 
-        phaseProgress.setMessage("正在解压过滤器 zip 文件...");
+        phaseProgress.setMessage("正在解压过滤器 zip 文件(" + InformationSize.fromByte(file.length()) + ")...");
         // file 解压至 dir
         Path dir = FileSystem.PsiBloomFilter.getPath(job.getPartner().memberId.replace(":", "_") + "-" + FileUtil.getFileNameWithoutSuffix(file.getName()));
         SuperDecompressor.decompression(file, dir.toAbsolutePath().toString(), false);
 
-        phaseProgress.setMessage("正在加载过滤器...");
-        job.getPartner().psiBloomFilter = PsiBloomFilter.of(dir);
+
+        PsiBloomFilter psiBloomFilter = PsiBloomFilter.of(dir);
+        InformationSize size = InformationSize.fromByte(psiBloomFilter.getDataFile().length());
+
         LOG.info("正在加载过滤器，job_id：{}，psiBloomFilter:{}", job.getJobId(), job.getPartner().psiBloomFilter.id);
-        job.getPartner().psiBloomFilter.getBloomFilter();
+        phaseProgress.setMessage("正在加载过滤器(" + size + ")...");
+        // 将过滤器文件加载到内存是个很重的操作，所以是按需加载的，调用 getBloomFilter() 可触发加载。
+        psiBloomFilter.getBloomFilter();
         LOG.info(
                 "过滤器加载完毕({})，job_id：{}，psiBloomFilter:{}",
-                InformationSize.fromByte(job.getPartner().psiBloomFilter.getDataFile().length()),
+                size,
                 job.getJobId(),
                 job.getPartner().psiBloomFilter.id
         );
+
+
+        // 保存到 job 上下文供后续使用
+        job.getPartner().psiBloomFilter = psiBloomFilter;
     }
 
     @Override

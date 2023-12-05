@@ -67,7 +67,6 @@ public class IntersectionAction extends AbstractJobPhaseAction {
 
         HashConfig hashConfig = job.getMyself().dataResourceInfo.hashConfig;
 
-
         Files.write(
                 resultFile.toPath(),
                 hashConfig.getIdHeadersForCsv().getBytes(StandardCharsets.UTF_8),
