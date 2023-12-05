@@ -146,7 +146,7 @@ public class JobService extends AbstractService {
 
     private FusionJob createFusionJob(JobDbModel job) throws Exception {
         JobMemberDbModel myselfJobInfo = jobMemberService.findMyself(job.getId());
-        MemberDbModel myselfInfo = memberService.findById(myselfJobInfo.getMemberId());
+        MemberDbModel myselfInfo = memberService.getMyself();
         DataResourceInfo myselfDataResourceInfo = DataResourceInfo.of(myselfJobInfo.getDataResourceType(), myselfJobInfo.getTotalDataCount(), myselfJobInfo.getHashConfigModel());
         JobMember myself = JobMember.of(myselfInfo.getId(), myselfInfo.getName(), myselfDataResourceInfo);
 
