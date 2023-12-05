@@ -72,7 +72,7 @@ export const testPartnerConntent = (parmas:TestPartnerConntentRequestInterface) 
 export interface SendTaskToProviderRequestInterface {
     job_id:string,
     base_url:string,
-    name?:string
+    member_name?:string
     public_key:string
 }
 /**

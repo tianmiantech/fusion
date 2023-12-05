@@ -77,11 +77,6 @@ const Index =()=>{
         width:200,
         render:(text:string,row:RowProps)=>{
             const { createTime = new Date(),role} = row;
-            console.log("role",role);
-            console.log("ROLE_TO_CN",ROLE_TO_CN[role]);
-            
-            console.log("role-",ROLE_TO_CN[`${role}`]);
-            
             return <><Tag color={role==='promoter'?'success':'default'}>{ROLE_TO_CN[`${role}`]}</Tag>
             <div>{moment(createTime).startOf('hour').fromNow()}</div>
             </>
@@ -110,7 +105,15 @@ const Index =()=>{
         key: 'provider',
         width:400,
         render:(text:string,row:RowProps)=>{
-            return <>暂无内容</>
+            const { partner=null } = row;
+            if(partner){
+                const member_name = lodash.get(row,'partner.member_name')
+                const base_url  = lodash.get(row,'partner.base_url')
+                return <>{member_name && <div>协作方名称：{member_name}</div>}
+                <div>服务地址：{base_url}</div>
+                </>
+            } else 
+                return <>暂无内容</>
         }
     },{
         title: '状态',

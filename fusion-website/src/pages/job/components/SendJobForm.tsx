@@ -5,6 +5,7 @@ import { history, useModel } from '@umijs/max';
 import { useRequest } from "ahooks";
 import {testPartnerConntent,TestPartnerConntentRequestInterface,sendJobToProvider,SendTaskToProviderRequestInterface} from '../service'
 import useDetail from '../hooks/useDetail';
+import lodash from 'lodash'
 
 const SendJobForm = forwardRef((props, ref) => {
 
@@ -17,9 +18,9 @@ const SendJobForm = forwardRef((props, ref) => {
   useEffect(()=>{
     if(detailData.jobDetailData){
       formRef.setFieldsValue({
-        name:detailData.jobDetailData['partner'].member_name,
-        base_url:detailData.jobDetailData['partner'].base_url,
-        public_key:detailData.jobDetailData['partner'].public_key
+        member_name: lodash.get(detailData,'jobDetailData.partner.member_name',''),
+        base_url:lodash.get(detailData,'jobDetailData.partner.base_url',''),
+        public_key:lodash.get(detailData,'jobDetailData.partner.public_key','')
       })
     }
   },[detailData.jobDetailData])
@@ -84,7 +85,7 @@ const SendJobForm = forwardRef((props, ref) => {
             layout="vertical"
             disabled={checkFormDisable()}
           >
-            <Form.Item name="name" label="协作方名称">
+            <Form.Item name="member_name" label="协作方名称">
               <Input placeholder='请输入' />
             </Form.Item>
             <Form.Item label={

@@ -22,6 +22,14 @@ const useDetail = ()=>{
         jobId:''
     });
 
+  const clearDetailData = ()=>{
+    setDetailData(draft=>{
+      draft.role = '';
+      draft.jobDetailData = null;
+      draft.jobId = '';
+    })
+  }
+
     useEffect(() => {
         if(detailData.jobId){
           runGetJobDetail(detailData.jobId);
@@ -42,7 +50,8 @@ const useDetail = ()=>{
 
     return {
         detailData,
-        setDetailData
+        setDetailData,
+        clearDetailData
     }
 
 }
