@@ -97,14 +97,14 @@ public class FusionJobTest {
 
     private static JobFunctions createAJobFunctions() {
         JobFunctions jobFunctions = createJobFunctions();
-        jobFunctions.getPartnerProgressFunction = () -> memberBJob.getMyProgress();
+        jobFunctions.getPartnerProgressFunction = (jobId) -> memberBJob.getMyProgress();
 
         return jobFunctions;
     }
 
     private static JobFunctions createBJobFunctions() {
         JobFunctions jobFunctions = createJobFunctions();
-        jobFunctions.getPartnerProgressFunction = () -> memberAJob.getMyProgress();
+        jobFunctions.getPartnerProgressFunction = (jobId) -> memberAJob.getMyProgress();
 
         return jobFunctions;
     }

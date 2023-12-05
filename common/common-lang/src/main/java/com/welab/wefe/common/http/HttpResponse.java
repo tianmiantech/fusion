@@ -197,13 +197,21 @@ public class HttpResponse {
      * Outputs the current response object to the log
      */
     public void log() {
-        String content = getBodyAsString();
-        if (contentType != null && contentType.toLowerCase().contains("json")) {
-            try {
-                JSONObject json = getBodyAsJson();
-                content = JSON.toJSONString(json.getInnerMap(), LoggerValueFilter.DEFAULT);
-            } catch (Exception e) {
+        String content = null;
+        if (contentType != null) {
+            if (contentType.toLowerCase().contains("stream")) {
+                content = "byte length: " + bodyBytes.length;
+            } else if (contentType.toLowerCase().contains("json")) {
+                try {
+                    JSONObject json = getBodyAsJson();
+                    content = JSON.toJSONString(json.getInnerMap(), LoggerValueFilter.DEFAULT);
+                } catch (Exception e) {
+                }
             }
+        }
+
+        if (content == null) {
+            content = getBodyAsString();
         }
 
         if (content != null) {
