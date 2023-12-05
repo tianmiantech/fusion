@@ -24,7 +24,6 @@ import com.welab.wefe.common.crypto.Sm2;
 import com.welab.wefe.common.exception.StatusCodeWithException;
 import com.welab.wefe.common.http.HttpRequest;
 import com.welab.wefe.common.http.HttpResponse;
-import com.welab.wefe.common.util.ClassUtils;
 import com.welab.wefe.common.util.JObject;
 import com.welab.wefe.common.util.StringUtil;
 import com.welab.wefe.common.web.Launcher;
@@ -78,6 +77,7 @@ public class GatewayService extends AbstractService {
         HttpResponse response = HttpRequest
                 .create(url)
                 .setBody(signedApiInput.toJSONString())
+                .setTimeout(1_000 * 60 * 10)
                 .postJson();
 
         if (!response.success()) {
@@ -103,9 +103,9 @@ public class GatewayService extends AbstractService {
     /**
      * 调用其他节点接口
      *
-     * @param target      目标节点间
-     * @param apiClass    接口
-     * @param input       请求参数
+     * @param target   目标节点间
+     * @param apiClass 接口
+     * @param input    请求参数
      */
     public <IN extends AbstractApiInput, OUT> OUT callOtherFusionNode(FusionNodeInfo target, Class<? extends AbstractApi<IN, OUT>> apiClass, AbstractApiInput input) throws StatusCodeWithException {
         if (input.isRequestFromPartner()) {
@@ -128,7 +128,7 @@ public class GatewayService extends AbstractService {
         }
 
         Class<OUT> resultClass = Launcher.getBean(apiClass).getOutputClass();
-        if(resultClass == null){
+        if (resultClass == null) {
             return null;
         }
 

@@ -15,7 +15,6 @@
  */
 package com.welab.fusion.service.api.download;
 
-import com.alibaba.fastjson.JSONObject;
 import com.welab.fusion.core.io.FileSystem;
 import com.welab.fusion.service.api.download.base.FileInfo;
 import com.welab.fusion.service.api.download.base.FileType;
@@ -89,11 +88,12 @@ public class Downloader {
         // 分片下载
         downloadChunks(fileInfo, partner, distDir);
 
+        // 合并分片
+        File file = mergeChunks(distDir, distFilePath, fileInfo);
+
         LOG.info("从合作方下载 {} 文件完成，memberId：{}，jobId：{}，耗时：{}ms", fileType, partnerId, jobId, System.currentTimeMillis() - start);
 
-        // 合并分片
-        return mergeChunks(distDir, distFilePath, fileInfo);
-
+        return file;
     }
 
     /**
