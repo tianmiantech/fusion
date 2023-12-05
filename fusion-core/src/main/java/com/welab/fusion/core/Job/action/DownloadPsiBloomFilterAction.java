@@ -57,7 +57,7 @@ public class DownloadPsiBloomFilterAction extends AbstractJobPhaseAction {
                 });
 
         // file 解压至 dir
-        Path dir = FileSystem.PsiBloomFilter.getPath(job.getPartner().memberId + "-" + FileUtil.getFileNameWithoutSuffix(file.getName()));
+        Path dir = FileSystem.PsiBloomFilter.getPath(job.getPartner().memberId.replace(":", "_") + "-" + FileUtil.getFileNameWithoutSuffix(file.getName()));
         SuperDecompressor.decompression(file, dir.toAbsolutePath().toString(), false);
 
         // 加载过滤器
