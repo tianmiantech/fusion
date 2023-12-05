@@ -23,7 +23,7 @@ const TaskDetail = () => {
     const list = lodash.get(detailData,'jobDetailData.partner.hash_config.list',[])
     let result = ''
     list.forEach((item:hashConfigItemInterface,index:number)=>{
-      result += `${item.method}(${item.columns.join(',')})`
+      result += `${item.method}(${item.columns.join('+')})`
       if(index !== list.length-1){
         result += '+'
       }

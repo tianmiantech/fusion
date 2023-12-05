@@ -34,7 +34,7 @@ interface JobFormPropsInterface {
 
 
 const JobForm = forwardRef((props:JobFormPropsInterface, ref) => {
-  const { loading,renderFormAction} = props
+  const { loading=false,renderFormAction} = props
   const [formRef] = Form.useForm();
   const {detailData,setDetailData} = useDetail();
 
