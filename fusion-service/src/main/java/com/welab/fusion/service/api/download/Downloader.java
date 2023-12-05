@@ -114,7 +114,7 @@ public class Downloader {
             mergedFile.delete();
         }
 
-        for (int i = 0; i <= parts.length; i++) {
+        for (int i = 0; i < parts.length; i++) {
             File part = dir.resolve(i + ".part").toFile();
 
             FileOutputStream stream = new FileOutputStream(mergedFile, true);
