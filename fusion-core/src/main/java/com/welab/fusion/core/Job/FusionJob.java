@@ -92,15 +92,10 @@ public class FusionJob implements Closeable {
                 gotoAction(JobPhase.firstPhase());
 
                 while (true) {
-                    if (myProgress.getJobStatus().isFinished()) {
-                        break;
-                    }
 
                     // 执行调度
-                    schedule();
-
-                    // 这里二次判断是为了快速跳出，少等待一次。
-                    if (myProgress.getJobStatus().isFinished()) {
+                    boolean keep = schedule();
+                    if (!keep) {
                         break;
                     }
 
@@ -119,31 +114,33 @@ public class FusionJob implements Closeable {
 
     /**
      * 观察，并调度任务。
+     *
+     * @return 是否继续调度
      */
-    private void schedule() throws Exception {
+    private boolean schedule() throws Exception {
         JobProgress partnerProgress = getPartnerProgress();
         // 失联，任务中止。
         if (partnerProgress == null) {
             finishJobByDisconnection();
-            return;
+            return false;
         }
 
         // 还没有任何进度，跳过。
         if (partnerProgress.isEmpty()) {
-            return;
+            return false;
         }
 
         // 如果对方已失败，则我方跟随失败。
         if (partnerProgress.getJobStatus().isFailed()) {
             finishJobFollowFailed(partnerProgress);
-            return;
+            return false;
         }
 
         // 双方都已完成，任务结束。
         if (myProgress.getCurrentPhase().isLastPhase() && partnerProgress.getCurrentPhase().isLastPhase()) {
             if (myProgress.getJobStatus().isSuccess() && partnerProgress.getJobStatus().isSuccess()) {
                 finishJobBySuccess();
-                return;
+                return false;
             }
         }
 
@@ -151,6 +148,8 @@ public class FusionJob implements Closeable {
         if (needGotoNextPhase(partnerProgress)) {
             gotoAction(myProgress.getCurrentPhase().next());
         }
+
+        return true;
     }
 
 
@@ -275,6 +274,7 @@ public class FusionJob implements Closeable {
         if (myProgress.isEmpty()) {
             return false;
         }
+
         return myProgress.getJobStatus().isFinished();
     }
 
