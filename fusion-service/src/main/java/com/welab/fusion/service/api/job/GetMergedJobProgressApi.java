@@ -33,12 +33,18 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author zane.luo
  * @date 2023/12/4
  */
-@Api(path = "job/get_merged_job_progress", name = "获取多方合并的任务进度", allowAccessWithSign = true)
+@Api(
+        path = "job/get_merged_job_progress",
+        name = "获取多方合并的任务进度",
+        allowAccessWithSign = true,
+        logSaplingInterval = 1_000 * 30
+)
 public class GetMergedJobProgressApi extends AbstractApi<GetMergedJobProgressApi.Input, GetMergedJobProgressApi.Output> {
     @Autowired
     private JobService jobService;
     @Autowired
     private GatewayService gatewayService;
+
     @Override
     protected ApiResult<Output> handle(GetMergedJobProgressApi.Input input) throws Exception {
 
@@ -51,7 +57,7 @@ public class GetMergedJobProgressApi extends AbstractApi<GetMergedJobProgressApi
                 GetMyJobProgressApi.Input.of(input.jobId)
         );
 
-        return success(Output.of(myselfProgress,partnerProgress));
+        return success(Output.of(myselfProgress, partnerProgress));
     }
 
     public static class Input extends AbstractApiInput {

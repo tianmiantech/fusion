@@ -17,12 +17,11 @@ package com.welab.fusion.service.service;
 
 import com.welab.fusion.core.data_resource.base.DataResourceType;
 import com.welab.fusion.core.data_source.AbstractTableDataSourceReader;
-import com.welab.fusion.service.api.job.SendJobApi;
+import com.welab.fusion.service.api.job.SendJobToProviderApi;
 import com.welab.fusion.service.constans.JobMemberRole;
 import com.welab.fusion.service.database.base.MySpecification;
 import com.welab.fusion.service.database.base.Where;
 import com.welab.fusion.service.database.entity.BloomFilterDbModel;
-import com.welab.fusion.service.database.entity.JobDbModel;
 import com.welab.fusion.service.database.entity.JobMemberDbModel;
 import com.welab.fusion.service.database.repository.JobMemberRepository;
 import com.welab.fusion.service.dto.JobConfigInput;
@@ -53,7 +52,7 @@ public class JobMemberService extends AbstractService {
      * 添加协作方
      * 仅在推送任务到协作方时调用
      */
-    public void addProvider(SendJobApi.Input input) {
+    public void addProvider(SendJobToProviderApi.Input input) {
         String providerId = MemberService.buildMemberId(input.getBaseUrl());
 
         JobMemberDbModel model = new JobMemberDbModel();

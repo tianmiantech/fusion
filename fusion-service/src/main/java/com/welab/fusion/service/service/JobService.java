@@ -191,7 +191,7 @@ public class JobService extends AbstractService {
     /**
      * 发起方将任务发送到协作方
      */
-    public void sendJobToProvider(SendJobApi.Input input) throws Exception {
+    public void sendJobToProvider(SendJobToProviderApi.Input input) throws Exception {
         checkBeforeSendJob(input);
 
         JobDbModel job = findById(input.jobId);
@@ -231,7 +231,7 @@ public class JobService extends AbstractService {
     /**
      * 发送任务前的检查
      */
-    private void checkBeforeSendJob(SendJobApi.Input input) throws Exception {
+    private void checkBeforeSendJob(SendJobToProviderApi.Input input) throws Exception {
         // 检查连通性
         memberService.testConnection(input);
     }
@@ -337,7 +337,8 @@ public class JobService extends AbstractService {
             }
         }
 
-        // 删除数据库记录
+        // 应删尽删
+        FusionJobManager.remove(id);
         jobMemberService.deleteByJobId(id);
         jobRepository.deleteById(id);
     }
@@ -360,5 +361,21 @@ public class JobService extends AbstractService {
     public MemberDbModel findPartner(String jobId) {
         JobDbModel job = findById(jobId);
         return memberService.findById(job.getPartnerMemberId());
+    }
+
+    /**
+     * 手动停止任务
+     */
+    public void stop(String id) throws StatusCodeWithException {
+        JobDbModel job = findById(id);
+        if (job == null) {
+            return;
+        }
+
+        if (!job.getStatus().isRunning()) {
+            StatusCode.PARAMETER_VALUE_INVALID.throwException("任务并未运行，无法执行中止动作。");
+        }
+
+        FusionJobManager.get(id).finishJobByUserStop();
     }
 }

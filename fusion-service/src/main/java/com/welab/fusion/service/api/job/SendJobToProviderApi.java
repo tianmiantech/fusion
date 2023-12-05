@@ -15,41 +15,34 @@
  */
 package com.welab.fusion.service.api.job;
 
-import com.welab.fusion.core.progress.JobProgress;
+import com.welab.fusion.service.dto.entity.MemberInputModel;
 import com.welab.fusion.service.service.JobService;
+import com.welab.wefe.common.fieldvalidate.annotation.Check;
 import com.welab.wefe.common.web.api.base.AbstractApi;
 import com.welab.wefe.common.web.api.base.Api;
-import com.welab.wefe.common.web.dto.AbstractApiInput;
 import com.welab.wefe.common.web.dto.ApiResult;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author zane.luo
- * @date 2023/12/4
+ * @date 2023/11/27
  */
-@Api(
-        path = "job/get_my_job_progress",
-        name = "获取我放的任务进度",
-        allowAccessWithSign = true,
-        logSaplingInterval = 1_000 * 30
-)
-public class GetMyJobProgressApi extends AbstractApi<GetMyJobProgressApi.Input, JobProgress> {
+@Api(path = "job/send_to_provider", name = "发送任务到协作方")
+public class SendJobToProviderApi extends AbstractApi<SendJobToProviderApi.Input, SendJobToProviderApi.Output> {
     @Autowired
     private JobService jobService;
 
     @Override
-    protected ApiResult<JobProgress> handle(GetMyJobProgressApi.Input input) throws Exception {
-        JobProgress jobProgress = jobService.getMyJobProgress(input.jobId);
-        return success(jobProgress);
+    protected ApiResult<SendJobToProviderApi.Output> handle(Input input) throws Exception {
+        jobService.sendJobToProvider(input);
+        return success();
     }
 
-    public static class Input extends AbstractApiInput {
+    public static class Input extends MemberInputModel {
+        @Check(name = "任务ID", require = true)
         public String jobId;
+    }
 
-        public static Input of(String jobId) {
-            Input input = new Input();
-            input.jobId = jobId;
-            return input;
-        }
+    public static class Output {
     }
 }

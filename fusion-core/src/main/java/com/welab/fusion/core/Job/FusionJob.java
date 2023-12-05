@@ -207,6 +207,14 @@ public class FusionJob implements Closeable {
         finishJob(JobStatus.error_on_running, message);
     }
 
+    /**
+     * 手动中止
+     */
+    public void finishJobByUserStop() {
+        String message = "成员[" + myself.memberName + "]停止了任务。";
+        finishJob(JobStatus.stop_on_running, message);
+    }
+
     private void finishJobBySuccess() {
         String message = "success";
         finishJob(JobStatus.success, message);
