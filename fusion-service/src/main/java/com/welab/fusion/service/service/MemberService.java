@@ -117,6 +117,11 @@ public class MemberService extends AbstractService {
             model.setId(memberId);
         }
 
+        // myself 的 id 固定，不允许修改。
+        if (MYSELF_NAME.equals(name)) {
+            model.setId(MYSELF_NAME);
+        }
+
         /**
          * 仅在以下两种情况下设置名称，避免在未指定名称时覆盖。
          * 1. 输入了名称
