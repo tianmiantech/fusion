@@ -87,7 +87,7 @@ public class PsiBloomFilter {
         }
 
         // 加载过滤器
-        File bfFile = dir.resolve(DATA_FILE_NAME).toFile();
+        File bfFile = getDataFile();
         try (FileInputStream inputStream = new FileInputStream(bfFile)) {
             this.bloomFilter = BloomFilter.readFrom(
                     inputStream,
@@ -96,6 +96,10 @@ public class PsiBloomFilter {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public File getDataFile() {
+        return dir.resolve(DATA_FILE_NAME).toFile();
     }
 
     public static PsiBloomFilter of(String id, HashConfig hashConfig, RsaPsiParam rsaPsiParam, BloomFilter<String> bloomFilter) {

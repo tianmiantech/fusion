@@ -56,6 +56,7 @@ public class IntersectionAction extends AbstractJobPhaseAction {
 
     @Override
     protected void doAction() throws Exception {
+
         publicModulus = job.getPartner().psiBloomFilter.rsaPsiParam.publicModulus;
         publicExponent = job.getPartner().psiBloomFilter.rsaPsiParam.publicExponent;
 

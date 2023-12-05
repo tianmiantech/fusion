@@ -21,6 +21,7 @@ import com.welab.fusion.core.Job.JobPhase;
 import com.welab.fusion.core.bloom_filter.PsiBloomFilter;
 import com.welab.fusion.core.function.DownloadPartnerPsiBloomFilterFunction;
 import com.welab.fusion.core.io.FileSystem;
+import com.welab.wefe.common.InformationSize;
 import com.welab.wefe.common.file.decompression.SuperDecompressor;
 import com.welab.wefe.common.util.FileUtil;
 
@@ -43,6 +44,7 @@ public class DownloadPsiBloomFilterAction extends AbstractJobPhaseAction {
 
     @Override
     protected void doAction() throws Exception {
+        phaseProgress.setMessage("正在从合作方下载过滤器...");
         DownloadPartnerPsiBloomFilterFunction function = job.getJobFunctions().downloadPartnerPsiBloomFilterFunction;
 
         // 从合作方下载过滤器
@@ -56,12 +58,21 @@ public class DownloadPsiBloomFilterAction extends AbstractJobPhaseAction {
                     phaseProgress.updateCompletedWorkload(size);
                 });
 
+        phaseProgress.setMessage("正在解压过滤器 zip 文件...");
         // file 解压至 dir
         Path dir = FileSystem.PsiBloomFilter.getPath(job.getPartner().memberId.replace(":", "_") + "-" + FileUtil.getFileNameWithoutSuffix(file.getName()));
         SuperDecompressor.decompression(file, dir.toAbsolutePath().toString(), false);
 
-        // 加载过滤器
+        phaseProgress.setMessage("正在加载过滤器...");
         job.getPartner().psiBloomFilter = PsiBloomFilter.of(dir);
+        LOG.info("正在加载过滤器，job_id：{}，psiBloomFilter:{}", job.getJobId(), job.getPartner().psiBloomFilter.id);
+        job.getPartner().psiBloomFilter.getBloomFilter();
+        LOG.info(
+                "过滤器加载完毕({})，job_id：{}，psiBloomFilter:{}",
+                InformationSize.fromByte(job.getPartner().psiBloomFilter.getDataFile().length()),
+                job.getJobId(),
+                job.getPartner().psiBloomFilter.id
+        );
     }
 
     @Override
