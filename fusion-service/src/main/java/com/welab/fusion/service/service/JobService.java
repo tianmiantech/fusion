@@ -45,6 +45,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.net.URISyntaxException;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -119,6 +120,7 @@ public class JobService extends AbstractService {
         }
 
         job.setStatus(JobStatus.running);
+        job.setStartTime(new Date());
         if (input.isRequestFromMyself()) {
             job.setRemark(input.remark);
         }

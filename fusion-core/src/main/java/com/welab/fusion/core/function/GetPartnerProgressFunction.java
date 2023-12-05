@@ -23,5 +23,5 @@ import com.welab.fusion.core.progress.JobProgress;
  */
 @FunctionalInterface
 public interface GetPartnerProgressFunction {
-    JobProgress get() throws Exception;
+    JobProgress get(String jobId) throws Exception;
 }
