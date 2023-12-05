@@ -38,7 +38,6 @@ public class DownloadPartnerPsiBloomFilterFunction implements com.welab.fusion.c
                 jobId,
                 partnerId,
                 FileType.BloomFilter,
-                JObject.create("jobId", jobId),
                 fileInfo -> {
                     return FileSystem.getTempDir().resolve("member_" + partnerId + "-bf_" + fileInfo.filename);
                 }

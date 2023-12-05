@@ -15,7 +15,6 @@
  */
 package com.welab.fusion.service.api.download;
 
-import com.alibaba.fastjson.JSONObject;
 import com.welab.fusion.core.bloom_filter.PsiBloomFilter;
 import com.welab.fusion.core.io.FileSystem;
 import com.welab.fusion.service.api.download.base.FileInfo;
@@ -50,8 +49,7 @@ public class GetDownloadFileInfoApi extends AbstractApi<GetDownloadFileInfoApi.I
     private File findFile(Input input) throws IOException {
         switch (input.fileType) {
             case BloomFilter:
-                String jobId = input.bizData.getString("job_id");
-                String bloomFilterId = jobMemberService.findMyself(jobId).getBloomFilterId();
+                String bloomFilterId = jobMemberService.findMyself(input.jobId).getBloomFilterId();
                 Path dir = FileSystem.PsiBloomFilter.getPath(bloomFilterId);
                 return PsiBloomFilter.of(dir).zip();
 
@@ -63,13 +61,13 @@ public class GetDownloadFileInfoApi extends AbstractApi<GetDownloadFileInfoApi.I
     public static class Input extends AbstractApiInput {
         @Check(name = "文件类型", require = true)
         public FileType fileType;
-        @Check(name = "业务数据", require = true, desc = "用于服务端定位被下载的文件，例如job_id、bloom_filter_id")
-        public JSONObject bizData;
+        @Check(name = "任务Id", require = true)
+        public String jobId;
 
-        public static Input of(FileType fileType, JSONObject bizData) {
+        public static Input of(FileType fileType, String jobId) {
             Input input = new Input();
             input.fileType = fileType;
-            input.bizData = bizData;
+            input.jobId = jobId;
             return input;
         }
     }

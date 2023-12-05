@@ -59,7 +59,6 @@ public class SaveFusionResultFunction implements com.welab.fusion.core.function.
                 job.getId(),
                 job.getPartnerMemberId(),
                 FileType.FusionResult,
-                JObject.create("jobId", job.getId()),
                 fileInfo -> {
                     return FileSystem.FusionResult.getFile(job.getId()).toPath();
                 }

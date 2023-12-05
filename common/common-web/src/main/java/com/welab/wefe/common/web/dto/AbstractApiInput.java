@@ -61,6 +61,7 @@ public abstract class AbstractApiInput extends AbstractCheckModel {
     /**
      * 请求是否来自己方
      */
+    @JSONField(serialize = false)
     public boolean isRequestFromMyself() {
         return caller == null;
     }
@@ -68,6 +69,7 @@ public abstract class AbstractApiInput extends AbstractCheckModel {
     /**
      * 请求是否来自其它合作节点
      */
+    @JSONField(serialize = false)
     public boolean isRequestFromPartner() {
         return caller != null;
     }

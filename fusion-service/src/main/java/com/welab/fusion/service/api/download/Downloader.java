@@ -51,10 +51,6 @@ public class Downloader {
      */
     private FileType fileType;
     /**
-     * 业务数据
-     */
-    private JSONObject bizData;
-    /**
      * 下载后的文件输出路径
      */
     Function<FileInfo, Path> distFilePathGetter;
@@ -63,11 +59,10 @@ public class Downloader {
     private Consumer<Long> totalSizeConsumer;
     private Consumer<Long> completedSizeConsumer;
 
-    public Downloader(String jobId, String partnerId, FileType fileType, JSONObject bizData, Function<FileInfo, Path> distFilePathGetter) {
+    public Downloader(String jobId, String partnerId, FileType fileType, Function<FileInfo, Path> distFilePathGetter) {
         this.partnerId = partnerId;
         this.jobId = jobId;
         this.fileType = fileType;
-        this.bizData = bizData;
         this.distFilePathGetter = distFilePathGetter;
     }
 
@@ -175,7 +170,7 @@ public class Downloader {
         FileInfo fileInfo = gatewayService.callOtherFusionNode(
                 partner,
                 GetDownloadFileInfoApi.class,
-                GetDownloadFileInfoApi.Input.of(fileType, bizData)
+                GetDownloadFileInfoApi.Input.of(fileType, jobId)
         );
         return fileInfo;
     }
