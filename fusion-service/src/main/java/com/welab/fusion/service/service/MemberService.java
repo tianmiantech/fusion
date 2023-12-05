@@ -18,7 +18,6 @@ package com.welab.fusion.service.service;
 import com.welab.fusion.service.api.member.TestConnectApi;
 import com.welab.fusion.service.database.base.MySpecification;
 import com.welab.fusion.service.database.base.Where;
-import com.welab.fusion.service.database.entity.JobDbModel;
 import com.welab.fusion.service.database.entity.MemberDbModel;
 import com.welab.fusion.service.database.repository.MemberRepository;
 import com.welab.fusion.service.dto.entity.MemberInputModel;
@@ -76,7 +75,7 @@ public class MemberService extends AbstractService {
         }
 
         MemberInputModel input = new MemberInputModel();
-        input.setName(MYSELF_NAME);
+        input.setMember_name(MYSELF_NAME);
         input.setBaseUrl(config.publicServiceBaseUrl);
         input.setPublicKey(config.publicKey);
         return save(input);
@@ -98,7 +97,7 @@ public class MemberService extends AbstractService {
     }
 
     public MemberDbModel save(MemberInputModel input) throws Exception {
-        return save(input.getName(), input.getBaseUrl(), input.getPublicKey());
+        return save(input.getMember_name(), input.getBaseUrl(), input.getPublicKey());
     }
 
     public synchronized MemberDbModel save(String name, String baseUrl, String publicKey) throws Exception {
@@ -166,6 +165,9 @@ public class MemberService extends AbstractService {
     }
 
     public void delete(String id) {
+        if (MYSELF_NAME.equals(id)) {
+            throw new RuntimeException("不能删除自己");
+        }
         memberRepository.deleteById(id);
     }
 

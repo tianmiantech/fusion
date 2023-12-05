@@ -28,7 +28,7 @@ import com.welab.wefe.common.web.dto.FusionNodeInfo;
  */
 public class MemberInputModel extends AbstractApiInput {
     @Check(name = "名称")
-    private String name;
+    private String member_name;
     @Check(name = "公钥", require = true)
     private String publicKey;
     @Check(name = "接口地址", require = true)
@@ -45,7 +45,7 @@ public class MemberInputModel extends AbstractApiInput {
     public void checkAndStandardize() throws StatusCodeWithException {
         super.checkAndStandardize();
 
-        if (MemberService.MYSELF_NAME.equals(name)) {
+        if (MemberService.MYSELF_NAME.equals(member_name)) {
             StatusCode
                     .PARAMETER_VALUE_INVALID
                     .throwException("名称不能为：" + MemberService.MYSELF_NAME);
@@ -58,12 +58,12 @@ public class MemberInputModel extends AbstractApiInput {
 
     // region getter/setter
 
-    public String getName() {
-        return name;
+    public String getMember_name() {
+        return member_name;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setMember_name(String member_name) {
+        this.member_name = member_name;
     }
 
     public String getPublicKey() {
