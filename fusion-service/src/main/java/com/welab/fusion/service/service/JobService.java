@@ -19,6 +19,7 @@ import com.welab.fusion.core.Job.FusionJob;
 import com.welab.fusion.core.Job.JobMember;
 import com.welab.fusion.core.Job.JobStatus;
 import com.welab.fusion.core.data_resource.base.DataResourceInfo;
+import com.welab.fusion.core.data_resource.base.DataResourceType;
 import com.welab.fusion.core.progress.JobProgress;
 import com.welab.fusion.service.api.job.*;
 import com.welab.fusion.service.constans.JobMemberRole;
@@ -151,6 +152,10 @@ public class JobService extends AbstractService {
         MemberDbModel myselfInfo = memberService.getMyself();
         DataResourceInfo myselfDataResourceInfo = DataResourceInfo.of(myselfJobInfo.getDataResourceType(), myselfJobInfo.getTotalDataCount(), myselfJobInfo.getHashConfigModel());
         JobMember myself = JobMember.of(myselfInfo.getId(), myselfInfo.getName(), myselfDataResourceInfo);
+        if (myselfDataResourceInfo.dataResourceType == DataResourceType.TableDataSource) {
+            myself.tableDataResourceReader = myselfJobInfo.getTableDataResourceInfoModel().createReader(-1, -1);
+        }
+
 
         JobMemberDbModel partnerJobInfo = jobMemberService.findByMemberId(job.getId(), job.getPartnerMemberId());
         MemberDbModel partnerInfo = memberService.findById(partnerJobInfo.getMemberId());

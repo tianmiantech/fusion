@@ -157,6 +157,7 @@ public class MemberService extends AbstractService {
     public List<MemberOutputModel> list(String name) {
         MySpecification<MemberDbModel> where = Where
                 .create()
+                .notEqual("name", MYSELF_NAME)
                 .contains("name", name)
                 .build();
 
