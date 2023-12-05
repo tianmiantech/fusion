@@ -99,7 +99,10 @@ public class FileSystem {
      */
     public static Path getBaseDir(UseType type) {
         String childDir = StringUtil.stringToUnderLineLowerCase(type.name());
-        return getRootDir().resolve(childDir);
+        Path path = getRootDir().resolve(childDir);
+        // 自动创建目录
+        path.toFile().mkdirs();
+        return path;
     }
 
     public static class PsiBloomFilter {
