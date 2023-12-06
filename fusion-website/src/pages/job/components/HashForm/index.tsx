@@ -29,9 +29,6 @@ const HashForm = (props:HashFormPropsInterface) => {
     <>
       <Form.List name="valueList" >
         {(fields, { add, remove,...rest }) => {
-          console.log("rest",rest);
-          console.log("fields",fields);
-          
           return(
           <>
             {fields.map(({key, name}, index) => (

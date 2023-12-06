@@ -13,7 +13,7 @@ import {fileMerge,FileMergeInterface,securityScan,PeviewDataRequestInterface,pre
 import { useImmer } from "use-immer";
 import { Button, Spin, message } from "antd";
 import styles from './index.less'
-import { useRequest } from "ahooks";
+import { useRequest,useMount } from "ahooks";
 import DataSetPreview from "../DataSetPreview";
 interface UploaderInterface {
   fileList:Record<string, any>;
@@ -32,7 +32,7 @@ interface FileChunkUploadInterface {
 
 const Index= forwardRef((props:FileChunkUploadInterface,ref) => {
 
-  const {uploadFinishCallBack,onChange,value={},disabled} = props;
+  const {uploadFinishCallBack,onChange,value={},disabled} = props;  
   
   const uploader = useRef<UploaderInterfaceRef>(null);
   const [uploadData,setUploadData] = useImmer({
@@ -48,9 +48,16 @@ const Index= forwardRef((props:FileChunkUploadInterface,ref) => {
     }
   })
 
+  useEffect(()=>{
+    if(value){
+      console.log("value",value);
+      
+      console.log('uploader.current?.fileList',uploader.current?.fileList);
+      
+    }
+  },[value])
+
   const [fileType,setFileType] = useState('TableDataSource')
-
-
   
   const optionsConfig ={
     target:`${getBaseURL()}/file/upload`,

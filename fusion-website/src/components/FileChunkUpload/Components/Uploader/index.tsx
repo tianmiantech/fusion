@@ -36,6 +36,7 @@ export type UploaderProps = {
   [key: string]: any;
   className?: string;
   style?: React.CSSProperties;
+  
 };
 
 enum UploadEventEnum {
@@ -63,6 +64,7 @@ const { FILE_ADDED_EVENT, FILES_ADDED_EVENT, UPLOAD_START_EVENT } =
   export type UploaderInterfaceRef = {
     // 定义导出的函数或属性
     setFileList: (files: Recordable[]) => void;
+    fileList?: Recordable[];
     getUploader: () => any;
 }
 
@@ -162,7 +164,8 @@ const Uploader:  React.ForwardRefRenderFunction<UploaderInterfaceRef, UploaderPr
 
   useImperativeHandle(ref, () => ({
     getUploader: () => uploaderRef.current,
-    setFileList:setFileList
+    setFileList:setFileList,
+    fileList:fileList,
   }));
 
   useEffect(() => {

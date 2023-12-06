@@ -30,7 +30,7 @@ export function getBaseURL(){
 export const request = axiosInstance({
   message,
   baseURL:getBaseURL(),
-  invalidTokenCodes:['401'],
+  invalidTokenCodes:['10006'],
   successCode:0,
   onTokenInvalid: async (response:any) => {
     const { code, message: msg } = response.data;

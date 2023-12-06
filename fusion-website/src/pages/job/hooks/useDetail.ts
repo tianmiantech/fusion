@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useImmer } from "use-immer";
 import lodash from 'lodash'
 import { useRequest } from "ahooks";
+import { JOB_STATUS } from "@/constant/dictionary";
 
 import { getJobDetail,getMergedJobProgress,getMyJobProgress } from "../service";
 
@@ -44,7 +45,7 @@ const useDetail = ()=>{
 
   useEffect(() => {
     const status = lodash.get(detailData,'jobDetailData.status','');
-    if(status && status !== 'editing' && detailData.jobId){
+    if(status && status !== JOB_STATUS.EDITING && status!==JOB_STATUS.AUDITING && detailData.jobId){
       runGetMergedJobProgress(detailData.jobId);
       runGetMyJobProgress(detailData.jobId)
     }
