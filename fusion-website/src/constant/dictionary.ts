@@ -1,3 +1,4 @@
+
 // 样本类型
 export const dataResourceTypeMap = new Map([
   ['TableDataSource', '数据集'],
@@ -17,11 +18,10 @@ export const encryMethodMap = new Map([
   ['none', '不哈希'],
 ]);
 
-// 角色类型
-export const RoleMap = new Map([
-  ['promoter', '发起方'],
-  ['provider', '协作方'],
-])
+export const ROLE_TYPE = {
+  PROMOTER: 'promoter',
+  PROVIDER: 'provider',
+}
 
 // 角色类型
 export const AddMethodMap = new Map([
@@ -30,14 +30,35 @@ export const AddMethodMap = new Map([
   ['Database', '数据库'],
 ])
 
+// 任务类型 
+export const JOB_STATUS = {
+  EDITING: 'editing',
+  AUDITING: 'auditing',
+  DISAGREE: 'disagree',
+  WAIT_RUN: 'wait_run',
+  RUNNING: 'running',
+  STOP_ON_RUNNING: 'stop_on_running',
+  ERROR_ON_RUNNING: 'error_on_running',
+  SUCCESS: 'success',
+}
+
 // 任务状态
 export const JobStatus = new Map([
-  ['editing', '编辑中'],
-  ['auditing', '审批中'],
-  ['disagree', '已拒绝'],
-  ['wait_run', '等待运行'],
-  ['running', '运行中'],
-  ['stop_on_running','终止运行'],
-  ['error_on_running','运行出错'],
-  ['success','运行成功']
+  [JOB_STATUS.EDITING, '编辑中'],
+  [JOB_STATUS.AUDITING, '审批中'],
+  [JOB_STATUS.DISAGREE, '已拒绝'],
+  [JOB_STATUS.WAIT_RUN, '等待运行'],
+  [JOB_STATUS.RUNNING, '运行中'],
+  [JOB_STATUS.STOP_ON_RUNNING,'终止运行'],
+  [JOB_STATUS.ERROR_ON_RUNNING,'运行出错'],
+  [JOB_STATUS.SUCCESS,'运行成功']
+])
+
+// 任务阶段
+export const JOB_PHASE_LSIT = new Map([
+  ['ConfirmMemberRole', '协商成员角色'],
+  ['CreatePsiBloomFilter', '生成过滤器'],
+  ['DownloadPsiBloomFilter', '下载过滤器'],
+  ['Intersection', '求交'],
+  ['SaveResult', '保存结果'],
 ])

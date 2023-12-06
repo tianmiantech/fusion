@@ -43,9 +43,9 @@ const SendJobForm = forwardRef((props, ref) => {
     const {code} = reponse;
     if(code === 0) {
       message.success('发送成功')
-      // setTimeout(()=>{
-      //   history.back();
-      // },800)
+      setTimeout(()=>{
+        history.push('/home')
+      },800)
     }
   },{manual:true})
 

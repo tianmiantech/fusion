@@ -2,10 +2,12 @@ import { useEffect, useState, useRef, useMemo } from "react";
 import { Card, Row, Spin } from 'antd';
 import Promoter from "./components/Promoter";
 import Provider from './components/Provider'
+import DetailWithProgress from './components/DetailWithProgress'
 import useDetail from './hooks/useDetail'
 import { useParams } from "@umijs/max";
 import { useUnmount } from "ahooks";
 import styles from './index.less'
+import lodash from 'lodash'
 
 const Detail = () => {
   
@@ -40,11 +42,16 @@ const renderLoading = ()=>{
 }
 
 const renderDetail = ()=>{
-  if(detailData.role === 'promoter'){
-    return <Promoter />
-  }else if(detailData.role === 'provider'){
-    return <Provider />
-  } else
+  const status = lodash.get(detailData,'jobDetailData.status','')
+  if(!status|| status === 'editing' || status === 'auditing') {
+    if(detailData.role === 'promoter'){
+      return <Promoter />
+    }else if(detailData.role === 'provider'){
+      return <Provider />
+    }
+  } else if(status) {
+    return <DetailWithProgress />
+  }
   return renderLoading();
 }
 

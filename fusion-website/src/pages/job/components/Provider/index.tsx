@@ -5,7 +5,7 @@ import { useImmer } from 'use-immer';
 import { history } from '@umijs/max';
 import JobForm from "../JobForm";
 import SendJobForm from "../SendJobForm";
-import PrompoterDetail from "./PrompoterDetail";
+import ReadOnlyDetailItem from "../ReadOnlyDetailItem";
 import RefuseModal from "../RefuseModal";
 import './index.less';
 import lodash from 'lodash'
@@ -25,6 +25,8 @@ const Index = forwardRef((props:PromoterPropsInterface,ref) => {
   const { detailData,setDetailData } = useDetail()
   const jobFormRef = useRef<any>();
   const [showRefuseModal,setShowRefuseModal] = useState(false)
+
+  const [promoterDetail,setPromoterDetail] = useState()
 
   const {run:runAgreeAndStart,loading:agreeAndStartLoading} = useRequest(async (params:CreateJobRequestInterface)=>{
     const reponse = await agreeAndStart(params)
@@ -56,8 +58,6 @@ const {run:runDisagreeJob,loading:disagreeJobLoading} = useRequest(async (params
         hash_config
       }
     }
-    console.log("requestParams",requestParams);
-    
     runAgreeAndStart(requestParams)
   }
 
@@ -93,13 +93,15 @@ const {run:runDisagreeJob,loading:disagreeJobLoading} = useRequest(async (params
         <Col span={12}>
           <JobCard
             title={'发起方'}
+            bodyStyle={{ height: 'calc(100vh - 92px)'}}
           >
-           <PrompoterDetail />
+           <ReadOnlyDetailItem detailInfoData={detailData.jobDetailData?.partner}/>
           </JobCard>
         </Col>
         <Col span={12}>
           <JobCard
             title={'协作方'}
+            bodyStyle={{ height: 'calc(100vh - 92px)'}}
           >
              <JobForm
                ref={jobFormRef}

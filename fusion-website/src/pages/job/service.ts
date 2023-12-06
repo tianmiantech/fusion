@@ -102,6 +102,9 @@ export const agreeAndStart = (param:CreateJobRequestInterface)=>{
     return request.post('/job/agree_and_start',param)
 }
 
+/**
+ * 协作方任务，拒绝
+ */
 export interface DisagreeJobRequestInterface {
     job_id:string,
     reason?:string
@@ -111,4 +114,22 @@ export const disagreeJob = (param:DisagreeJobRequestInterface)=>{
 }
 
 
+
+/**
+ * 获取多方任务进度
+ * @param job_id 
+ * @returns 
+ */
+export const getMergedJobProgress = (job_id:string)=>{
+    return request.get('/job/get_merged_job_progress',{job_id})
+}
+
+/**
+ * 
+ * @param job_id 
+ * @returns 
+ */
+export const getMyJobProgress = (job_id:string)=>{
+    return request.get('/job/get_my_job_progress',{job_id})
+}
 

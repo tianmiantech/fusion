@@ -10,3 +10,7 @@ export interface GetJobListRequestInterface {
 export const getJobList = (params:GetJobListRequestInterface) => {
     return request.get('/job/query',{params})
 }
+
+export const deleteJob = (id:string) => {
+    return request.post(`/job/delete`,{id})
+}

@@ -1,4 +1,5 @@
-import { Table,Tag ,Button,Card} from "antd"
+import {useRef} from 'react'
+import { Table,Tag ,Button,Card, message} from "antd"
 import { TmTable } from "@tianmiantech/pro";
 import type { ColumnsType } from 'antd/es/table';
 import { useRequest,useMount } from "ahooks";
@@ -6,9 +7,9 @@ import { history } from 'umi';
 import { useModel } from '@umijs/max';
 import { useImmer } from 'use-immer';
 import styles from './index.less'
-import { getJobList } from "../service";
+import { getJobList,deleteJob } from "../service";
 import moment from "moment";
-import {dataResourceTypeMap,AddMethodMap,JobStatus} from '@/constant/dictionary'
+import {dataResourceTypeMap,AddMethodMap,JobStatus,JOB_STATUS,ROLE_TYPE} from '@/constant/dictionary'
 import lodash from 'lodash'
 
 interface RowProps {
@@ -31,13 +32,20 @@ interface RowProps {
     status:string
 }
 
+interface ActionItemInterface {
+    text:string,
+    key:string,
+    confirmConfig?:any
+}
+
 const ROLE_TO_CN = {
-    'promoter':'我发起的',
-    'provider':'我参与的',
+    [ROLE_TYPE.PROMOTER]:'我发起的',
+    [ROLE_TYPE.PROVIDER]:'我参与的',
  }
 
 const Index =()=>{
 
+    const tabelRef = useRef<any>()
    // 角色类型
 
    
@@ -60,15 +68,19 @@ const Index =()=>{
         }
     },{manual:true})
 
+    const {run:deleteJobData,loading:deleteLoading} = useRequest(async (id)=>{
+        const reponse = await deleteJob(id)
+        const {code,data} = reponse;
+        if (code == 0) {
+            message.success('删除成功')
+            runGetJobListData({page_size:jobListData.page_size,page_index:jobListData.page_index,role:''})
+        }
+    },{manual:true})
+
 
     useMount(()=>{
         runGetJobListData({page_size:jobListData.page_size,page_index:jobListData.page_index,role:''})
     })
-
-
-
-
-
 
     const columns: ColumnsType<RowProps> = [{
         title: '任务角色/创建时间',
@@ -123,13 +135,19 @@ const Index =()=>{
         render:(text:string)=>{
             return <Tag >{JobStatus.get(text)}</Tag>
         }
+    },{
+        title: '备注',
+        dataIndex: 'remark',
+        key: 'remark'
     }]
 
     const actionClickHandle = (key:string, record:RowProps, index:number)=>{
         if (key === 'detail') {
-            console.log("record",record);
             const {id} = record
             history.push(`/job/detail/${id}`);
+        } else if(key === 'delete'){
+            const {id} = record;
+            deleteJobData(id)
         }
     }
 
@@ -148,25 +166,37 @@ const Index =()=>{
         </div>
     }
 
+
+
+    const renderAction = (record:RowProps)=>{
+        const {role,status} = record;
+        const defaultList:ActionItemInterface[] =[]
+        defaultList.push({text: '详情', key: 'detail'})
+        if(role === ROLE_TYPE.PROMOTER){
+            if(!status || status === JOB_STATUS.EDITING){
+                defaultList.push({text: '删除', key: 'delete',confirmConfig:{title:'确认删除该任务吗？'}})
+            }
+        }
+        return defaultList
+    }
+
     const renderList = ()=>{
         return <Card title='任务列表' extra={renderBtn()}>
-            <TmTable
-                dataSource={jobListData.dataSource}
-                columns={columns}
-                pagination={{
-                    page_size:jobListData.page_size,
-                    current:jobListData.page_index,
-                    showSizeChanger: false,
-                    size: 'small',
-                }}
+                <TmTable
+                    ref={tabelRef}
+                    dataSource={jobListData.dataSource}
+                    columns={columns}
+                    pagination={{
+                        page_size:jobListData.page_size,
+                        current:jobListData.page_index,
+                        showSizeChanger: false,
+                        size: 'small',
+                    }}
                 >
                 <TmTable.Table
-                    actionItems={(record:RowProps) => [
-                    { text: '详情', key: 'detail'},
-                    { text: '删除', key: 'delete' },
-                    { text: '查看备注', key: 'remark' },
-                    ]}
-                actionClickHandle={actionClickHandle}
+                    actionItems={renderAction}
+                    loading={getJobListLoading||deleteLoading}
+                    actionClickHandle={actionClickHandle}
             />
         </TmTable>
         </Card>

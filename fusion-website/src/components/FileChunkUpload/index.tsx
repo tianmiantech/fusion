@@ -48,7 +48,7 @@ const Index= forwardRef((props:FileChunkUploadInterface,ref) => {
     }
   })
 
-  const [fileType,setFileType] = useState('PsiBloomFilter')
+  const [fileType,setFileType] = useState('TableDataSource')
 
 
   

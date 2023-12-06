@@ -100,7 +100,7 @@ const JobForm = forwardRef((props:JobFormPropsInterface, ref) => {
               layout="vertical"
               disabled={checkFormDisable()}
             >
-              <Form.Item label="样本类型" required>
+              <Form.Item style={{marginBottom:0}}  label="样本类型" required>
                 <Form.Item name="data_resource_type" style={{ display: 'inline-block', marginBottom: 0 }} rules={[{ required: true }]}>
                   <Radio.Group>
                     {[...dataResourceTypeMap].map(([value, label]) => (
@@ -110,39 +110,44 @@ const JobForm = forwardRef((props:JobFormPropsInterface, ref) => {
                     ))}
                   </Radio.Group>
                 </Form.Item>
-                <Form.Item noStyle shouldUpdate={(prev, cur) => prev.data_resource_type !== cur.data_resource_type }>
+                <Form.Item noStyle shouldUpdate={(prev, cur) => prev.data_resource_type !== cur.data_resource_type|| prev.dataSetAddMethod !== cur.dataSetAddMethod  }>
                   {({ getFieldValue }) => {
-                      return getFieldValue('data_resource_type') === 'PsiBloomFilter' ?
-                      <Button
-                        style={{ marginLeft: 15 }}
-                        onClick={()=>{}}
-                      >布隆过滤器管理</Button> : null
+                      const data_resource_type = getFieldValue('data_resource_type');
+                      const dataSetAddMethod = getFieldValue('dataSetAddMethod');
+                      if(data_resource_type === 'TableDataSource') {
+                        return <>
+                           <Form.Item style={{marginTop:30}} name="dataSetAddMethod" label="选择样本" rules={[formRuleRequire()]}>
+                            <Radio.Group>
+                              {[...dataSetAddMethodMap].map(([value, label]) => (
+                                <Radio key={value} value={value}>
+                                  {label}
+                                </Radio>
+                              ))}
+                            </Radio.Group>
+                         </Form.Item>
+                        <Form.Item >
+                            {dataSetAddMethod === 'HttpUpload' ?
+                              <>
+                                <Form.Item name={'table_data_resource_info'}>
+                                  <FileChunkUpload uploadFinishCallBack={uploadFinishCallBack}/>
+                                </Form.Item>
+                              </> :
+                              <DataSourceForm formRef={formRef}/>
+                            }
+                        </Form.Item>
+                        </>
+                      } else {
+                       return  <Form.Item style={{marginTop:30}} name="dataSetAddMethod" label="选择布隆过滤器" rules={[formRuleRequire()]}>
+                            <Button
+                              onClick={()=>{}}
+                            >选择布隆过滤器</Button> 
+                        </Form.Item>
+                      }
                     }
                   }
                 </Form.Item>
               </Form.Item>
-              <Form.Item name="dataSetAddMethod" label="选择样本" rules={[formRuleRequire()]}>
-                <Radio.Group>
-                  {[...dataSetAddMethodMap].map(([value, label]) => (
-                    <Radio key={value} value={value}>
-                      {label}
-                    </Radio>
-                  ))}
-                </Radio.Group>
-              </Form.Item>
-              <Form.Item >
-                <Form.Item  noStyle shouldUpdate={(prev, cur) => prev.dataSetAddMethod !== cur.dataSetAddMethod }>
-                  {({ getFieldValue }) => 
-                    getFieldValue('dataSetAddMethod') === 'HttpUpload' ?
-                    <>
-                      <Form.Item name={'table_data_resource_info'}>
-                        <FileChunkUpload uploadFinishCallBack={uploadFinishCallBack}/>
-                      </Form.Item>
-                    </> :
-                    <DataSourceForm formRef={formRef}/>
-                  }
-                </Form.Item>
-              </Form.Item>
+             
               <Form.Item name={'hash_config'}>
                 <HashForm columnList={jobFormData.dataourceColumnList}/> 
               </Form.Item>
