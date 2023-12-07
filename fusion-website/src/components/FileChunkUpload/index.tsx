@@ -13,7 +13,7 @@ import {fileMerge,FileMergeInterface,securityScan,PeviewDataRequestInterface,pre
 import { useImmer } from "use-immer";
 import { Button, Spin, message } from "antd";
 import styles from './index.less'
-import { useRequest } from "ahooks";
+import { useRequest,useMount } from "ahooks";
 import DataSetPreview from "../DataSetPreview";
 interface UploaderInterface {
   fileList:Record<string, any>;
@@ -27,11 +27,13 @@ interface FileChunkUploadInterface {
   uploadFinishCallBack?:Function
   value?:FileChunkUploadValue,
   onChange?: (value:FileChunkUploadValue) => void;
+  disabled?:boolean
 }
 
 const Index= forwardRef((props:FileChunkUploadInterface,ref) => {
 
-  const {uploadFinishCallBack,onChange,value={}} = props;
+  const {uploadFinishCallBack,onChange,value={},disabled} = props;  
+  
   const uploader = useRef<UploaderInterfaceRef>(null);
   const [uploadData,setUploadData] = useImmer({
     filename:'',
@@ -46,12 +48,19 @@ const Index= forwardRef((props:FileChunkUploadInterface,ref) => {
     }
   })
 
-  const [fileType,setFileType] = useState('PsiBloomFilter')
+  useEffect(()=>{
+    if(value){
+      console.log("value",value);
+      
+      console.log('uploader.current?.fileList',uploader.current?.fileList);
+      
+    }
+  },[value])
 
-
+  const [fileType,setFileType] = useState('TableDataSource')
   
   const optionsConfig ={
-    target:`http://172.31.21.36:8080/fusion/file/upload`,
+    target:`${getBaseURL()}/file/upload`,
     chunkSize:4*1024*1024,
     simultaneousUploads:4,
     headers:{

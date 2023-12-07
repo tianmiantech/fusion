@@ -33,7 +33,7 @@ const BasicLayout = (props:BasicLayoutPros) => {
   return  <ConfigProvider prefixCls={'fusion'}  locale={zhCN}>
               <Layout style={{width:'100%',height:'100%'}}>
                   <Header/>
-                  <Content >
+                  <Content style={{overflowY:'auto'}}>
                     <Outlet/>
                   </Content>
               </Layout>

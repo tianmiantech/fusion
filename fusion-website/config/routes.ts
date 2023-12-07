@@ -28,14 +28,14 @@ export default [
       },
       
       {
-        name: 'task',
-        path: '/task',
-        component: './task',
+        name: 'job',
+        path: '/job/create',
+        component: './job/Create',
       },
       {
-        name: 'taskDetail',
-        path: '/task/detail',
-        component: './task/Detail',
+        name: 'jobDetail',
+        path: '/job/detail/:id',
+        component: './job/Detail',
       },
     ],
   }

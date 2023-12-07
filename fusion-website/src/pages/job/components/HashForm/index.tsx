@@ -7,30 +7,28 @@ import './index.less';
 import lodash from 'lodash'
 
 export interface HashFormValue {
-  columns:string[],
-  method:string
+  list:{
+    columns:string[],
+    method:string
+  }[]
 }
 interface HashFormPropsInterface  {
   columnList:string[]
-  value?:HashFormValue[]
-  onChange?:(value:HashFormValue[])=>void
+  value?:HashFormValue
+  onChange?:(value:HashFormValue)=>void
 }
 const HashForm = (props:HashFormPropsInterface) => {
   const {columnList,value,onChange} = props
 
   const onValuesChange = (changedValues:any, allValues:any) => {
-    const valueList = lodash.get(allValues,'valueList',[]) as HashFormValue[]
-
-    onChange?.(valueList)
+    const valueList = lodash.get(allValues,'valueList',[])
+    onChange?.({list:valueList})
   };
 
   const HashKeyForm = () => (
     <>
       <Form.List name="valueList" >
         {(fields, { add, remove,...rest }) => {
-          console.log("rest",rest);
-          console.log("fields",fields);
-          
           return(
           <>
             {fields.map(({key, name}, index) => (
