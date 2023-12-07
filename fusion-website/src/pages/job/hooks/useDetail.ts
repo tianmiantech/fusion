@@ -13,18 +13,22 @@ interface useDetailDataInterface {
     status?:string,// 审核状态
     jobId?:string,
     jobDetailData:any,
-    mysqlJobProgress?:any,
+    myselfJobProgress?:any,
     partnerJobProgress?:any,
+    myselfPhasesList:any[],
+    partnerPhasesList:any[],
   }
 
 const useDetail = ()=>{
     
   const [detailData, setDetailData] = useImmer<useDetailDataInterface>({
       role:'',
-      jobDetailData:null,
+      jobDetailData:null,//任务详情数据
       jobId:'',
-      mysqlJobProgress:null,
-      partnerJobProgress:null
+      myselfJobProgress:null, //我方当前任务进度
+      partnerJobProgress:null,//协作方当前任务进度
+      myselfPhasesList:[], //我方任务阶段列表
+      partnerPhasesList:[],//协作方任务阶段列表
   });
 
   const clearDetailData = ()=>{
@@ -32,8 +36,10 @@ const useDetail = ()=>{
       draft.role = '';
       draft.jobDetailData = null;
       draft.jobId = '';
-      draft.mysqlJobProgress = null;
+      draft.myselfJobProgress = null;
       draft.partnerJobProgress = null;
+      draft.myselfPhasesList = [];
+      draft.partnerPhasesList = [];
     })
   }
 
@@ -72,12 +78,14 @@ const useDetail = ()=>{
     const res = await getMergedJobProgress(id);
     const {code,data} = res;
     if(code === 0){
-      const partner = lodash.get(data,'partner',null);
+      const partner = lodash.get(data,'partner.current_phase_progress',null);
+      const partnerPhasesList = lodash.get(data,'partner.phases',[]);
       setDetailData(draft=>{
         draft.partnerJobProgress = partner;
+        draft.partnerPhasesList = partnerPhasesList;
       })
     }
-  } ,{manual:true})
+  } ,{manual:true,pollingInterval:3000})
 
   /**
    * 主要是协作方任务进度
@@ -86,11 +94,14 @@ const useDetail = ()=>{
     const res = await getMyJobProgress(id);
     const {code,data} = res;
     if(code === 0){
+      const myselfJobProgress = lodash.get(data,'current_phase_progress',null);
+      const myselfPhasesList = lodash.get(data,'phases',[]);
       setDetailData(draft=>{
-        draft.mysqlJobProgress = data;
+        draft.myselfJobProgress = myselfJobProgress;
+        draft.myselfPhasesList = myselfPhasesList;
       })
     }
-  } ,{manual:true})
+  } ,{manual:true,pollingInterval:3000})
 
     return {
         detailData,

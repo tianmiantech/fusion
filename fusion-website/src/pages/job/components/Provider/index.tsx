@@ -91,12 +91,7 @@ const {run:runDisagreeJob,loading:disagreeJobLoading} = useRequest(async (params
     <>
       <Row>
         <Col span={12}>
-          <JobCard
-            title={'发起方'}
-            bodyStyle={{ height: 'calc(100vh - 92px)'}}
-          >
-           <ReadOnlyDetailItem detailInfoData={detailData.jobDetailData?.partner}/>
-          </JobCard>
+           <ReadOnlyDetailItem title={'发起方'}  bodyStyle={{ height: 'calc(100vh - 92px)'}} detailInfoData={detailData.jobDetailData?.partner}/>
         </Col>
         <Col span={12}>
           <JobCard

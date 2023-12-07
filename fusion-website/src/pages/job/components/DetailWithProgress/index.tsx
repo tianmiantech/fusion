@@ -44,8 +44,8 @@ const Index = ()=>{
     },[detailData.jobDetailData])
 
     useEffect(()=>{
-      if(detailData.mysqlJobProgress){
-        const tmpProgress = lodash.get(detailData,'mysqlJobProgress');
+      if(detailData.myselfJobProgress){
+        const tmpProgress = lodash.get(detailData,'myselfJobProgress');
         if(detailData.role === ROLE_TYPE.PROMOTER){
           setData(g=>{
             g.promoterProgress = tmpProgress;
@@ -56,7 +56,7 @@ const Index = ()=>{
           })
         } 
       }
-    },[detailData.mysqlJobProgress])
+    },[detailData.myselfJobProgress])
 
 
     useEffect(()=>{
@@ -74,6 +74,9 @@ const Index = ()=>{
       }
     },[detailData.partnerJobProgress])
 
+    useEffect(()=>{
+    },[detailData])
+
     const renderProgressTitle = ()=>{
       return <>任务进度<span style={{fontSize:12,color:'gray'}}>（发起方,协作方节点任务阶段相同）</span></>
     }
@@ -81,23 +84,15 @@ const Index = ()=>{
     return <>
           <div className="topContainer">
             <Card title={renderProgressTitle()}>
-              <JobProgress data={detailData.mysqlJobProgress}/>
+              <JobProgress data={detailData.myselfJobProgress}/>
             </Card>
           </div>
             <Row>
               <Col span={12}>
-                <JobCard
-                    title={'发起方'}
-                >
-                  <ReadOnlyDetailItem detailInfoData={data.promoterDetail} progressData={data.promoterProgress}/>
-                </JobCard>
+                  <ReadOnlyDetailItem title="发起方" detailInfoData={data.promoterDetail} progressData={data.promoterProgress}/>
               </Col>
               <Col span={12}>
-                <JobCard
-                    title={'协作方'}
-                >
-                  <ReadOnlyDetailItem  detailInfoData={data.providerDetail} progressData={data.providerProgress}/>
-                </JobCard>
+                  <ReadOnlyDetailItem title={'协作方'}  detailInfoData={data.providerDetail} progressData={data.providerProgress}/>
               </Col>
             </Row>
       </>

@@ -1,10 +1,10 @@
 import { useEffect, useState, useRef } from "react";
-import { Descriptions, } from 'antd';
+import { Descriptions,Typography,Button,Popover } from 'antd';
 import {dataResourceTypeMap} from '@/constant/dictionary'
 import lodash from 'lodash'
 import moment from 'moment'
 import {Progress,List} from 'antd'
-import CurrentJobProgress from './DetailWithProgress/CurrentJobProgress'
+import JobCard from './JobCard'
 
 interface hashConfigItemInterface {
   columns: string[];
@@ -12,10 +12,13 @@ interface hashConfigItemInterface {
 }
 
 interface ReadOnlyDetailItemProps {
+  title?:string,
+  bodyStyle?:any,
   detailInfoData:{
     hash_config?:{list:any[]}
     base_url?:string,
     data_resource_type?:string,
+    table_data_resource_info?:any|null,
     total_data_count?:string,
     public_key?:string,
     created_time?:string,
@@ -34,7 +37,7 @@ interface ReadOnlyDetailItemProps {
   }
 }
 const ReadOnlyDetailItem = (props:ReadOnlyDetailItemProps) => {
-  const {detailInfoData,progressData } = props
+  const {detailInfoData,progressData,title,bodyStyle } = props
   
   const labelStyle = {
     width: 150,
@@ -57,9 +60,8 @@ const ReadOnlyDetailItem = (props:ReadOnlyDetailItemProps) => {
   }
 
   const renderUpdateTime = ()=>{
-    const created_time = lodash.get(detailInfoData,'created_time','')
-    const updated_time = lodash.get(detailInfoData,'updated_time','')
-    return moment(updated_time|| created_time||new Date()).startOf('hour').fromNow()
+    const start_time = lodash.get(detailInfoData,'start_time','')
+    return moment(start_time||new Date()).startOf('hour').fromNow()
   }
 
   const displayChineseTime = (cost_time:number)=>{
@@ -102,27 +104,37 @@ const ReadOnlyDetailItem = (props:ReadOnlyDetailItemProps) => {
         速度：{lodash.get(progressData,'speed_in_second',0)}条/秒
       <br/>
         结束时间：{moment(lodash.get(progressData,'end_time',0)).format('YYYY-MM-DD HH:mm:ss')}
-        {logList.length>0?<><br/>日志：<List dataSource={logList}/></>:null}
+        {renderLogBtn()}
     </>
   }
+  const renderLogBtn = ()=>{
+    const logList = lodash.get(progressData,'logs',[])
+    if(logList.length>0){
+      return <>
+      <br/>
+      <Popover content={<div>{arrayToParagraphs(logList)}</div>}><Button>查看日志</Button></Popover>
+      </>
 
-  
+    }
+    return null
+  }
 
+  function arrayToParagraphs(array:string[]) {
+    return array.map(function(item) {
+      return <p>{item}</p>;
+    });
+  }
 
-
-  return (
-    <>
+  return (<JobCard title={title} bodyStyle={bodyStyle}>
       <Descriptions column={1} bordered labelStyle={labelStyle}>
         <Descriptions.Item label="服务地址">{lodash.get(detailInfoData,'base_url','') }</Descriptions.Item>
         <Descriptions.Item label="样本类型">{ dataResourceTypeMap.get(lodash.get(detailInfoData,'data_resource_type',''))  }</Descriptions.Item>
         <Descriptions.Item label="数据量">{ lodash.get(detailInfoData,'total_data_count','')}</Descriptions.Item>
         <Descriptions.Item label="主键">{renderHashConfig()}</Descriptions.Item>
-        <Descriptions.Item label="公钥">{ lodash.get(detailInfoData,'public_key','')}</Descriptions.Item>
-        <Descriptions.Item label="更新时间">{renderUpdateTime()}</Descriptions.Item>
+        <Descriptions.Item label="开始时间">{renderUpdateTime()}</Descriptions.Item>
         {progressData?<Descriptions.Item label="任务进度">{renderCurrentProgress()} </Descriptions.Item>:null}
-        
       </Descriptions>
-    </>
+    </JobCard>
   );
 };
 

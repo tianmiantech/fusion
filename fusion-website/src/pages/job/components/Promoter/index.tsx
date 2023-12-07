@@ -12,7 +12,7 @@ import JobCard from '../JobCard'
 import useDetail from "../../hooks/useDetail";
 import { useRequest } from 'ahooks';
 import {createJob,CreateJobRequestInterface} from '../../service'
-import ReadOnlyDetailItem from '../ReadOnlyDetailItem'
+
 interface PromoterPropsInterface {
   detailData?:any
 }
@@ -59,10 +59,7 @@ const Index = forwardRef((props:PromoterPropsInterface,ref) => {
 
   const renderFormAction = ()=>{
     const status = lodash.get(detailData,'jobDetailData.status','')
-    if(!status || status==='editing'){
-      return  <Button loading={createJobloading} type="primary" onClick={submitFormData}>{detailData.jobId?'更新':'保存'}</Button>
-    }
-    return null
+    return  <Button disabled={!(!status || status==='editing')} loading={createJobloading} type="primary" onClick={submitFormData}>{detailData.jobId?'更新':'保存'}</Button>
   }
 
   const renderProviderTitle = ()=>{
