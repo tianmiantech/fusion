@@ -20,9 +20,7 @@ interface HashFormPropsInterface  {
 }
 const HashForm = (props:HashFormPropsInterface) => {
   const {columnList,value,onChange,disabled} = props
-  const [formRef] = Form.useForm();
-  console.log("disabled",disabled);
-  
+  const [formRef] = Form.useForm();  
   
   //编辑时，Form主动设置value，将数据进行回填
   useEffect(()=>{

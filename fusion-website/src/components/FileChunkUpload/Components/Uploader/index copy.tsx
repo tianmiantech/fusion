@@ -17,7 +17,7 @@ import UploaderUnsupport from "../Unsupport";
 import UploaderContext, { defaultGetPrefixCls } from "../UploaderContext";
 import "./index.css";
 import { camelCase } from "../../utils";
-import { Spin } from "antd";
+
 type Recordable<T = any> = Record<string, T>;
 
 export type StatusType = {
@@ -36,10 +36,6 @@ export type UploaderProps = {
   [key: string]: any;
   className?: string;
   style?: React.CSSProperties;
-  loading?: boolean;
-  accept?: string;
-  disabled?: boolean;
-  renderPrewView?: () => React.ReactNode;
   
 };
 
@@ -73,8 +69,7 @@ const { FILE_ADDED_EVENT, FILES_ADDED_EVENT, UPLOAD_START_EVENT } =
 }
 
 const Uploader:  React.ForwardRefRenderFunction<UploaderInterfaceRef, UploaderProps> = (props, ref) => {
-  const { className, style, options, fileStatusText, loading=false,children,accept,disabled
-  ,renderPrewView } = props;
+  const { className, style, options, fileStatusText, children } = props;
 
   const prefixCls = defaultGetPrefixCls("");
 
@@ -198,15 +193,6 @@ const Uploader:  React.ForwardRefRenderFunction<UploaderInterfaceRef, UploaderPr
     };
   }, []);
 
-  useEffect(()=>{
-    var fileInput = document.getElementById('fusion_job_detail_file_input') as HTMLInputElement;
-    if(fileInput){
-      if(disabled){
-        fileInput.disabled = disabled
-        }
-    }
-  },[disabled])
-
   return (
     <UploaderContext.Provider
       value={{
@@ -220,24 +206,19 @@ const Uploader:  React.ForwardRefRenderFunction<UploaderInterfaceRef, UploaderPr
           className={classNames(`${prefixCls}-wrapper`, className)}
           style={style}
         >
-           {children ? (
+          {children ? (
             children({ fileList, files, started })
           ) : (
-          <Fragment>
-            <Spin spinning={loading}>
-            <UploaderUnsupport />
-            <UploaderDrop>
-              <p>拖拽文件上传</p>
-              <UploaderBtn single={true} attrs={{accept:accept,id:'fusion_job_detail_file_input'}}>
-                上传文件
-              </UploaderBtn>
-              {renderPrewView && renderPrewView()}
-            </UploaderDrop>
-            <UploaderList fileList={fileList} />
-            </Spin>
-          </Fragment>
+            <Fragment>
+              <UploaderUnsupport />
+              <UploaderDrop>
+                <p>Drop files here to upload or</p>
+                <UploaderBtn>select files</UploaderBtn>
+                <UploaderBtn directory>select folder</UploaderBtn>
+              </UploaderDrop>
+              <UploaderList fileList={fileList} />
+            </Fragment>
           )}
-
         </div>
       }
     </UploaderContext.Provider>

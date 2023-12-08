@@ -14,11 +14,9 @@ import { useImmer } from "use-immer";
 import { Button, Spin, message } from "antd";
 import styles from './index.less'
 import { useRequest,useMount } from "ahooks";
-import {HttpUpload} from "../DataSetPreview";
+import {HttpUploadPreview} from '@/components/DataSetPreview'
 
-interface UploaderInterface {
-  fileList:Record<string, any>;
-}
+
 
 interface FileChunkUploadValue {
   data_source_file:string,
@@ -157,14 +155,15 @@ const Index= forwardRef((props:FileChunkUploadInterface,ref) => {
     })
   }
 
-  useEffect(()=>{
-    var fileInput = document.getElementById('fusion_job_detail_file_input') as HTMLInputElement;
-    if(fileInput){
-      if(disabled){
-        fileInput.disabled = disabled
-        }
+  const renderPrewView = ()=>{
+    if(uploadData.showPreBtn){
+      return <HttpUploadPreview autoLoadPreView={true} columnsChangeCallBack={columnsChangeCallBack} filename={uploadData.filename}/>
     }
-  },[disabled])
+   return  null
+  }
+  
+
+
 
 
   return <>
@@ -172,30 +171,9 @@ const Index= forwardRef((props:FileChunkUploadInterface,ref) => {
       ref={uploader} 
       options={optionsConfig} 
       onFileComplete={onFileComplete}
-      autoStart >
-      {(fileObj:UploaderInterface) => {
-        const {fileList} = fileObj
-       return  (
-          <Fragment>
-            <Spin spinning={uploadData.loading}>
-              <UploaderUnsupport />
-              <UploaderDrop>
-                <p>拖拽文件上传</p>
-                <UploaderBtn single={true} attrs={{accept:uploadData.accept,id:'fusion_job_detail_file_input'}}>
-                  上传文件
-                </UploaderBtn>
-                {
-                  uploadData.showPreBtn && <HttpUpload autoLoadPreView={true} columnsChangeCallBack={columnsChangeCallBack} filename={uploadData.filename}/>
-                }
-                
-                {/* <UploaderBtn directory>上传文件夹</UploaderBtn> */}
-              </UploaderDrop>
-              <UploaderList fileList={fileList} />
-            </Spin>
-          </Fragment>
-        )
-      }}
-    </Uploader>
+      disabled={disabled}
+      renderPrewView={renderPrewView}
+      autoStart />
     </>
 });
 export default Index

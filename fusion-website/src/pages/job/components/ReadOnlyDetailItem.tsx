@@ -5,7 +5,7 @@ import lodash from 'lodash'
 import moment from 'moment'
 import {Progress,List} from 'antd'
 import JobCard from './JobCard'
-import { HttpUpload } from "@/components/DataSetPreview";
+import { HttpUploadPreview } from "@/components/DataSetPreview";
 import { ROLE_TYPE } from "@/constant/dictionary";
 interface hashConfigItemInterface {
   columns: string[];
@@ -134,7 +134,7 @@ const ReadOnlyDetailItem = (props:ReadOnlyDetailItemProps) => {
       const fileName = lodash.get(table_data_resource_info,'data_source_file','')
       return <>
       {total_data_count}
-      <HttpUpload filename={fileName} />
+      <HttpUploadPreview filename={fileName} />
     </>
     }
     return <>
