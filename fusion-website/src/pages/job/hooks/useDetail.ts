@@ -11,7 +11,7 @@ import { getJobDetail,getMergedJobProgress,getMyJobProgress } from "../service";
 interface useDetailDataInterface {
     role:'promoter'|'provider'|'',
     status?:string,// 审核状态
-    jobId?:string,
+    jobId:string,
     jobDetailData:any,
     myselfJobProgress?:any,
     partnerJobProgress?:any,
@@ -41,6 +41,8 @@ const useDetail = ()=>{
       draft.myselfPhasesList = [];
       draft.partnerPhasesList = [];
     })
+    cancelGetMergedJobProgress();
+    cancelGetMyJobProgress();
   }
 
   useEffect(() => {
@@ -74,7 +76,7 @@ const useDetail = ()=>{
   /**
    * 获取多方任务进度
    */
-  const {run:runGetMergedJobProgress} = useRequest(async (id:string)=>{
+  const {run:runGetMergedJobProgress,cancel:cancelGetMergedJobProgress} = useRequest(async (id:string)=>{
     const res = await getMergedJobProgress(id);
     const {code,data} = res;
     if(code === 0){
@@ -90,7 +92,7 @@ const useDetail = ()=>{
   /**
    * 主要是协作方任务进度
    */
-  const {run:runGetMyJobProgress} = useRequest(async (id:string)=>{
+  const {run:runGetMyJobProgress,cancel:cancelGetMyJobProgress} = useRequest(async (id:string)=>{
     const res = await getMyJobProgress(id);
     const {code,data} = res;
     if(code === 0){

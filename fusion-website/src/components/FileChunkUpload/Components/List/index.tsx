@@ -2,6 +2,7 @@ import React from "react";
 import classNames from "classnames";
 import { UploaderContext } from "../UploaderContext";
 import UploaderFile from "../File";
+import ReadonlyFile from '../File/ReadonlyFile'
 import "./index.css";
 
 type UploaderListType = {
@@ -16,14 +17,19 @@ export default (props: UploaderListType) => {
   const { getPrefixCls } = React.useContext(UploaderContext);
   const prefixCls = getPrefixCls("list");
 
+  const isString = (str: any) => {
+    return typeof str === 'string';
+  }
+
+
   return (
     <div className={classNames(prefixCls, className)} style={style}>
       {children ? (
         children({ fileList })
       ) : (
         <ul>
-          {fileList.map((file: Record<string, any>) => (
-            <UploaderFile key={file.id} file={file} list />
+          {fileList.map((file: Record<string, any>,index:number) => (
+            isString(file)?<ReadonlyFile file={file} list />:<UploaderFile key={file.id} file={file} list />
           ))}
         </ul>
       )}

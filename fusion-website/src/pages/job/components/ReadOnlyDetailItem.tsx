@@ -5,7 +5,8 @@ import lodash from 'lodash'
 import moment from 'moment'
 import {Progress,List} from 'antd'
 import JobCard from './JobCard'
-
+import { HttpUpload } from "@/components/DataSetPreview";
+import { ROLE_TYPE } from "@/constant/dictionary";
 interface hashConfigItemInterface {
   columns: string[];
   method: string;
@@ -125,11 +126,27 @@ const ReadOnlyDetailItem = (props:ReadOnlyDetailItemProps) => {
     });
   }
 
+  const renderTotlDataCount = ()=>{
+    const total_data_count = lodash.get(detailInfoData,'total_data_count','')
+    const table_data_resource_info = lodash.get(detailInfoData,'table_data_resource_info',null)
+    const role = lodash.get(detailInfoData,'role',{})
+    if(role===ROLE_TYPE.PROMOTER && table_data_resource_info){
+      const fileName = lodash.get(table_data_resource_info,'data_source_file','')
+      return <>
+      {total_data_count}
+      <HttpUpload filename={fileName} />
+    </>
+    }
+    return <>
+       {total_data_count}
+    </>
+  }
+
   return (<JobCard title={title} bodyStyle={bodyStyle}>
       <Descriptions column={1} bordered labelStyle={labelStyle}>
         <Descriptions.Item label="服务地址">{lodash.get(detailInfoData,'base_url','') }</Descriptions.Item>
         <Descriptions.Item label="样本类型">{ dataResourceTypeMap.get(lodash.get(detailInfoData,'data_resource_type',''))  }</Descriptions.Item>
-        <Descriptions.Item label="数据量">{ lodash.get(detailInfoData,'total_data_count','')}</Descriptions.Item>
+        <Descriptions.Item label="数据量">{ renderTotlDataCount()}</Descriptions.Item>
         <Descriptions.Item label="主键">{renderHashConfig()}</Descriptions.Item>
         <Descriptions.Item label="开始时间">{renderUpdateTime()}</Descriptions.Item>
         {progressData?<Descriptions.Item label="任务进度">{renderCurrentProgress()} </Descriptions.Item>:null}

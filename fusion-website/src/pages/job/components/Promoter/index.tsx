@@ -71,6 +71,32 @@ const Index = forwardRef((props:PromoterPropsInterface,ref) => {
       return `协作方（${member_id}）`
     }
   }
+
+   /**
+   *  初始化表格填充内容
+    remark:string,
+    status:string,
+    data_resource_type:string,
+    hash_config:{},
+    table_data_resource_info:{},
+    dataSetAddMethod:string,
+    bloom_filter_id:string,
+   */
+    useEffect(()=>{
+      if(detailData.jobDetailData){
+        const dataSetAddMethod = lodash.get(detailData,'jobDetailData.myself.table_data_resource_info.add_method');
+        jobFormRef.current.setFieldsValue({
+          remark:lodash.get(detailData,'jobDetailData.remark',''),
+          status: lodash.get(detailData,'jobDetailData.status','') ,
+          data_resource_type: lodash.get(detailData,'jobDetailData.myself.data_resource_type',''),
+          hash_config: {...lodash.get(detailData,'jobDetailData.myself.hash_config',''),source:'setFieldsValue'},
+          table_data_resource_info:{...lodash.get(detailData,'jobDetailData.myself.table_data_resource_info',{}),source:'setFieldsValue'},
+          dataSetAddMethod:dataSetAddMethod
+        })
+      }
+    },[detailData.jobDetailData])
+
+
   
 
   return (

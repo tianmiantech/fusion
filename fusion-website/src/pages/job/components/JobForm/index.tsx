@@ -1,19 +1,14 @@
 import React, { useEffect, useState, useRef, forwardRef, useImperativeHandle } from 'react';
 import { Input, Button, Form, Radio, Upload, Tooltip, Space, Row, Col,Alert,Spin, message } from 'antd';
-import { dataResourceTypeMap, dataSetAddMethodMap } from '@/constant/dictionary';
-import DataSetPreview from "@/components/DataSetPreview";
+import { dataResourceTypeMap, dataSetAddMethodMap,JOB_STATUS } from '@/constant/dictionary';
 import HashForm from '../HashForm/index';
 import DataSourceForm from '../DataSourceForm';
 import BloomFilterManage from '../BloomFilterManage';
 import { formRuleRequire } from '@/utils/common';
 import { useImmer } from 'use-immer';
 import FileChunkUpload from '@/components/FileChunkUpload'
-import { useModel } from '@umijs/max';
-import { CheckCircleFilled } from '@ant-design/icons';
 import './index.less'
-
 import lodash from 'lodash'
-import { useRequest } from 'ahooks';
 import useDetail from "../../hooks/useDetail";
 
 
@@ -53,41 +48,20 @@ const JobForm = forwardRef((props:JobFormPropsInterface, ref) => {
       g.uploadFileName = uploadFileName
     })
   }
-
-  /**
-   *  初始化表格填充内容
-    remark:string,
-    status:string,
-    data_resource_type:string,
-    hash_config:{},
-    table_data_resource_info:{},
-    dataSetAddMethod:string,
-    bloom_filter_id:string,
-   */
-  useEffect(()=>{
-    if(detailData.role==='promoter' && detailData.jobDetailData){
-      const dataSetAddMethod = lodash.get(detailData,'jobDetailData.myself.table_data_resource_info.add_method');
-      formRef.setFieldsValue({
-        remark:detailData.jobDetailData.remark,
-        status:detailData.jobDetailData.status,
-        data_resource_type:detailData.jobDetailData['myself'].data_resource_type,
-        hash_config:detailData.jobDetailData['myself'].hash_config,
-        table_data_resource_info:detailData.jobDetailData['myself'].table_data_resource_info,
-        dataSetAddMethod:dataSetAddMethod
-      })
-    }
-  },[detailData.jobDetailData])
-
-
  
   useImperativeHandle(ref, () => {
     return {
-      validateFields:formRef.validateFields
+      validateFields:formRef.validateFields,
+      setFieldsValue:formRef.setFieldsValue,
     }
   });
 
   const checkFormDisable = ()=>{
-    return detailData.jobDetailData && detailData.jobDetailData.status!=='editing'
+    const status = lodash.get(detailData,'jobDetailData.status','')
+    if(!status || status === JOB_STATUS.EDITING){
+      return false
+    }
+    return true
   }
 
   return <>
@@ -129,7 +103,7 @@ const JobForm = forwardRef((props:JobFormPropsInterface, ref) => {
                             {dataSetAddMethod === 'HttpUpload' ?
                               <>
                                 <Form.Item name={'table_data_resource_info'}>
-                                  <FileChunkUpload uploadFinishCallBack={uploadFinishCallBack}/>
+                                  <FileChunkUpload uploadFinishCallBack={uploadFinishCallBack}  disabled={checkFormDisable()}/>
                                 </Form.Item>
                               </> :
                               <DataSourceForm formRef={formRef}/>
@@ -149,7 +123,7 @@ const JobForm = forwardRef((props:JobFormPropsInterface, ref) => {
               </Form.Item>
              
               <Form.Item name={'hash_config'}>
-                <HashForm columnList={jobFormData.dataourceColumnList}/> 
+                <HashForm disabled={checkFormDisable()} columnList={jobFormData.dataourceColumnList}/> 
               </Form.Item>
               <Form.Item name="remark" label="任务备注">
                 <Input.TextArea rows={4} placeholder="请输入" />

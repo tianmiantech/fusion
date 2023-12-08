@@ -19,7 +19,7 @@ type Recordable<T = any> = Record<string, T>;
 export type FileType = {
   style?: React.CSSProperties;
   className?: string;
-  file: string;
+  file: any;
   list: boolean;
   children?: (props: Recordable) => React.ReactNode;
 };
@@ -34,26 +34,9 @@ export default (props: FileType) => {
   const tid = useRef<any>(null);
 
   const [iconType, setIconType] = useState("");
-  const [status, setStatus] = useState("");
-  const [statusText, setStatusText] = useState("");
+
   const [progressStyle, setProgressStyle] = useState<ProgressStyleType>({});
-  const [progressingClass, setProgressingClass] = useState("");
-  const [formatedAverageSpeed, setFormatedAverageSpeed] = useState("");
-  const [formatedTimeRemaining, setFormatedTimeRemaining] = useState("");
-  const [response, setResponse] = useState("");
-  const [paused, setPaused] = useState(false);
-  const [error, setError] = useState(false);
-  const [averageSpeed, setAverageSpeed] = useState(0);
-  const [currentSpeed, setCurrentSpeed] = useState(0);
-  const [isComplete, setIsComplete] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
-  const [size, setSize] = useState(0);
-  const [formatedSize, setFormatedSize] = useState("");
-  const [uploadedSize, setUploadedSize] = useState(0);
-  const [progress, setProgress] = useState(0);
-  const [timeRemaining, setTimeRemaining] = useState(0);
-  const [type, setType] = useState("");
-  const [extension, setExtension] = useState("");
+ 
 
   function getFileExtension(filename: string) {
     // 如果文件名为空或者不包含点号，返回空字符串
@@ -101,21 +84,6 @@ export default (props: FileType) => {
   }, [file]);
 
 
-  function getProgressStyle() {
-    const curProgress = Math.floor(progress * 100);
-    const style = `translateX(${Math.floor(curProgress - 100)}%)`;
-    setProgressStyle({
-      progress: `${curProgress}%`,
-      WebkitTransform: style,
-      MozTransform: style,
-      msTransform: style,
-      transform: style,
-    });
-  }
-  useEffect(() => {
-    getProgressStyle();
-  }, [progress]);
-
 
 
 
@@ -127,30 +95,13 @@ export default (props: FileType) => {
           file,
           list,
           status,
-          paused,
-          error,
-          response,
-          averageSpeed,
-          formatedAverageSpeed,
-          currentSpeed,
-          isComplete,
-          isUploading,
-          size,
-          formatedSize,
-          uploadedSize,
-          progress,
           progressStyle,
-          progressingClass,
-          timeRemaining,
-          formatedTimeRemaining,
-          type,
-          extension,
           fileCategory,
         })
       ) : (
         <Fragment>
           <div
-            className={classNames(`${prefixCls}-progress`, progressingClass)}
+            className={classNames(`${prefixCls}-progress`)}
             style={{ ...progressStyle }}
           />
           <div className={`${prefixCls}-info`}>

@@ -9,12 +9,13 @@ import  {
 } from "./Components";
 import { getBaseURL,getToken } from '@/utils/request'
 import lodash from 'lodash'
-import {fileMerge,FileMergeInterface,securityScan,PeviewDataRequestInterface,preViewData} from './service'
+import {fileMerge,FileMergeInterface,securityScan} from './service'
 import { useImmer } from "use-immer";
 import { Button, Spin, message } from "antd";
 import styles from './index.less'
 import { useRequest,useMount } from "ahooks";
-import DataSetPreview from "../DataSetPreview";
+import {HttpUpload} from "../DataSetPreview";
+
 interface UploaderInterface {
   fileList:Record<string, any>;
 }
@@ -32,7 +33,7 @@ interface FileChunkUploadInterface {
 
 const Index= forwardRef((props:FileChunkUploadInterface,ref) => {
 
-  const {uploadFinishCallBack,onChange,value={},disabled} = props;  
+  const {uploadFinishCallBack,onChange,value={},disabled=false} = props;  
   
   const uploader = useRef<UploaderInterfaceRef>(null);
   const [uploadData,setUploadData] = useImmer({
@@ -42,18 +43,22 @@ const Index= forwardRef((props:FileChunkUploadInterface,ref) => {
     loading:false,
     showPreBtn:false,
     previewOpen:false,
-    preViewData:{
-      columns:[],
-      dataSource:[],
-    }
-  })
+    columns:[] as any[],
+    accept:'.csv, text/csv, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+  })  
 
   useEffect(()=>{
     if(value){
-      console.log("value",value);
-      
-      console.log('uploader.current?.fileList',uploader.current?.fileList);
-      
+      //表示Form表单中主动设置值
+      const source = lodash.get(value,'source','')
+      if(source === 'setFieldsValue'){
+        const dataSourceFile = lodash.get(value,'data_source_file','')
+        uploader.current?.setFileList([dataSourceFile])
+        setUploadData(draft=>{
+          draft.filename = dataSourceFile
+          draft.showPreBtn = true
+        })
+      } 
     }
   },[value])
 
@@ -99,25 +104,6 @@ const Index= forwardRef((props:FileChunkUploadInterface,ref) => {
     }
   }
 
-    // 预览接口请求
-  const {run:runPreViewData,loading } = useRequest(async (params:PeviewDataRequestInterface)=>{
-    const reponse = await preViewData(params)
-    const {code,data} = reponse
-    if(code == 0) {
-      setUploadData(draft=>{
-        const columns = data.header.map((item: string)=>{
-          return {
-              title:item,
-              dataIndex:item,
-          }
-        }) 
-        draft.preViewData = {
-          columns,
-          dataSource:data.rows
-        }
-      })
-    } 
-  },{manual:true})
 
   // 上传完成后，文件安全扫描
   let  fileSecurityScanTimer: NodeJS.Timeout;
@@ -140,7 +126,6 @@ const Index= forwardRef((props:FileChunkUploadInterface,ref) => {
             draft.showPreBtn = true
           })      
           onChange?.({ data_source_file:filename,add_method:'HttpUpload' });
-          getPreViewData(filename)
         } else {
           message.error('全扫描不通过')
           clearFileList()
@@ -153,31 +138,34 @@ const Index= forwardRef((props:FileChunkUploadInterface,ref) => {
     uploader.current?.setFileList([])
   }
 
-  const getPreViewData = (filename:string)=>{
-    const params = {
-      data_source_file:filename,
-      add_method:'HttpUpload'
-    } as PeviewDataRequestInterface
-    runPreViewData(params)
-  }
 
-  const onPreViewClick = async ()=>{
-    if(uploadData.preViewData.columns.length == 0 && uploadData.filename){
-      await getPreViewData(uploadData.filename)
-    } 
-    setUploadData(draft=>{draft.previewOpen = true})
-  }
 
   useEffect(()=>{
-    const columns = uploadData.preViewData.columns.map(item=>{
+    const columns = uploadData.columns.map(item=>{
       return lodash.get(item,'dataIndex')
     })
     uploadFinishCallBack && uploadFinishCallBack({
       uploadFileName:uploadData.filename,
       dataourceColumnList:columns
     })
-  },[uploadData.filename,uploadData.preViewData.columns])
-  
+  },[uploadData.filename,uploadData.columns])
+
+  //获取获取预览的数据给其他的组件时间
+  const columnsChangeCallBack = (columns:any[])=>{
+    setUploadData(draft=>{
+      draft.columns = columns
+    })
+  }
+
+  useEffect(()=>{
+    var fileInput = document.getElementById('fusion_job_detail_file_input') as HTMLInputElement;
+    if(fileInput){
+      if(disabled){
+        fileInput.disabled = disabled
+        }
+    }
+  },[disabled])
+
 
   return <>
     <Uploader 
@@ -189,21 +177,15 @@ const Index= forwardRef((props:FileChunkUploadInterface,ref) => {
         const {fileList} = fileObj
        return  (
           <Fragment>
-            <Spin spinning={uploadData.loading|| loading}>
+            <Spin spinning={uploadData.loading}>
               <UploaderUnsupport />
               <UploaderDrop>
                 <p>拖拽文件上传</p>
-                <UploaderBtn single={true} attrs={{accept:'.csv, text/csv, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}}>
+                <UploaderBtn single={true} attrs={{accept:uploadData.accept,id:'fusion_job_detail_file_input'}}>
                   上传文件
                 </UploaderBtn>
                 {
-                  uploadData.showPreBtn && <UploaderBtn 
-                  className={styles.preBtn} 
-                  noUploadAction={true}
-                  onClick={()=>{onPreViewClick()}}
-                  >
-                  预览
-                </UploaderBtn>
+                  uploadData.showPreBtn && <HttpUpload autoLoadPreView={true} columnsChangeCallBack={columnsChangeCallBack} filename={uploadData.filename}/>
                 }
                 
                 {/* <UploaderBtn directory>上传文件夹</UploaderBtn> */}
@@ -214,12 +196,6 @@ const Index= forwardRef((props:FileChunkUploadInterface,ref) => {
         )
       }}
     </Uploader>
-    <DataSetPreview
-        open={uploadData.previewOpen}
-        onCancel={() => {setUploadData(draft=>{draft.previewOpen = false})}}
-        columns={uploadData.preViewData.columns}
-        dataSource={uploadData.preViewData.dataSource}
-      />
     </>
 });
 export default Index

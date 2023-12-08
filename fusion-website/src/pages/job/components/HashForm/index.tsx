@@ -16,9 +16,24 @@ interface HashFormPropsInterface  {
   columnList:string[]
   value?:HashFormValue
   onChange?:(value:HashFormValue)=>void
+  disabled?:boolean
 }
 const HashForm = (props:HashFormPropsInterface) => {
-  const {columnList,value,onChange} = props
+  const {columnList,value,onChange,disabled} = props
+  const [formRef] = Form.useForm();
+  console.log("disabled",disabled);
+  
+  
+  //编辑时，Form主动设置value，将数据进行回填
+  useEffect(()=>{
+    if(value){
+      const source = lodash.get(value,'source','')
+      if(source === "setFieldsValue") {
+        const valueList = lodash.get(value,'list',[])
+        formRef.setFieldValue('valueList',valueList)
+      }
+    }
+  },[value])
 
   const onValuesChange = (changedValues:any, allValues:any) => {
     const valueList = lodash.get(allValues,'valueList',[])
@@ -53,18 +68,20 @@ const HashForm = (props:HashFormPropsInterface) => {
                 </Form.Item>
 
                 <div className="operation-group">
-                  <MinusCircleTwoTone
+                 {
+                   !disabled && <MinusCircleTwoTone
                     twoToneColor="#ff7875"
                     className="operation-btn minus-btn"
                     onClick={() => remove(index)}
                   />
-                  { index === fields.length - 1 ?
+                 }
+                  { (index === fields.length - 1  && !disabled) ?
                     <PlusCircleTwoTone className="operation-btn" onClick={() => add()} /> : null }
                 </div>
               </Space>
             ))}
             {
-              fields.length ==0  &&  <Button onClick={()=>{add()}}>设置主键</Button>
+              fields.length ==0 && !disabled  &&  <Button onClick={()=>{add()}}>设置主键</Button>
             }
           </>
         )}}
@@ -73,7 +90,7 @@ const HashForm = (props:HashFormPropsInterface) => {
   )
 
   return (
-    <Form onValuesChange={onValuesChange}>
+    <Form onValuesChange={onValuesChange} form={formRef}>
       <Form.Item
         label={
           <>
