@@ -125,9 +125,9 @@ public class FusionJob implements Closeable {
             return false;
         }
 
-        // 还没有任何进度，跳过。
+        // 还没有任何进度，等待。
         if (partnerProgress.isEmpty()) {
-            return false;
+            return true;
         }
 
         // 如果对方已失败，则我方跟随失败。
