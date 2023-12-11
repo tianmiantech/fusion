@@ -143,6 +143,9 @@ public class Progress {
             return -1;
         }
 
+        if (getPercent() == 100) {
+            return 0;
+        }
 
         return BigDecimal.valueOf(totalWorkload - completedWorkload)
                 .divide(BigDecimal.valueOf(completedWorkload), 5, RoundingMode.HALF_UP)
