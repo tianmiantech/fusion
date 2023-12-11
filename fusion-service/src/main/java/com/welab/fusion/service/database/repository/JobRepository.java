@@ -19,10 +19,13 @@ import com.welab.fusion.service.database.entity.JobDbModel;
 import com.welab.fusion.service.database.repository.base.BaseRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 /**
  * @author zane.luo
  * @date 2023/11/24
  */
 @Repository
 public interface JobRepository extends BaseRepository<JobDbModel, String> {
+    List<JobDbModel> findAllRunningJob();
 }

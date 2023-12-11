@@ -21,6 +21,7 @@ import com.welab.fusion.core.Job.JobStatus;
 import com.welab.fusion.core.data_resource.base.DataResourceInfo;
 import com.welab.fusion.core.data_resource.base.DataResourceType;
 import com.welab.fusion.core.progress.JobProgress;
+import com.welab.fusion.core.progress.ProgressStatus;
 import com.welab.fusion.service.api.job.*;
 import com.welab.fusion.service.constans.JobMemberRole;
 import com.welab.fusion.service.database.base.MySpecification;
@@ -64,6 +65,20 @@ public class JobService extends AbstractService {
     private GatewayService gatewayService;
     @Autowired
     private JobMemberService jobMemberService;
+
+    public void finishAllJob(){
+        List<JobDbModel> jobs = jobRepository.findAllRunningJob();
+        for (JobDbModel job : jobs) {
+            job.setEndTime(null);
+            job.setCostTime(null);
+            job.setStatus(JobStatus.error_on_running);
+            job.setMessage("因服务重启导致任务中断，进度已丢失。");
+            job.setProgressDetail(null);
+            job.setUpdatedTimeNow();
+
+            job.save();
+        }
+    }
 
     /**
      * 创建任务
