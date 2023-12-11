@@ -13,7 +13,7 @@ const DataSourceForm = (props:DataSourceFormInterface) => {
     checkIfNeedGetDataSourceAvailableType,
     runTestDataSource,
     testDataSourceCallBakData
-  } = useModel('task.useDataSourceForm')
+  } = useModel('job.useDataSourceForm')
   //展示测试成功的数据源预览
   const [successCheck, setSuccessCheck] = useState<boolean>(false);
 

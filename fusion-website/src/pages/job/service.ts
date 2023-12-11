@@ -34,7 +34,7 @@ export interface CreateJobRequestInterface {
         bloom_filter_resource_input?:{
             bloom_filter_id:string
         },
-        table_data_resource_input?:{
+        table_data_resource_info?:{
             add_method:'HttpUpload'|'LocalFile'|'Database',
             sql?:string,
             data_source_file?:string,
@@ -72,7 +72,7 @@ export const testPartnerConntent = (parmas:TestPartnerConntentRequestInterface) 
 export interface SendTaskToProviderRequestInterface {
     job_id:string,
     base_url:string,
-    name?:string
+    member_name?:string
     public_key:string
 }
 /**
@@ -83,3 +83,53 @@ export interface SendTaskToProviderRequestInterface {
 export const sendJobToProvider = (parmas:SendTaskToProviderRequestInterface) => {
     return request.post('/job/send_to_provider',parmas)
 }
+
+export const getMemberList = (name?:string)=>{
+    return request.get('/member/list',{name})
+}
+
+/**
+ * 获取任务详情
+ */
+export const getJobDetail = (id:string)=>{
+    return request.get('/job/detail',{id})
+}
+
+/**
+ * 协作方同意任务
+ */
+export const agreeAndStart = (param:CreateJobRequestInterface)=>{
+    return request.post('/job/agree_and_start',param)
+}
+
+/**
+ * 协作方任务，拒绝
+ */
+export interface DisagreeJobRequestInterface {
+    job_id:string,
+    reason?:string
+}
+export const disagreeJob = (param:DisagreeJobRequestInterface)=>{
+    return request.post('/job/disagree',param)
+}
+
+
+
+/**
+ * 获取多方任务进度
+ * @param job_id 
+ * @returns 
+ */
+export const getMergedJobProgress = (job_id:string)=>{
+    return request.get('/job/get_merged_job_progress',{job_id})
+}
+
+/**
+ * 
+ * @param job_id 
+ * @returns 
+ */
+export const getMyJobProgress = (job_id:string)=>{
+    return request.get('/job/get_my_job_progress',{job_id})
+}
+
