@@ -147,6 +147,10 @@ public class JobService extends AbstractService {
         if (input.isRequestFromMyself() && StringUtil.isNotEmpty(input.remark)) {
             job.setRemark(input.remark);
         }
+        job.setProgressDetail(null);
+        job.save();
+
+        FusionJobManager.remove(input.jobId);
 
         FusionNodeInfo target = memberService
                 .findById(job.getPartnerMemberId())
