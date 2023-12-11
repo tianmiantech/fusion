@@ -17,6 +17,7 @@ package com.welab.fusion.service.database.repository;
 
 import com.welab.fusion.service.database.entity.JobDbModel;
 import com.welab.fusion.service.database.repository.base.BaseRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -27,5 +28,8 @@ import java.util.List;
  */
 @Repository
 public interface JobRepository extends BaseRepository<JobDbModel, String> {
+    @Query(
+            value = "select * from #{#entityName} where `status` in ('wait_run','running','wait_stop','wait_success');",
+            nativeQuery = true)
     List<JobDbModel> findAllRunningJob();
 }
