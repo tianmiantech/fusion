@@ -139,6 +139,6 @@ public class GatewayService extends AbstractService {
             return (OUT) JObject.create(data);
         }
 
-        return (OUT) data.toJavaObject(resultClass);
+        return data.toJavaObject(resultClass);
     }
 }
