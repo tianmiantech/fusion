@@ -123,18 +123,19 @@ public class PsiBloomFilter {
         LOG.info("start to sink PsiBloomFilter to disk. dir:{}", dir);
         long start = System.currentTimeMillis();
         dir.toFile().mkdirs();
-        // 输出过滤器
-        File bfFile = dir.resolve(DATA_FILE_NAME).toFile();
-        try (FileOutputStream outputStream = new FileOutputStream(bfFile)) {
-            bloomFilter.writeTo(outputStream);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
 
         // 输出元数据
         File metaFile = dir.resolve(META_FILE_NAME).toFile();
         try {
             Files.write(metaFile.toPath(), JSON.toJSONBytes(this));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        // 输出过滤器
+        File bfFile = dir.resolve(DATA_FILE_NAME).toFile();
+        try (FileOutputStream outputStream = new FileOutputStream(bfFile)) {
+            bloomFilter.writeTo(outputStream);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
