@@ -134,7 +134,7 @@ public class JobService extends AbstractService {
                 .toFusionNodeInfo();
 
         // 同步给发起方
-        gatewayService.callOtherFusionNode(target, AgreeAndStartJobApi.class, input);
+        gatewayService.callOtherFusionNode(target, RestartJobApi.class, input);
 
         // 创建任务并启动
         FusionJob fusionJob = createFusionJob(job);
