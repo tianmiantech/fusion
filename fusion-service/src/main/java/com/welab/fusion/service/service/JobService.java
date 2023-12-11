@@ -111,10 +111,41 @@ public class JobService extends AbstractService {
     }
 
     /**
+     * 对曾经执行过的任务进行重启
+     */
+    public void restart(RestartJobApi.Input input) throws Exception {
+        JobDbModel job = findById(input.jobId);
+        if (job == null) {
+            StatusCode.PARAMETER_VALUE_INVALID.throwException("任务已被删除，请重新创建。");
+        }
+
+        if (!job.getStatus().isFinished()) {
+            StatusCode.PARAMETER_VALUE_INVALID.throwException("仅支持对执行过的任务进行重启");
+        }
+
+        job.setStatus(JobStatus.running);
+        job.setStartTime(new Date());
+        if (input.isRequestFromMyself() && StringUtil.isNotEmpty(input.remark)) {
+            job.setRemark(input.remark);
+        }
+
+        FusionNodeInfo target = memberService
+                .findById(job.getPartnerMemberId())
+                .toFusionNodeInfo();
+
+        // 同步给发起方
+        gatewayService.callOtherFusionNode(target, AgreeAndStartJobApi.class, input);
+
+        // 创建任务并启动
+        FusionJob fusionJob = createFusionJob(job);
+        FusionJobManager.start(fusionJob);
+    }
+
+    /**
      * 启动任务
      * 由协作方触发
      */
-    public void startJob(JobConfigInput input) throws Exception {
+    public void agreeAndStartJob(JobConfigInput input) throws Exception {
         JobDbModel job = findById(input.jobId);
         if (job == null) {
             StatusCode.PARAMETER_VALUE_INVALID.throwException("任务已被删除，请重新创建。");
@@ -139,7 +170,7 @@ public class JobService extends AbstractService {
                 .toFusionNodeInfo();
 
         // 同步给发起方
-        gatewayService.callOtherFusionNode(target, StartJobApi.class, input);
+        gatewayService.callOtherFusionNode(target, AgreeAndStartJobApi.class, input);
 
 
         // 创建任务并启动

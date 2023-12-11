@@ -27,13 +27,13 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @date 2023/11/27
  */
 @Api(path = "job/agree_and_start", name = "协作方填写资源信息并启动任务", allowAccessWithSign = true)
-public class StartJobApi extends AbstractApi<JobConfigInput, StartJobApi.Output> {
+public class AgreeAndStartJobApi extends AbstractApi<JobConfigInput, AgreeAndStartJobApi.Output> {
     @Autowired
     private JobService jobService;
 
     @Override
-    protected ApiResult<StartJobApi.Output> handle(JobConfigInput input) throws Exception {
-        jobService.startJob(input);
+    protected ApiResult<AgreeAndStartJobApi.Output> handle(JobConfigInput input) throws Exception {
+        jobService.agreeAndStartJob(input);
         return success();
     }
 
