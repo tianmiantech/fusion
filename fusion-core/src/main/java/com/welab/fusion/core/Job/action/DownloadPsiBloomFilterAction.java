@@ -67,7 +67,7 @@ public class DownloadPsiBloomFilterAction extends AbstractJobPhaseAction {
         PsiBloomFilter psiBloomFilter = PsiBloomFilter.of(dir);
         InformationSize size = InformationSize.fromByte(psiBloomFilter.getDataFile().length());
 
-        LOG.info("正在加载过滤器，job_id：{}，psiBloomFilter:{}", job.getJobId(), job.getPartner().psiBloomFilter.id);
+        LOG.info("正在加载过滤器，job_id：{}，psiBloomFilter:{}", job.getJobId(), psiBloomFilter.id);
         phaseProgress.setMessage("正在加载过滤器(" + size + ")...");
         // 将过滤器文件加载到内存是个很重的操作，所以是按需加载的，调用 getBloomFilter() 可触发加载。
         psiBloomFilter.getBloomFilter();
@@ -75,7 +75,7 @@ public class DownloadPsiBloomFilterAction extends AbstractJobPhaseAction {
                 "过滤器加载完毕({})，job_id：{}，psiBloomFilter:{}",
                 size,
                 job.getJobId(),
-                job.getPartner().psiBloomFilter.id
+                psiBloomFilter.id
         );
 
 
