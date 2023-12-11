@@ -163,6 +163,14 @@ public class Progress {
 
     // region getter/setter
 
+    public String getModelId() {
+        return modelId;
+    }
+
+    public void setModelId(String modelId) {
+        this.modelId = modelId;
+    }
+
     public String getSessionId() {
         return sessionId;
     }
@@ -187,6 +195,22 @@ public class Progress {
         this.completedWorkload = completedWorkload;
     }
 
+    public long getSpeedInSecond() {
+        return speedInSecond;
+    }
+
+    public void setSpeedInSecond(long speedInSecond) {
+        this.speedInSecond = speedInSecond;
+    }
+
+    public long getLastUpdateCompletedWorkloadTime() {
+        return lastUpdateCompletedWorkloadTime;
+    }
+
+    public void setLastUpdateCompletedWorkloadTime(long lastUpdateCompletedWorkloadTime) {
+        this.lastUpdateCompletedWorkloadTime = lastUpdateCompletedWorkloadTime;
+    }
+
     public Date getStartTime() {
         return startTime;
     }
@@ -207,14 +231,6 @@ public class Progress {
         return message;
     }
 
-    public long getSpeedInSecond() {
-        return speedInSecond;
-    }
-
-    public ProgressStatus getStatus() {
-        return status;
-    }
-
     public List<String> getLogs() {
         return logs;
     }
@@ -222,5 +238,14 @@ public class Progress {
     public void setLogs(List<String> logs) {
         this.logs = logs;
     }
-// endregion
+
+    public ProgressStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(ProgressStatus status) {
+        this.status = status;
+    }
+
+    // endregion
 }
