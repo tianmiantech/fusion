@@ -233,7 +233,7 @@ const Uploader:  React.ForwardRefRenderFunction<UploaderInterfaceRef, UploaderPr
               </UploaderBtn>
               {renderPrewView && renderPrewView()}
             </UploaderDrop>
-            <UploaderList fileList={fileList} />
+            <UploaderList setFileList={setFileList} fileList={fileList} />
             </Spin>
           </Fragment>
           )}

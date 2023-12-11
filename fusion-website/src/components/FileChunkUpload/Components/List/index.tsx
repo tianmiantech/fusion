@@ -10,10 +10,11 @@ type UploaderListType = {
   style?: React.CSSProperties;
   fileList: Record<string, any>;
   children?: (props: { fileList: any }) => React.ReactNode;
+  setFileList: (fileList: any) => void;
 };
 
 export default (props: UploaderListType) => {
-  const { className, style, fileList, children } = props;
+  const { className, style, fileList, children,setFileList } = props;
   const { getPrefixCls } = React.useContext(UploaderContext);
   const prefixCls = getPrefixCls("list");
 
@@ -29,7 +30,7 @@ export default (props: UploaderListType) => {
       ) : (
         <ul>
           {fileList.map((file: Record<string, any>,index:number) => (
-            isString(file)?<ReadonlyFile file={file} list />:<UploaderFile key={file.id} file={file} list />
+            isString(file)?<ReadonlyFile fileIndex={index}  fileList={fileList} setFileList={setFileList} file={file} list />:<UploaderFile fileIndex={index} fileList={fileList}   setFileList={setFileList} key={file.id} file={file} list />
           ))}
         </ul>
       )}

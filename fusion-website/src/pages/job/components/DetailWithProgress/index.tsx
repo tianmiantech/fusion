@@ -77,7 +77,7 @@ const Index = ()=>{
           })
         } else {
           setData(g=>{
-            g.promoterDetail = tmpProgress;
+            g.promoterProgress = tmpProgress;
           })
         } 
       }

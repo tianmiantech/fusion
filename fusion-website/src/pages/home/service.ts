@@ -14,3 +14,7 @@ export const getJobList = (params:GetJobListRequestInterface) => {
 export const deleteJob = (id:string) => {
     return request.post(`/job/delete`,{id})
 }
+
+export const restartJob = (id:string) => {
+    return request.post(`/job/restart`,{job_id:id})
+}

@@ -22,10 +22,13 @@ export type FileType = {
   file: any;
   list: boolean;
   children?: (props: Recordable) => React.ReactNode;
+  setFileList: (fileList: any) => void;
+  fileList:any[]
+  fileIndex:number
 };
 
 export default (props: FileType) => {
-  const { className, style, file, list = true, children } = props;
+  const { className, style, file, list = true, children,setFileList,fileIndex,fileList } = props;
   const { getPrefixCls } = React.useContext(UploaderContext);
 
   const prefixCls = getPrefixCls("file");
@@ -84,7 +87,9 @@ export default (props: FileType) => {
   }, [file]);
 
 
-
+  const removeFile = () => {
+    setFileList([])
+  }
 
 
 
@@ -108,6 +113,12 @@ export default (props: FileType) => {
             <div className={`${prefixCls}-name`}>
               <i className={classNames(`${prefixCls}-icon`, iconType)} />
               {file || ""}
+            </div>
+            <div className={`${prefixCls}-size`}/>
+            <div className={`${prefixCls}-meta`} />
+            <div className={`${prefixCls}-status`}/>
+            <div className={`${prefixCls}-actions`}>
+              <span className={`${prefixCls}-remove`} onClick={()=>{removeFile()}} />
             </div>
           </div>
         </Fragment>

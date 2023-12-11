@@ -7,7 +7,7 @@ import { history } from 'umi';
 import { useModel } from '@umijs/max';
 import { useImmer } from 'use-immer';
 import styles from './index.less'
-import { getJobList,deleteJob } from "../service";
+import { getJobList,deleteJob,restartJob } from "../service";
 import moment from "moment";
 import {dataResourceTypeMap,AddMethodMap,JobStatus,JOB_STATUS,ROLE_TYPE} from '@/constant/dictionary'
 import lodash from 'lodash'
@@ -74,6 +74,15 @@ const Index =()=>{
         if (code == 0) {
             message.success('删除成功')
             runGetJobListData({page_size:jobListData.page_size,page_index:jobListData.page_index,role:''})
+        }
+    },{manual:true})
+
+    const {run:restartJobData,loading:restartLoading} = useRequest(async (id)=>{
+        const reponse = await restartJob(id)
+        const {code,data} = reponse;
+        if (code == 0) {
+            message.success('重启成功')
+            runGetJobListData({page_size:jobListData.page_size,page_index:jobListData.page_index})
         }
     },{manual:true})
 
@@ -148,6 +157,9 @@ const Index =()=>{
         } else if(key === 'delete'){
             const {id} = record;
             deleteJobData(id)
+        } else if(key === 'restart'){
+            const {id} = record;
+            restartJobData(id)
         }
     }
 
@@ -176,6 +188,9 @@ const Index =()=>{
             if(!status || status === JOB_STATUS.EDITING){
                 defaultList.push({text: '删除', key: 'delete',confirmConfig:{title:'确认删除该任务吗？'}})
             }
+            if(status === JOB_STATUS.SUCCESS|| status === JOB_STATUS.STOP_ON_RUNNING|| status === JOB_STATUS.ERROR_ON_RUNNING || status === JOB_STATUS.RUNNING ){
+                defaultList.push({text: '重启', key: 'restart'})
+            }
         }
         return defaultList
     }
@@ -195,7 +210,7 @@ const Index =()=>{
                 >
                 <TmTable.Table
                     actionItems={renderAction}
-                    loading={getJobListLoading||deleteLoading}
+                    loading={getJobListLoading||deleteLoading||restartLoading}
                     actionClickHandle={actionClickHandle}
             />
         </TmTable>
