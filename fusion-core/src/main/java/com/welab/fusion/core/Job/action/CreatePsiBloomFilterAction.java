@@ -71,11 +71,19 @@ public class CreatePsiBloomFilterAction extends AbstractJobPhaseAction {
 
     @Override
     protected boolean skipThisAction() {
-        // 仅在我方提供的是数据集，但需要以过滤器身份执行时，才需要创建过滤器。
-        boolean needCreate = job.getMyJobRole() == FusionJobRole.psi_bool_filter_provider
-                && job.getMyself().dataResourceInfo.dataResourceType == DataResourceType.TableDataSource;
+        // 角色不是过滤器方，不生成。
+        if (job.getMyJobRole() == FusionJobRole.table_data_resource_provider) {
+            phaseProgress.setMessage("我方为数据集提供方，无需生成过滤器。");
+            return true;
+        }
 
-        return !needCreate;
+        // 资源类型已经是过滤器，不生成。
+        if (job.getMyself().dataResourceInfo.dataResourceType == DataResourceType.PsiBloomFilter) {
+            phaseProgress.setMessage("使用已有过滤器，无需生成。");
+            return true;
+        }
+
+        return false;
     }
 
 }
