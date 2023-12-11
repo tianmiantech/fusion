@@ -102,6 +102,7 @@ public class PsiBloomFilter {
         }
     }
 
+    @JSONField(serialize = false)
     public File getDataFile() {
         return dir.resolve(DATA_FILE_NAME).toFile();
     }
