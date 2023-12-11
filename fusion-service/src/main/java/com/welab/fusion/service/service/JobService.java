@@ -147,7 +147,7 @@ public class JobService extends AbstractService {
         if (input.isRequestFromMyself() && StringUtil.isNotEmpty(input.remark)) {
             job.setRemark(input.remark);
         }
-        job.setProgressDetail(null);
+        job.setProgressDetail(new JobProgress().toJson());
         job.save();
 
         FusionJobManager.remove(input.jobId);
