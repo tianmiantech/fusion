@@ -89,6 +89,9 @@ public class JobProgress {
      * 获取当前阶段
      */
     public JobPhase getCurrentPhase() {
+        if (phases.isEmpty()) {
+            return null;
+        }
         return getCurrentPhaseProgress().getJobPhase();
     }
 

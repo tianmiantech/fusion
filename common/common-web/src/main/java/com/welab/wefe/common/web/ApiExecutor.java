@@ -126,7 +126,11 @@ public class ApiExecutor {
                 Launcher.API_LOGGER.action(httpServletRequest, start, api, params, result);
             }
 
-            logResponse(annotation, result);
+            try {
+                logResponse(annotation, result);
+            } catch (Exception e) {
+                LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);
+            }
 
             MDC.clear();
         }
