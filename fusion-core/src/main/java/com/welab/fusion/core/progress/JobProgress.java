@@ -38,6 +38,9 @@ public class JobProgress {
      * 返回最后一个阶段的 message
      */
     public String getMessage() {
+        if (phases.isEmpty()) {
+            return null;
+        }
         return getCurrentPhaseProgress().getMessage();
     }
 
