@@ -72,7 +72,7 @@ public abstract class AbstractJobPhaseAction {
             phaseProgress = JobPhaseProgress.of(
                     job.getJobId(),
                     getPhase(),
-                    skipThisAction ? 1 : getTotalWorkload()
+                    skipThisAction ? 0 : getTotalWorkload()
             );
 
             phaseProgress.setMessage("开始执行阶段动作: " + getPhase());

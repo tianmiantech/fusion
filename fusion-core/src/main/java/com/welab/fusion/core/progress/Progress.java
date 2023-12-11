@@ -35,11 +35,11 @@ public class Progress {
     /**
      * 总工作量
      */
-    protected long totalWorkload;
+    protected long totalWorkload = -1;
     /**
      * 已完成工作量
      */
-    protected long completedWorkload;
+    protected long completedWorkload = -1;
     /**
      * 速度，以秒为单位。
      */
@@ -125,7 +125,10 @@ public class Progress {
      * 进度，百分比，0 ~ 100。
      */
     public int getPercent() {
-        if (completedWorkload <= 0 || totalWorkload <= 0) {
+        if (totalWorkload == 0) {
+            return 100;
+        }
+        if (completedWorkload <= 0) {
             return 0;
         }
 
