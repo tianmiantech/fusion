@@ -18,6 +18,7 @@ package com.welab.fusion.service.listener;
 
 import com.welab.fusion.core.io.FileSystem;
 import com.welab.fusion.service.service.GlobalConfigService;
+import com.welab.fusion.service.service.JobService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +44,8 @@ public class ApplicationStartedListener implements ApplicationListener<Applicati
     private String fileSystemBaseDir;
     @Autowired
     private GlobalConfigService globalConfigService;
-
+@Autowired
+private JobService jobService;
     @Override
     public void onApplicationEvent(ApplicationStartedEvent event) {
 
@@ -62,5 +64,9 @@ public class ApplicationStartedListener implements ApplicationListener<Applicati
             LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);
             System.exit(-1);
         }
+
+        // 关闭之前处于运行中的任务
+        jobService.finishAllJob();
+
     }
 }

@@ -21,7 +21,6 @@ import com.welab.fusion.core.Job.JobStatus;
 import com.welab.fusion.core.data_resource.base.DataResourceInfo;
 import com.welab.fusion.core.data_resource.base.DataResourceType;
 import com.welab.fusion.core.progress.JobProgress;
-import com.welab.fusion.core.progress.ProgressStatus;
 import com.welab.fusion.service.api.job.*;
 import com.welab.fusion.service.constans.JobMemberRole;
 import com.welab.fusion.service.database.base.MySpecification;
@@ -43,6 +42,7 @@ import com.welab.wefe.common.exception.StatusCodeWithException;
 import com.welab.wefe.common.util.StringUtil;
 import com.welab.wefe.common.web.dto.FusionNodeInfo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -66,7 +66,11 @@ public class JobService extends AbstractService {
     @Autowired
     private JobMemberService jobMemberService;
 
-    public void finishAllJob(){
+    /**
+     * 关闭之前处于运行中的任务
+     */
+    @Async
+    public void finishAllJob() {
         List<JobDbModel> jobs = jobRepository.findAllRunningJob();
         for (JobDbModel job : jobs) {
             job.setEndTime(null);
