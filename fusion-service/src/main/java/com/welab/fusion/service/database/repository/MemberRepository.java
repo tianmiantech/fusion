@@ -18,7 +18,10 @@ package com.welab.fusion.service.database.repository;
 
 import com.welab.fusion.service.database.entity.MemberDbModel;
 import com.welab.fusion.service.database.repository.base.BaseRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author zane.luo
@@ -27,4 +30,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface MemberRepository extends BaseRepository<MemberDbModel, String> {
     MemberDbModel findByName(String name);
+
+    @Transactional
+    @Modifying
+    void deleteByName(String name);
 }
