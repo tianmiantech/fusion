@@ -74,11 +74,7 @@ public class MemberService extends AbstractService {
                     .throwException("未设置“对外服务地址”，请在全局配置中填写，供其它节点通信。");
         }
 
-        MemberInputModel input = new MemberInputModel();
-        input.setMember_name(MYSELF_NAME);
-        input.setBaseUrl(config.publicServiceBaseUrl);
-        input.setPublicKey(config.publicKey);
-        return save(input);
+        return save(MYSELF_NAME, config.publicServiceBaseUrl, config.publicKey);
     }
 
     /**
@@ -97,6 +93,16 @@ public class MemberService extends AbstractService {
     }
 
     public MemberDbModel save(MemberInputModel input) throws Exception {
+        // 如果输入的是自己，不保存。
+        FusionConfigModel config = globalConfigService.getFusionConfig();
+        if (config != null && StringUtil.isNotEmpty(config.publicServiceBaseUrl)) {
+            String myselfId = MemberService.buildMemberId(config.publicServiceBaseUrl);
+            String inputId = MemberService.buildMemberId(input.getBaseUrl());
+            if (inputId.equals(myselfId)) {
+                return null;
+            }
+        }
+
         return save(input.getMember_name(), input.getBaseUrl(), input.getPublicKey());
     }
 
@@ -109,18 +115,21 @@ public class MemberService extends AbstractService {
         }
 
         String memberId = buildMemberId(baseUrl);
-        MemberDbModel model = findById(memberId);
+        MemberDbModel model = MYSELF_NAME.equals(name)
+                ? memberRepository.findByName(MYSELF_NAME)
+                : findById(memberId);
 
         // 有则更新，无则新增。
         if (model == null) {
             model = new MemberDbModel();
-            model.setId(memberId);
+            model.setId(
+                    MYSELF_NAME.equals(name)
+                            // myself 的 id 固定，不允许修改。
+                            ? MYSELF_NAME
+                            : memberId
+            );
         }
 
-        // myself 的 id 固定，不允许修改。
-        if (MYSELF_NAME.equals(name)) {
-            model.setId(MYSELF_NAME);
-        }
 
         /**
          * 仅在以下两种情况下设置名称，避免在未指定名称时覆盖。
