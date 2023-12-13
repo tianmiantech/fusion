@@ -52,8 +52,7 @@ public class LoginApi extends AbstractApi<LoginApi.Input, LoginApi.Output> {
         }
 
         AccountOutputModel account = accountService.login(input.username, input.password);
-        String token = CurrentAccount.token();
-        return success(Output.of(token, account));
+        return success(Output.of(account));
     }
 
     public static class Input extends AbstractApiInput {
@@ -67,9 +66,9 @@ public class LoginApi extends AbstractApi<LoginApi.Input, LoginApi.Output> {
         public String token;
         public AccountOutputModel account;
 
-        public static Output of(String token, AccountOutputModel account) {
+        public static Output of(AccountOutputModel account) {
             Output output = new Output();
-            output.token = token;
+            output.token = CurrentAccount.token();
             output.account = account;
             return output;
         }

@@ -15,6 +15,9 @@
  */
 package com.welab.fusion.service.api.service;
 
+import com.welab.fusion.service.api.account.LoginApi;
+import com.welab.fusion.service.database.entity.AccountDbModel;
+import com.welab.fusion.service.dto.entity.AccountOutputModel;
 import com.welab.fusion.service.service.InitService;
 import com.welab.wefe.common.fieldvalidate.annotation.Check;
 import com.welab.wefe.common.web.api.base.AbstractApi;
@@ -28,14 +31,15 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @date 2023/11/7
  */
 @Api(path = "service/init", name = "注册超级管理员账号，初始化服务。", allowAccessWithNothing = true)
-public class InitServiceApi extends AbstractApi<InitServiceApi.Input, InitServiceApi.Output> {
+public class InitServiceApi extends AbstractApi<InitServiceApi.Input, LoginApi.Output> {
     @Autowired
     private InitService initService;
 
     @Override
-    protected ApiResult<InitServiceApi.Output> handle(InitServiceApi.Input input) throws Exception {
-        initService.init(input.username, input.password);
-        return success();
+    protected ApiResult<LoginApi.Output> handle(InitServiceApi.Input input) throws Exception {
+        AccountDbModel account = initService.init(input.username, input.password);
+        LoginApi.Output output = LoginApi.Output.of(account.mapTo(AccountOutputModel.class));
+        return success(output);
     }
 
     public static class Input extends AbstractApiInput {
@@ -45,7 +49,5 @@ public class InitServiceApi extends AbstractApi<InitServiceApi.Input, InitServic
         public String password;
     }
 
-    public static class Output {
 
-    }
 }
