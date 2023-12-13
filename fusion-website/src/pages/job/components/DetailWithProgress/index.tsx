@@ -137,17 +137,6 @@ const Index = ()=>{
        
       }
       return;
-      
-    
-      console.log("reponse",reponse);
-      
-      // const url = window.URL.createObjectURL(new Blob([reponse]));
-      // const link = document.createElement('a');
-      // link.download = '1111.csv';
-      // link.href = url;
-      // link.click();
-      // document.body.removeChild(link);
-      // URL.revokeObjectURL(url);
     },{manual:true})
 
     const renderProgressTitle = ()=>{

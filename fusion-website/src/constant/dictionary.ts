@@ -1,4 +1,5 @@
 
+export const FUNSION_INITIALIZED_KEY = 'fission_initialized';
 // 样本类型
 export const dataResourceTypeMap = new Map([
   ['TableDataSource', '数据集'],

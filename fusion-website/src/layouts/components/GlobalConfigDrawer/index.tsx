@@ -1,13 +1,14 @@
 
 
 import {useState,useImperativeHandle,forwardRef} from 'react'
-import { Button, Drawer,Input,Spin,Form, message } from 'antd'
+import { Button, Drawer,Input,Spin,Form, message,Row } from 'antd'
 import { TmDrawer } from '@tianmiantech/pro';
 import styles from './index.less'
 import { useRequest,useMount } from 'ahooks';
 import { useImmer } from 'use-immer';
 import { getGlobalConfig,updateGlobalConfig,UpdateGlobalConfigRequestInterface } from './service';
 import lodash from 'lodash'
+import { testPartnerConntent } from '@/pages/job/service';
 
 const { TextArea } = Input;
 const Index = forwardRef((props,ref)=>{
@@ -55,6 +56,10 @@ const Index = forwardRef((props,ref)=>{
     
     },{manual:true})
 
+    const testPartnerConntention = ()=>{
+
+    }
+
   
 
     const resetKey = ()=>{
@@ -80,6 +85,11 @@ const Index = forwardRef((props,ref)=>{
                 <Form.Item label={'对外服务地址'} name='public_service_base_url' rules={[{required:true}]}>
                     <Input/>
                 </Form.Item>
+                <Form.Item>
+                    <Row justify="end">
+                        <Button type="link"  onClick={testPartnerConntention}>连通性测试</Button>
+                    </Row>
+                    </Form.Item>
                 <Form.Item label={'公钥 (密钥用于与其他合作方通信时进行信息加密)'} name='public_key' required >
                     <TextArea
                         disabled

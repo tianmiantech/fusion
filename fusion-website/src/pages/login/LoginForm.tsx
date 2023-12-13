@@ -7,7 +7,7 @@ import {getTokenName} from '@/utils/index'
 import {setCookies} from '@tianmiantech/util'
 import lodash from 'lodash'
 import Sm3Util from '@/utils/Sm3Util';
-
+import {FUNSION_INITIALIZED_KEY} from '@/constant/dictionary'
 interface LoginFormProps {
   isRegister?:boolean //是否是系统初始化，如果是初始化则需要确认密码
 }
@@ -20,6 +20,7 @@ const Index = (props: LoginFormProps) => {
     const {code} = reponse
     if(code === 0 ){
       message.info('初始化成功')
+      localStorage.setItem(FUNSION_INITIALIZED_KEY,'true')
       setTimeout(()=>{
         history.replace('/home')
       },800)

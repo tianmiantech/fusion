@@ -22,7 +22,7 @@ const Index =()=>{
     const renderRightContent = ()=>{
         if (location.pathname.indexOf('/home')==-1) {
             return <>
-                <PlusOutlined  className={styles.setting}/>
+                <PlusOutlined  className={styles.setting} onClick={()=>{history.push('/job/create')}}/>
                 <BarsOutlined  className={styles.setting} onClick={showHistory}/>
                 {renderSetting()}
             </>

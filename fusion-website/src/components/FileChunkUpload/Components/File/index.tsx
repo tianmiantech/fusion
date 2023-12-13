@@ -241,8 +241,9 @@ export default (props: FileType) => {
 
   function remove() {
     file.cancel();
-    
-    setFileList([])
+    const tmpFileList = JSON.parse(JSON.stringify(fileList))
+    tmpFileList.splice(fileIndex,1)
+    setFileList(tmpFileList)
   }
 
   function retry() {

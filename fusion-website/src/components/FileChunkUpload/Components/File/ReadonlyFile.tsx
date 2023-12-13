@@ -88,7 +88,9 @@ export default (props: FileType) => {
 
 
   const removeFile = () => {
-    setFileList([])
+    const tmpFileList = JSON.parse(JSON.stringify(fileList))
+    tmpFileList.splice(fileIndex,1)
+    setFileList(tmpFileList)
   }
 
 

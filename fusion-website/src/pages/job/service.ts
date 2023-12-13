@@ -57,7 +57,7 @@ export const createJob = (parmas:CreateJobRequestInterface) => {
 
 export interface TestPartnerConntentRequestInterface {
     base_url:string,
-    name:string,
+    name?:string,
     public_key:string
 }
 /**
