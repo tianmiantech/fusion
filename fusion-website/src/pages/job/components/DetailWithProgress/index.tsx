@@ -12,7 +12,6 @@ import { getPrevResult,downloadResult } from "./service";
 import {ResizableTable} from '@/components/DataSetPreview'
 import './index.less'
 
-
 /**
  * 当前访问数据的角色分为发起方，协作方
  * 任务是由发起方当发起方，发起方发起任务，协作方参与任务，任务的角色是固定的。
@@ -25,8 +24,8 @@ const Index = ()=>{
     const [data,setData] = useImmer({
       promoterDetail:{},
       providerDetail:{},
-      promoterProgress:{},
-      providerProgress:{},
+      promoterPhasesList:[],//
+      providerPhasesList:[],
       previewOpen:false,
       previewData:{
         columns:[],
@@ -53,35 +52,35 @@ const Index = ()=>{
     },[detailData.jobDetailData])
 
     useEffect(()=>{
-      if(detailData.myselfJobProgress){
-        const tmpProgress = lodash.get(detailData,'myselfJobProgress');
+      if(detailData.myselfPhasesList.length>0){
+        const tmpProgress = lodash.get(detailData,'myselfPhasesList',[]);
         if(detailData.role === ROLE_TYPE.PROMOTER){
           setData(g=>{
-            g.promoterProgress = tmpProgress;
+            g.promoterPhasesList = tmpProgress;
           })
         } else {
           setData(g=>{
-            g.providerProgress = tmpProgress;
+            g.providerPhasesList = tmpProgress;
           })
         } 
       }
-    },[detailData.myselfJobProgress])
+    },[detailData.myselfPhasesList.length])
 
 
     useEffect(()=>{
-      if(detailData.partnerJobProgress){
-        const tmpProgress = lodash.get(detailData,'partnerJobProgress');
+      if(detailData.partnerJobCurrentProgress){
+        const tmpProgress = lodash.get(detailData,'partnerPhasesList',[]);
         if(detailData.role === ROLE_TYPE.PROMOTER){
           setData(g=>{
-            g.providerProgress = tmpProgress;
+            g.providerPhasesList = tmpProgress;
           })
         } else {
           setData(g=>{
-            g.promoterProgress = tmpProgress;
+            g.promoterPhasesList = tmpProgress;
           })
         } 
       }
-    },[detailData.partnerJobProgress])
+    },[detailData.partnerPhasesList.length])
 
     const {run:runGetPrevResult,loading:getPrevResultLoading} = useRequest(async (id:string)=>{
       const reponse = await getPrevResult(id);
@@ -139,10 +138,6 @@ const Index = ()=>{
       return;
     },{manual:true})
 
-    const renderProgressTitle = ()=>{
-      return <>任务进度<span style={{fontSize:12,color:'gray'}}>（发起方,协作方节点任务阶段相同）</span></>
-    }
-
     //如果任务运行成功，则
     const renderResultbtn = ()=>{
       if(detailData.jobDetailData && detailData.jobDetailData.status === JOB_STATUS.SUCCESS){
@@ -154,19 +149,20 @@ const Index = ()=>{
     }
 
     return <>
-          <div className="topContainer">
-            <Card title={renderProgressTitle()} extra={renderResultbtn()}>
-              <JobProgress data={detailData.myselfJobProgress}/>
-            </Card>
-          </div>
-            <Row>
-              <Col span={12}>
-                  <ReadOnlyDetailItem title="发起方" detailInfoData={data.promoterDetail} progressData={data.promoterProgress}/>
-              </Col>
-              <Col span={12}>
-                  <ReadOnlyDetailItem title={'协作方'}  detailInfoData={data.providerDetail} progressData={data.providerProgress}/>
-              </Col>
-            </Row>
+          <Card>
+              <Row>
+                <Col span={12}>
+                    <ReadOnlyDetailItem title="发起方" detailInfoData={data.promoterDetail} />
+                </Col>
+                <Col span={12}>
+                    <ReadOnlyDetailItem title='协作方'  detailInfoData={data.providerDetail}/>
+                </Col>
+              </Row>
+          </Card>
+          <Card title='任务进度' style={{marginTop:8}} extra={renderResultbtn()}>
+              <JobProgress promoterPhasesList={data.promoterPhasesList} providerPhasesList={data.providerPhasesList}/>
+          </Card>
+            
             <ResizableTable
               open={data.previewOpen}
               onCancel={() => {setData(draft=>{draft.previewOpen = false})}}

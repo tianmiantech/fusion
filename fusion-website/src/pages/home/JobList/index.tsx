@@ -1,5 +1,5 @@
 import {useRef} from 'react'
-import { Table,Tag ,Button,Card, message} from "antd"
+import { Table,Tag ,Button,Card, message, Space} from "antd"
 import { TmTable } from "@tianmiantech/pro";
 import type { ColumnsType } from 'antd/es/table';
 import { useRequest,useMount } from "ahooks";
@@ -91,7 +91,7 @@ const Index =()=>{
         runGetJobListData({page_size:jobListData.page_size,page_index:jobListData.page_index,role:''})
     })
 
-    const columns: ColumnsType<RowProps> = [{
+    const columns: ColumnsType<RowProps>|any = [{
         title: '任务角色/创建时间',
         dataIndex: 'create',
         key: 'create',
@@ -148,9 +148,29 @@ const Index =()=>{
         title: '备注',
         dataIndex: 'remark',
         key: 'remark'
+    },{
+        key: 'optionOop',
+        title: '操作',
+        fixed: 'right',
+        width:120,
+        render:(value:any, record:any, index:number)=> {
+            const defaultList = [<Button type='link' onClick={()=>{actionClickHandle('detail',record)}}>详情</Button>]
+            const {role,status} = record;
+            if(role === ROLE_TYPE.PROMOTER){
+                if(!status || status === JOB_STATUS.EDITING){
+                    defaultList.push(<Button type='link' onClick={()=>{actionClickHandle('delete',record)}}>删除</Button>)
+                }
+                if(status === JOB_STATUS.SUCCESS|| status === JOB_STATUS.STOP_ON_RUNNING|| status === JOB_STATUS.ERROR_ON_RUNNING  ){
+                    defaultList.push(<Button type='link'  onClick={()=>{actionClickHandle('restart',record)}}>重启任务</Button>)
+                }
+            }
+            return <Space>
+                {defaultList}
+            </Space>
+        },
     }]
 
-    const actionClickHandle = (key:string, record:RowProps, index:number)=>{
+    const actionClickHandle = (key:string, record:RowProps,)=>{
         if (key === 'detail') {
             const {id} = record
             history.push(`/job/detail/${id}`);
@@ -178,23 +198,6 @@ const Index =()=>{
         </div>
     }
 
-
-
-    const renderAction = (record:RowProps)=>{
-        const {role,status} = record;
-        const defaultList:ActionItemInterface[] =[]
-        defaultList.push({text: '详情', key: 'detail'})
-        if(role === ROLE_TYPE.PROMOTER){
-            if(!status || status === JOB_STATUS.EDITING){
-                defaultList.push({text: '删除', key: 'delete',confirmConfig:{title:'确认删除该任务吗？'}})
-            }
-            if(status === JOB_STATUS.SUCCESS|| status === JOB_STATUS.STOP_ON_RUNNING|| status === JOB_STATUS.ERROR_ON_RUNNING || status === JOB_STATUS.RUNNING ){
-                defaultList.push({text: '重启', key: 'restart'})
-            }
-        }
-        return defaultList
-    }
-
     const renderList = ()=>{
         return <Card title='任务列表' extra={renderBtn()}>
                 <TmTable
@@ -209,9 +212,7 @@ const Index =()=>{
                     }}
                 >
                 <TmTable.Table
-                    actionItems={renderAction}
                     loading={getJobListLoading||deleteLoading||restartLoading}
-                    actionClickHandle={actionClickHandle}
             />
         </TmTable>
         </Card>

@@ -1,12 +1,14 @@
-import { useEffect, useState, useRef } from "react";
-import { Descriptions,Typography,Button,Popover } from 'antd';
+import { useEffect, useState, useRef,useContext, } from "react";
+import { Descriptions,Typography,Button,Popover,ConfigProvider, Steps } from 'antd';
 import {dataResourceTypeMap} from '@/constant/dictionary'
 import lodash from 'lodash'
 import moment from 'moment'
 import {Progress,List} from 'antd'
-import JobCard from './JobCard'
+import JobCard from '../JobCard'
 import { HttpUploadPreview } from "@/components/DataSetPreview";
 import { ROLE_TYPE } from "@/constant/dictionary";
+import styles from './index.less'
+
 interface hashConfigItemInterface {
   columns: string[];
   method: string;
@@ -25,24 +27,16 @@ interface ReadOnlyDetailItemProps {
     created_time?:string,
     updated_time?:string,
 
-  },
-  progressData?:{
-    job_phase?:string, //所处阶段
-    end_time?:number, //结束时间
-    cost_time?:number, //耗时  毫秒
-    logs?:string[],//日志
-    status?:'doing'|'completed'|'failed', //状态
-    message?:string,
-    percent?:number,//进度百分比
-    speed_in_second?:number //每秒速度
   }
 }
 const ReadOnlyDetailItem = (props:ReadOnlyDetailItemProps) => {
-  const {detailInfoData,progressData,title,bodyStyle } = props
-  
+  const {detailInfoData,title,bodyStyle } = props
+  const configContext = useContext(ConfigProvider.ConfigContext);
+  const prefixCls = 'portal' || configContext.getPrefixCls();
   const labelStyle = {
     width: 150,
-    justifyContent: 'end'
+    justifyContent: 'end',
+    height: '20px',
   }
 
 
@@ -95,30 +89,6 @@ const ReadOnlyDetailItem = (props:ReadOnlyDetailItemProps) => {
     return result;
   }
 
-  const renderCurrentProgress = ()=>{
-    const logList = lodash.get(progressData,'logs',[])
-    return <>
-        任务进度：<Progress style={{width:'70%'}} percent={lodash.get(progressData,'percent',0)} />
-      <br/>
-        耗时：{displayChineseTime(lodash.get(progressData,'cost_time',0))}
-      <br/>
-        速度：{lodash.get(progressData,'speed_in_second',0)}条/秒
-      <br/>
-        结束时间：{moment(lodash.get(progressData,'end_time',0)).format('YYYY-MM-DD HH:mm:ss')}
-        {renderLogBtn()}
-    </>
-  }
-  const renderLogBtn = ()=>{
-    const logList = lodash.get(progressData,'logs',[])
-    if(logList.length>0){
-      return <>
-      <br/>
-      <Popover content={<div>{arrayToParagraphs(logList)}</div>}><Button>查看日志</Button></Popover>
-      </>
-
-    }
-    return null
-  }
 
   function arrayToParagraphs(array:string[]) {
     return array.map(function(item) {
@@ -142,15 +112,14 @@ const ReadOnlyDetailItem = (props:ReadOnlyDetailItemProps) => {
     </>
   }
 
-  return (<JobCard title={title} bodyStyle={bodyStyle}>
-      <Descriptions column={1} bordered labelStyle={labelStyle}>
+  return (<JobCard title={title} bodyStyle={bodyStyle} >
+      <Descriptions column={1} bordered labelStyle={labelStyle} contentStyle={{paddingTop:10,paddingBottom:10}}>
         <Descriptions.Item label="服务地址">{lodash.get(detailInfoData,'base_url','') }</Descriptions.Item>
         <Descriptions.Item label="样本类型">{ dataResourceTypeMap.get(lodash.get(detailInfoData,'data_resource_type',''))  }</Descriptions.Item>
-        <Descriptions.Item label="数据量">{ renderTotlDataCount()}</Descriptions.Item>
+        <Descriptions.Item label="数据量" >{ renderTotlDataCount()}</Descriptions.Item>
         <Descriptions.Item label="主键">{renderHashConfig()}</Descriptions.Item>
-        <Descriptions.Item label="开始时间">{renderUpdateTime()}</Descriptions.Item>
-        {progressData?<Descriptions.Item label="任务进度">{renderCurrentProgress()} </Descriptions.Item>:null}
       </Descriptions>
+      
     </JobCard>
   );
 };

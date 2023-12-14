@@ -15,6 +15,7 @@ const Index = forwardRef((props,ref)=>{
     const [formRef] = Form.useForm();
     const [visible, setVisible] = useState(false);
     const [okLoading,setOkLoading] = useState(false);
+    const [isTestConnect,setIsTestConnect] = useState(false)
 
     useImperativeHandle(ref,()=>{
         return {
@@ -56,9 +57,16 @@ const Index = forwardRef((props,ref)=>{
     
     },{manual:true})
 
-    const testPartnerConntention = ()=>{
-
-    }
+    const {run:runTestPartnerConntention,loading:testPartnerConntentLoading} = useRequest(async ()=>{
+        const values = await formRef.validateFields();
+        const requestParams = {base_url:values.public_service_base_url,public_key:values.public_key}
+        const res = await testPartnerConntent(requestParams);
+        const {code} = res;
+        if(code === 0){
+            setIsTestConnect(true)
+            message.success('连接成功')
+        }
+    },{manual:true})
 
   
 
@@ -78,18 +86,16 @@ const Index = forwardRef((props,ref)=>{
         open={visible}
         okText='保存'
         onOk={runUpdateGlobalConfig}
-        loading={getGlobalConfigLaoding||updateGlobalConfigLoading}
+        loading={getGlobalConfigLaoding||updateGlobalConfigLoading||testPartnerConntentLoading}
        >
         <Spin spinning={okLoading}>
             <Form  layout="vertical"  form={formRef}>
-                <Form.Item label={'对外服务地址'} name='public_service_base_url' rules={[{required:true}]}>
+                <Form.Item style={{marginBottom:0}} label={'对外服务地址'} name='public_service_base_url' rules={[{required:true}]}>
                     <Input/>
                 </Form.Item>
-                <Form.Item>
-                    <Row justify="end">
-                        <Button type="link"  onClick={testPartnerConntention}>连通性测试</Button>
+                <Row justify="end">
+                        <Button type="link"  onClick={runTestPartnerConntention}>连通性测试</Button>
                     </Row>
-                    </Form.Item>
                 <Form.Item label={'公钥 (密钥用于与其他合作方通信时进行信息加密)'} name='public_key' required >
                     <TextArea
                         disabled
