@@ -23,12 +23,13 @@ export type FileType = {
   list: boolean;
   children?: (props: Recordable) => React.ReactNode;
   setFileList: (fileList: any) => void;
-  fileList:any[]
+  fileList?:any[]
   fileIndex:number
+  disabled?:boolean
 };
 
 export default (props: FileType) => {
-  const { className, style, file, list = true, children,setFileList,fileIndex,fileList } = props;
+  const { className, style, file, list = true, children,setFileList,fileIndex,fileList,disabled } = props;
   const { getPrefixCls } = React.useContext(UploaderContext);
 
   const prefixCls = getPrefixCls("file");
@@ -120,7 +121,7 @@ export default (props: FileType) => {
             <div className={`${prefixCls}-meta`} />
             <div className={`${prefixCls}-status`}/>
             <div className={`${prefixCls}-actions`}>
-              <span className={`${prefixCls}-remove`} onClick={()=>{removeFile()}} />
+              {!disabled && <span className={`${prefixCls}-remove`} onClick={()=>{removeFile()}} />}
             </div>
           </div>
         </Fragment>
