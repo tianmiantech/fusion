@@ -33,7 +33,7 @@ const Index = ()=>{
       }
 
     })
-
+    //根据任务角色将我方和合作方的数据转换为发起方和参与方的数据
     useEffect(()=>{
       if(detailData.jobDetailData){
         let promoterDetail = {},providerDetail = {};

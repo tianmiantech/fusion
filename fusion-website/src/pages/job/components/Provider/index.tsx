@@ -26,7 +26,6 @@ const Index = forwardRef((props:PromoterPropsInterface,ref) => {
   const jobFormRef = useRef<any>();
   const [showRefuseModal,setShowRefuseModal] = useState(false)
 
-  const [promoterDetail,setPromoterDetail] = useState()
 
   const {run:runAgreeAndStart,loading:agreeAndStartLoading} = useRequest(async (params:CreateJobRequestInterface)=>{
     const reponse = await agreeAndStart(params)
@@ -75,7 +74,7 @@ const {run:runDisagreeJob,loading:disagreeJobLoading} = useRequest(async (params
       <Button
         type="primary"
         danger
-
+        onClick={()=>{setShowRefuseModal(true)}}
       >拒绝</Button>
       <Button
         type="primary"
