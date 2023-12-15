@@ -115,7 +115,7 @@ public class JobService extends AbstractService {
         job.setId(input.jobId);
         job.setRole(input.isRequestFromPartner() ? JobMemberRole.provider : JobMemberRole.promoter);
         job.setRemark(input.remark);
-        job.setStatus(JobStatus.editing);
+        job.setStatus(input.isRequestFromMyself() ? JobStatus.editing : JobStatus.auditing);
 
         jobRepository.save(job);
 
@@ -304,7 +304,7 @@ public class JobService extends AbstractService {
             StatusCode.PARAMETER_VALUE_INVALID.throwException("任务已被删除，请重新创建。");
         }
 
-        if (job.getStatus() != JobStatus.editing) {
+        if (job.getStatus() != JobStatus.editing && job.getStatus() != JobStatus.auditing) {
             throw new RuntimeException("任务已经被处理，不能重复处理，请尝试新建任务。");
         }
 
