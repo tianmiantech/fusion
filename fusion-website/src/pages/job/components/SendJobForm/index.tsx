@@ -9,8 +9,11 @@ import lodash from 'lodash'
 import { JOB_STATUS } from '@/constant/dictionary';
 import styles from './index.less'
 
-const SendJobForm = forwardRef((props, ref) => {
-
+interface SendJobFormPropsInterface {
+  showActionButton?:boolean
+}
+const SendJobForm = forwardRef((props:SendJobFormPropsInterface, ref) => {
+  const { showActionButton=true } = props
   const [isTestConnect,setIsTestConnect] = useState(false)
 
   const [formRef] = Form.useForm();
@@ -124,9 +127,12 @@ const SendJobForm = forwardRef((props, ref) => {
           </Spin>
         </Col>
       </Row>
-      <Row className="operation-area">
-          <Button type="primary" disabled={testPartnerConntentLoading||loadingSendJobToProvider || checkFormDisable()} onClick={submitData}>发起任务</Button> 
-      </Row>
+      {
+       showActionButton &&  <Row className="operation-area">
+        <Button type="primary" disabled={testPartnerConntentLoading||loadingSendJobToProvider || checkFormDisable()} onClick={submitData}>发起任务</Button>
+        </Row>
+      }
+      
     </>
   );
 });

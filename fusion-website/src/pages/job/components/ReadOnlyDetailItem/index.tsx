@@ -14,20 +14,21 @@ interface hashConfigItemInterface {
   method: string;
 }
 
+
+export interface ReadOnlyDetailItemDeetailInfoDataInterface {
+  hash_config?:{list:any[]}
+  base_url?:string,
+  data_resource_type?:string,
+  table_data_resource_info?:any|null,
+  total_data_count?:string,
+  public_key?:string,
+  created_time?:string,
+  updated_time?:string,
+}
 interface ReadOnlyDetailItemProps {
   title?:string,
   bodyStyle?:any,
-  detailInfoData:{
-    hash_config?:{list:any[]}
-    base_url?:string,
-    data_resource_type?:string,
-    table_data_resource_info?:any|null,
-    total_data_count?:string,
-    public_key?:string,
-    created_time?:string,
-    updated_time?:string,
-
-  }
+  detailInfoData:ReadOnlyDetailItemDeetailInfoDataInterface|null,
 }
 const ReadOnlyDetailItem = (props:ReadOnlyDetailItemProps) => {
   const {detailInfoData,title,bodyStyle } = props
