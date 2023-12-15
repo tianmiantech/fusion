@@ -51,7 +51,7 @@ public class DataSourceDbModel extends AbstractDbModel {
     private JSONObject connectorConfig;
 
     @JSONField(serialize = false)
-    public JdbcDataSourceClient getJdbcDataSourceClient() throws StatusCodeWithException {
+    public JdbcDataSourceClient getJdbcDataSourceClient() {
         return SuperDataSourceClient.create(databaseType.name(), connectorConfig);
     }
 

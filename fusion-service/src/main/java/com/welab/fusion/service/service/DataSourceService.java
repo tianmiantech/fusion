@@ -81,14 +81,14 @@ public class DataSourceService extends AbstractService {
         return ModelMapper.maps(all, DataSourceOutputModel.class);
     }
 
-    public void testDataSource(TestDataSourceApi.Input input) throws StatusCodeWithException {
+    public String testDataSource(TestDataSourceApi.Input input) {
         JdbcDataSourceClient client = StringUtil.isNotEmpty(input.id)
                 // 前端传了 id，从数据库取出数据源配置
                 ? dataSourceRepository.findById(input.id).orElse(null).getJdbcDataSourceClient()
                 // 前端没传 id，直接用前端传的数据源配置
                 : SuperDataSourceClient.create(input.databaseType.name(), input.dataSourceParams);
 
-        client.test();
+        return client.test();
     }
 
     /**
