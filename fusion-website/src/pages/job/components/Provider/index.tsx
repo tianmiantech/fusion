@@ -24,7 +24,9 @@ const Index = forwardRef((props:PromoterPropsInterface,ref) => {
  
   const { detailData,setDetailData } = useDetail()
   const jobFormRef = useRef<any>();
-  const [showRefuseModal,setShowRefuseModal] = useState(false)
+
+  const refuseModalRef = useRef<any>();
+ 
 
 
   const {run:runAgreeAndStart,loading:agreeAndStartLoading} = useRequest(async (params:CreateJobRequestInterface)=>{
@@ -38,13 +40,7 @@ const Index = forwardRef((props:PromoterPropsInterface,ref) => {
     }  
   },{ manual:true})
 
-const {run:runDisagreeJob,loading:disagreeJobLoading} = useRequest(async (params:DisagreeJobRequestInterface)=>{
-  const reponse = await disagreeJob(params)
-  const {code,data} = reponse;
-  if(code === 0){
-    message.success('操作成功')
-  }}
-  ,{ manual:true})
+
 
   const submitFormData = async () => {
     const {data_resource_type,dataSetAddMethod,hash_config,remark,table_data_resource_info} = await jobFormRef.current?.validateFields();
@@ -60,21 +56,15 @@ const {run:runDisagreeJob,loading:disagreeJobLoading} = useRequest(async (params
     runAgreeAndStart(requestParams)
   }
 
-  const submitDisagreeJob = (value:string)=>{
-    const requestParams = {
-      job_id:detailData.jobId,
-      reason:value
-    } as DisagreeJobRequestInterface
-    runDisagreeJob(requestParams)
-  }
+  
 
   const renderFormAction = ()=>{
-    return  <Spin spinning={agreeAndStartLoading|| disagreeJobLoading}>
+    return  <Spin spinning={agreeAndStartLoading}>
     <Space size={30}>
       <Button
         type="primary"
         danger
-        onClick={()=>{setShowRefuseModal(true)}}
+        onClick={()=>{refuseModalRef.current.showRefuseModal()}}
       >拒绝</Button>
       <Button
         type="primary"
@@ -99,16 +89,14 @@ const {run:runDisagreeJob,loading:disagreeJobLoading} = useRequest(async (params
           >
              <JobForm
                ref={jobFormRef}
-               loading={agreeAndStartLoading|| disagreeJobLoading}
+               loading={agreeAndStartLoading}
                renderFormAction={renderFormAction}
              />
           </JobCard>
         </Col>
       </Row>
       <RefuseModal
-        open={showRefuseModal}
-        onCancel={()=>{setShowRefuseModal(false)}}
-        onOk={submitDisagreeJob}
+        ref={refuseModalRef}
       />
     </>
   );

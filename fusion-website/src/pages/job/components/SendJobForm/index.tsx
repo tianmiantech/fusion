@@ -1,11 +1,13 @@
 import React, { useState,forwardRef,useImperativeHandle,useEffect } from 'react';
-import { Form, Input, Button, Row, Col,Tooltip, Spin, message } from 'antd';
+import { Form, Input, Button, Row, Col,Tooltip, Spin, message,Alert } from 'antd';
 import { FolderOpenOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import { history, useModel } from '@umijs/max';
 import { useRequest } from "ahooks";
-import {testPartnerConntent,TestPartnerConntentRequestInterface,sendJobToProvider,SendTaskToProviderRequestInterface} from '../service'
-import useDetail from '../hooks/useDetail';
+import {testPartnerConntent,TestPartnerConntentRequestInterface,sendJobToProvider,SendTaskToProviderRequestInterface} from '../../service'
+import useDetail from '../../hooks/useDetail';
 import lodash from 'lodash'
+import { JOB_STATUS } from '@/constant/dictionary';
+import styles from './index.less'
 
 const SendJobForm = forwardRef((props, ref) => {
 
@@ -72,7 +74,15 @@ const SendJobForm = forwardRef((props, ref) => {
     })
   };
   const checkFormDisable = ()=>{
-    return  !(!detailData.jobDetailData || detailData.jobDetailData.status==='editing')
+    return  !(!detailData.jobDetailData || detailData.jobDetailData.status===JOB_STATUS.EDITING)
+  }
+
+  const renderRejectReason = ()=>{
+    const status = lodash.get(detailData,'jobDetailData.status')
+    const message = lodash.get(detailData,'jobDetailData.message')
+    if(status===JOB_STATUS.DISAGREE && message){
+      return <Alert message={message} type="error" className={styles.alertContainer} ></Alert>
+    }
   }
 
   return (
@@ -80,6 +90,7 @@ const SendJobForm = forwardRef((props, ref) => {
       <Row justify="center" className="form-scroll">
         <Col lg={{span: 16}} md={{span: 24}}>
           <Spin spinning={testPartnerConntentLoading||loadingSendJobToProvider}>
+            {renderRejectReason()}
           <Form
             form={formRef}
             layout="vertical"
