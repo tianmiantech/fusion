@@ -18,7 +18,7 @@ package com.welab.fusion.core.test;
 import com.alibaba.fastjson.JSON;
 import com.welab.fusion.core.Job.FusionJob;
 import com.welab.fusion.core.Job.JobMember;
-import com.welab.fusion.core.Job.PsiAlgorithm;
+import com.welab.fusion.core.algorithm.base.PsiAlgorithm;
 import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
 import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilterCreator;
 import com.welab.fusion.core.data_resource.base.DataResourceInfo;

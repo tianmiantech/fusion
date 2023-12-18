@@ -17,22 +17,41 @@ package com.welab.fusion.core.algorithm.ecdh_psi;
 
 import com.welab.fusion.core.algorithm.AbstractJobFlow;
 import com.welab.fusion.core.algorithm.JobPhase;
+import com.welab.fusion.core.algorithm.rsa_psi.action.*;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author zane.luo
  * @date 2023/12/18
  */
 public class EcdhPsiJobFlow extends AbstractJobFlow {
+
+    public static final EcdhPsiJobFlow INSTANCE = new EcdhPsiJobFlow();
+
+    private static final Map<JobPhase, Class<? extends AbstractJobPhaseAction>> map = new HashMap<>();
+
+    static {
+        map.put(JobPhase.ConfirmMemberRole, ConfirmMemberRoleAction.class);
+        map.put(JobPhase.CreatePsiBloomFilter, CreatePsiBloomFilterAction.class);
+        map.put(JobPhase.DownloadPsiBloomFilter, DownloadPsiBloomFilterAction.class);
+        map.put(JobPhase.Intersection, IntersectionAction.class);
+        map.put(JobPhase.SaveResult, SaveResultAction.class);
+    }
+
     public EcdhPsiJobFlow() {
-        super(Arrays.asList(
-                JobPhase.ConfirmMemberRole,
-                JobPhase.EncryptMyselfData,
-                JobPhase.EncryptPartnerData,
-                JobPhase.DownloadSecondaryEncryptedData,
-                JobPhase.Intersection,
-                JobPhase.SaveResult
-        ));
+        super(
+                Arrays.asList(
+                        JobPhase.ConfirmMemberRole,
+                        JobPhase.EncryptMyselfData,
+                        JobPhase.EncryptPartnerData,
+                        JobPhase.DownloadSecondaryEncryptedData,
+                        JobPhase.Intersection,
+                        JobPhase.SaveResult
+                ),
+                map
+        );
     }
 }

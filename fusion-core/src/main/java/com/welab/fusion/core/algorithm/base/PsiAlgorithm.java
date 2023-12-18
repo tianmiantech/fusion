@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.welab.fusion.core.Job;
+package com.welab.fusion.core.algorithm.base;
 
 import com.welab.fusion.core.algorithm.AbstractJobFlow;
 import com.welab.fusion.core.algorithm.ecdh_psi.EcdhPsiJobFlow;
@@ -33,9 +33,9 @@ public enum PsiAlgorithm {
     public AbstractJobFlow createJobFlow() {
         switch (this) {
             case rsa_psi:
-                return new RsaPsiJobFlow();
+                return RsaPsiJobFlow.INSTANCE;
             case ecdh_psi:
-                return new EcdhPsiJobFlow();
+                return EcdhPsiJobFlow.INSTANCE;
             default:
                 throw new RuntimeException("Unknown algorithm: " + this);
         }

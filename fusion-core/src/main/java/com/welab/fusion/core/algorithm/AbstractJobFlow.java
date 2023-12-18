@@ -18,7 +18,6 @@ package com.welab.fusion.core.algorithm;
 import com.welab.fusion.core.Job.FusionJob;
 import com.welab.fusion.core.algorithm.rsa_psi.action.*;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -29,37 +28,12 @@ import java.util.Map;
  * @date 2023/12/18
  */
 public abstract class AbstractJobFlow {
-    private static final Map<JobPhase, Class<? extends AbstractJobPhaseAction>> map = new HashMap<>();
-
-    static {
-        map.put(JobPhase.ConfirmMemberRole, ConfirmMemberRoleAction.class);
-        map.put(JobPhase.CreatePsiBloomFilter, CreatePsiBloomFilterAction.class);
-        map.put(JobPhase.DownloadPsiBloomFilter, DownloadPsiBloomFilterAction.class);
-        map.put(JobPhase.Intersection, IntersectionAction.class);
-        map.put(JobPhase.SaveResult, SaveResultAction.class);
-
-    }
-
-    /**
-     * 创建任务阶段动作
-     */
-    public static AbstractJobPhaseAction createAction(JobPhase phase, FusionJob fusionJob) {
-        Class<? extends AbstractJobPhaseAction> aClass = map.get(phase);
-        if (aClass == null) {
-            throw new RuntimeException("Unknown phase: " + phase);
-        }
-
-        try {
-            return aClass.getConstructor(FusionJob.class).newInstance(fusionJob);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     private List<JobPhase> flow;
+    private Map<JobPhase, Class<? extends AbstractJobPhaseAction>> phaseActionMap;
 
-    public AbstractJobFlow(List<JobPhase> flow) {
+    public AbstractJobFlow(List<JobPhase> flow,Map<JobPhase, Class<? extends AbstractJobPhaseAction>> actionMap) {
         this.flow = flow;
+        this.phaseActionMap = actionMap;
     }
 
     /**
@@ -98,4 +72,19 @@ public abstract class AbstractJobFlow {
         return nextPhase(phase) == null;
     }
 
+    /**
+     * 创建任务阶段动作
+     */
+    public AbstractJobPhaseAction createAction(JobPhase phase, FusionJob fusionJob) {
+        Class<? extends AbstractJobPhaseAction> aClass = phaseActionMap.get(phase);
+        if (aClass == null) {
+            throw new RuntimeException("Unknown phase: " + phase);
+        }
+
+        try {
+            return aClass.getConstructor(FusionJob.class).newInstance(fusionJob);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
