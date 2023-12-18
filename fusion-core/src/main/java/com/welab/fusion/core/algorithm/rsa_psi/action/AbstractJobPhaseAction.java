@@ -16,7 +16,7 @@
 package com.welab.fusion.core.algorithm.rsa_psi.action;
 
 import com.welab.fusion.core.Job.FusionJob;
-import com.welab.fusion.core.algorithm.rsa_psi.JobPhase;
+import com.welab.fusion.core.algorithm.JobPhase;
 import com.welab.fusion.core.Job.JobStatus;
 import com.welab.fusion.core.progress.JobPhaseProgress;
 import org.slf4j.Logger;

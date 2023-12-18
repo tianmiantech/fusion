@@ -13,19 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.welab.fusion.core.algorithm.rsa_psi.action;
+package com.welab.fusion.core.algorithm;
 
 import com.welab.fusion.core.Job.FusionJob;
-import com.welab.fusion.core.algorithm.rsa_psi.JobPhase;
+import com.welab.fusion.core.algorithm.rsa_psi.action.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
+ * 任务流程声明
+ *
  * @author zane.luo
- * @date 2023/11/13
+ * @date 2023/12/18
  */
-public class JobPhaseActionCreator {
+public abstract class AbstractJobFlow {
     private static final Map<JobPhase, Class<? extends AbstractJobPhaseAction>> map = new HashMap<>();
 
     static {
@@ -37,7 +40,10 @@ public class JobPhaseActionCreator {
 
     }
 
-    public static AbstractJobPhaseAction create(JobPhase phase, FusionJob fusionJob) {
+    /**
+     * 创建任务阶段动作
+     */
+    public static AbstractJobPhaseAction createAction(JobPhase phase, FusionJob fusionJob) {
         Class<? extends AbstractJobPhaseAction> aClass = map.get(phase);
         if (aClass == null) {
             throw new RuntimeException("Unknown phase: " + phase);
@@ -49,4 +55,47 @@ public class JobPhaseActionCreator {
             throw new RuntimeException(e);
         }
     }
+
+    private List<JobPhase> flow;
+
+    public AbstractJobFlow(List<JobPhase> flow) {
+        this.flow = flow;
+    }
+
+    /**
+     * 获取下一个阶段
+     */
+    public JobPhase nextPhase(JobPhase phase) {
+        int index = phaseIndex(phase);
+        if (index == flow.size() - 1) {
+            return null;
+        }
+        return flow.get(index + 1);
+    }
+
+    /**
+     * 获取按顺序排列的所有阶段
+     */
+    public List<JobPhase> listPhase() {
+        return flow;
+    }
+
+    /**
+     * 获取第一个阶段
+     */
+    public JobPhase firstPhase() {
+        return flow.get(0);
+    }
+
+    public int phaseIndex(JobPhase phase) {
+        return flow.indexOf(phase);
+    }
+
+    /**
+     * 是否是最后一个阶段
+     */
+    public boolean isLastPhase(JobPhase phase) {
+        return nextPhase(phase) == null;
+    }
+
 }

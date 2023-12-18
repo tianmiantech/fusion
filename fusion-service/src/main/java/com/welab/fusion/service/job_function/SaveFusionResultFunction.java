@@ -15,7 +15,7 @@
  */
 package com.welab.fusion.service.job_function;
 
-import com.welab.fusion.core.algorithm.rsa_psi.Role;
+import com.welab.fusion.core.Job.JobRole;
 import com.welab.fusion.core.Job.FusionResult;
 import com.welab.fusion.core.data_source.CsvTableDataSourceReader;
 import com.welab.fusion.core.io.FileSystem;
@@ -28,7 +28,7 @@ import com.welab.wefe.common.web.Launcher;
 import java.io.File;
 import java.util.function.Consumer;
 
-import static com.welab.fusion.core.algorithm.rsa_psi.Role.psi_bool_filter_provider;
+import static com.welab.fusion.core.Job.JobRole.follower;
 
 /**
  * @author zane.luo
@@ -38,11 +38,11 @@ public class SaveFusionResultFunction implements com.welab.fusion.core.function.
     private static final JobService jobService = Launcher.getBean(JobService.class);
 
     @Override
-    public void save(String jobId, Role myRole, FusionResult result, Consumer<Long> totalSizeConsumer, Consumer<Long> downloadSizeConsumer) throws Exception {
+    public void save(String jobId, JobRole myRole, FusionResult result, Consumer<Long> totalSizeConsumer, Consumer<Long> downloadSizeConsumer) throws Exception {
         JobDbModel job = jobService.findById(jobId);
 
         // 如果我是过滤器提供方，则需要从协作方下载求交结果。
-        if (myRole == psi_bool_filter_provider) {
+        if (myRole == follower) {
             downloadFusionResult(job, result, totalSizeConsumer, downloadSizeConsumer);
         }
 

@@ -18,6 +18,7 @@ package com.welab.fusion.service.database.entity;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.welab.fusion.core.Job.JobStatus;
+import com.welab.fusion.core.Job.PsiAlgorithm;
 import com.welab.fusion.core.progress.JobProgress;
 import com.welab.fusion.service.constans.JobMemberRole;
 import com.welab.wefe.common.fieldvalidate.annotation.Check;
@@ -37,6 +38,8 @@ import java.util.Date;
  */
 @Entity(name = "job")
 public class JobDbModel extends AbstractDbModel {
+    @Check(name = "算法")
+    private PsiAlgorithm algorithm;
     @Check(name = "创建任务的成员ID")
     private String creatorMemberId;
     @Check(name = "合作方ID")
@@ -89,6 +92,15 @@ public class JobDbModel extends AbstractDbModel {
     }
 
     // region getter/setter
+
+
+    public PsiAlgorithm getAlgorithm() {
+        return algorithm;
+    }
+
+    public void setAlgorithm(PsiAlgorithm algorithm) {
+        this.algorithm = algorithm;
+    }
 
     public String getCreatorMemberId() {
         return creatorMemberId;

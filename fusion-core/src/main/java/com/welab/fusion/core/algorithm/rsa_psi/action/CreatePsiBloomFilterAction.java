@@ -16,8 +16,8 @@
 package com.welab.fusion.core.algorithm.rsa_psi.action;
 
 import com.welab.fusion.core.Job.FusionJob;
-import com.welab.fusion.core.algorithm.rsa_psi.Role;
-import com.welab.fusion.core.algorithm.rsa_psi.JobPhase;
+import com.welab.fusion.core.Job.JobRole;
+import com.welab.fusion.core.algorithm.JobPhase;
 import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
 import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilterCreator;
 import com.welab.fusion.core.data_resource.base.DataResourceType;
@@ -72,7 +72,7 @@ public class CreatePsiBloomFilterAction extends AbstractJobPhaseAction {
     @Override
     protected boolean skipThisAction() {
         // 角色不是过滤器方，不生成。
-        if (job.getMyJobRole() == Role.table_data_resource_provider) {
+        if (job.getMyJobRole() == JobRole.leader) {
             phaseProgress.setMessage("我方为数据集提供方，无需生成过滤器。");
             return true;
         }

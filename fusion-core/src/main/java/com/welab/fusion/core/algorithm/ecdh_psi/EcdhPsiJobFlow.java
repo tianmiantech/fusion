@@ -13,18 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.welab.fusion.core.function;
+package com.welab.fusion.core.algorithm.ecdh_psi;
 
-import com.welab.fusion.core.Job.JobRole;
-import com.welab.fusion.core.Job.FusionResult;
+import com.welab.fusion.core.algorithm.AbstractJobFlow;
+import com.welab.fusion.core.algorithm.JobPhase;
 
-import java.util.function.Consumer;
+import java.util.Arrays;
 
 /**
  * @author zane.luo
- * @date 2023/11/15
+ * @date 2023/12/18
  */
-@FunctionalInterface
-public interface SaveFusionResultFunction {
-    void save(String jobId, JobRole myRole, FusionResult result, Consumer<Long> totalSizeConsumer, Consumer<Long> downloadSizeConsumer) throws Exception;
+public class EcdhPsiJobFlow extends AbstractJobFlow {
+    public EcdhPsiJobFlow() {
+        super(Arrays.asList(
+                JobPhase.ConfirmMemberRole,
+                JobPhase.EncryptMyselfData,
+                JobPhase.EncryptPartnerData,
+                JobPhase.DownloadSecondaryEncryptedData,
+                JobPhase.Intersection,
+                JobPhase.SaveResult
+        ));
+    }
 }
