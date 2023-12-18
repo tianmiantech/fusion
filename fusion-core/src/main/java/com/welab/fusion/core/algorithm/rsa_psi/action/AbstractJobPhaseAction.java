@@ -29,11 +29,7 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractJobPhaseAction {
     protected final Logger LOG = LoggerFactory.getLogger(this.getClass());
     protected FusionJob job;
-    protected JobPhaseProgress phaseProgress = JobPhaseProgress.of(
-            job.getJobId(),
-            getPhase(),
-            0
-    );
+    protected JobPhaseProgress phaseProgress;
 
     /**
      * 执行动作
@@ -52,6 +48,11 @@ public abstract class AbstractJobPhaseAction {
 
     public AbstractJobPhaseAction(FusionJob job) {
         this.job = job;
+        this.phaseProgress = JobPhaseProgress.of(
+                job.getJobId(),
+                getPhase(),
+                0
+        );
     }
 
     /**
