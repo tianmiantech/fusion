@@ -17,10 +17,10 @@ package com.welab.fusion.core.Job;
 
 import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.StrUtil;
-import com.welab.fusion.core.algorithm.rsa_psi.action.AbstractJobPhaseAction;
-import com.welab.fusion.core.algorithm.rsa_psi.action.JobPhaseActionCreator;
 import com.welab.fusion.core.algorithm.rsa_psi.JobPhase;
 import com.welab.fusion.core.algorithm.rsa_psi.Role;
+import com.welab.fusion.core.algorithm.rsa_psi.action.AbstractJobPhaseAction;
+import com.welab.fusion.core.algorithm.rsa_psi.action.JobPhaseActionCreator;
 import com.welab.fusion.core.data_resource.base.DataResourceType;
 import com.welab.fusion.core.function.JobFunctions;
 import com.welab.fusion.core.progress.JobProgress;
@@ -226,6 +226,10 @@ public class FusionJob implements Closeable {
      * 结束任务
      */
     private void finishJob(JobStatus status, String message) {
+        if (myProgress.getJobStatus().isFinished()) {
+            return;
+        }
+
         LOG.info("任务结束，状态：{}，消息：{}", status, message);
         myProgress.finish(status, message);
         try {

@@ -101,9 +101,13 @@ public class Progress {
     public synchronized void updateCompletedWorkload(long completedWorkload) {
         BigDecimal increment = BigDecimal.valueOf(completedWorkload - this.completedWorkload);
         BigDecimal cost = BigDecimal.valueOf(System.currentTimeMillis() - lastUpdateCompletedWorkloadTime);
-        this.speedInSecond = increment.divide(cost, 5, RoundingMode.HALF_UP)
-                .multiply(BigDecimal.valueOf(1_000))
-                .longValue();
+        if (cost.intValue() > 0) {
+            this.speedInSecond = increment.divide(cost, 5, RoundingMode.HALF_UP)
+                    .multiply(BigDecimal.valueOf(1_000))
+                    .longValue();
+        } else {
+            this.speedInSecond = 0;
+        }
 
         this.lastUpdateCompletedWorkloadTime = System.currentTimeMillis();
         this.completedWorkload = completedWorkload;
