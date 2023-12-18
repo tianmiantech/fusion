@@ -53,6 +53,8 @@ public abstract class AbstractJobPhaseAction {
                 getPhase(),
                 0
         );
+
+        this.phaseProgress.setMessage("开始执行阶段动作: " + getPhase());
     }
 
     /**
@@ -77,8 +79,6 @@ public abstract class AbstractJobPhaseAction {
             if (!skipThisAction) {
                 phaseProgress.updateCompletedWorkload(getTotalWorkload());
             }
-
-            phaseProgress.setMessage("开始执行阶段动作: " + getPhase());
 
             // 添加当前阶段进度到总进度
             job.getMyProgress().addPhaseProgress(phaseProgress);
