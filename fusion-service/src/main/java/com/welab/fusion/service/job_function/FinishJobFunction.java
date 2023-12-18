@@ -35,6 +35,10 @@ public class FinishJobFunction implements com.welab.fusion.core.function.FinishJ
     public void finish(String jobId, JobProgress progress) throws Exception {
         JobDbModel job = jobService.findById(jobId);
 
+        if (job.getStatus().isFinished()) {
+            return;
+        }
+
         job.setEndTime(new Date());
         job.setCostTime(job.getEndTime().getTime() - job.getStartTime().getTime());
         job.setStatus(progress.getJobStatus());
