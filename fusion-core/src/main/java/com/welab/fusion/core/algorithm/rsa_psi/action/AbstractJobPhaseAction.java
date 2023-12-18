@@ -29,7 +29,11 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractJobPhaseAction {
     protected final Logger LOG = LoggerFactory.getLogger(this.getClass());
     protected FusionJob job;
-    protected JobPhaseProgress phaseProgress;
+    protected JobPhaseProgress phaseProgress = JobPhaseProgress.of(
+            job.getJobId(),
+            getPhase(),
+            0
+    );
 
     /**
      * 执行动作
@@ -69,11 +73,9 @@ public abstract class AbstractJobPhaseAction {
             boolean skipThisAction = skipThisAction();
 
             // 初始化当前阶段进度
-            phaseProgress = JobPhaseProgress.of(
-                    job.getJobId(),
-                    getPhase(),
-                    skipThisAction ? 0 : getTotalWorkload()
-            );
+            if (!skipThisAction) {
+                phaseProgress.updateCompletedWorkload(getTotalWorkload());
+            }
 
             phaseProgress.setMessage("开始执行阶段动作: " + getPhase());
 
