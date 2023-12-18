@@ -15,6 +15,10 @@
  */
 package com.welab.fusion.core.Job;
 
+import com.welab.fusion.core.algorithm.AbstractJobFlow;
+import com.welab.fusion.core.algorithm.ecdh_psi.EcdhPsiJobFlow;
+import com.welab.fusion.core.algorithm.rsa_psi.RsaPsiJobFlow;
+
 /**
  * @author zane.luo
  * @date 2023/12/11
@@ -24,5 +28,16 @@ public enum PsiAlgorithm {
      * 基于 RSA 加盲的 PSI
      */
     rsa_psi,
-    ecdh_psi
+    ecdh_psi;
+
+    public AbstractJobFlow createJobFlow() {
+        switch (this) {
+            case rsa_psi:
+                return new RsaPsiJobFlow();
+            case ecdh_psi:
+                return new EcdhPsiJobFlow();
+            default:
+                throw new RuntimeException("Unknown algorithm: " + this);
+        }
+    }
 }

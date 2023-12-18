@@ -18,6 +18,7 @@ package com.welab.fusion.core.test;
 import com.alibaba.fastjson.JSON;
 import com.welab.fusion.core.Job.FusionJob;
 import com.welab.fusion.core.Job.JobMember;
+import com.welab.fusion.core.Job.PsiAlgorithm;
 import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
 import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilterCreator;
 import com.welab.fusion.core.data_resource.base.DataResourceInfo;
@@ -88,8 +89,8 @@ public class FusionJobTest {
         memberB = JobMember.of("memberB", "memberB", dataResourceInfoB);
         memberB.tableDataResourceReader = readerB;
 
-        memberAJob = new FusionJob(job_id, memberA, memberB, createAJobFunctions());
-        memberBJob = new FusionJob(job_id, memberB, memberA, createBJobFunctions());
+        memberAJob = new FusionJob(PsiAlgorithm.rsa_psi, job_id, memberA, memberB, createAJobFunctions());
+        memberBJob = new FusionJob(PsiAlgorithm.rsa_psi, job_id, memberB, memberA, createBJobFunctions());
     }
 
     private static JobFunctions createAJobFunctions() {

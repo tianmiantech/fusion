@@ -93,6 +93,7 @@ public class JobService extends AbstractService {
         memberService.trySave(input.caller);
 
         JobDbModel job = new JobDbModel();
+        job.setAlgorithm(input.algorithm);
         // 来自自己前端，填充任务Id，便于其它方法统一行为。
         if (input.isRequestFromMyself()) {
             input.jobId = job.getId();
@@ -216,7 +217,7 @@ public class JobService extends AbstractService {
         DataResourceInfo partnerDataResourceInfo = DataResourceInfo.of(partnerJobInfo.getDataResourceType(), partnerJobInfo.getTotalDataCount(), partnerJobInfo.getHashConfigModel());
         JobMember partner = JobMember.of(partnerInfo.getId(), partnerInfo.getName(), partnerDataResourceInfo);
 
-        return new FusionJob(job.getId(), myself, partner, MyJobFunctions.INSTANCE);
+        return new FusionJob(job.getAlgorithm(), job.getId(), myself, partner, MyJobFunctions.INSTANCE);
     }
 
 

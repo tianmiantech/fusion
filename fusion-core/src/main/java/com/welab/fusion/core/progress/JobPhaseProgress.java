@@ -15,7 +15,7 @@
  */
 package com.welab.fusion.core.progress;
 
-import com.welab.fusion.core.algorithm.rsa_psi.JobPhase;
+import com.welab.fusion.core.algorithm.JobPhase;
 import com.welab.fusion.core.Job.JobStatus;
 
 /**

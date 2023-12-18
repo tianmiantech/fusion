@@ -17,10 +17,9 @@ package com.welab.fusion.core.Job;
 
 import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.StrUtil;
-import com.welab.fusion.core.algorithm.rsa_psi.JobPhase;
-import com.welab.fusion.core.algorithm.rsa_psi.Role;
+import com.welab.fusion.core.algorithm.AbstractJobFlow;
+import com.welab.fusion.core.algorithm.JobPhase;
 import com.welab.fusion.core.algorithm.rsa_psi.action.AbstractJobPhaseAction;
-import com.welab.fusion.core.algorithm.rsa_psi.action.JobPhaseActionCreator;
 import com.welab.fusion.core.data_resource.base.DataResourceType;
 import com.welab.fusion.core.function.JobFunctions;
 import com.welab.fusion.core.progress.JobProgress;
@@ -46,19 +45,23 @@ public class FusionJob implements Closeable {
     private JobMember myself;
     private JobMember partner;
     private JobProgress myProgress = new JobProgress();
-    private Role jobRole;
+    private JobRole jobRole;
     private ThreadPool actionSingleThreadExecutor;
     private ThreadPool scheduleSingleThreadExecutor;
     private JobFunctions jobFunctions;
     private FusionResult fusionResult;
+    private PsiAlgorithm algorithm;
+    private AbstractJobFlow jobFlow;
     /**
      * 已执行的阶段
      */
     private final Set<JobPhase> executedPhases = new HashSet<>();
 
-    public FusionJob(String jobId, JobMember myself, JobMember partner, JobFunctions jobFunctions) {
+    public FusionJob(PsiAlgorithm algorithm, String jobId, JobMember myself, JobMember partner, JobFunctions jobFunctions) {
         jobFunctions.check();
 
+        this.algorithm = algorithm;
+        this.jobFlow = algorithm.createJobFlow();
         this.jobId = StrUtil.isEmpty(jobId) ? UUID.randomUUID().toString().replace("-", "") : jobId;
         this.myself = myself;
         this.partner = partner;
@@ -91,7 +94,7 @@ public class FusionJob implements Closeable {
         scheduleSingleThreadExecutor.execute(() -> {
             try {
                 // 开始执行第一阶段任务
-                gotoAction(JobPhase.firstPhase());
+                gotoPhase(jobFlow.firstPhase());
 
                 while (true) {
 
@@ -139,7 +142,7 @@ public class FusionJob implements Closeable {
         }
 
         // 双方都已完成，任务结束。
-        if (myProgress.getCurrentPhase().isLastPhase() && partnerProgress.getCurrentPhase().isLastPhase()) {
+        if (jobFlow.isLastPhase(myProgress.getCurrentPhase()) && jobFlow.isLastPhase(partnerProgress.getCurrentPhase())) {
             if (myProgress.getJobStatus().isSuccess() && partnerProgress.getJobStatus().isSuccess()) {
                 finishJobBySuccess();
                 return false;
@@ -148,7 +151,7 @@ public class FusionJob implements Closeable {
 
         // 进入下一个阶段。
         if (needGotoNextPhase(partnerProgress)) {
-            gotoAction(myProgress.getCurrentPhase().next());
+            gotoPhase(jobFlow.nextPhase(myProgress.getCurrentPhase()));
         }
 
         return true;
@@ -166,17 +169,17 @@ public class FusionJob implements Closeable {
         }
 
         // 已经是最后一个阶段，不进入下一阶段。
-        if (myProgress.getCurrentPhase().isLastPhase()) {
+        if (jobFlow.isLastPhase(myProgress.getCurrentPhase())) {
             return false;
         }
 
         // 如果我方进度落后于对方，进入下一阶段。
-        if (myProgress.getCurrentPhase().index() < partnerProgress.getCurrentPhase().index()) {
+        if (jobFlow.phaseIndex(myProgress.getCurrentPhase()) < jobFlow.phaseIndex(partnerProgress.getCurrentPhase())) {
             return true;
         }
 
         // 双方进度相同，且双方都已完成，进入下一阶段。
-        if (myProgress.getCurrentPhase().index() == partnerProgress.getCurrentPhase().index()) {
+        if (jobFlow.phaseIndex(myProgress.getCurrentPhase()) == jobFlow.phaseIndex(partnerProgress.getCurrentPhase())) {
             if (myProgress.getCurrentPhaseStatus().isSuccess() && partnerProgress.getCurrentPhaseStatus().isSuccess()) {
                 return true;
             }
@@ -250,14 +253,14 @@ public class FusionJob implements Closeable {
     /**
      * 由调度器调用，进入指定阶段。
      */
-    private synchronized void gotoAction(JobPhase phase) {
+    private synchronized void gotoPhase(JobPhase phase) {
         if (executedPhases.contains(phase)) {
             throw new RuntimeException("阶段已执行过，不能重复执行。");
         }
         executedPhases.add(phase);
 
         // 异步执行当前阶段动作
-        AbstractJobPhaseAction action = JobPhaseActionCreator.create(phase, this);
+        AbstractJobPhaseAction action = jobFlow.createAction(phase, this);
         actionSingleThreadExecutor.execute(() -> {
             action.run();
         });
@@ -313,11 +316,11 @@ public class FusionJob implements Closeable {
         return partner;
     }
 
-    public void setMyRole(Role jobRole) {
+    public void setMyRole(JobRole jobRole) {
         this.jobRole = jobRole;
     }
 
-    public Role getMyJobRole() {
+    public JobRole getMyJobRole() {
         return jobRole;
     }
 

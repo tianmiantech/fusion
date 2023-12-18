@@ -16,8 +16,8 @@
 package com.welab.fusion.core.algorithm.rsa_psi.action;
 
 import com.welab.fusion.core.Job.FusionJob;
-import com.welab.fusion.core.algorithm.rsa_psi.Role;
-import com.welab.fusion.core.algorithm.rsa_psi.JobPhase;
+import com.welab.fusion.core.Job.JobRole;
+import com.welab.fusion.core.algorithm.JobPhase;
 
 /**
  * @author zane.luo
@@ -30,7 +30,7 @@ public class SaveResultAction extends AbstractJobPhaseAction {
 
     @Override
     protected void doAction() throws Exception {
-        if (job.getMyJobRole() == Role.psi_bool_filter_provider) {
+        if (job.getMyJobRole() == JobRole.follower) {
             phaseProgress.setMessage("正在从合作方下载求交结果...");
         }else{
             phaseProgress.setMessage("正在保存求交结果...");

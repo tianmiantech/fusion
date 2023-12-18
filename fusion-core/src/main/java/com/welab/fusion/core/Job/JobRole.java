@@ -13,19 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.welab.fusion.core.algorithm.rsa_psi;
+package com.welab.fusion.core.Job;
 
 /**
+ * 不管是什么 pis 算法，最终都需要在其中一个节点上进行最后的求交动作，这个节点就是 leader。
+ *
  * @author zane.luo
  * @date 2023/11/13
  */
-public enum Role {
+public enum JobRole {
     /**
-     * PSI 过滤器
+     * 首领
      */
-    psi_bool_filter_provider,
+    leader,
     /**
-     * 数据集
+     * 从属
      */
-    table_data_resource_provider;
+    follower,
+
 }

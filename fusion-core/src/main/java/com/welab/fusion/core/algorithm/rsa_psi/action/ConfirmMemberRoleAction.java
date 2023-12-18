@@ -16,15 +16,18 @@
 package com.welab.fusion.core.algorithm.rsa_psi.action;
 
 import com.welab.fusion.core.Job.FusionJob;
-import com.welab.fusion.core.algorithm.rsa_psi.Role;
 import com.welab.fusion.core.Job.JobMember;
-import com.welab.fusion.core.algorithm.rsa_psi.JobPhase;
+import com.welab.fusion.core.algorithm.JobPhase;
+import com.welab.fusion.core.Job.JobRole;
 import com.welab.fusion.core.data_resource.base.DataResourceInfo;
 import com.welab.fusion.core.data_resource.base.DataResourceType;
 
 /**
  * 确认成员角色
  * 这里采用了离线协商的方式
+ *
+ * leader：提供数据集，提供返回字段。
+ * follower: 提供过滤器
  *
  * @author zane.luo
  * @date 2023/11/13
@@ -41,7 +44,7 @@ public class ConfirmMemberRoleAction extends AbstractJobPhaseAction {
 
     @Override
     public void doAction() throws Exception {
-        Role role = consultMyRole();
+        JobRole role = consultMyRole();
         job.setMyRole(role);
 
         phaseProgress.setMessage("协商完毕，我方角色：" + role);
@@ -68,7 +71,7 @@ public class ConfirmMemberRoleAction extends AbstractJobPhaseAction {
      * - 双方都为数据集，数据量大的生成过滤器。
      * - 双方都为数据集，双方数据量相同，成员名称字典序小的生成过滤器。
      */
-    private Role consultMyRole() throws Exception {
+    private JobRole consultMyRole() throws Exception {
         JobMember myself = job.getMyself();
         JobMember partner = job.getPartner();
         DataResourceInfo myDataResourceInfo = myself.dataResourceInfo;
@@ -87,7 +90,7 @@ public class ConfirmMemberRoleAction extends AbstractJobPhaseAction {
     /**
      * 双方资源类型相同
      */
-    private Role consultMyRoleWhenEqualType() throws Exception {
+    private JobRole consultMyRoleWhenEqualType() throws Exception {
         JobMember myself = job.getMyself();
         JobMember partner = job.getPartner();
         DataResourceInfo myDataResourceInfo = myself.dataResourceInfo;
@@ -108,26 +111,26 @@ public class ConfirmMemberRoleAction extends AbstractJobPhaseAction {
             }
 
             return myHash > partnerHash
-                    ? Role.psi_bool_filter_provider
-                    : Role.table_data_resource_provider;
+                    ? JobRole.follower
+                    : JobRole.leader;
         }
 
         // 双方数据量不同，数据量大的生成过滤器。
         return myDataResourceInfo.dataCount > partnerDataResourceInfo.dataCount
-                ? Role.psi_bool_filter_provider
-                : Role.table_data_resource_provider;
+                ? JobRole.follower
+                : JobRole.leader;
     }
 
     /**
      * 双方资源类型不同
      */
-    private Role consultMyRoleWhenNotEqualType() {
+    private JobRole consultMyRoleWhenNotEqualType() {
         switch (job.getMyself().dataResourceInfo.dataResourceType) {
             case PsiBloomFilter:
-                return Role.psi_bool_filter_provider;
+                return JobRole.follower;
 
             case TableDataSource:
-                return Role.table_data_resource_provider;
+                return JobRole.leader;
             default:
                 throw new RuntimeException("意料之外的情形");
         }

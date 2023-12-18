@@ -16,8 +16,8 @@
 package com.welab.fusion.core.algorithm.rsa_psi.action;
 
 import com.welab.fusion.core.Job.FusionJob;
-import com.welab.fusion.core.algorithm.rsa_psi.Role;
-import com.welab.fusion.core.algorithm.rsa_psi.JobPhase;
+import com.welab.fusion.core.Job.JobRole;
+import com.welab.fusion.core.algorithm.JobPhase;
 import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
 import com.welab.fusion.core.function.DownloadPartnerPsiBloomFilterFunction;
 import com.welab.fusion.core.io.FileSystem;
@@ -39,7 +39,7 @@ public class DownloadPsiBloomFilterAction extends AbstractJobPhaseAction {
 
     @Override
     protected boolean skipThisAction() {
-        return job.getMyJobRole() == Role.psi_bool_filter_provider;
+        return job.getMyJobRole() == JobRole.follower;
     }
 
     @Override
