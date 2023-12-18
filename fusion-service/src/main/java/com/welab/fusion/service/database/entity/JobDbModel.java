@@ -60,6 +60,7 @@ public class JobDbModel extends AbstractDbModel {
     @Check(name = "任务耗时")
     private Long costTime;
     @Check(name = "任务状态")
+    @Enumerated(EnumType.STRING)
     private JobStatus status;
     private String message;
 
