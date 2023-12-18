@@ -1,5 +1,5 @@
 import { useRequest,useMount } from 'ahooks';
-import { getDataSourceAvailableType,getDataSourceList,testDataSource,TestDataSourceInterface } from '../service'
+import { getDataSourceAvailableType,getDataSourceList} from '../service'
 import { useImmer } from 'use-immer';
 import lodash from 'lodash'
 
@@ -32,10 +32,7 @@ interface getDataSourceListInterface {
     }
 }
 
-interface testDataSourceReponseInterface {
-    code:string,
-    success:boolean
-}
+
 
 const useDataSourceForm = ()=>{
 
@@ -43,8 +40,9 @@ const useDataSourceForm = ()=>{
         dataSoureTypeList:[],
         dataSoureSuggestion:[]
     })
-    //获取数据库类型
-    const getDataSourceAvailableTypeHandeler = async():Promise<null>=> {
+
+
+    const {run:runGetDataSourceAvailableType} = useRequest(async ()=>{
         const reponse:getDataSourceAvailableTypeInterface = await getDataSourceAvailableType()
         const {code} = reponse;
         if(code === 0){
@@ -54,20 +52,16 @@ const useDataSourceForm = ()=>{
                 g.dataSoureTypeList = result
             })
         }
-        return null
-    }
-
-    const {run:runGetDataSourceAvailableType} = useRequest(getDataSourceAvailableTypeHandeler,{
+    },{
         manual:true,
     })
 
     //获取所有可用的数据源
-    const getDataSourceListHandeler =  async():Promise<null>=> {
+    const {run:runGetDataSourceList} = useRequest(async ()=>{
         const reponse:getDataSourceListInterface = await getDataSourceList()
-        return null
-    }
-
-    const {run:runGetDataSourceList} = useRequest(getDataSourceListHandeler,{
+        console.log("runGetDataSourceList",reponse);
+        
+    },{
         manual:true,
     })
 
@@ -83,25 +77,9 @@ const useDataSourceForm = ()=>{
         }
     }
 
-    //测试数据源是否可以用
-    const testDataSourceHandeler =  async(params:TestDataSourceInterface):Promise<testDataSourceReponseInterface>=> {
-        const reponse:testDataSourceReponseInterface = await testDataSource(params)
-        console.log("reponse",reponse);
-        const {code,success} = reponse
-        return {code,success}
-    }
-
-    const {run:runTestDataSource,data:testDataSourceCallBakData} = useRequest(testDataSourceHandeler,{
-        manual:true,
-    })
-    
-
-
     return {
         dataSoureConfig,
-        checkIfNeedGetDataSourceAvailableType,
-        runTestDataSource,
-        testDataSourceCallBakData
+        checkIfNeedGetDataSourceAvailableType
     }
     
 }

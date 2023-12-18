@@ -9,7 +9,7 @@ import { useParams } from "@umijs/max";
 import { useUnmount } from "ahooks";
 import styles from './index.less'
 import lodash from 'lodash'
-import { JOB_STATUS } from "@/constant/dictionary";
+import { JOB_STATUS,ROLE_TYPE } from "@/constant/dictionary";
 
 const Detail = () => {
   
@@ -46,13 +46,18 @@ const renderLoading = ()=>{
 const renderDetail = ()=>{
   const status = lodash.get(detailData,'jobDetailData.status','')
   if(!status|| status === JOB_STATUS.EDITING || status === JOB_STATUS.AUDITING ) {
-    if(detailData.role === 'promoter'){
+    if(detailData.role === ROLE_TYPE.PROMOTER){
       return <Promoter />
-    }else if(detailData.role === 'provider'){
+    }else if(detailData.role === ROLE_TYPE.PROVIDER){
       return <Provider />
     }
   } else if(status === JOB_STATUS.DISAGREE) { // 审核不通过 发起方，协作方展示同一个界面
-    return <DisagreeDetail />
+    if(detailData.role === ROLE_TYPE.PROMOTER){
+      return <Promoter />
+    }else if(detailData.role === ROLE_TYPE.PROVIDER){
+      return <DisagreeDetail />
+    }
+   
   } else {
     return <DetailWithProgress />
   }

@@ -43,14 +43,15 @@ const Index = forwardRef((props:PromoterPropsInterface,ref) => {
 
 
   const submitFormData = async () => {
-    const {data_resource_type,dataSetAddMethod,hash_config,remark,table_data_resource_info} = await jobFormRef.current?.validateFields();
+    const {data_resource_type,add_method,hash_config,remark,table_data_resource_info} = await jobFormRef.current?.validateFields();
     const requestParams = {
       remark,
       job_id:detailData.jobId,
       data_resource:{
         data_resource_type,
         table_data_resource_info,
-        hash_config
+        hash_config,
+        add_method
       }
     }
     runAgreeAndStart(requestParams)

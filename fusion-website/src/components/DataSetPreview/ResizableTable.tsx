@@ -7,9 +7,10 @@ interface ResizableTableProps {
   dataSource: any[];
   open:boolean,
   onCancel: () => void;
+  loading?: boolean;
 }
 
-const ResizableTable: React.FC<ResizableTableProps> = ({ columns, dataSource,open,onCancel }) => {
+const ResizableTable: React.FC<ResizableTableProps> = ({ columns, dataSource,open,onCancel,loading=false }) => {
   const [tableWidth, setTableWidth] = useState<number>(0);
   const modalRef = useRef<ModalProps>(null);
 
@@ -32,6 +33,7 @@ const ResizableTable: React.FC<ResizableTableProps> = ({ columns, dataSource,ope
         columns={columns}
         dataSource={dataSource}
         scroll={{ x: tableWidth }}
+        loading={loading}
       />
     </ResizeObserver>
   );

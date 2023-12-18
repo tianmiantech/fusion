@@ -15,13 +15,8 @@ import useDetail from "../../hooks/useDetail";
 interface JobFormDataInterface {
   BFManageOpen:boolean,
   dataourceColumnList:string[],//数据预览的column列表，用来选择设置hash
-  uploadFileName:string //上传到后端的文件名
 }
 
-interface UploadFinishCallBackInterface {
-  uploadFileName:string,
-  dataourceColumnList:string[]
-}
 interface JobFormPropsInterface {
   loading?:boolean,
   renderFormAction?:()=>React.ReactNode, //表单提交按钮，发起方，协作方不一样，交给各组装
@@ -31,21 +26,18 @@ interface JobFormPropsInterface {
 const JobForm = forwardRef((props:JobFormPropsInterface, ref) => {
   const { loading=false,renderFormAction} = props
   const [formRef] = Form.useForm();
-  const {detailData,setDetailData} = useDetail();
+  const {detailData} = useDetail();
 
   const [jobFormData,setJobFormData] = useImmer<JobFormDataInterface>({
     BFManageOpen:false,
-    uploadFileName:'',
     dataourceColumnList:[]
   })
 
  
   
-  const uploadFinishCallBack = (parma:UploadFinishCallBackInterface)=>{
-    const {uploadFileName,dataourceColumnList} = parma
+  const prevColumnsChangeCallBack = (parma:string[])=>{
     setJobFormData(g=>{
-      g.dataourceColumnList = dataourceColumnList;
-      g.uploadFileName = uploadFileName
+      g.dataourceColumnList = parma;
     })
   }
  
@@ -70,7 +62,7 @@ const JobForm = forwardRef((props:JobFormPropsInterface, ref) => {
           <Col lg={{span: 16}} md={{span: 24}}>
             <Form
               form={formRef}
-              initialValues={{data_resource_type:'TableDataSource',dataSetAddMethod:'HttpUpload'}}
+              initialValues={{data_resource_type:'TableDataSource',add_method:'HttpUpload'}}
               layout="vertical"
               disabled={checkFormDisable()}
             >
@@ -84,13 +76,14 @@ const JobForm = forwardRef((props:JobFormPropsInterface, ref) => {
                     ))}
                   </Radio.Group>
                 </Form.Item>
-                <Form.Item noStyle shouldUpdate={(prev, cur) => prev.data_resource_type !== cur.data_resource_type|| prev.dataSetAddMethod !== cur.dataSetAddMethod  }>
+                <Form.Item noStyle shouldUpdate={(prev, cur) => prev.data_resource_type !== cur.data_resource_type|| prev.add_method !== cur.add_method  }>
                   {({ getFieldValue }) => {
                       const data_resource_type = getFieldValue('data_resource_type');
-                      const dataSetAddMethod = getFieldValue('dataSetAddMethod');
+                      const add_method = getFieldValue('add_method');
+                      // 选择数据集
                       if(data_resource_type === 'TableDataSource') {
                         return <>
-                           <Form.Item style={{marginTop:30}} name="dataSetAddMethod" label="选择样本" rules={[formRuleRequire()]}>
+                           <Form.Item style={{marginTop:30}} name="add_method" label="选择样本" rules={[formRuleRequire()]}>
                             <Radio.Group>
                               {[...dataSetAddMethodMap].map(([value, label]) => (
                                 <Radio key={value} value={value}>
@@ -99,19 +92,14 @@ const JobForm = forwardRef((props:JobFormPropsInterface, ref) => {
                               ))}
                             </Radio.Group>
                          </Form.Item>
-                        <Form.Item >
-                            {dataSetAddMethod === 'HttpUpload' ?
-                              <>
-                                <Form.Item name={'table_data_resource_info'}>
-                                  <FileChunkUpload uploadFinishCallBack={uploadFinishCallBack}  disabled={checkFormDisable()}/>
-                                </Form.Item>
-                              </> :
-                              <DataSourceForm formRef={formRef}/>
-                            }
-                        </Form.Item>
+                         <Form.Item name={'table_data_resource_info'}>
+                         {add_method === 'HttpUpload'?<FileChunkUpload uploadFinishCallBack={prevColumnsChangeCallBack}  disabled={checkFormDisable()}/>:
+                         <DataSourceForm prevColumnsChangeCallBack={prevColumnsChangeCallBack} disabled={checkFormDisable()}/>
+                          }
+                         </Form.Item>
                         </>
                       } else {
-                       return  <Form.Item style={{marginTop:30}} name="dataSetAddMethod" label="选择布隆过滤器" rules={[formRuleRequire()]}>
+                       return  <Form.Item style={{marginTop:30}} name="xxxxx" label="选择布隆过滤器" rules={[formRuleRequire()]}>
                             <Button
                               onClick={()=>{}}
                             >选择布隆过滤器</Button> 

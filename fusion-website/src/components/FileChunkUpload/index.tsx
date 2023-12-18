@@ -14,7 +14,7 @@ import { useImmer } from "use-immer";
 import { Button, Spin, message } from "antd";
 import styles from './index.less'
 import { useRequest,useMount } from "ahooks";
-import {HttpUploadPreview} from '@/components/DataSetPreview'
+import {DataPreviewBtn} from '@/components/DataSetPreview'
 
 
 
@@ -41,7 +41,6 @@ const Index= forwardRef((props:FileChunkUploadInterface,ref) => {
     loading:false,
     showPreBtn:false,
     previewOpen:false,
-    columns:[] as any[],
     accept:'.csv, text/csv, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
   })  
 
@@ -136,28 +135,14 @@ const Index= forwardRef((props:FileChunkUploadInterface,ref) => {
     uploader.current?.setFileList([])
   }
 
-
-
-  useEffect(()=>{
-    const columns = uploadData.columns.map(item=>{
-      return lodash.get(item,'dataIndex')
-    })
-    uploadFinishCallBack && uploadFinishCallBack({
-      uploadFileName:uploadData.filename,
-      dataourceColumnList:columns
-    })
-  },[uploadData.filename,uploadData.columns])
-
   //获取获取预览的数据给其他的组件时间
   const columnsChangeCallBack = (columns:any[])=>{
-    setUploadData(draft=>{
-      draft.columns = columns
-    })
+    uploadFinishCallBack && uploadFinishCallBack(columns)
   }
 
   const renderPrewView = ()=>{
     if(uploadData.showPreBtn){
-      return <HttpUploadPreview autoLoadPreView={true} columnsChangeCallBack={columnsChangeCallBack} filename={uploadData.filename}/>
+      return <DataPreviewBtn autoLoadPreView={true} columnsChangeCallBack={columnsChangeCallBack} requestParams={{data_source_file:uploadData.filename,add_method:'HttpUpload'}} />
     }
    return  null
   }

@@ -6,7 +6,7 @@ import { history } from '@umijs/max';
 import {getTokenName} from '@/utils/index'
 import {setCookies} from '@tianmiantech/util'
 import lodash from 'lodash'
-import Sm3Util from '@/utils/Sm3Util';
+import SmUtil from '@/utils/SmUtil';
 import {FUNSION_INITIALIZED_KEY} from '@/constant/dictionary'
 interface LoginFormProps {
   isRegister?:boolean //是否是系统初始化，如果是初始化则需要确认密码
@@ -53,7 +53,7 @@ const Index = (props: LoginFormProps) => {
 
   const onFinish = (values: UserRequestParams) => {
     const {username,password} = values
-    submitData({username,password:Sm3Util.encrypt(`_${username}-${password}_${username}@!#`)})
+    submitData({username,password:SmUtil.encrypt(`_${username}-${password}_${username}@!#`)})
   };
 
 

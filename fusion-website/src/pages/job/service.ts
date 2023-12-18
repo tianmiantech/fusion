@@ -22,7 +22,7 @@ export const getDataSourceList = ()=>{
  */
 export interface TestDataSourceInterface {
     database_type:string,
-    data_source_params:{}
+    data_source_params:any
 }
 export const testDataSource = (parmas:TestDataSourceInterface)=>{
     return request.post('/data_source/test',parmas)

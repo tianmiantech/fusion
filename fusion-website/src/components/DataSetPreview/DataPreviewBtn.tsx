@@ -7,24 +7,20 @@ import {UploaderBtn} from '../FileChunkUpload/Components'
 import styles from './index.less'
 
 interface UploadDataPropsInterface {
-  filename:string,
+  requestParams:PeviewDataRequestInterface,
   autoLoadPreView?:boolean,//是否主动话加载预览
   columnsChangeCallBack?:(columns:any[])=>void,//当加载到数据后，如果其他的组件需要使用预览数据，可以调用这个方法
 }
-const HttpUpload = forwardRef((props:UploadDataPropsInterface,ref) => {
-  const {filename ,columnsChangeCallBack,autoLoadPreView=false} = props
+const DataPreviewBtn = forwardRef((props:UploadDataPropsInterface,ref) => {
+  const {requestParams ,columnsChangeCallBack,autoLoadPreView=false} = props
   const [httpData,setHttpData] = useImmer({
     previewOpen:false,
     columns:[],
     dataSource:[],
   })
 
-  const getPreViewData = (filename:string)=>{
-    const params = {
-      data_source_file:filename,
-      add_method:'HttpUpload'
-    } as PeviewDataRequestInterface
-    runPreViewData(params)
+  const getPreViewData = ()=>{
+    runPreViewData(requestParams)
   }
 
 
@@ -47,21 +43,24 @@ const HttpUpload = forwardRef((props:UploadDataPropsInterface,ref) => {
   },{manual:true})
 
   const onPreViewClick = async ()=>{
-    if(httpData.columns.length == 0 && filename){
-      await getPreViewData(filename)
+    if(httpData.columns.length == 0 && (requestParams.data_source_file || requestParams.sql)){
+      await getPreViewData()
     } 
     setHttpData(draft=>{draft.previewOpen = true})
   }
 
   useEffect(()=>{
-  if(autoLoadPreView && filename){
-    getPreViewData(filename)
+  if(autoLoadPreView && (requestParams.data_source_file || requestParams.sql)){
+
+    getPreViewData()
   }
-  },[autoLoadPreView,filename])
+  },[autoLoadPreView,requestParams])
+
 
   useEffect(()=>{
     if(httpData.columns.length>0){
-      columnsChangeCallBack && columnsChangeCallBack(httpData.columns)
+      const tmpResult = httpData.columns.map((item:any)=>item.dataIndex)
+      columnsChangeCallBack && columnsChangeCallBack(tmpResult)
     }
   },[httpData.columns])
 
@@ -78,7 +77,8 @@ const HttpUpload = forwardRef((props:UploadDataPropsInterface,ref) => {
         onCancel={() => {setHttpData(draft=>{draft.previewOpen = false})}}
         columns={httpData.columns}
         dataSource={httpData.dataSource}
+        loading={loading}
     />
   </>
 })
-export default HttpUpload
+export default DataPreviewBtn

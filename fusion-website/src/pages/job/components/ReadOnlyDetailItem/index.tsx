@@ -5,7 +5,7 @@ import lodash from 'lodash'
 import moment from 'moment'
 import {Progress,List} from 'antd'
 import JobCard from '../JobCard'
-import { HttpUploadPreview } from "@/components/DataSetPreview";
+import { DataPreviewBtn } from "@/components/DataSetPreview";
 import { ROLE_TYPE } from "@/constant/dictionary";
 import styles from './index.less'
 
@@ -105,7 +105,7 @@ const ReadOnlyDetailItem = (props:ReadOnlyDetailItemProps) => {
       const fileName = lodash.get(table_data_resource_info,'data_source_file','')
       return <>
       {total_data_count}
-      <HttpUploadPreview filename={fileName} />
+      <DataPreviewBtn requestParams={{data_source_file:fileName,add_method:'HttpUpload'}} />
     </>
     }
     return <>
