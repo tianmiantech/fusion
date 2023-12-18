@@ -17,11 +17,9 @@ package com.welab.fusion.core.test;
 
 import com.alibaba.fastjson.JSON;
 import com.welab.fusion.core.Job.FusionJob;
-import com.welab.fusion.core.Job.FusionJobRole;
-import com.welab.fusion.core.Job.FusionResult;
 import com.welab.fusion.core.Job.JobMember;
-import com.welab.fusion.core.bloom_filter.PsiBloomFilter;
-import com.welab.fusion.core.bloom_filter.PsiBloomFilterCreator;
+import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
+import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilterCreator;
 import com.welab.fusion.core.data_resource.base.DataResourceInfo;
 import com.welab.fusion.core.data_resource.base.DataResourceType;
 import com.welab.fusion.core.data_source.CsvTableDataSourceReader;
@@ -38,7 +36,6 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.UUID;
-import java.util.function.Consumer;
 
 /**
  * @author zane.luo

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.welab.fusion.core.bloom_filter;
+package com.welab.fusion.core.algorithm.rsa_psi.bloom_filter;
 
 import cn.hutool.core.thread.ThreadUtil;
 import com.google.common.base.Charsets;

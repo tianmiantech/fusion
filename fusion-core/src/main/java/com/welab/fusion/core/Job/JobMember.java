@@ -16,7 +16,7 @@
 package com.welab.fusion.core.Job;
 
 import com.alibaba.fastjson.annotation.JSONField;
-import com.welab.fusion.core.bloom_filter.PsiBloomFilter;
+import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
 import com.welab.fusion.core.data_resource.base.DataResourceInfo;
 import com.welab.fusion.core.data_source.AbstractTableDataSourceReader;
 

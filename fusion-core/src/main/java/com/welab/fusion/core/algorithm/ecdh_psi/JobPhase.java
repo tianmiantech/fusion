@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.welab.fusion.core.Job;
+package com.welab.fusion.core.algorithm.ecdh_psi;
 
 import java.util.Arrays;
 import java.util.Comparator;

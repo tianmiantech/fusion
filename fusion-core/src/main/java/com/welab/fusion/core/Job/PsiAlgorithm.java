@@ -20,6 +20,9 @@ package com.welab.fusion.core.Job;
  * @date 2023/12/11
  */
 public enum PsiAlgorithm {
+    /**
+     * 基于 RSA 加盲的 PSI
+     */
     rsa_psi,
     ecdh_psi
 }

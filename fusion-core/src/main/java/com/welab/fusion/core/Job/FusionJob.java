@@ -17,8 +17,10 @@ package com.welab.fusion.core.Job;
 
 import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.StrUtil;
-import com.welab.fusion.core.Job.action.AbstractJobPhaseAction;
-import com.welab.fusion.core.Job.action.JobPhaseActionCreator;
+import com.welab.fusion.core.algorithm.rsa_psi.action.AbstractJobPhaseAction;
+import com.welab.fusion.core.algorithm.rsa_psi.action.JobPhaseActionCreator;
+import com.welab.fusion.core.algorithm.rsa_psi.JobPhase;
+import com.welab.fusion.core.algorithm.rsa_psi.Role;
 import com.welab.fusion.core.data_resource.base.DataResourceType;
 import com.welab.fusion.core.function.JobFunctions;
 import com.welab.fusion.core.progress.JobProgress;
@@ -44,7 +46,7 @@ public class FusionJob implements Closeable {
     private JobMember myself;
     private JobMember partner;
     private JobProgress myProgress = new JobProgress();
-    private FusionJobRole jobRole;
+    private Role jobRole;
     private ThreadPool actionSingleThreadExecutor;
     private ThreadPool scheduleSingleThreadExecutor;
     private JobFunctions jobFunctions;
@@ -307,11 +309,11 @@ public class FusionJob implements Closeable {
         return partner;
     }
 
-    public void setMyRole(FusionJobRole jobRole) {
+    public void setMyRole(Role jobRole) {
         this.jobRole = jobRole;
     }
 
-    public FusionJobRole getMyJobRole() {
+    public Role getMyJobRole() {
         return jobRole;
     }
 

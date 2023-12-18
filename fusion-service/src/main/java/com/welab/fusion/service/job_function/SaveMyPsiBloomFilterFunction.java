@@ -15,7 +15,7 @@
  */
 package com.welab.fusion.service.job_function;
 
-import com.welab.fusion.core.bloom_filter.PsiBloomFilter;
+import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
 import com.welab.fusion.core.data_resource.base.DataResourceType;
 import com.welab.fusion.core.io.FileSystem;
 import com.welab.fusion.service.api.job.CreateJobApi;

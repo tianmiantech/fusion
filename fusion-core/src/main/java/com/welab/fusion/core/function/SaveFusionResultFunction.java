@@ -15,11 +15,9 @@
  */
 package com.welab.fusion.core.function;
 
-import com.welab.fusion.core.Job.FusionJobRole;
+import com.welab.fusion.core.algorithm.rsa_psi.Role;
 import com.welab.fusion.core.Job.FusionResult;
-import com.welab.wefe.common.exception.StatusCodeWithException;
 
-import java.io.IOException;
 import java.util.function.Consumer;
 
 /**
@@ -28,5 +26,5 @@ import java.util.function.Consumer;
  */
 @FunctionalInterface
 public interface SaveFusionResultFunction {
-    void save(String jobId, FusionJobRole myRole, FusionResult result, Consumer<Long> totalSizeConsumer, Consumer<Long> downloadSizeConsumer) throws Exception;
+    void save(String jobId, Role myRole, FusionResult result, Consumer<Long> totalSizeConsumer, Consumer<Long> downloadSizeConsumer) throws Exception;
 }

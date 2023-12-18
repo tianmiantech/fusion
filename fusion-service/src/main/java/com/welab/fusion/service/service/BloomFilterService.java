@@ -15,8 +15,8 @@
  */
 package com.welab.fusion.service.service;
 
-import com.welab.fusion.core.bloom_filter.PsiBloomFilter;
-import com.welab.fusion.core.bloom_filter.PsiBloomFilterCreator;
+import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
+import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilterCreator;
 import com.welab.fusion.core.data_source.AbstractTableDataSourceReader;
 import com.welab.fusion.core.hash.HashConfig;
 import com.welab.fusion.core.io.FileSystem;

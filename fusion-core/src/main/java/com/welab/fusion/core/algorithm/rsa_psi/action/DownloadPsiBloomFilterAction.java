@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.welab.fusion.core.Job.action;
+package com.welab.fusion.core.algorithm.rsa_psi.action;
 
 import com.welab.fusion.core.Job.FusionJob;
-import com.welab.fusion.core.Job.FusionJobRole;
-import com.welab.fusion.core.Job.JobPhase;
-import com.welab.fusion.core.bloom_filter.PsiBloomFilter;
+import com.welab.fusion.core.algorithm.rsa_psi.Role;
+import com.welab.fusion.core.algorithm.rsa_psi.JobPhase;
+import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
 import com.welab.fusion.core.function.DownloadPartnerPsiBloomFilterFunction;
 import com.welab.fusion.core.io.FileSystem;
 import com.welab.wefe.common.InformationSize;
@@ -39,7 +39,7 @@ public class DownloadPsiBloomFilterAction extends AbstractJobPhaseAction {
 
     @Override
     protected boolean skipThisAction() {
-        return job.getMyJobRole() == FusionJobRole.psi_bool_filter_provider;
+        return job.getMyJobRole() == Role.psi_bool_filter_provider;
     }
 
     @Override

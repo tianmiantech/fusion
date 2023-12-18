@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.welab.fusion.core.Job.action;
+package com.welab.fusion.core.algorithm.rsa_psi.action;
 
 import com.welab.fusion.core.Job.FusionJob;
-import com.welab.fusion.core.Job.FusionJobRole;
-import com.welab.fusion.core.Job.JobPhase;
+import com.welab.fusion.core.algorithm.rsa_psi.Role;
+import com.welab.fusion.core.algorithm.rsa_psi.JobPhase;
 
 /**
  * @author zane.luo
@@ -30,7 +30,7 @@ public class SaveResultAction extends AbstractJobPhaseAction {
 
     @Override
     protected void doAction() throws Exception {
-        if (job.getMyJobRole() == FusionJobRole.psi_bool_filter_provider) {
+        if (job.getMyJobRole() == Role.psi_bool_filter_provider) {
             phaseProgress.setMessage("正在从合作方下载求交结果...");
         }else{
             phaseProgress.setMessage("正在保存求交结果...");

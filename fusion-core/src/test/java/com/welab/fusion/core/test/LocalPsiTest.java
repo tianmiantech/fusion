@@ -16,8 +16,8 @@
 package com.welab.fusion.core.test;
 
 import cn.hutool.core.codec.Base64;
-import com.welab.fusion.core.bloom_filter.PsiBloomFilter;
-import com.welab.fusion.core.bloom_filter.PsiBloomFilterCreator;
+import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
+import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilterCreator;
 import com.welab.fusion.core.data_source.CsvTableDataSourceReader;
 import com.welab.fusion.core.hash.HashConfig;
 import com.welab.fusion.core.hash.HashConfigItem;

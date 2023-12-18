@@ -16,7 +16,7 @@
 package com.welab.fusion.core.psi;
 
 import cn.hutool.core.codec.Base64;
-import com.welab.fusion.core.bloom_filter.PsiBloomFilter;
+import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

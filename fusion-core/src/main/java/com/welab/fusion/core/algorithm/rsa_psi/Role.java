@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.welab.fusion.core.Job;
+package com.welab.fusion.core.algorithm.rsa_psi;
 
 /**
  * @author zane.luo
  * @date 2023/11/13
  */
-public enum FusionJobRole {
+public enum Role {
     /**
      * PSI 过滤器
      */

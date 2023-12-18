@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.welab.fusion.core.Job.action;
+package com.welab.fusion.core.algorithm.rsa_psi.action;
 
 import com.welab.fusion.core.Job.FusionJob;
-import com.welab.fusion.core.Job.JobPhase;
+import com.welab.fusion.core.algorithm.rsa_psi.JobPhase;
 
 import java.util.HashMap;
 import java.util.Map;

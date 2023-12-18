@@ -15,7 +15,7 @@
  */
 package com.welab.fusion.service.api.download;
 
-import com.welab.fusion.core.bloom_filter.PsiBloomFilter;
+import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
 import com.welab.fusion.core.io.FileSystem;
 import com.welab.fusion.service.api.download.base.FileInfo;
 import com.welab.fusion.service.api.download.base.FileType;

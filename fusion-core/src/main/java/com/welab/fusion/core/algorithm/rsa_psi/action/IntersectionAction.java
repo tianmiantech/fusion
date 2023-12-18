@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.welab.fusion.core.Job.action;
+package com.welab.fusion.core.algorithm.rsa_psi.action;
 
 import cn.hutool.core.codec.Base64;
 import com.welab.fusion.core.Job.FusionJob;
-import com.welab.fusion.core.Job.FusionJobRole;
+import com.welab.fusion.core.algorithm.rsa_psi.Role;
 import com.welab.fusion.core.Job.FusionResult;
-import com.welab.fusion.core.Job.JobPhase;
+import com.welab.fusion.core.algorithm.rsa_psi.JobPhase;
 import com.welab.fusion.core.hash.HashConfig;
 import com.welab.fusion.core.io.FileSystem;
 import com.welab.fusion.core.psi.PsiRecord;
@@ -153,6 +153,6 @@ public class IntersectionAction extends AbstractJobPhaseAction {
 
     @Override
     protected boolean skipThisAction() {
-        return job.getMyJobRole() == FusionJobRole.psi_bool_filter_provider;
+        return job.getMyJobRole() == Role.psi_bool_filter_provider;
     }
 }

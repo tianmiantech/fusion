@@ -15,7 +15,7 @@
  */
 package com.welab.fusion.core.function;
 
-import com.welab.fusion.core.bloom_filter.PsiBloomFilter;
+import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
 import com.welab.wefe.common.exception.StatusCodeWithException;
 
 import java.io.IOException;
