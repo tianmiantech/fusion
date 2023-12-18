@@ -18,7 +18,7 @@ package com.welab.fusion.service.database.entity;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.welab.fusion.core.Job.JobStatus;
-import com.welab.fusion.core.Job.PsiAlgorithm;
+import com.welab.fusion.core.algorithm.base.PsiAlgorithm;
 import com.welab.fusion.core.progress.JobProgress;
 import com.welab.fusion.service.constans.JobMemberRole;
 import com.welab.wefe.common.fieldvalidate.annotation.Check;
