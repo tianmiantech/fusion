@@ -111,6 +111,7 @@ public class DataSourceService extends AbstractService {
 
         if (model == null) {
             model = new DataSourceDbModel();
+            model.setId(input.databaseType + "-" + input.getHost() + ":" + input.getPort());
         }
 
         model.setName(dataSourceClient.getParams().name);
@@ -154,7 +155,7 @@ public class DataSourceService extends AbstractService {
         if (input.isRequestFromPartner()) {
             return;
         }
-        
+
         // 不是数据集类型的数据源，不创建。
         if (input.dataResource.dataResourceType != DataResourceType.TableDataSource) {
             return;
