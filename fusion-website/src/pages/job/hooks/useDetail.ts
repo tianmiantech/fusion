@@ -68,11 +68,14 @@ const useDetail = ()=>{
   },[detailData.jobId]) 
 
   useEffect(() => {
-    const checkResult = checkIfNeedToGetMergedJobProgress()
-    if(checkResult){
-      runGetMergedJobProgress(detailData.jobId);
+    if(detailData.jobDetailData?.status) {
+      const checkResult = checkIfNeedToGetMergedJobProgress()
+      if(checkResult){
+        runGetMergedJobProgress(detailData.jobId);
+      }
     }
-  },[detailData.jobDetailData])
+   
+  },[detailData.jobDetailData?.status])
 
   const checkIfNeedToGetMergedJobProgress = ()=>{
     const status = lodash.get(detailData,'jobDetailData.status','');

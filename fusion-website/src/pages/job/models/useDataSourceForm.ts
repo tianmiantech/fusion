@@ -15,25 +15,18 @@ interface getDataSourceAvailableTypeInterface {
     }
 }
 
-//数据源列表 
-interface getDataSourceListInterface {
-    code:number,
-    data:{
-        list:{
-            database_type:string,
-            host:string,
-            port:number
-            connector_config:{
-                database_name:string,
-                user_name:string,
-                password:string
-            }
-        }[]
-    }
+export interface DataSourceListItemInterface {
+    database_type:string,
+    host:string,
+    port:number,
+    id:string,
+    name:string,
+    database_name:string,
+    user_name:string,
+    password:string,
 }
 
-
-
+//数据源列表 
 const useDataSourceForm = ()=>{
 
     const [dataSoureConfig,setDataSourceConfig] = useImmer<dataSoureConfigInterface>({
@@ -58,8 +51,25 @@ const useDataSourceForm = ()=>{
 
     //获取所有可用的数据源
     const {run:runGetDataSourceList} = useRequest(async ()=>{
-        const reponse:getDataSourceListInterface = await getDataSourceList()
-        console.log("runGetDataSourceList",reponse);
+        const reponse = await getDataSourceList()
+        const {code,data} = reponse;
+        if(code == 0) {
+            const listData = lodash.get(data,'list',[]);
+            const resultData = listData.map((item:any)=>{
+                const {database_type,host,port,id,name,connector_config} = item;
+                return {
+                    database_type,
+                    host,
+                    port,
+                    id,
+                    name,
+                    ...connector_config
+                }
+            })
+            setDataSourceConfig(g=>{
+                g.dataSoureSuggestion = resultData
+            })
+        }
         
     },{
         manual:true,

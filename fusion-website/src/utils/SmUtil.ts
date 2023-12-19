@@ -23,8 +23,6 @@ class SmUtil {
  * @returns 加密后的数据
  */
   static encryptByPublicKey(publicKey: string,data: string): string {
-    console.log("publicKey'",publicKey);
-    
     return '04' + smCrypto.sm2.doEncrypt(data, publicKey, cipherMode);
   }
 }

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Form, Select, Input, Button, Space, Row, Col,FormInstance,Spin,message } from 'antd';
+import { Form, Select, Input, Button, Space, Row, Col,AutoComplete,Spin,message } from 'antd';
 import { FolderOpenOutlined } from '@ant-design/icons';
 import { useMount,useRequest } from 'ahooks';
 import { useModel } from '@umijs/max';
@@ -8,16 +8,25 @@ import SmUtil from '@/utils/SmUtil'
 import { testDataSource,TestDataSourceInterface  } from '../service';
 import {DataPreviewBtn} from '@/components/DataSetPreview'
 import type {PeviewDataRequestInterface} from '@/components/DataSetPreview/service'
-
+import type {DataSourceListItemInterface} from '../models/useDataSourceForm'
+import { useImmer } from 'use-immer';
 interface DataSourceFormInterface {
   disabled?:boolean,
   value?:any,
   onChange?: (value:any)=>void,
-  prevColumnsChangeCallBack?: (columns:any[])=>void
+  prevColumnsChangeCallBack?: (columns:string[])=>void
+}
+
+interface SourceDataInterface {
+  successCheck:boolean,
+  dataSoureSuggestionList:DataSourceListItemInterface[],
+  preViewDataRequest:PeviewDataRequestInterface
 }
 
 const DataSourceForm = (props:DataSourceFormInterface) => {
+
   const {disabled=false,value,onChange,prevColumnsChangeCallBack} = props
+
   const {dataSoureConfig,
     checkIfNeedGetDataSourceAvailableType,
   } = useModel('job.useDataSourceForm')
@@ -26,11 +35,12 @@ const DataSourceForm = (props:DataSourceFormInterface) => {
 
   const {getEncryptPublicKey} = useModel('initializeConfig')
 
-  //展示测试成功的数据源预览
-  const [successCheck, setSuccessCheck] = useState<boolean>(false);
-
-  const [preViewDataRequest,setPreViewDataRequest] = useState<PeviewDataRequestInterface>({
-    add_method:'Database',
+  const [sourceData,setSourceData] = useImmer<SourceDataInterface>({
+    successCheck:false,  //展示测试成功的数据源预览
+    dataSoureSuggestionList:[],
+    preViewDataRequest:{ //数据源预览请求参数
+      add_method:'Database',
+    }
   })
 
   useEffect(()=>{
@@ -40,11 +50,30 @@ const DataSourceForm = (props:DataSourceFormInterface) => {
       if(source === 'setFieldsValue'){
         const data_source_params = lodash.get(value,'data_source_params',{})
         dataSourceFormRef.setFieldsValue(data_source_params);
-        setPreViewDataRequest(value)
-        setSuccessCheck(true)
+        setSourceData(draft=>{
+          draft.preViewDataRequest = value
+          draft.successCheck = true
+        })
       } 
     }
   },[value])
+
+  //初始化自动补全数据源
+  useEffect(()=>{
+    if(dataSoureConfig.dataSoureSuggestion.length>0){
+      const newList = dataSoureConfig.dataSoureSuggestion.map((item:DataSourceListItemInterface)=>{
+        const {host,id} = item
+        return {
+          ...item,
+          label:host,
+          value:id
+        }
+      })
+      setSourceData(draft=>{
+        draft.dataSoureSuggestionList = newList
+      })
+    }
+  },[dataSoureConfig.dataSoureSuggestion.length])
   
 
   
@@ -56,10 +85,14 @@ const DataSourceForm = (props:DataSourceFormInterface) => {
     const msg = lodash.get(data,'message')
     const success = lodash.get(data,'success')
     if(code === 0 && success){
-      setSuccessCheck(true)
+      setSourceData(draft=>{
+        draft.successCheck = true
+      })
       message.success(msg)
     }else{
-      setSuccessCheck(false)
+      setSourceData(draft=>{
+        draft.successCheck = false
+      })
       message.error(msg)
     }
   },{
@@ -90,15 +123,27 @@ const DataSourceForm = (props:DataSourceFormInterface) => {
       sql:formResult.sql,
       ...requestParams
     } as PeviewDataRequestInterface
-    setPreViewDataRequest(prewViewDataRequest)
+    setSourceData(draft=>{
+      draft.preViewDataRequest = prewViewDataRequest
+    })
     onChange && onChange({...prewViewDataRequest})
 
   }
 
   const onDataSourceFormChange = (changedValues:any, allValues:any)=>{
    //表单变动时，需要重新测试数据源可用性
-   if(successCheck)
-      setSuccessCheck(false);
+   if(sourceData.successCheck) {
+    setSourceData(draft=>{
+      draft.successCheck = false
+    })
+   }
+  }
+
+  const handleSearch = (value: string) => {
+    const newList = sourceData.dataSoureSuggestionList.filter(item => item.host.indexOf(value) > -1);
+    setSourceData(draft=>{
+      draft.dataSoureSuggestionList = newList
+    })
   }
 
   
@@ -116,15 +161,30 @@ const DataSourceForm = (props:DataSourceFormInterface) => {
     prevColumnsChangeCallBack && prevColumnsChangeCallBack(columns)
   }
   
+  const onDataSourceTypeChange = (value:string)=>{
+    const newList = sourceData.dataSoureSuggestionList.filter(item => item.database_type.indexOf(value) > -1);
+    setSourceData(draft=>{
+      draft.dataSoureSuggestionList = newList
+    })
+  }
+
+  const onHostSelected = (value:string)=>{
+    const selectItem = lodash.find(sourceData.dataSoureSuggestionList,{id:value},null)
+    if(selectItem){
+      dataSourceFormRef.setFieldsValue({
+        ...selectItem
+      })
+    }
+  }
 
  
 
   const BaseDataSourceForm = () => (
     <>
-      <Form.Item name="databaseName" label="默认数据库名称" {...formItemLayout}>
+      <Form.Item name="database_name" label="默认数据库名称" {...formItemLayout}>
         <Input placeholder='请输入'></Input>
       </Form.Item>
-      <Form.Item name="username" label="用户名" {...formItemLayout}>
+      <Form.Item name="user_name" label="用户名" {...formItemLayout}>
         <Input placeholder='请输入'></Input>
       </Form.Item>
       <Form.Item name="password" label="密码" {...formItemLayout}>
@@ -135,10 +195,10 @@ const DataSourceForm = (props:DataSourceFormInterface) => {
 
   const HiveForm = () => (
     <>
-      <Form.Item name="metastorePort" label="Metastore端口" {...formItemLayout} initialValue={9083}>
+      <Form.Item name="metastore_port" label="Metastore端口" {...formItemLayout} initialValue={9083}>
         <Input placeholder='请输入'></Input>
       </Form.Item>
-      <Form.Item name="databaseName" label="默认数据库名称" {...formItemLayout}>
+      <Form.Item name="database_name" label="默认数据库名称" {...formItemLayout}>
         <Input placeholder='请输入'></Input>
       </Form.Item>
     </>
@@ -154,11 +214,16 @@ const DataSourceForm = (props:DataSourceFormInterface) => {
           
           <Col span={24}>
           <Form.Item name="database_type" label="数据源类型" {...formItemLayout}>
-            <Select options={dataSoureConfig.dataSoureTypeList}>
+            <Select options={dataSoureConfig.dataSoureTypeList} onSelect={onDataSourceTypeChange}>
             </Select>
           </Form.Item>
           <Form.Item name="host" label="Host" {...formItemLayout}>
-            <Input placeholder='请输入'></Input>
+            <AutoComplete 
+              placeholder='请输入'
+              options={sourceData.dataSoureSuggestionList}
+              onSearch={handleSearch}
+              onSelect={onHostSelected}
+            />
           </Form.Item>
           <Form.Item name="port" label="JDBC端口" {...formItemLayout}>
             <Input placeholder='请输入'></Input>
@@ -186,7 +251,7 @@ const DataSourceForm = (props:DataSourceFormInterface) => {
                 onClick={() => {testConnection()}}
               >查询测试</Button>
               {
-                successCheck ? <DataPreviewBtn autoLoadPreView={true} requestParams={preViewDataRequest} columnsChangeCallBack={columnsChangeCallBack}/>  : null
+                sourceData.successCheck ? <DataPreviewBtn autoLoadPreView={true} requestParams={sourceData.preViewDataRequest} columnsChangeCallBack={columnsChangeCallBack}/>  : null
               }
             </Space>
           </Form.Item>
