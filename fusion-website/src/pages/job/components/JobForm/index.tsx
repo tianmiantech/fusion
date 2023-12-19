@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef, forwardRef, useImperativeHandle } from 'react';
 import { Input, Button, Form, Radio, Upload, Tooltip, Space, Row, Col,Alert,Spin, message } from 'antd';
-import { dataResourceTypeMap, dataSetAddMethodMap,JOB_STATUS } from '@/constant/dictionary';
+import { dataResourceTypeMap, dataSetAddMethodMap,JOB_STATUS, ROLE_TYPE } from '@/constant/dictionary';
 import HashForm from '../HashForm/index';
 import DataSourceForm from '../DataSourceForm';
 import BloomFilterManage from '../BloomFilterManage';
@@ -50,7 +50,8 @@ const JobForm = forwardRef((props:JobFormPropsInterface, ref) => {
 
   const checkFormDisable = ()=>{
     const status = lodash.get(detailData,'jobDetailData.status','')
-    if(!status || status === JOB_STATUS.EDITING){
+    const role = lodash.get(detailData,'jobDetailData.role','')
+    if(!status || status === JOB_STATUS.EDITING ||(role === ROLE_TYPE.PROVIDER && status === JOB_STATUS.AUDITING) ){
       return false
     }
     return true

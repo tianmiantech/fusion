@@ -54,12 +54,10 @@ const DataSourceForm = (props:DataSourceFormInterface) => {
     const reponse = await testDataSource(params)
     const {code,data} = reponse
     const msg = lodash.get(data,'message')
-    if(code === 0){
-      const success = lodash.get(data,'success')
-      if(success){
-        setSuccessCheck(true)
-        message.success(msg)
-      }
+    const success = lodash.get(data,'success')
+    if(code === 0 && success){
+      setSuccessCheck(true)
+      message.success(msg)
     }else{
       setSuccessCheck(false)
       message.error(msg)

@@ -5,7 +5,6 @@ import { Card, Steps,Typography,Popover,Row,Col,Progress,List } from 'antd';
 import { ProDescriptions } from '@ant-design/pro-components';
 import {JOB_PHASE_LSIT} from '@/constant/dictionary'
 import lodash from 'lodash'
-import useDetail from '../../hooks/useDetail';
 import type {PhasesListItemInterface} from '../../hooks/useDetail';
 import {displayChineseCoastTime} from '@/utils/time'
 import styles from './index.less'
@@ -42,7 +41,7 @@ const JobProgress = (props:JobProgressProps) => {
           const myselfStatus = promoterPhasesObj?.status;
           const partnerStatus = providerPhases?.status;
           step.status = changeProgressStatusToStepStatus(myselfStatus,partnerStatus);
-          step.description = renderDescription(promoterPhasesObj,promoterPhasesObj)
+          step.description = renderDescription(promoterPhasesObj,providerPhases)
         }
         tmpList.push(step)
       }
@@ -60,9 +59,10 @@ const JobProgress = (props:JobProgressProps) => {
             
           </Col>
           <Col span={12} >
-            <Card>
+            {providerPhases && <Card>
               {renderPhasesItem(providerPhases,'协作方')}
-            </Card>
+            </Card>}
+            
           </Col>
       </Row>
       </>

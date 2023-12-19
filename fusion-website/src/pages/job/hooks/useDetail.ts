@@ -80,9 +80,9 @@ const useDetail = ()=>{
     if(detailData.jobId && detailData.jobDetailData){
       if(status === JOB_STATUS.RUNNING || 
         status===JOB_STATUS.WAIT_RUN ||
-        (status ===JOB_STATUS.ERROR_ON_RUNNING || 
+        ((status ===JOB_STATUS.ERROR_ON_RUNNING || 
           status=== JOB_STATUS.STOP_ON_RUNNING || 
-          status=== JOB_STATUS.SUCCESS && 
+          status=== JOB_STATUS.SUCCESS) && 
           (!detailData.myselfJobCurrentProgress || !detailData.partnerJobCurrentProgress))){
         result =  true
       } 

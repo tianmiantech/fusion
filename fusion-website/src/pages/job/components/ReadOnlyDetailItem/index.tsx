@@ -105,12 +105,27 @@ const ReadOnlyDetailItem = (props:ReadOnlyDetailItemProps) => {
       const fileName = lodash.get(table_data_resource_info,'data_source_file','')
       return <>
       {total_data_count}
-      <DataPreviewBtn requestParams={{data_source_file:fileName,add_method:'HttpUpload'}} />
+      <DataPreviewBtn requestParams={getDataPrevieParams()} />
     </>
     }
     return <>
        {total_data_count}
     </>
+  }
+
+  const getDataPrevieParams = ()=>{
+    const table_data_resource_info = lodash.get(detailInfoData,'table_data_resource_info',null)
+    const add_method = lodash.get(table_data_resource_info,'add_method','')
+    //文件上传
+    if(add_method === 'HttpUpload'){
+      const fileName = lodash.get(table_data_resource_info,'data_source_file','')
+      return {data_source_file:fileName,add_method}
+    //数据库
+    }else if(add_method ==='Database'){ 
+      return {
+        ...table_data_resource_info
+      }
+    }
   }
 
   return (<JobCard title={title} bodyStyle={bodyStyle} >
