@@ -62,6 +62,8 @@ public class JobService extends AbstractService {
     @Autowired
     private MemberService memberService;
     @Autowired
+    private DataSourceService dataSourceService;
+    @Autowired
     private GatewayService gatewayService;
     @Autowired
     private JobMemberService jobMemberService;
@@ -91,6 +93,8 @@ public class JobService extends AbstractService {
         checkBeforeCreateJob(input);
         // 自动保存合作方信息
         memberService.trySave(input.caller);
+        // 自动保存数据源信息
+        dataSourceService.trySave(input);
 
         JobDbModel job = new JobDbModel();
         // 来自自己前端，填充任务Id，便于其它方法统一行为。
@@ -169,6 +173,9 @@ public class JobService extends AbstractService {
      * 由协作方触发
      */
     public void agreeAndStartJob(JobConfigInput input) throws Exception {
+        // 自动保存数据源信息
+        dataSourceService.trySave(input);
+
         JobDbModel job = findById(input.jobId);
         if (job == null) {
             StatusCode.PARAMETER_VALUE_INVALID.throwException("任务已被删除，请重新创建。");

@@ -15,12 +15,14 @@
  */
 package com.welab.fusion.service.service;
 
+import com.welab.fusion.core.data_resource.base.DataResourceType;
 import com.welab.fusion.service.api.bloom_filter.AddBloomFilterApi;
 import com.welab.fusion.service.api.data_source.SaveDataSourceApi;
 import com.welab.fusion.service.api.data_source.TestDataSourceApi;
 import com.welab.fusion.service.constans.AddMethod;
 import com.welab.fusion.service.database.entity.DataSourceDbModel;
 import com.welab.fusion.service.database.repository.DataSourceRepository;
+import com.welab.fusion.service.dto.JobConfigInput;
 import com.welab.fusion.service.dto.entity.DataSourceOutputModel;
 import com.welab.fusion.service.service.base.AbstractService;
 import com.welab.wefe.common.ModelMapper;
@@ -128,6 +130,10 @@ public class DataSourceService extends AbstractService {
      */
     @Async
     public void trySave(AddBloomFilterApi.Input input) {
+        if (input.isRequestFromPartner()) {
+            return;
+        }
+
         // 不是数据库类型的数据源，不创建。
         if (input.addMethod != AddMethod.Database) {
             return;
@@ -135,6 +141,32 @@ public class DataSourceService extends AbstractService {
 
         try {
             save(input);
+        } catch (StatusCodeWithException e) {
+            LOG.error(e.getClass().getSimpleName() + " 自动保存数据源失败：" + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * 由创建/启动触发的创建数据源
+     * 由于这里创建数据源是个顺带的操作，所以仅作尝试，失败时不抛出异常。
+     */
+    public void trySave(JobConfigInput input) {
+        if (input.isRequestFromPartner()) {
+            return;
+        }
+        
+        // 不是数据集类型的数据源，不创建。
+        if (input.dataResource.dataResourceType != DataResourceType.TableDataSource) {
+            return;
+        }
+
+        // 不是数据库类型的数据源，不创建。
+        if (input.dataResource.tableDataResourceInfo.addMethod != AddMethod.Database) {
+            return;
+        }
+
+        try {
+            save(input.dataResource.tableDataResourceInfo);
         } catch (StatusCodeWithException e) {
             LOG.error(e.getClass().getSimpleName() + " 自动保存数据源失败：" + e.getMessage(), e);
         }
