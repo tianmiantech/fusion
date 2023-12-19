@@ -15,11 +15,6 @@
  */
 package com.welab.fusion.core.algorithm;
 
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
-
 /**
  * @author zane.luo
  * @date 2023/11/10
@@ -49,6 +44,10 @@ public enum JobPhase {
      * 加密己方数据
      */
     EncryptMyselfData,
+    /**
+     * 下载合作方加密后的数据
+     */
+    DownloadPartnerECEncryptedData,
     /**
      * 加密合作方数据
      */

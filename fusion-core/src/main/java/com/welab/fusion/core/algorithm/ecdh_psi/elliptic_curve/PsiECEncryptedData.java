@@ -34,11 +34,11 @@ import java.nio.file.Path;
  * @author zane.luo
  * @date 2023/12/18
  */
-public class PsiEllipticCurveEncryptedData {
+public class PsiECEncryptedData {
     protected final Logger LOG = LoggerFactory.getLogger(this.getClass());
-    private static final String META_FILE_NAME = "PsiEllipticCurveEncryptedData.json";
-    private static final String DATA_FILE_NAME = "PsiEllipticCurveEncryptedData.data";
-    private static final String ZIP_FILE_NAME = "PsiEllipticCurveEncryptedData.zip";
+    private static final String META_FILE_NAME = "PsiECEncryptedData.json";
+    private static final String DATA_FILE_NAME = "PsiECEncryptedData.data";
+    private static final String ZIP_FILE_NAME = "PsiECEncryptedData.zip";
     public String id;
     public HashConfig hashConfig;
     public EcdhPsiParam ecdhPsiParam;
@@ -51,8 +51,8 @@ public class PsiEllipticCurveEncryptedData {
      */
     private Path dir;
 
-    public static PsiEllipticCurveEncryptedData of(String id, HashConfig hashConfig, EcdhPsiParam ecdhPsiParam) {
-        PsiEllipticCurveEncryptedData data = new PsiEllipticCurveEncryptedData();
+    public static PsiECEncryptedData of(String id, HashConfig hashConfig, EcdhPsiParam ecdhPsiParam) {
+        PsiECEncryptedData data = new PsiECEncryptedData();
         data.id = id;
         data.hashConfig = hashConfig;
         data.ecdhPsiParam = ecdhPsiParam;

@@ -17,8 +17,6 @@ package com.welab.fusion.core.algorithm.ecdh_psi.elliptic_curve;
 
 import cn.hutool.core.thread.ThreadUtil;
 import com.welab.fusion.core.algorithm.ecdh_psi.EllipticCurve;
-import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
-import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilterCreator;
 import com.welab.fusion.core.data_source.AbstractTableDataSourceReader;
 import com.welab.fusion.core.data_source.CsvTableDataSourceReader;
 import com.welab.fusion.core.hash.HashConfig;
@@ -44,18 +42,18 @@ import java.util.function.Consumer;
  * @author zane.luo
  * @date 2023/12/19
  */
-public class PsiEllipticCurveEncryptedDataCreator implements Closeable {
+public class PsiECEncryptedDataCreator implements Closeable {
     protected final Logger LOG = LoggerFactory.getLogger(this.getClass());
 
     private AbstractTableDataSourceReader dataSourceReader;
-    private PsiEllipticCurveEncryptedData psiEllipticCurveEncryptedData;
+    private PsiECEncryptedData psiECEncryptedData;
     /**
      * 用来异步生成过滤器的线程池
      */
     private ThreadPool singleThreadExecutor;
     private Progress progress;
 
-    public PsiEllipticCurveEncryptedDataCreator(String id, AbstractTableDataSourceReader dataSourceReader, HashConfig hashConfig) {
+    public PsiECEncryptedDataCreator(String id, AbstractTableDataSourceReader dataSourceReader, HashConfig hashConfig) {
         this(
                 id,
                 dataSourceReader,
@@ -64,13 +62,13 @@ public class PsiEllipticCurveEncryptedDataCreator implements Closeable {
         );
     }
 
-    public PsiEllipticCurveEncryptedDataCreator(String id, AbstractTableDataSourceReader dataSourceReader, HashConfig hashConfig, Progress progress) {
+    public PsiECEncryptedDataCreator(String id, AbstractTableDataSourceReader dataSourceReader, HashConfig hashConfig, Progress progress) {
         this.dataSourceReader = dataSourceReader;
         this.singleThreadExecutor = new ThreadPool("create-psi_elliptic_curve_encrypted_data:" + id, 1);
 
         this.progress = progress;
 
-        this.psiEllipticCurveEncryptedData = PsiEllipticCurveEncryptedData.of(
+        this.psiECEncryptedData = PsiECEncryptedData.of(
                 id,
                 hashConfig,
                 EcdhPsiParam.of(generateSecretKey(EllipticCurve.EC_PARAMETER_SPEC))
@@ -88,7 +86,7 @@ public class PsiEllipticCurveEncryptedDataCreator implements Closeable {
         return k;
     }
 
-    public PsiEllipticCurveEncryptedData create() throws Exception {
+    public PsiECEncryptedData create() throws Exception {
         return create(null);
     }
 
@@ -97,12 +95,12 @@ public class PsiEllipticCurveEncryptedDataCreator implements Closeable {
      *
      * @param progressConsumer 进度回调
      */
-    public PsiEllipticCurveEncryptedData create(Consumer<Progress> progressConsumer) throws Exception {
-        LOG.info("start to create PsiEllipticCurveEncryptedData. id:{}", psiEllipticCurveEncryptedData.id);
+    public PsiECEncryptedData create(Consumer<Progress> progressConsumer) throws Exception {
+        LOG.info("start to create PsiEllipticCurveEncryptedData. id:{}", psiECEncryptedData.id);
         final long start = System.currentTimeMillis();
 
         AtomicReference<Exception> error = new AtomicReference<>();
-        try (PsiEllipticCurveEncryptedDataConsumer consumer = new PsiEllipticCurveEncryptedDataConsumer(psiEllipticCurveEncryptedData, progress)) {
+        try (PsiECEncryptedDataConsumer consumer = new PsiECEncryptedDataConsumer(psiECEncryptedData, progress)) {
             singleThreadExecutor.execute(() -> {
                 try {
                     dataSourceReader.readRows(consumer);
@@ -128,13 +126,13 @@ public class PsiEllipticCurveEncryptedDataCreator implements Closeable {
                 }
             }
 
-            psiEllipticCurveEncryptedData.insertedElementCount = consumer.getInsertedElementCount().longValue();
+            psiECEncryptedData.insertedElementCount = consumer.getInsertedElementCount().longValue();
         }
 
         long spend = System.currentTimeMillis() - start;
-        LOG.info("create PsiBloomFilter success({}). id:{}", TimeSpan.fromMs(spend), psiEllipticCurveEncryptedData.id);
+        LOG.info("create PsiBloomFilter success({}). id:{}", TimeSpan.fromMs(spend), psiECEncryptedData.id);
 
-        return psiEllipticCurveEncryptedData;
+        return psiECEncryptedData;
     }
 
     public Progress getProgress() {
@@ -163,8 +161,8 @@ public class PsiEllipticCurveEncryptedDataCreator implements Closeable {
         HashConfig hashConfig = HashConfig.of(HashConfigItem.of(HashMethod.MD5, "id"));
 
         // 生成过滤器
-        try (PsiEllipticCurveEncryptedDataCreator creator = new PsiEllipticCurveEncryptedDataCreator("test", reader, hashConfig)) {
-            PsiEllipticCurveEncryptedData data = creator.create(progress -> {
+        try (PsiECEncryptedDataCreator creator = new PsiECEncryptedDataCreator("test", reader, hashConfig)) {
+            PsiECEncryptedData data = creator.create(progress -> {
                 System.out.println("进度：" + progress.getCompletedWorkload() + "," + progress.getSpeedInSecond() + "条/秒");
             });
 

@@ -16,6 +16,7 @@
 package com.welab.fusion.core.Job;
 
 import com.alibaba.fastjson.annotation.JSONField;
+import com.welab.fusion.core.algorithm.ecdh_psi.elliptic_curve.PsiECEncryptedData;
 import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
 import com.welab.fusion.core.data_resource.base.DataResourceInfo;
 import com.welab.fusion.core.data_source.AbstractTableDataSourceReader;
@@ -34,6 +35,8 @@ public class JobMember {
 
     @JSONField(serialize = false)
     public PsiBloomFilter psiBloomFilter;
+    @JSONField(serialize = false)
+    public PsiECEncryptedData psiECEncryptedData;
 
     public static JobMember of(String memberId, String memberName, DataResourceInfo dataResourceInfo) {
         JobMember jobMember = new JobMember();

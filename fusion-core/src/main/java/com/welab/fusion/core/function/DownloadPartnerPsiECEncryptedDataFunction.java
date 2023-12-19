@@ -15,21 +15,22 @@
  */
 package com.welab.fusion.core.function;
 
-import java.util.List;
+import java.io.File;
+import java.util.function.Consumer;
 
 /**
  * @author zane.luo
- * @date 2023/11/14
+ * @date 2023/12/19
  */
-@FunctionalInterface
-public interface EncryptPsiRecordsFunction {
+public interface DownloadPartnerPsiECEncryptedDataFunction {
     /**
-     * 加密数据
+     * 从合作方下载加密后的数据
      *
-     * @param partnerId 合作方id
-     * @param bucket    待加密的数据
-     * @return 加密后的数据
+     * @param jobId                任务Id
+     * @param partnerId            合作方id
+     * @param totalSizeConsumer    用于更新总大小的消费者
+     * @param downloadSizeConsumer 用于更新已下载大小的消费者
+     * @return 下载的文件
      */
-    List<String> encrypt(String jobId, String partnerId, List<String> bucket) throws Exception;
-
+    File download(String jobId, String partnerId, Consumer<Long> totalSizeConsumer, Consumer<Long> downloadSizeConsumer) throws Exception;
 }

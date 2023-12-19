@@ -80,7 +80,7 @@ public class IntersectionAction extends AbstractJobPhaseAction {
         BatchConsumer<PsiRecord> consumer = new BatchConsumer<>(batchSize, 5_000, records -> {
             try {
                 // 将数据发送到过滤器方加密
-                List<String> encryptedList = job.getJobFunctions().encryptPsiRecordsFunction.encrypt(
+                List<String> encryptedList = job.getJobFunctions().encryptRsaPsiRecordsFunction.encrypt(
                         job.getJobId(),
                         job.getPartner().memberId,
                         records.stream().map(x -> x.encodedKey).collect(Collectors.toList())

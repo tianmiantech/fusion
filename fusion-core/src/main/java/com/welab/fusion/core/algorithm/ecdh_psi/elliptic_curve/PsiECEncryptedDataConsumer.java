@@ -35,9 +35,9 @@ import java.util.function.BiConsumer;
  * @author zane.luo
  * @date 2023/11/24
  */
-public class PsiEllipticCurveEncryptedDataConsumer implements BiConsumer<Long, LinkedHashMap<String, Object>>, Closeable {
+public class PsiECEncryptedDataConsumer implements BiConsumer<Long, LinkedHashMap<String, Object>>, Closeable {
     protected final Logger LOG = LoggerFactory.getLogger(this.getClass());
-    private PsiEllipticCurveEncryptedData psiEllipticCurveEncryptedData;
+    private PsiECEncryptedData psiECEncryptedData;
     /**
      * 已经写入过滤器的数据量
      */
@@ -53,12 +53,12 @@ public class PsiEllipticCurveEncryptedDataConsumer implements BiConsumer<Long, L
      */
     private BufferedWriter fileWriter;
 
-    public PsiEllipticCurveEncryptedDataConsumer(PsiEllipticCurveEncryptedData psiEllipticCurveEncryptedData, Progress progress) throws IOException {
-        this.psiEllipticCurveEncryptedData = psiEllipticCurveEncryptedData;
+    public PsiECEncryptedDataConsumer(PsiECEncryptedData psiECEncryptedData, Progress progress) throws IOException {
+        this.psiECEncryptedData = psiECEncryptedData;
         this.GENERATE_FILTER_THREAD_POOL = createThreadPoll();
         this.progress = progress;
 
-        File file = psiEllipticCurveEncryptedData.getDataFile();
+        File file = psiECEncryptedData.getDataFile();
         file.delete();
         file.getParentFile().mkdirs();
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file, false), StandardCharsets.UTF_8));
@@ -91,10 +91,10 @@ public class PsiEllipticCurveEncryptedDataConsumer implements BiConsumer<Long, L
         }
 
         try {
-            String key = psiEllipticCurveEncryptedData.hashConfig.hash(row);
+            String key = psiECEncryptedData.hashConfig.hash(row);
 
             GENERATE_FILTER_THREAD_POOL.execute(() -> {
-                String encrypted = psiEllipticCurveEncryptedData.encrypt(key);
+                String encrypted = psiECEncryptedData.encrypt(key);
                 // 将加密后的数据保存到文件
                 try {
                     // 这里写入的必须拼接上换行符之后写入，如果分开写入，在并发的影响下，会导致数据错乱。

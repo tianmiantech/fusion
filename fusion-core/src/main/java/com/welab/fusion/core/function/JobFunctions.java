@@ -28,9 +28,21 @@ import java.util.List;
  */
 public class JobFunctions {
     public GetPartnerProgressFunction getPartnerProgressFunction;
+
+    // region rsa_psi
+
     public SaveMyPsiBloomFilterFunction saveMyPsiBloomFilterFunction;
     public DownloadPartnerPsiBloomFilterFunction downloadPartnerPsiBloomFilterFunction;
-    public EncryptPsiRecordsFunction encryptPsiRecordsFunction;
+    public EncryptRsaPsiRecordsFunction encryptRsaPsiRecordsFunction;
+
+    // endregion
+
+    // region ecdh_psi
+
+
+
+    // endregion
+
     public SaveFusionResultFunction saveFusionResultFunction;
     public FinishJobFunction finishJobFunction;
 
@@ -39,7 +51,7 @@ public class JobFunctions {
                 Tuple2.of(getPartnerProgressFunction, GetPartnerProgressFunction.class),
                 Tuple2.of(saveMyPsiBloomFilterFunction, SaveMyPsiBloomFilterFunction.class),
                 Tuple2.of(downloadPartnerPsiBloomFilterFunction, DownloadPartnerPsiBloomFilterFunction.class),
-                Tuple2.of(encryptPsiRecordsFunction, EncryptPsiRecordsFunction.class),
+                Tuple2.of(encryptRsaPsiRecordsFunction, EncryptRsaPsiRecordsFunction.class),
                 Tuple2.of(saveFusionResultFunction, SaveFusionResultFunction.class),
                 Tuple2.of(finishJobFunction, FinishJobFunction.class)
         );

@@ -112,7 +112,7 @@ public class FusionJobTest {
         jobFunctions.downloadPartnerPsiBloomFilterFunction = new DownloadPartnerPsiBloomFilterFunctionImpl();
         jobFunctions.saveMyPsiBloomFilterFunction = new SaveMyPsiBloomFilterFunctionImpl();
 
-        jobFunctions.encryptPsiRecordsFunction = (String memberId, String psiBloomFilterId, List<String> bucket) -> {
+        jobFunctions.encryptRsaPsiRecordsFunction = (String memberId, String psiBloomFilterId, List<String> bucket) -> {
             Path dir = FileSystem.PsiBloomFilter.getDir(psiBloomFilterId);
             PsiBloomFilter psiBloomFilter = PsiBloomFilter.of(dir);
             return PsiUtils.encryptPsiRecords(psiBloomFilter, bucket);

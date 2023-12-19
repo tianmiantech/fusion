@@ -18,11 +18,12 @@ package com.welab.fusion.core.algorithm.ecdh_psi;
 import com.welab.fusion.core.algorithm.AbstractJobFlow;
 import com.welab.fusion.core.algorithm.JobPhase;
 import com.welab.fusion.core.algorithm.base.AbstractJobPhaseAction;
+import com.welab.fusion.core.algorithm.ecdh_psi.action.DownloadPartnerECEncryptedDataAction;
+import com.welab.fusion.core.algorithm.ecdh_psi.action.EncryptMyselfDataAction;
 import com.welab.fusion.core.algorithm.rsa_psi.action.*;
 
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Map;
+import java.util.LinkedHashMap;
 
 /**
  * @author zane.luo
@@ -32,10 +33,12 @@ public class EcdhPsiJobFlow extends AbstractJobFlow {
 
     public static final EcdhPsiJobFlow INSTANCE = new EcdhPsiJobFlow();
 
-    private static final Map<JobPhase, Class<? extends AbstractJobPhaseAction>> map = new HashMap<>();
+    private static final LinkedHashMap<JobPhase, Class<? extends AbstractJobPhaseAction>> map = new HashMap<>();
 
     static {
         map.put(JobPhase.ConfirmMemberRole, ConfirmMemberRoleAction.class);
+        map.put(JobPhase.EncryptMyselfData, EncryptMyselfDataAction.class);
+        map.put(JobPhase.DownloadPartnerECEncryptedData, DownloadPartnerECEncryptedDataAction.class);
         map.put(JobPhase.CreatePsiBloomFilter, CreatePsiBloomFilterAction.class);
         map.put(JobPhase.DownloadPsiBloomFilter, DownloadPsiBloomFilterAction.class);
         map.put(JobPhase.Intersection, IntersectionAction.class);
@@ -43,16 +46,6 @@ public class EcdhPsiJobFlow extends AbstractJobFlow {
     }
 
     public EcdhPsiJobFlow() {
-        super(
-                Arrays.asList(
-                        JobPhase.ConfirmMemberRole,
-                        JobPhase.EncryptMyselfData,
-                        JobPhase.EncryptPartnerData,
-                        JobPhase.DownloadSecondaryEncryptedData,
-                        JobPhase.Intersection,
-                        JobPhase.SaveResult
-                ),
-                map
-        );
+        super(map);
     }
 }

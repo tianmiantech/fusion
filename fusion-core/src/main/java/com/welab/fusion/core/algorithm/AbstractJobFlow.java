@@ -18,6 +18,8 @@ package com.welab.fusion.core.algorithm;
 import com.welab.fusion.core.Job.FusionJob;
 import com.welab.fusion.core.algorithm.base.AbstractJobPhaseAction;
 
+import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -29,10 +31,10 @@ import java.util.Map;
  */
 public abstract class AbstractJobFlow {
     private List<JobPhase> flow;
-    private Map<JobPhase, Class<? extends AbstractJobPhaseAction>> phaseActionMap;
+    private LinkedHashMap<JobPhase, Class<? extends AbstractJobPhaseAction>> phaseActionMap;
 
-    public AbstractJobFlow(List<JobPhase> flow,Map<JobPhase, Class<? extends AbstractJobPhaseAction>> actionMap) {
-        this.flow = flow;
+    public AbstractJobFlow(LinkedHashMap<JobPhase, Class<? extends AbstractJobPhaseAction>> actionMap) {
+        this.flow = Arrays.asList(actionMap.keySet().toArray(new JobPhase[0]));
         this.phaseActionMap = actionMap;
     }
 

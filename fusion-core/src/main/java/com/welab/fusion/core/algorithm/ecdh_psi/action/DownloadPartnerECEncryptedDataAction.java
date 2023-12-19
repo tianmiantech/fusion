@@ -33,8 +33,8 @@ import java.nio.file.Path;
  * @author zane.luo
  * @date 2023/11/13
  */
-public class DownloadPsiBloomFilterAction extends AbstractJobPhaseAction {
-    public DownloadPsiBloomFilterAction(FusionJob job) {
+public class DownloadPartnerECEncryptedDataAction extends AbstractJobPhaseAction {
+    public DownloadPartnerECEncryptedDataAction(FusionJob job) {
         super(job);
     }
 

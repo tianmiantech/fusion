@@ -28,7 +28,7 @@ public class MyJobFunctions extends JobFunctions {
 
     private MyJobFunctions() {
         downloadPartnerPsiBloomFilterFunction = new DownloadPartnerPsiBloomFilterFunction();
-        encryptPsiRecordsFunction = new EncryptPsiRecordsFunction();
+        encryptRsaPsiRecordsFunction = new EncryptRsaPsiRecordsFunction();
         getPartnerProgressFunction = new GetPartnerProgressFunction();
         saveFusionResultFunction = new SaveFusionResultFunction();
         saveMyPsiBloomFilterFunction = new SaveMyPsiBloomFilterFunction();
