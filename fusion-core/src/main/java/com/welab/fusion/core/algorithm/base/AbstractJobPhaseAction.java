@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.welab.fusion.core.algorithm.rsa_psi.action;
+package com.welab.fusion.core.algorithm.base;
 
 import com.welab.fusion.core.Job.FusionJob;
 import com.welab.fusion.core.algorithm.JobPhase;

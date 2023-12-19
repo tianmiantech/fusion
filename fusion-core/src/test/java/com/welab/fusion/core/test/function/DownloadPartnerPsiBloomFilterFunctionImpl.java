@@ -30,7 +30,7 @@ import java.util.function.Consumer;
 public class DownloadPartnerPsiBloomFilterFunctionImpl implements DownloadPartnerPsiBloomFilterFunction {
     @Override
     public File download(String memberId, String partnerId, Consumer<Long> totalSizeConsumer, Consumer<Long> downloadSizeConsumer) throws Exception {
-        Path dir = FileSystem.PsiBloomFilter.getPath(partnerId);
+        Path dir = FileSystem.PsiBloomFilter.getDir(partnerId);
         PsiBloomFilter psiBloomFilter = PsiBloomFilter.of(dir);
 
         return psiBloomFilter.zip();

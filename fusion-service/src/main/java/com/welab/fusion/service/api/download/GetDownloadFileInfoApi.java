@@ -55,7 +55,7 @@ public class GetDownloadFileInfoApi extends AbstractApi<GetDownloadFileInfoApi.I
         switch (input.fileType) {
             case BloomFilter:
                 String bloomFilterId = jobMemberService.findMyself(input.jobId).getBloomFilterId();
-                Path dir = FileSystem.PsiBloomFilter.getPath(bloomFilterId);
+                Path dir = FileSystem.PsiBloomFilter.getDir(bloomFilterId);
                 return PsiBloomFilter.of(dir).zip();
             case FusionResult:
                 return FileSystem.FusionResult.getFile(input.jobId);

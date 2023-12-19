@@ -16,7 +16,7 @@
 package com.welab.fusion.core.algorithm;
 
 import com.welab.fusion.core.Job.FusionJob;
-import com.welab.fusion.core.algorithm.rsa_psi.action.*;
+import com.welab.fusion.core.algorithm.base.AbstractJobPhaseAction;
 
 import java.util.List;
 import java.util.Map;

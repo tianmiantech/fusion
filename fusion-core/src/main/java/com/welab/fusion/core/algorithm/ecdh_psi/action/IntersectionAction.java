@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.welab.fusion.core.algorithm.rsa_psi.action;
+package com.welab.fusion.core.algorithm.ecdh_psi.action;
 
 import cn.hutool.core.codec.Base64;
 import com.welab.fusion.core.Job.FusionJob;

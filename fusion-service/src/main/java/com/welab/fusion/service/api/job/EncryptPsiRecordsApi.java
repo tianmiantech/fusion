@@ -67,7 +67,7 @@ public class EncryptPsiRecordsApi extends AbstractApi<EncryptPsiRecordsApi.Input
                 // 从缓存加载过滤器
                 ? CACHE.get(bloomFilterId)
                 // 从硬盘加载过滤器
-                : PsiBloomFilter.of(FileSystem.PsiBloomFilter.getPath(bloomFilterId));
+                : PsiBloomFilter.of(FileSystem.PsiBloomFilter.getDir(bloomFilterId));
 
         // 使用过滤器加密数据
         List<String> list = PsiUtils.encryptPsiRecords(psiBloomFilter, input.bucket);

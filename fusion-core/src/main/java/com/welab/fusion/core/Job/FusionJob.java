@@ -19,7 +19,7 @@ import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.StrUtil;
 import com.welab.fusion.core.algorithm.AbstractJobFlow;
 import com.welab.fusion.core.algorithm.JobPhase;
-import com.welab.fusion.core.algorithm.rsa_psi.action.AbstractJobPhaseAction;
+import com.welab.fusion.core.algorithm.base.AbstractJobPhaseAction;
 import com.welab.fusion.core.algorithm.base.PsiAlgorithm;
 import com.welab.fusion.core.data_resource.base.DataResourceType;
 import com.welab.fusion.core.function.JobFunctions;

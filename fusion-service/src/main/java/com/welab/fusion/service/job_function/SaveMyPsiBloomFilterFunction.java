@@ -64,8 +64,7 @@ public class SaveMyPsiBloomFilterFunction implements com.welab.fusion.core.funct
 
         LOG.info("开始保存过滤器文件，job_id：{}，bloom_filter_id:{}", jobId, psiBloomFilter.id);
         long startTime = System.currentTimeMillis();
-        Path sinkDir = FileSystem.PsiBloomFilter.getPath(psiBloomFilter.id);
-        psiBloomFilter.sink(sinkDir);
+        psiBloomFilter.sink();
         TimeSpan spend = TimeSpan.fromMs(System.currentTimeMillis() - startTime);
         LOG.info("保存过滤器文件完成，job_id：{}，bloom_filter_id:{}，耗时：{}", jobId, psiBloomFilter.id, spend);
 
@@ -84,8 +83,8 @@ public class SaveMyPsiBloomFilterFunction implements com.welab.fusion.core.funct
         model.setSql(tableDataResourceInfoModel.sql);
         model.setHashConfigs(myself.getHashConfig());
         model.setTotalDataCount(psiBloomFilter.insertedElementCount);
-        model.setStorageDir(sinkDir.toAbsolutePath().toString());
-        model.setStorageSize(PsiBloomFilter.getDataFile(sinkDir).length());
+        model.setStorageDir(psiBloomFilter.getDir().toAbsolutePath().toString());
+        model.setStorageSize(psiBloomFilter.getDataFile().length());
         model.setKey(key + "");
         model.save();
     }

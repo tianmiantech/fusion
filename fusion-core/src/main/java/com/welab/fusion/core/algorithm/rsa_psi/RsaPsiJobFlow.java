@@ -17,7 +17,7 @@ package com.welab.fusion.core.algorithm.rsa_psi;
 
 import com.welab.fusion.core.algorithm.AbstractJobFlow;
 import com.welab.fusion.core.algorithm.JobPhase;
-import com.welab.fusion.core.algorithm.ecdh_psi.EcdhPsiJobFlow;
+import com.welab.fusion.core.algorithm.base.AbstractJobPhaseAction;
 import com.welab.fusion.core.algorithm.rsa_psi.action.*;
 
 import java.util.Arrays;

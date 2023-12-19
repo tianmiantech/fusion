@@ -97,13 +97,12 @@ public class BloomFilterService extends AbstractService {
             PsiBloomFilter psiBloomFilter = creator.create();
 
             progress.setMessage("过滤器生成完毕，正在储存...");
-            Path sinkDir = FileSystem.PsiBloomFilter.getPath(model.getId());
-            psiBloomFilter.sink(sinkDir);
+            psiBloomFilter.sink();
 
             // 填充 model
             model.setTotalDataCount(dataSourceReader.getTotalDataRowCount());
-            model.setStorageDir(sinkDir.toAbsolutePath().toString());
-            model.setStorageSize(PsiBloomFilter.getDataFile(sinkDir).length());
+            model.setStorageDir(psiBloomFilter.getDir().toAbsolutePath().toString());
+            model.setStorageSize(psiBloomFilter.getDataFile().length());
             model.setKey(psiBloomFilter.hashCode() + "");
         } catch (Exception e) {
             LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);

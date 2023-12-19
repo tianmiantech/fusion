@@ -81,6 +81,7 @@ public class FileSystem {
          */
         Temp,
         PsiBloomFilter,
+        PsiEllipticCurveEncryptedData,
         /**
          * 求交结果
          */
@@ -109,7 +110,7 @@ public class FileSystem {
         /**
          * 获取指定布隆过滤器所在目录
          */
-        public static Path getPath(String id) {
+        public static Path getDir(String id) {
             return getBaseDir(UseType.PsiBloomFilter).resolve(id);
         }
 
@@ -118,6 +119,12 @@ public class FileSystem {
     public static class FusionResult {
         public static File getFile(String jobId) {
             return getBaseDir(UseType.FusionResult).resolve(jobId + ".csv").toFile();
+        }
+    }
+
+    public static class PsiEllipticCurveEncryptedData {
+        public static Path getDir(String id) {
+            return getBaseDir(UseType.PsiEllipticCurveEncryptedData).resolve(id);
         }
     }
 }

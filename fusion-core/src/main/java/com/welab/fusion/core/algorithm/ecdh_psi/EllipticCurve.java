@@ -15,6 +15,7 @@
  */
 package com.welab.fusion.core.algorithm.ecdh_psi;
 
+import org.bouncycastle.jce.ECNamedCurveTable;
 import org.bouncycastle.jce.spec.ECParameterSpec;
 import org.bouncycastle.math.ec.ECCurve;
 import org.bouncycastle.math.ec.ECFieldElement;
@@ -33,6 +34,8 @@ import java.util.Objects;
  * @date 2023/12/18
  */
 public class EllipticCurve {
+    public static final ECParameterSpec EC_PARAMETER_SPEC = ECNamedCurveTable.getParameterSpec("prime256v1");
+    public static final  EllipticCurve INSTANCE = new EllipticCurve();
     private static final BigInteger THREE = BigInteger.valueOf(3);
     private static final BigInteger TWO = BigInteger.valueOf(2);
     private static final BigInteger ONE = BigInteger.valueOf(1);
@@ -46,33 +49,28 @@ public class EllipticCurve {
     private ECCurve ecCurve;
     private String name;
 
-    private ECParameterSpec ecParameterSpec;
-
-    ECCurve getEcCurve() {
+    public    ECCurve getEcCurve() {
         return this.ecCurve;
     }
 
-    String getName() {
+    public String getName() {
         return this.name;
     }
 
-    ECParameterSpec getEcParameterSpec() {
-        return this.ecParameterSpec;
-    }
+
 
     BigInteger getN() {
         return this.n;
     }
 
-    public EllipticCurve(ECParameterSpec params) {
-        this.ecParameterSpec = params;
-        this.ecCurve = params.getCurve();
+    private EllipticCurve() {
+        this.ecCurve = EC_PARAMETER_SPEC.getCurve();
         this.name = getNameCurve(this.ecCurve.getA().getFieldSize());
         this.a = this.ecCurve.getA().toBigInteger();
         this.b = this.ecCurve.getB().toBigInteger();
-        this.g = params.getG();
+        this.g = EC_PARAMETER_SPEC.getG();
         this.p = new BigInteger(getPFromNameCurve(this.name), 16);
-        this.n = params.getN();
+        this.n = EC_PARAMETER_SPEC.getN();
     }
 
     /**
@@ -203,7 +201,7 @@ public class EllipticCurve {
      * @param m BigInteger input value
      * @return ECPoint mapping of the input value
      */
-    public ECPoint mapMessage(BigInteger m) {
+    public ECPoint hashToPoint(BigInteger m) {
 //        if (this.p.compareTo(m) < 0)
 //            throw new RuntimeException("Unexpected: Hashing missing");
         BigInteger k = BigInteger.valueOf(200);

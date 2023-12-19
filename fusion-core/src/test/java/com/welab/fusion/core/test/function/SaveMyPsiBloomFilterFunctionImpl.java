@@ -28,7 +28,6 @@ import java.nio.file.Path;
 public class SaveMyPsiBloomFilterFunctionImpl implements SaveMyPsiBloomFilterFunction {
     @Override
     public void save(String jobId,PsiBloomFilter psiBloomFilter) {
-        Path dir = FileSystem.PsiBloomFilter.getPath(psiBloomFilter.id);
-        psiBloomFilter.sink(dir);
+        psiBloomFilter.sink();
     }
 }

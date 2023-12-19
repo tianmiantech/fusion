@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.welab.fusion.core.algorithm.rsa_psi.action;
+package com.welab.fusion.core.algorithm.ecdh_psi.action;
 
 import com.welab.fusion.core.Job.FusionJob;
 import com.welab.fusion.core.Job.JobMember;
-import com.welab.fusion.core.algorithm.JobPhase;
 import com.welab.fusion.core.Job.JobRole;
+import com.welab.fusion.core.algorithm.JobPhase;
 import com.welab.fusion.core.algorithm.base.AbstractJobPhaseAction;
 import com.welab.fusion.core.data_resource.base.DataResourceInfo;
 import com.welab.fusion.core.data_resource.base.DataResourceType;

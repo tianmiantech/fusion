@@ -13,23 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.welab.fusion.core.algorithm.ecdh_psi.elliptic_curve;
-
-import java.math.BigInteger;
+package com.welab.fusion.core.algorithm.ecdh_psi;
 
 /**
  * @author zane.luo
- * @date 2023/12/18
+ * @date 2023/12/19
  */
-public class EcdhPsiParam {
-    /**
-     * 私钥
-     */
-    public BigInteger secretKey;
-
-    public static EcdhPsiParam of(BigInteger secretKey) {
-        EcdhPsiParam param = new EcdhPsiParam();
-        param.secretKey = secretKey;
-        return param;
+public class Demo {
+    public static void main(String[] args) {
+        
     }
 }

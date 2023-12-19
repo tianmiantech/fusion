@@ -78,10 +78,6 @@ public class PsiBloomFilter {
         return result;
     }
 
-    public static File getDataFile(Path dir) {
-        return dir.resolve(DATA_FILE_NAME).toFile();
-    }
-
     /**
      * 为避免资源浪费，过滤器文件在需要用到的时候才加载。
      */
@@ -113,13 +109,14 @@ public class PsiBloomFilter {
         psiBloomFilter.hashConfig = hashConfig;
         psiBloomFilter.rsaPsiParam = rsaPsiParam;
         psiBloomFilter.bloomFilter = bloomFilter;
+        psiBloomFilter.dir = FileSystem.PsiBloomFilter.getDir(id);
         return psiBloomFilter;
     }
 
     /**
      * 将 pis 布隆过滤器持久化到硬盘
      */
-    public void sink(Path dir) {
+    public void sink() {
         LOG.info("start to sink PsiBloomFilter to disk. dir:{}", dir);
         long start = System.currentTimeMillis();
         dir.toFile().mkdirs();
@@ -154,7 +151,7 @@ public class PsiBloomFilter {
      * 这里要注意： meta 文件中的 RsaPsiParam 对象包含私钥信息，打包前要删除。
      */
     public File zip() throws IOException {
-        Path dir = FileSystem.PsiBloomFilter.getPath(id);
+        Path dir = FileSystem.PsiBloomFilter.getDir(id);
         File zipFile = dir.resolve(ZIP_FILE_NAME).toFile();
 
         // 已存在，不反复压缩。
@@ -189,5 +186,9 @@ public class PsiBloomFilter {
     @Override
     public int hashCode() {
         return Objects.hash(hashConfig, rsaPsiParam, bloomFilter);
+    }
+
+    public Path getDir() {
+        return dir;
     }
 }
