@@ -46,7 +46,7 @@ const JobProgress = (props:JobProgressProps) => {
         tmpList.push(step)
       }
       setStepList(tmpList);
-    },[promoterPhasesList.length,providerPhasesList.length])
+    },[promoterPhasesList,providerPhasesList])
 
     const renderDescription = (promoterPhasesObj:PhasesListItemInterface,providerPhases:PhasesListItemInterface)=>{
       return <>

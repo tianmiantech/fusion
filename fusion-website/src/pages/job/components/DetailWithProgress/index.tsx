@@ -64,7 +64,7 @@ const Index = ()=>{
           })
         } 
       }
-    },[detailData.myselfPhasesList.length])
+    },[detailData.myselfPhasesList])
 
 
     useEffect(()=>{
@@ -80,7 +80,7 @@ const Index = ()=>{
           })
         } 
       }
-    },[detailData.partnerPhasesList.length])
+    },[detailData.partnerPhasesList])
 
     const {run:runGetPrevResult,loading:getPrevResultLoading} = useRequest(async (id:string)=>{
       const reponse = await getPrevResult(id);
