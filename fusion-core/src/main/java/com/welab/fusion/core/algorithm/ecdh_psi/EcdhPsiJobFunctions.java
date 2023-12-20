@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.welab.fusion.core.function;
+package com.welab.fusion.core.algorithm.ecdh_psi;
 
-import com.welab.fusion.core.progress.JobProgress;
+import com.welab.fusion.core.Job.AbstractJobFunctions;
+import com.welab.fusion.core.algorithm.ecdh_psi.function.DownloadPartnerPsiECEncryptedDataFunction;
 
 /**
  * @author zane.luo
- * @date 2023/11/15
+ * @date 2023/12/20
  */
-@FunctionalInterface
-public interface GetPartnerProgressFunction {
-    JobProgress get(String jobId) throws Exception;
+public class EcdhPsiJobFunctions extends AbstractJobFunctions {
+    public DownloadPartnerPsiECEncryptedDataFunction downloadPartnerPsiECEncryptedDataFunction;
 }

@@ -17,7 +17,6 @@ package com.welab.fusion.core.algorithm.ecdh_psi.elliptic_curve;
 
 import cn.hutool.core.io.FileUtil;
 import com.alibaba.fastjson.annotation.JSONField;
-import com.welab.fusion.core.algorithm.ecdh_psi.EllipticCurve;
 import com.welab.fusion.core.hash.HashConfig;
 import com.welab.fusion.core.io.FileSystem;
 import com.welab.fusion.core.psi.PsiUtils;
@@ -58,6 +57,10 @@ public class PsiECEncryptedData {
         data.ecdhPsiParam = ecdhPsiParam;
         data.dir = FileSystem.PsiEllipticCurveEncryptedData.getDir(id);
         return data;
+    }
+
+    public static PsiECEncryptedData of(Path dir) {
+        return null;
     }
 
     @JSONField(serialize = false)

@@ -13,23 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.welab.fusion.core.function;
+package com.welab.fusion.core.algorithm.rsa_psi.function;
 
-import java.util.List;
+import com.welab.fusion.core.Job.JobRole;
+import com.welab.fusion.core.Job.FusionResult;
+
+import java.util.function.Consumer;
 
 /**
  * @author zane.luo
- * @date 2023/11/14
+ * @date 2023/11/15
  */
 @FunctionalInterface
-public interface EncryptRsaPsiRecordsFunction {
-    /**
-     * 加密数据
-     *
-     * @param partnerId 合作方id
-     * @param bucket    待加密的数据
-     * @return 加密后的数据
-     */
-    List<String> encrypt(String jobId, String partnerId, List<String> bucket) throws Exception;
-
+public interface SaveFusionResultFunction {
+    void save(String jobId, JobRole myRole, FusionResult result, Consumer<Long> totalSizeConsumer, Consumer<Long> downloadSizeConsumer) throws Exception;
 }

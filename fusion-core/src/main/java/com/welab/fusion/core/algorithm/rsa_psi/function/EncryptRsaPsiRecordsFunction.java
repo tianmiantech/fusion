@@ -13,17 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.welab.fusion.core.function;
+package com.welab.fusion.core.algorithm.rsa_psi.function;
 
-import com.welab.fusion.core.progress.JobProgress;
+import java.util.List;
 
 /**
- * 结束任务的动作
- *
  * @author zane.luo
- * @date 2023/12/4
+ * @date 2023/11/14
  */
 @FunctionalInterface
-public interface FinishJobFunction {
-    void finish(String jobId, JobProgress progress) throws Exception;
+public interface EncryptRsaPsiRecordsFunction {
+    /**
+     * 加密数据
+     *
+     * @param partnerId 合作方id
+     * @param bucket    待加密的数据
+     * @return 加密后的数据
+     */
+    List<String> encrypt(String jobId, String partnerId, List<String> bucket) throws Exception;
+
 }

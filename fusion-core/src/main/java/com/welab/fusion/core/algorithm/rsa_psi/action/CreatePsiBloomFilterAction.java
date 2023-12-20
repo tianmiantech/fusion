@@ -15,8 +15,8 @@
  */
 package com.welab.fusion.core.algorithm.rsa_psi.action;
 
-import com.welab.fusion.core.Job.FusionJob;
 import com.welab.fusion.core.Job.JobRole;
+import com.welab.fusion.core.algorithm.rsa_psi.RsaPsiJob;
 import com.welab.fusion.core.algorithm.JobPhase;
 import com.welab.fusion.core.algorithm.base.AbstractJobPhaseAction;
 import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
@@ -31,7 +31,7 @@ import java.util.UUID;
  * @author zane.luo
  * @date 2023/11/13
  */
-public class CreatePsiBloomFilterAction extends AbstractJobPhaseAction {
+public class CreatePsiBloomFilterAction extends AbstractJobPhaseAction<RsaPsiJob> {
     @Override
     protected void doAction() throws Exception {
         AbstractTableDataSourceReader reader = job.getMyself().tableDataResourceReader;
@@ -66,7 +66,7 @@ public class CreatePsiBloomFilterAction extends AbstractJobPhaseAction {
         return job.getMyself().dataResourceInfo.dataCount;
     }
 
-    public CreatePsiBloomFilterAction(FusionJob job) {
+    public CreatePsiBloomFilterAction(RsaPsiJob job) {
         super(job);
     }
 

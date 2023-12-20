@@ -16,7 +16,6 @@
 package com.welab.fusion.core.algorithm.ecdh_psi.elliptic_curve;
 
 import cn.hutool.core.thread.ThreadUtil;
-import com.welab.fusion.core.algorithm.ecdh_psi.EllipticCurve;
 import com.welab.fusion.core.data_source.AbstractTableDataSourceReader;
 import com.welab.fusion.core.data_source.CsvTableDataSourceReader;
 import com.welab.fusion.core.hash.HashConfig;

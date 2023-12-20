@@ -15,9 +15,10 @@
  */
 package com.welab.fusion.service.service;
 
-import com.welab.fusion.core.Job.FusionJob;
-import com.welab.fusion.core.Job.JobMember;
+import com.welab.fusion.core.Job.AbstractPsiJob;
 import com.welab.fusion.core.Job.JobStatus;
+import com.welab.fusion.core.algorithm.rsa_psi.RsaPsiJob;
+import com.welab.fusion.core.algorithm.rsa_psi.RsaPsiJobMember;
 import com.welab.fusion.core.data_resource.base.DataResourceInfo;
 import com.welab.fusion.core.data_resource.base.DataResourceType;
 import com.welab.fusion.core.progress.JobProgress;
@@ -34,7 +35,7 @@ import com.welab.fusion.service.dto.JobMemberDataResourceInput;
 import com.welab.fusion.service.dto.base.PagingOutput;
 import com.welab.fusion.service.dto.entity.JobMemberOutputModel;
 import com.welab.fusion.service.dto.entity.JobOutputModel;
-import com.welab.fusion.service.job_function.MyJobFunctions;
+import com.welab.fusion.service.job_function.MyRsaJobFunctions;
 import com.welab.fusion.service.model.FusionJobManager;
 import com.welab.fusion.service.service.base.AbstractService;
 import com.welab.wefe.common.StatusCode;
@@ -161,8 +162,8 @@ public class JobService extends AbstractService {
         gatewayService.callOtherFusionNode(target, RestartJobApi.class, input);
 
         // 创建任务并启动
-        FusionJob fusionJob = createFusionJob(job);
-        FusionJobManager.start(fusionJob);
+        AbstractPsiJob psiJob = createFusionJob(job);
+        FusionJobManager.start(psiJob);
     }
 
     /**
@@ -198,15 +199,15 @@ public class JobService extends AbstractService {
 
 
         // 创建任务并启动
-        FusionJob fusionJob = createFusionJob(job);
-        FusionJobManager.start(fusionJob);
+        AbstractPsiJob psiJob = createFusionJob(job);
+        FusionJobManager.start(psiJob);
     }
 
-    private FusionJob createFusionJob(JobDbModel job) throws Exception {
+    private AbstractPsiJob createFusionJob(JobDbModel job) throws Exception {
         JobMemberDbModel myselfJobInfo = jobMemberService.findMyself(job.getId());
         MemberDbModel myselfInfo = memberService.getMyself();
         DataResourceInfo myselfDataResourceInfo = DataResourceInfo.of(myselfJobInfo.getDataResourceType(), myselfJobInfo.getTotalDataCount(), myselfJobInfo.getHashConfigModel());
-        JobMember myself = JobMember.of(myselfInfo.getId(), myselfInfo.getName(), myselfDataResourceInfo);
+        RsaPsiJobMember myself = RsaPsiJobMember.of(myselfInfo.getId(), myselfInfo.getName(), myselfDataResourceInfo);
         if (myselfDataResourceInfo.dataResourceType == DataResourceType.TableDataSource) {
             myself.tableDataResourceReader = myselfJobInfo.getTableDataResourceInfoModel().createReader(-1, -1);
         }
@@ -215,9 +216,9 @@ public class JobService extends AbstractService {
         JobMemberDbModel partnerJobInfo = jobMemberService.findByMemberId(job.getId(), job.getPartnerMemberId());
         MemberDbModel partnerInfo = memberService.findById(partnerJobInfo.getMemberId());
         DataResourceInfo partnerDataResourceInfo = DataResourceInfo.of(partnerJobInfo.getDataResourceType(), partnerJobInfo.getTotalDataCount(), partnerJobInfo.getHashConfigModel());
-        JobMember partner = JobMember.of(partnerInfo.getId(), partnerInfo.getName(), partnerDataResourceInfo);
+        RsaPsiJobMember partner = RsaPsiJobMember.of(partnerInfo.getId(), partnerInfo.getName(), partnerDataResourceInfo);
 
-        return new FusionJob(job.getAlgorithm(), job.getId(), myself, partner, MyJobFunctions.INSTANCE);
+        return new RsaPsiJob(job.getId(), myself, partner, MyRsaJobFunctions.INSTANCE);
     }
 
 
@@ -402,7 +403,7 @@ public class JobService extends AbstractService {
      * 获取我方任务进度
      */
     public JobProgress getMyJobProgress(String jobId) {
-        FusionJob job = FusionJobManager.get(jobId);
+        AbstractPsiJob job = FusionJobManager.get(jobId);
         if (job != null) {
             return job.getMyProgress();
         }

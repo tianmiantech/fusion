@@ -15,8 +15,8 @@
  */
 package com.welab.fusion.core.algorithm.rsa_psi.action;
 
-import com.welab.fusion.core.Job.FusionJob;
-import com.welab.fusion.core.Job.JobMember;
+import com.welab.fusion.core.Job.AbstractJobMember;
+import com.welab.fusion.core.algorithm.rsa_psi.RsaPsiJob;
 import com.welab.fusion.core.algorithm.JobPhase;
 import com.welab.fusion.core.Job.JobRole;
 import com.welab.fusion.core.algorithm.base.AbstractJobPhaseAction;
@@ -33,8 +33,8 @@ import com.welab.fusion.core.data_resource.base.DataResourceType;
  * @author zane.luo
  * @date 2023/11/13
  */
-public class ConfirmMemberRoleAction extends AbstractJobPhaseAction {
-    public ConfirmMemberRoleAction(FusionJob job) {
+public class ConfirmMemberRoleAction extends AbstractJobPhaseAction<RsaPsiJob> {
+    public ConfirmMemberRoleAction(RsaPsiJob job) {
         super(job);
     }
 
@@ -73,8 +73,8 @@ public class ConfirmMemberRoleAction extends AbstractJobPhaseAction {
      * - 双方都为数据集，双方数据量相同，成员名称字典序小的生成过滤器。
      */
     private JobRole consultMyRole() throws Exception {
-        JobMember myself = job.getMyself();
-        JobMember partner = job.getPartner();
+        AbstractJobMember myself = job.getMyself();
+        AbstractJobMember partner = job.getPartner();
         DataResourceInfo myDataResourceInfo = myself.dataResourceInfo;
         DataResourceInfo partnerDataResourceInfo = partner.dataResourceInfo;
 
@@ -92,8 +92,8 @@ public class ConfirmMemberRoleAction extends AbstractJobPhaseAction {
      * 双方资源类型相同
      */
     private JobRole consultMyRoleWhenEqualType() throws Exception {
-        JobMember myself = job.getMyself();
-        JobMember partner = job.getPartner();
+        AbstractJobMember myself = job.getMyself();
+        AbstractJobMember partner = job.getPartner();
         DataResourceInfo myDataResourceInfo = myself.dataResourceInfo;
         DataResourceInfo partnerDataResourceInfo = partner.dataResourceInfo;
 

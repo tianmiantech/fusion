@@ -13,8 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.welab.fusion.core.function;
+package com.welab.fusion.core.Job;
 
+import com.welab.fusion.core.algorithm.rsa_psi.function.FinishJobFunction;
+import com.welab.fusion.core.algorithm.rsa_psi.function.GetPartnerProgressFunction;
+import com.welab.fusion.core.algorithm.rsa_psi.function.SaveFusionResultFunction;
 import com.welab.wefe.common.tuple.Tuple2;
 
 import java.util.Arrays;
@@ -26,22 +29,8 @@ import java.util.List;
  * @author zane.luo
  * @date 2023/11/13
  */
-public class JobFunctions {
+public abstract class AbstractJobFunctions {
     public GetPartnerProgressFunction getPartnerProgressFunction;
-
-    // region rsa_psi
-
-    public SaveMyPsiBloomFilterFunction saveMyPsiBloomFilterFunction;
-    public DownloadPartnerPsiBloomFilterFunction downloadPartnerPsiBloomFilterFunction;
-    public EncryptRsaPsiRecordsFunction encryptRsaPsiRecordsFunction;
-
-    // endregion
-
-    // region ecdh_psi
-
-
-
-    // endregion
 
     public SaveFusionResultFunction saveFusionResultFunction;
     public FinishJobFunction finishJobFunction;
@@ -49,9 +38,6 @@ public class JobFunctions {
     public void check() {
         List<Tuple2> list = Arrays.asList(
                 Tuple2.of(getPartnerProgressFunction, GetPartnerProgressFunction.class),
-                Tuple2.of(saveMyPsiBloomFilterFunction, SaveMyPsiBloomFilterFunction.class),
-                Tuple2.of(downloadPartnerPsiBloomFilterFunction, DownloadPartnerPsiBloomFilterFunction.class),
-                Tuple2.of(encryptRsaPsiRecordsFunction, EncryptRsaPsiRecordsFunction.class),
                 Tuple2.of(saveFusionResultFunction, SaveFusionResultFunction.class),
                 Tuple2.of(finishJobFunction, FinishJobFunction.class)
         );

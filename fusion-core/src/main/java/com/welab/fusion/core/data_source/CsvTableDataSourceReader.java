@@ -18,16 +18,13 @@ package com.welab.fusion.core.data_source;
 
 import com.welab.wefe.common.StatusCode;
 import com.welab.wefe.common.exception.StatusCodeWithException;
-import com.welab.wefe.common.util.StringUtil;
+import com.welab.wefe.common.util.FileUtil;
 import de.siegmar.fastcsv.reader.CsvParser;
 import de.siegmar.fastcsv.reader.CsvReader;
 import de.siegmar.fastcsv.reader.CsvRow;
-import org.apache.commons.io.input.ReversedLinesFileReader;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.LineNumberReader;
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -62,7 +59,7 @@ public class CsvTableDataSourceReader extends AbstractTableDataSourceReader {
         reader.setSkipEmptyRows(true);
         this.parser = reader.parse(file, StandardCharsets.UTF_8);
 
-        // 主动调用一次，避免外部使用时只接 readRow() 功能导致第一行数据读到列头。
+        // 主动调用一次，避免外部使用时直接 readRow() 功能导致第一行数据读到列头。
         getHeader();
     }
 
@@ -75,30 +72,7 @@ public class CsvTableDataSourceReader extends AbstractTableDataSourceReader {
 
     @Override
     public long doGetTotalDataRowCount() {
-
-        // Get the number of file lines
-        try (LineNumberReader lineNumberReader = new LineNumberReader(new FileReader(file))) {
-            lineNumberReader.skip(Long.MAX_VALUE);
-            // 计算行数时，不包含列头。
-            totalRowCount = lineNumberReader.getLineNumber() - 1L;
-        } catch (IOException e) {
-            LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);
-            return 0;
-        }
-
-        // 如果最后一行是空行，行数减一。
-        if (totalRowCount > 0) {
-            try (ReversedLinesFileReader reversedLinesReader = new ReversedLinesFileReader(file, StandardCharsets.UTF_8)) {
-                String lastLine = reversedLinesReader.readLine();
-                if (StringUtil.isBlank(lastLine)) {
-                    totalRowCount--;
-                }
-            } catch (Exception e) {
-                LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);
-            }
-        }
-
-        return totalRowCount;
+        return FileUtil.getFileLineCount(file);
     }
 
     @Override

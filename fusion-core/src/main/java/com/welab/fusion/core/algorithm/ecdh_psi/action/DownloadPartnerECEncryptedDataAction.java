@@ -15,12 +15,14 @@
  */
 package com.welab.fusion.core.algorithm.ecdh_psi.action;
 
-import com.welab.fusion.core.Job.FusionJob;
+import com.welab.fusion.core.algorithm.ecdh_psi.EcdhPsiJob;
 import com.welab.fusion.core.Job.JobRole;
 import com.welab.fusion.core.algorithm.JobPhase;
 import com.welab.fusion.core.algorithm.base.AbstractJobPhaseAction;
+import com.welab.fusion.core.algorithm.ecdh_psi.elliptic_curve.PsiECEncryptedData;
+import com.welab.fusion.core.algorithm.ecdh_psi.function.DownloadPartnerPsiECEncryptedDataFunction;
 import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
-import com.welab.fusion.core.function.DownloadPartnerPsiBloomFilterFunction;
+import com.welab.fusion.core.algorithm.rsa_psi.function.DownloadPartnerPsiBloomFilterFunction;
 import com.welab.fusion.core.io.FileSystem;
 import com.welab.wefe.common.InformationSize;
 import com.welab.wefe.common.file.decompression.SuperDecompressor;
@@ -33,8 +35,8 @@ import java.nio.file.Path;
  * @author zane.luo
  * @date 2023/11/13
  */
-public class DownloadPartnerECEncryptedDataAction extends AbstractJobPhaseAction {
-    public DownloadPartnerECEncryptedDataAction(FusionJob job) {
+public class DownloadPartnerECEncryptedDataAction extends AbstractJobPhaseAction<EcdhPsiJob> {
+    public DownloadPartnerECEncryptedDataAction(EcdhPsiJob job) {
         super(job);
     }
 
@@ -46,7 +48,7 @@ public class DownloadPartnerECEncryptedDataAction extends AbstractJobPhaseAction
     @Override
     protected void doAction() throws Exception {
         phaseProgress.setMessage("正在从合作方下载过滤器...");
-        DownloadPartnerPsiBloomFilterFunction function = job.getJobFunctions().downloadPartnerPsiBloomFilterFunction;
+        DownloadPartnerPsiECEncryptedDataFunction function = job.getJobFunctions().downloadPartnerPsiECEncryptedDataFunction;
 
         // 从合作方下载过滤器
         File file = function.download(
@@ -59,29 +61,16 @@ public class DownloadPartnerECEncryptedDataAction extends AbstractJobPhaseAction
                     phaseProgress.updateCompletedWorkload(size);
                 });
 
-        phaseProgress.setMessage("正在解压过滤器 zip 文件(" + InformationSize.fromByte(file.length()) + ")...");
+        phaseProgress.setMessage("正在解压 zip 文件(" + InformationSize.fromByte(file.length()) + ")...");
         // file 解压至 dir
         Path dir = FileSystem.PsiBloomFilter.getDir(job.getPartner().memberId.replace(":", "_") + "-" + FileUtil.getFileNameWithoutSuffix(file.getName()));
         SuperDecompressor.decompression(file, dir.toAbsolutePath().toString(), false);
 
 
-        PsiBloomFilter psiBloomFilter = PsiBloomFilter.of(dir);
-        InformationSize size = InformationSize.fromByte(psiBloomFilter.getDataFile().length());
+        PsiECEncryptedData psiECEncryptedData = PsiECEncryptedData.of(dir);
 
-        LOG.info("正在加载过滤器，job_id：{}，psiBloomFilter:{}", job.getJobId(), psiBloomFilter.id);
-        phaseProgress.setMessage("正在加载过滤器(" + size + ")...");
-        // 将过滤器文件加载到内存是个很重的操作，所以是按需加载的，调用 getBloomFilter() 可触发加载。
-        psiBloomFilter.getBloomFilter();
-        LOG.info(
-                "过滤器加载完毕({})，job_id：{}，psiBloomFilter:{}",
-                size,
-                job.getJobId(),
-                psiBloomFilter.id
-        );
-
-
-        // 保存到 job 上下文供后续使用
-        job.getPartner().psiBloomFilter = psiBloomFilter;
+        // 保存到上下文供后续使用
+        job.getPartner().psiECEncryptedData = psiECEncryptedData;
     }
 
     @Override

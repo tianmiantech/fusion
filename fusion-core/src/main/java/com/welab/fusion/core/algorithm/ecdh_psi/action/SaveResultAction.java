@@ -15,7 +15,7 @@
  */
 package com.welab.fusion.core.algorithm.ecdh_psi.action;
 
-import com.welab.fusion.core.Job.FusionJob;
+import com.welab.fusion.core.algorithm.ecdh_psi.EcdhPsiJob;
 import com.welab.fusion.core.Job.JobRole;
 import com.welab.fusion.core.algorithm.JobPhase;
 import com.welab.fusion.core.algorithm.base.AbstractJobPhaseAction;
@@ -24,8 +24,8 @@ import com.welab.fusion.core.algorithm.base.AbstractJobPhaseAction;
  * @author zane.luo
  * @date 2023/11/13
  */
-public class SaveResultAction extends AbstractJobPhaseAction {
-    public SaveResultAction(FusionJob job) {
+public class SaveResultAction extends AbstractJobPhaseAction<EcdhPsiJob> {
+    public SaveResultAction(EcdhPsiJob job) {
         super(job);
     }
 

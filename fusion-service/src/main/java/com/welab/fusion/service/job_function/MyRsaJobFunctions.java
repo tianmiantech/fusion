@@ -15,7 +15,7 @@
  */
 package com.welab.fusion.service.job_function;
 
-import com.welab.fusion.core.function.JobFunctions;
+import com.welab.fusion.core.algorithm.rsa_psi.RsaPsiJobFunctions;
 
 /**
  * fusion-service 中的 JobFunctions
@@ -23,10 +23,10 @@ import com.welab.fusion.core.function.JobFunctions;
  * @author zane.luo
  * @date 2023/11/29
  */
-public class MyJobFunctions extends JobFunctions {
-    public static final MyJobFunctions INSTANCE = new MyJobFunctions();
+public class MyRsaJobFunctions extends RsaPsiJobFunctions {
+    public static final MyRsaJobFunctions INSTANCE = new MyRsaJobFunctions();
 
-    private MyJobFunctions() {
+    private MyRsaJobFunctions() {
         downloadPartnerPsiBloomFilterFunction = new DownloadPartnerPsiBloomFilterFunction();
         encryptRsaPsiRecordsFunction = new EncryptRsaPsiRecordsFunction();
         getPartnerProgressFunction = new GetPartnerProgressFunction();

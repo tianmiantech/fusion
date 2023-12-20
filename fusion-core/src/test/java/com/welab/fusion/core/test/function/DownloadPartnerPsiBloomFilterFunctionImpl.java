@@ -16,7 +16,7 @@
 package com.welab.fusion.core.test.function;
 
 import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
-import com.welab.fusion.core.function.DownloadPartnerPsiBloomFilterFunction;
+import com.welab.fusion.core.algorithm.rsa_psi.function.DownloadPartnerPsiBloomFilterFunction;
 import com.welab.fusion.core.io.FileSystem;
 
 import java.io.File;

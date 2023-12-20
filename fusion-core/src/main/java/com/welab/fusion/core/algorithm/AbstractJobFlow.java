@@ -15,13 +15,12 @@
  */
 package com.welab.fusion.core.algorithm;
 
-import com.welab.fusion.core.Job.FusionJob;
+import com.welab.fusion.core.Job.AbstractPsiJob;
 import com.welab.fusion.core.algorithm.base.AbstractJobPhaseAction;
 
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 任务流程声明
@@ -77,14 +76,14 @@ public abstract class AbstractJobFlow {
     /**
      * 创建任务阶段动作
      */
-    public AbstractJobPhaseAction createAction(JobPhase phase, FusionJob fusionJob) {
+    public AbstractJobPhaseAction createAction(JobPhase phase, AbstractPsiJob psiJob) {
         Class<? extends AbstractJobPhaseAction> aClass = phaseActionMap.get(phase);
         if (aClass == null) {
             throw new RuntimeException("Unknown phase: " + phase);
         }
 
         try {
-            return aClass.getConstructor(FusionJob.class).newInstance(fusionJob);
+            return aClass.getConstructor(AbstractPsiJob.class).newInstance(psiJob);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

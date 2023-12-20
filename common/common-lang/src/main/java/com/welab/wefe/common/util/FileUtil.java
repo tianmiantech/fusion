@@ -19,13 +19,15 @@ package com.welab.wefe.common.util;
 import cn.hutool.core.io.IoUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.input.ReversedLinesFileReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -34,6 +36,7 @@ import java.util.List;
  * @author zane.luo
  */
 public class FileUtil {
+    private static final Logger LOG = LoggerFactory.getLogger(FileUtil.class);
 
     public static boolean isImage(File file) {
         if (file.isDirectory()) {
@@ -438,11 +441,52 @@ public class FileUtil {
      * 获取文件创建时间
      */
     public static Date getCreateTime(File file) throws IOException {
-        // 根据文件的绝对路径获取Path
-        Path path = Paths.get(file.getAbsolutePath());
         // 根据path获取文件的基本属性类
-        BasicFileAttributes attrs = Files.readAttributes(path, BasicFileAttributes.class);
+        BasicFileAttributes attrs = Files.readAttributes(
+                file.toPath(),
+                BasicFileAttributes.class
+        );
         return new Date(attrs.creationTime().toMillis());
+    }
+
+    /**
+     * 获取文件行数
+     *
+     * 最终行数会剔除掉文件尾部的空行行数
+     */
+    public static long getFileLineCount(File file) {
+        long totalRowCount = 0;
+        try (LineNumberReader lineNumberReader = new LineNumberReader(new FileReader(file))) {
+            lineNumberReader.skip(Long.MAX_VALUE);
+            // 计算行数时，不包含列头。
+            totalRowCount = lineNumberReader.getLineNumber() - 1L;
+        } catch (IOException e) {
+            LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);
+            return 0;
+        }
+
+        // 如果最后一行是空行，行数减一。
+        if (totalRowCount > 0) {
+            try (ReversedLinesFileReader reversedLinesReader = new ReversedLinesFileReader(file, StandardCharsets.UTF_8)) {
+                String lastLine;
+
+                // 去除空行
+                while (true) {
+                    lastLine = reversedLinesReader.readLine();
+
+                    if (StringUtil.isBlank(lastLine)) {
+                        totalRowCount--;
+                    } else {
+                        break;
+                    }
+                }
+
+            } catch (Exception e) {
+                LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);
+            }
+        }
+
+        return totalRowCount;
     }
 
     public static void main(String[] args) throws IOException {

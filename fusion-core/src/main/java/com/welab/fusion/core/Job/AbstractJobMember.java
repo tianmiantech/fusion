@@ -20,37 +20,31 @@ import com.welab.fusion.core.algorithm.ecdh_psi.elliptic_curve.PsiECEncryptedDat
 import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
 import com.welab.fusion.core.data_resource.base.DataResourceInfo;
 import com.welab.fusion.core.data_source.AbstractTableDataSourceReader;
+import com.welab.wefe.common.util.CloseableUtils;
+
+import java.io.Closeable;
+import java.io.IOException;
 
 /**
  * @author zane.luo
  * @date 2023/11/10
  */
-public class JobMember {
+public abstract class AbstractJobMember implements Closeable {
     public String memberId;
     public String memberName;
     public DataResourceInfo dataResourceInfo;
 
-    @JSONField(serialize = false)
     public AbstractTableDataSourceReader tableDataResourceReader;
 
-    @JSONField(serialize = false)
-    public PsiBloomFilter psiBloomFilter;
-    @JSONField(serialize = false)
-    public PsiECEncryptedData psiECEncryptedData;
-
-    public static JobMember of(String memberId, String memberName, DataResourceInfo dataResourceInfo) {
-        JobMember jobMember = new JobMember();
-        jobMember.memberId = memberId;
-        jobMember.memberName = memberName;
-        jobMember.dataResourceInfo = dataResourceInfo;
-        return jobMember;
+    public AbstractJobMember(String memberId, String memberName, DataResourceInfo dataResourceInfo) {
+        this.memberId = memberId;
+        this.memberName = memberName;
+        this.dataResourceInfo = dataResourceInfo;
     }
 
-    public static JobMember of(String memberId, String memberName, PsiBloomFilter psiBloomFilter) {
-        JobMember jobMember = new JobMember();
-        jobMember.memberId = memberId;
-        jobMember.memberName = memberName;
-        jobMember.psiBloomFilter = psiBloomFilter;
-        return jobMember;
+    @Override
+    public void close() throws IOException {
+        CloseableUtils.closeQuietly(tableDataResourceReader);
     }
+
 }

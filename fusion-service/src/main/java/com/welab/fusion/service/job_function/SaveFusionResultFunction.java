@@ -34,7 +34,7 @@ import static com.welab.fusion.core.Job.JobRole.follower;
  * @author zane.luo
  * @date 2023/11/29
  */
-public class SaveFusionResultFunction implements com.welab.fusion.core.function.SaveFusionResultFunction {
+public class SaveFusionResultFunction implements com.welab.fusion.core.algorithm.rsa_psi.function.SaveFusionResultFunction {
     private static final JobService jobService = Launcher.getBean(JobService.class);
 
     @Override

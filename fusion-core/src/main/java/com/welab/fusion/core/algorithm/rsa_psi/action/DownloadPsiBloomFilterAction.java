@@ -15,12 +15,12 @@
  */
 package com.welab.fusion.core.algorithm.rsa_psi.action;
 
-import com.welab.fusion.core.Job.FusionJob;
 import com.welab.fusion.core.Job.JobRole;
+import com.welab.fusion.core.algorithm.rsa_psi.RsaPsiJob;
 import com.welab.fusion.core.algorithm.JobPhase;
 import com.welab.fusion.core.algorithm.base.AbstractJobPhaseAction;
 import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
-import com.welab.fusion.core.function.DownloadPartnerPsiBloomFilterFunction;
+import com.welab.fusion.core.algorithm.rsa_psi.function.DownloadPartnerPsiBloomFilterFunction;
 import com.welab.fusion.core.io.FileSystem;
 import com.welab.wefe.common.InformationSize;
 import com.welab.wefe.common.file.decompression.SuperDecompressor;
@@ -33,8 +33,8 @@ import java.nio.file.Path;
  * @author zane.luo
  * @date 2023/11/13
  */
-public class DownloadPsiBloomFilterAction extends AbstractJobPhaseAction {
-    public DownloadPsiBloomFilterAction(FusionJob job) {
+public class DownloadPsiBloomFilterAction extends AbstractJobPhaseAction<RsaPsiJob> {
+    public DownloadPsiBloomFilterAction(RsaPsiJob job) {
         super(job);
     }
 

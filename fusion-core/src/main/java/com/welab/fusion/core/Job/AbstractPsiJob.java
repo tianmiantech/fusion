@@ -22,7 +22,6 @@ import com.welab.fusion.core.algorithm.JobPhase;
 import com.welab.fusion.core.algorithm.base.AbstractJobPhaseAction;
 import com.welab.fusion.core.algorithm.base.PsiAlgorithm;
 import com.welab.fusion.core.data_resource.base.DataResourceType;
-import com.welab.fusion.core.function.JobFunctions;
 import com.welab.fusion.core.progress.JobProgress;
 import com.welab.wefe.common.thread.ThreadPool;
 import com.welab.wefe.common.util.CloseableUtils;
@@ -39,17 +38,17 @@ import java.util.UUID;
  * @author zane.luo
  * @date 2023/11/10
  */
-public class FusionJob implements Closeable {
+public abstract class AbstractPsiJob implements Closeable {
     protected final Logger LOG = LoggerFactory.getLogger(this.getClass());
 
     private String jobId;
-    private JobMember myself;
-    private JobMember partner;
+    private AbstractJobMember myself;
+    private AbstractJobMember partner;
     private JobProgress myProgress = new JobProgress();
     private JobRole jobRole;
     private ThreadPool actionSingleThreadExecutor;
     private ThreadPool scheduleSingleThreadExecutor;
-    private JobFunctions jobFunctions;
+    private AbstractJobFunctions jobFunctions;
     private FusionResult fusionResult;
     private PsiAlgorithm algorithm;
     private AbstractJobFlow jobFlow;
@@ -58,7 +57,7 @@ public class FusionJob implements Closeable {
      */
     private final Set<JobPhase> executedPhases = new HashSet<>();
 
-    public FusionJob(PsiAlgorithm algorithm, String jobId, JobMember myself, JobMember partner, JobFunctions jobFunctions) {
+    public AbstractPsiJob(PsiAlgorithm algorithm, String jobId, AbstractJobMember myself, AbstractJobMember partner, AbstractJobFunctions jobFunctions) {
         jobFunctions.check();
 
         this.algorithm = algorithm;
@@ -302,20 +301,11 @@ public class FusionJob implements Closeable {
         scheduleSingleThreadExecutor.shutdownNow();
         actionSingleThreadExecutor.shutdownNow();
 
-        if (myself.tableDataResourceReader != null) {
-            myself.tableDataResourceReader.close();
-        }
+        CloseableUtils.closeQuietly(myself);
+        CloseableUtils.closeQuietly(partner);
     }
 
     // region getter/setter
-
-    public JobMember getMyself() {
-        return myself;
-    }
-
-    public JobMember getPartner() {
-        return partner;
-    }
 
     public void setMyRole(JobRole jobRole) {
         this.jobRole = jobRole;
@@ -333,13 +323,19 @@ public class FusionJob implements Closeable {
         return jobId;
     }
 
-    public JobFunctions getJobFunctions() {
-        return jobFunctions;
-    }
-
     public FusionResult getJobResult() {
         return fusionResult;
     }
+
+    // endregion
+
+
+    // region abstract
+
+    public abstract <T extends AbstractJobMember> T getMyself();
+
+    public abstract <T extends AbstractJobMember> T getPartner();
+    public abstract <T extends AbstractJobFunctions> T getJobFunctions();
 
     // endregion
 

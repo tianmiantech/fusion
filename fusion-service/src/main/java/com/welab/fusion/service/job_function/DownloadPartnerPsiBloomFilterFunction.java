@@ -18,7 +18,6 @@ package com.welab.fusion.service.job_function;
 import com.welab.fusion.core.io.FileSystem;
 import com.welab.fusion.service.api.download.Downloader;
 import com.welab.fusion.service.api.download.base.FileType;
-import com.welab.wefe.common.util.JObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +28,7 @@ import java.util.function.Consumer;
  * @author zane.luo
  * @date 2023/11/29
  */
-public class DownloadPartnerPsiBloomFilterFunction implements com.welab.fusion.core.function.DownloadPartnerPsiBloomFilterFunction {
+public class DownloadPartnerPsiBloomFilterFunction implements com.welab.fusion.core.algorithm.rsa_psi.function.DownloadPartnerPsiBloomFilterFunction {
     protected final Logger LOG = LoggerFactory.getLogger(this.getClass());
 
     @Override

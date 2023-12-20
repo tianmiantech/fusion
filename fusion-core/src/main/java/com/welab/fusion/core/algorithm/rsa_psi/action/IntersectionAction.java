@@ -16,9 +16,9 @@
 package com.welab.fusion.core.algorithm.rsa_psi.action;
 
 import cn.hutool.core.codec.Base64;
-import com.welab.fusion.core.Job.FusionJob;
 import com.welab.fusion.core.Job.FusionResult;
 import com.welab.fusion.core.Job.JobRole;
+import com.welab.fusion.core.algorithm.rsa_psi.RsaPsiJob;
 import com.welab.fusion.core.algorithm.JobPhase;
 import com.welab.fusion.core.algorithm.base.AbstractJobPhaseAction;
 import com.welab.fusion.core.hash.HashConfig;
@@ -40,7 +40,7 @@ import java.util.stream.Collectors;
  * @author zane.luo
  * @date 2023/11/13
  */
-public class IntersectionAction extends AbstractJobPhaseAction {
+public class IntersectionAction extends AbstractJobPhaseAction<RsaPsiJob> {
     private static final int batchSize = 50000;
     /**
      * E
@@ -51,7 +51,7 @@ public class IntersectionAction extends AbstractJobPhaseAction {
      */
     private BigInteger publicModulus;
 
-    public IntersectionAction(FusionJob job) {
+    public IntersectionAction(RsaPsiJob job) {
         super(job);
     }
 

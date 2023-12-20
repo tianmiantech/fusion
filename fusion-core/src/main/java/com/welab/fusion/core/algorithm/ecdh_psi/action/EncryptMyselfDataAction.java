@@ -15,7 +15,7 @@
  */
 package com.welab.fusion.core.algorithm.ecdh_psi.action;
 
-import com.welab.fusion.core.Job.FusionJob;
+import com.welab.fusion.core.algorithm.ecdh_psi.EcdhPsiJob;
 import com.welab.fusion.core.algorithm.JobPhase;
 import com.welab.fusion.core.algorithm.base.AbstractJobPhaseAction;
 import com.welab.fusion.core.algorithm.ecdh_psi.elliptic_curve.PsiECEncryptedData;
@@ -29,8 +29,8 @@ import java.util.UUID;
  * @author zane.luo
  * @date 2023/12/19
  */
-public class EncryptMyselfDataAction extends AbstractJobPhaseAction {
-    public EncryptMyselfDataAction(FusionJob job) {
+public class EncryptMyselfDataAction extends AbstractJobPhaseAction<EcdhPsiJob> {
+    public EncryptMyselfDataAction(EcdhPsiJob job) {
         super(job);
     }
 

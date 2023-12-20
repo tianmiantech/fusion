@@ -16,7 +16,7 @@
 package com.welab.fusion.core.algorithm.ecdh_psi.action;
 
 import cn.hutool.core.codec.Base64;
-import com.welab.fusion.core.Job.FusionJob;
+import com.welab.fusion.core.algorithm.ecdh_psi.EcdhPsiJob;
 import com.welab.fusion.core.Job.FusionResult;
 import com.welab.fusion.core.Job.JobRole;
 import com.welab.fusion.core.algorithm.JobPhase;
@@ -40,7 +40,7 @@ import java.util.stream.Collectors;
  * @author zane.luo
  * @date 2023/11/13
  */
-public class IntersectionAction extends AbstractJobPhaseAction {
+public class IntersectionAction extends AbstractJobPhaseAction<EcdhPsiJob> {
     private static final int batchSize = 50000;
     /**
      * E
@@ -51,15 +51,15 @@ public class IntersectionAction extends AbstractJobPhaseAction {
      */
     private BigInteger publicModulus;
 
-    public IntersectionAction(FusionJob job) {
+    public IntersectionAction(EcdhPsiJob job) {
         super(job);
     }
 
     @Override
     protected void doAction() throws Exception {
 
-        publicModulus = job.getPartner().psiBloomFilter.rsaPsiParam.publicModulus;
-        publicExponent = job.getPartner().psiBloomFilter.rsaPsiParam.publicExponent;
+        publicModulus = null;
+        publicExponent = null;
 
         FusionResult result = job.getJobResult();
         LongAdder progress = new LongAdder();
@@ -80,19 +80,16 @@ public class IntersectionAction extends AbstractJobPhaseAction {
         BatchConsumer<PsiRecord> consumer = new BatchConsumer<>(batchSize, 5_000, records -> {
             try {
                 // 将数据发送到过滤器方加密
-                List<String> encryptedList = job.getJobFunctions().encryptRsaPsiRecordsFunction.encrypt(
-                        job.getJobId(),
-                        job.getPartner().memberId,
-                        records.stream().map(x -> x.encodedKey).collect(Collectors.toList())
-                );
+                List<String> encryptedList = null;
+
+                // job.getJobFunctions().encryptRsaPsiRecordsFunction.encrypt(
+                //         job.getJobId(),
+                //         job.getPartner().memberId,
+                //         records.stream().map(x -> x.encodedKey).collect(Collectors.toList())
+                // );
 
                 // 碰撞，并获取交集。
-                List<PsiRecord> fruit = PsiUtils.match(
-                        job.getPartner().psiBloomFilter,
-                        records,
-                        encryptedList,
-                        publicModulus
-                );
+                List<PsiRecord> fruit = null;
 
                 List<String> lines = fruit.stream()
                         .map(x -> hashConfig.getIdValuesForCsv(x.row))

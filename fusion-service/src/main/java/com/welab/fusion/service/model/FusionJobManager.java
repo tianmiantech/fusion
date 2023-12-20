@@ -15,7 +15,7 @@
  */
 package com.welab.fusion.service.model;
 
-import com.welab.fusion.core.Job.FusionJob;
+import com.welab.fusion.core.Job.AbstractPsiJob;
 import net.jodah.expiringmap.ExpiringMap;
 
 import java.util.concurrent.TimeUnit;
@@ -27,17 +27,17 @@ import java.util.concurrent.TimeUnit;
  * @date 2023/11/29
  */
 public class FusionJobManager {
-    private static ExpiringMap<String, FusionJob> JOBS = ExpiringMap
+    private static ExpiringMap<String, AbstractPsiJob> JOBS = ExpiringMap
             .builder()
             .expiration(30, TimeUnit.MINUTES)
             .build();
 
-    public static void start(FusionJob job) {
+    public static void start(AbstractPsiJob job) {
         JOBS.put(job.getJobId(), job);
         job.start();
     }
 
-    public static FusionJob get(String jobId) {
+    public static AbstractPsiJob get(String jobId) {
         return JOBS.get(jobId);
     }
 

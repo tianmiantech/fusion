@@ -15,7 +15,7 @@
  */
 package com.welab.fusion.core.algorithm.base;
 
-import com.welab.fusion.core.Job.FusionJob;
+import com.welab.fusion.core.Job.AbstractPsiJob;
 import com.welab.fusion.core.algorithm.JobPhase;
 import com.welab.fusion.core.Job.JobStatus;
 import com.welab.fusion.core.progress.JobPhaseProgress;
@@ -26,9 +26,9 @@ import org.slf4j.LoggerFactory;
  * @author zane.luo
  * @date 2023/11/13
  */
-public abstract class AbstractJobPhaseAction {
+public abstract class AbstractJobPhaseAction<T extends AbstractPsiJob> {
     protected final Logger LOG = LoggerFactory.getLogger(this.getClass());
-    protected FusionJob job;
+    protected T job;
     protected JobPhaseProgress phaseProgress;
 
     /**
@@ -46,7 +46,7 @@ public abstract class AbstractJobPhaseAction {
      */
     public abstract long getTotalWorkload();
 
-    public AbstractJobPhaseAction(FusionJob job) {
+    public AbstractJobPhaseAction(T job) {
         this.job = job;
         this.phaseProgress = JobPhaseProgress.of(
                 job.getJobId(),

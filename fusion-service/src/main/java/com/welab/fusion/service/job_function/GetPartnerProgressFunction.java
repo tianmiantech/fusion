@@ -17,7 +17,6 @@ package com.welab.fusion.service.job_function;
 
 import com.welab.fusion.core.progress.JobProgress;
 import com.welab.fusion.service.api.job.GetMyJobProgressApi;
-import com.welab.fusion.service.database.entity.JobDbModel;
 import com.welab.fusion.service.service.GatewayService;
 import com.welab.fusion.service.service.JobService;
 import com.welab.wefe.common.web.Launcher;
@@ -27,7 +26,7 @@ import com.welab.wefe.common.web.dto.FusionNodeInfo;
  * @author zane.luo
  * @date 2023/11/29
  */
-public class GetPartnerProgressFunction implements com.welab.fusion.core.function.GetPartnerProgressFunction {
+public class GetPartnerProgressFunction implements com.welab.fusion.core.algorithm.rsa_psi.function.GetPartnerProgressFunction {
     private static final GatewayService gatewayService = Launcher.getBean(GatewayService.class);
     private static final JobService jobService = Launcher.getBean(JobService.class);
 

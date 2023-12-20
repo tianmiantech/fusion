@@ -17,7 +17,6 @@ package com.welab.fusion.service.job_function;
 
 import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
 import com.welab.fusion.core.data_resource.base.DataResourceType;
-import com.welab.fusion.core.io.FileSystem;
 import com.welab.fusion.service.api.job.CreateJobApi;
 import com.welab.fusion.service.constans.AddMethod;
 import com.welab.fusion.service.database.entity.BloomFilterDbModel;
@@ -29,13 +28,11 @@ import com.welab.wefe.common.web.Launcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.nio.file.Path;
-
 /**
  * @author zane.luo
  * @date 2023/11/29
  */
-public class SaveMyPsiBloomFilterFunction implements com.welab.fusion.core.function.SaveMyPsiBloomFilterFunction {
+public class SaveMyPsiBloomFilterFunction implements com.welab.fusion.core.algorithm.rsa_psi.function.SaveMyPsiBloomFilterFunction {
     protected final Logger LOG = LoggerFactory.getLogger(this.getClass());
     private static final JobMemberService jobMemberService = Launcher.getBean(JobMemberService.class);
     private static final BloomFilterService bloomFilterService = Launcher.getBean(BloomFilterService.class);

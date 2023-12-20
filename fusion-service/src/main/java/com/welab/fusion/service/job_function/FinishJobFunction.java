@@ -28,7 +28,7 @@ import java.util.Date;
  * @author zane.luo
  * @date 2023/12/4
  */
-public class FinishJobFunction implements com.welab.fusion.core.function.FinishJobFunction {
+public class FinishJobFunction implements com.welab.fusion.core.algorithm.rsa_psi.function.FinishJobFunction {
     private static final JobService jobService = Launcher.getBean(JobService.class);
 
     @Override

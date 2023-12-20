@@ -16,15 +16,18 @@
 package com.welab.fusion.core.test;
 
 import com.alibaba.fastjson.JSON;
-import com.welab.fusion.core.Job.FusionJob;
-import com.welab.fusion.core.Job.JobMember;
+import com.welab.fusion.core.Job.AbstractPsiJob;
+import com.welab.fusion.core.Job.AbstractJobMember;
 import com.welab.fusion.core.algorithm.base.PsiAlgorithm;
+import com.welab.fusion.core.algorithm.rsa_psi.RsaPsiJob;
+import com.welab.fusion.core.algorithm.rsa_psi.RsaPsiJobFunctions;
+import com.welab.fusion.core.algorithm.rsa_psi.RsaPsiJobMember;
 import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
 import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilterCreator;
 import com.welab.fusion.core.data_resource.base.DataResourceInfo;
 import com.welab.fusion.core.data_resource.base.DataResourceType;
 import com.welab.fusion.core.data_source.CsvTableDataSourceReader;
-import com.welab.fusion.core.function.JobFunctions;
+import com.welab.fusion.core.Job.AbstractJobFunctions;
 import com.welab.fusion.core.hash.HashConfig;
 import com.welab.fusion.core.hash.HashConfigItem;
 import com.welab.fusion.core.hash.HashMethod;
@@ -44,10 +47,10 @@ import java.util.UUID;
  */
 public class FusionJobTest {
     private static String job_id = UUID.randomUUID().toString().replace("-", "");
-    private static JobMember memberA;
-    private static JobMember memberB;
-    private static FusionJob memberAJob;
-    private static FusionJob memberBJob;
+    private static RsaPsiJobMember memberA;
+    private static RsaPsiJobMember memberB;
+    private static AbstractPsiJob memberAJob;
+    private static AbstractPsiJob memberBJob;
 
     public static void main(String[] args) throws Exception {
         // 设置小一点，生成的过滤器体积也小一点，便于测试。
@@ -83,32 +86,32 @@ public class FusionJobTest {
         DataResourceInfo dataResourceInfoB = DataResourceInfo.of(DataResourceType.TableDataSource, readerB.getTotalDataRowCount(), hashConfig);
 
 
-        memberA = JobMember.of("memberA", "memberA", dataResourceInfoA);
+        memberA = RsaPsiJobMember.of("memberA", "memberA", dataResourceInfoA);
         memberA.tableDataResourceReader = readerA;
 
-        memberB = JobMember.of("memberB", "memberB", dataResourceInfoB);
+        memberB = RsaPsiJobMember.of("memberB", "memberB", dataResourceInfoB);
         memberB.tableDataResourceReader = readerB;
 
-        memberAJob = new FusionJob(PsiAlgorithm.rsa_psi, job_id, memberA, memberB, createAJobFunctions());
-        memberBJob = new FusionJob(PsiAlgorithm.rsa_psi, job_id, memberB, memberA, createBJobFunctions());
+        memberAJob = new RsaPsiJob(job_id, memberA, memberB, createAJobFunctions());
+        memberBJob = new RsaPsiJob(job_id, memberB, memberA, createBJobFunctions());
     }
 
-    private static JobFunctions createAJobFunctions() {
-        JobFunctions jobFunctions = createJobFunctions();
+    private static RsaPsiJobFunctions createAJobFunctions() {
+        RsaPsiJobFunctions jobFunctions = createJobFunctions();
         jobFunctions.getPartnerProgressFunction = (jobId) -> memberBJob.getMyProgress();
 
         return jobFunctions;
     }
 
-    private static JobFunctions createBJobFunctions() {
-        JobFunctions jobFunctions = createJobFunctions();
+    private static RsaPsiJobFunctions createBJobFunctions() {
+        RsaPsiJobFunctions jobFunctions = createJobFunctions();
         jobFunctions.getPartnerProgressFunction = (jobId) -> memberAJob.getMyProgress();
 
         return jobFunctions;
     }
 
-    private static JobFunctions createJobFunctions() {
-        JobFunctions jobFunctions = new JobFunctions();
+    private static RsaPsiJobFunctions createJobFunctions() {
+        RsaPsiJobFunctions jobFunctions = new RsaPsiJobFunctions();
         jobFunctions.downloadPartnerPsiBloomFilterFunction = new DownloadPartnerPsiBloomFilterFunctionImpl();
         jobFunctions.saveMyPsiBloomFilterFunction = new SaveMyPsiBloomFilterFunctionImpl();
 
