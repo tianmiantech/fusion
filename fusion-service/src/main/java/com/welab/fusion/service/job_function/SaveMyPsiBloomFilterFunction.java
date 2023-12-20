@@ -41,13 +41,6 @@ public class SaveMyPsiBloomFilterFunction implements com.welab.fusion.core.algor
     public void save(String jobId, PsiBloomFilter psiBloomFilter) throws Exception {
         int key = psiBloomFilter.hashCode();
 
-        // 更新自己的数据源类型
-        JobMemberDbModel myself = jobMemberService.findMyself(jobId);
-        myself.setDataResourceType(DataResourceType.PsiBloomFilter);
-        myself.setBloomFilterId(psiBloomFilter.id);
-        myself.setUpdatedTimeNow();
-        myself.save();
-
         /**
          * 暂时不考虑去重
          * 以后稳定了再考虑
@@ -71,14 +64,23 @@ public class SaveMyPsiBloomFilterFunction implements com.welab.fusion.core.algor
         spend = TimeSpan.fromMs(System.currentTimeMillis() - startTime);
         LOG.info("压缩过滤器文件完成，job_id：{}，bloom_filter_id:{}，耗时：{}", jobId, psiBloomFilter.id, spend);
 
+
+        // 更新自己的数据源类型
+        JobMemberDbModel myself = jobMemberService.findMyself(jobId);
+        myself.setDataResourceType(DataResourceType.PsiBloomFilter);
+        myself.setBloomFilterId(psiBloomFilter.id);
+        myself.setUpdatedTimeNow();
+        myself.save();
+
         // 保存过滤器，供以后复用。
         CreateJobApi.TableDataResourceInput tableDataResourceInfoModel = myself.getTableDataResourceInfoModel();
         BloomFilterDbModel model = new BloomFilterDbModel();
+        model.setId(psiBloomFilter.id);
         model.setName(tableDataResourceInfoModel.buildAutoName() + "(自动生成)");
         model.setAddMethod(AddMethod.AutoGenerate);
         model.setDescription(tableDataResourceInfoModel.buildAutoDescription());
         model.setSql(tableDataResourceInfoModel.sql);
-        model.setHashConfigs(myself.getHashConfig());
+        model.setHashConfig(myself.getHashConfig());
         model.setTotalDataCount(psiBloomFilter.insertedElementCount);
         model.setStorageDir(psiBloomFilter.getDir().toAbsolutePath().toString());
         model.setStorageSize(psiBloomFilter.getDataFile().length());

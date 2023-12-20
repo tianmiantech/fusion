@@ -53,7 +53,7 @@ public class BloomFilterOutputModel extends AbstractOutputModel {
      */
     @Type(type = "json")
     @Column(columnDefinition = "json")
-    private JSONObject hashConfigs;
+    private JSONObject hashConfig;
 
     /**
      * 布隆过滤器添加方式
@@ -107,12 +107,12 @@ public class BloomFilterOutputModel extends AbstractOutputModel {
         this.totalDataCount = totalDataCount;
     }
 
-    public JSONObject getHashConfigs() {
-        return hashConfigs;
+    public JSONObject getHashConfig() {
+        return hashConfig;
     }
 
-    public void setHashConfigs(JSONObject hashConfigs) {
-        this.hashConfigs = hashConfigs;
+    public void setHashConfig(JSONObject hashConfig) {
+        this.hashConfig = hashConfig;
     }
 
     public AddMethod getAddMethod() {

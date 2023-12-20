@@ -81,7 +81,10 @@ public class HashConfig extends AbstractCheckModel {
      */
     public String getIdValuesForCsv(LinkedHashMap<String, Object> row) {
         List<String> values = csvHeader.stream()
-                .map(x -> row.get(x).toString())
+                .map(x -> {
+                    Object value = row.get(x);
+                    return value == null ? "" : value.toString();
+                })
                 .collect(Collectors.toList());
 
         return StringUtil.joinByComma(values);

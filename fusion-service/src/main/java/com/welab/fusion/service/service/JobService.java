@@ -19,8 +19,10 @@ import com.welab.fusion.core.Job.AbstractPsiJob;
 import com.welab.fusion.core.Job.JobStatus;
 import com.welab.fusion.core.algorithm.rsa_psi.RsaPsiJob;
 import com.welab.fusion.core.algorithm.rsa_psi.RsaPsiJobMember;
+import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
 import com.welab.fusion.core.data_resource.base.DataResourceInfo;
 import com.welab.fusion.core.data_resource.base.DataResourceType;
+import com.welab.fusion.core.io.FileSystem;
 import com.welab.fusion.core.progress.JobProgress;
 import com.welab.fusion.service.api.job.*;
 import com.welab.fusion.service.constans.JobMemberRole;
@@ -63,6 +65,8 @@ public class JobService extends AbstractService {
     @Autowired
     private MemberService memberService;
     @Autowired
+    private DataSourceService dataSourceService;
+    @Autowired
     private GatewayService gatewayService;
     @Autowired
     private JobMemberService jobMemberService;
@@ -92,6 +96,8 @@ public class JobService extends AbstractService {
         checkBeforeCreateJob(input);
         // 自动保存合作方信息
         memberService.trySave(input.caller);
+        // 自动保存数据源信息
+        dataSourceService.trySave(input);
 
         JobDbModel job = new JobDbModel();
         job.setAlgorithm(input.algorithm);
@@ -171,6 +177,9 @@ public class JobService extends AbstractService {
      * 由协作方触发
      */
     public void agreeAndStartJob(JobConfigInput input) throws Exception {
+        // 自动保存数据源信息
+        dataSourceService.trySave(input);
+
         JobDbModel job = findById(input.jobId);
         if (job == null) {
             StatusCode.PARAMETER_VALUE_INVALID.throwException("任务已被删除，请重新创建。");
@@ -210,6 +219,14 @@ public class JobService extends AbstractService {
         RsaPsiJobMember myself = RsaPsiJobMember.of(myselfInfo.getId(), myselfInfo.getName(), myselfDataResourceInfo);
         if (myselfDataResourceInfo.dataResourceType == DataResourceType.TableDataSource) {
             myself.tableDataResourceReader = myselfJobInfo.getTableDataResourceInfoModel().createReader(-1, -1);
+        }
+        if (myselfDataResourceInfo.dataResourceType == DataResourceType.PsiBloomFilter) {
+            if (!PsiBloomFilter.exist(myselfJobInfo.getBloomFilterId())) {
+                throw new RuntimeException("过滤器文件不存在或已损坏：" + FileSystem.PsiBloomFilter.getPath(myselfJobInfo.getBloomFilterId()));
+            }
+            myself.psiBloomFilter = PsiBloomFilter.of(
+                    FileSystem.PsiBloomFilter.getPath(myselfJobInfo.getBloomFilterId())
+            );
         }
 
 

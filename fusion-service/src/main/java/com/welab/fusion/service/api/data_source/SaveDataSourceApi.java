@@ -18,6 +18,7 @@ package com.welab.fusion.service.api.data_source;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.welab.fusion.service.service.DataSourceService;
+import com.welab.wefe.common.Convert;
 import com.welab.wefe.common.data.source.JdbcDataSourceParams;
 import com.welab.wefe.common.enums.DatabaseType;
 import com.welab.wefe.common.exception.StatusCodeWithException;
@@ -72,7 +73,7 @@ public class SaveDataSourceApi extends AbstractApi<SaveDataSourceApi.Input, Save
             if (port == null) {
                 return null;
             }
-            return (Integer) port;
+            return Convert.toInt(port);
         }
 
         @Override
