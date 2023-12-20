@@ -81,7 +81,10 @@ public class JobMemberService extends AbstractService {
         if (input.dataResource.tableDataResourceInfo != null) {
             model.setTableDataResourceInfo(input.dataResource.tableDataResourceInfo.toJson());
         }
-        model.setBloomFilterId(input.dataResource.bloomFilterResourceInput.bloomFilterId);
+        if (input.dataResource.bloomFilterResourceInput != null) {
+            model.setBloomFilterId(input.dataResource.bloomFilterResourceInput.bloomFilterId);
+        }
+
         model.setTotalDataCount(input.dataResource.totalDataCount);
         model.setHashConfig(input.dataResource.hashConfig.toJson());
         model.save();
