@@ -82,6 +82,11 @@ public class PsiBloomFilter {
         return dir.resolve(DATA_FILE_NAME).toFile();
     }
 
+    public static boolean exist(String bloomFilterId) {
+        Path dir = FileSystem.PsiBloomFilter.getPath(bloomFilterId);
+        return Files.exists(dir.resolve(META_FILE_NAME)) && Files.exists(dir.resolve(DATA_FILE_NAME));
+    }
+
     /**
      * 为避免资源浪费，过滤器文件在需要用到的时候才加载。
      */

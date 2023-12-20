@@ -18,8 +18,10 @@ package com.welab.fusion.service.service;
 import com.welab.fusion.core.Job.FusionJob;
 import com.welab.fusion.core.Job.JobMember;
 import com.welab.fusion.core.Job.JobStatus;
+import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
 import com.welab.fusion.core.data_resource.base.DataResourceInfo;
 import com.welab.fusion.core.data_resource.base.DataResourceType;
+import com.welab.fusion.core.io.FileSystem;
 import com.welab.fusion.core.progress.JobProgress;
 import com.welab.fusion.service.api.job.*;
 import com.welab.fusion.service.constans.JobMemberRole;
@@ -215,6 +217,14 @@ public class JobService extends AbstractService {
         JobMember myself = JobMember.of(myselfInfo.getId(), myselfInfo.getName(), myselfDataResourceInfo);
         if (myselfDataResourceInfo.dataResourceType == DataResourceType.TableDataSource) {
             myself.tableDataResourceReader = myselfJobInfo.getTableDataResourceInfoModel().createReader(-1, -1);
+        }
+        if (myselfDataResourceInfo.dataResourceType == DataResourceType.PsiBloomFilter) {
+            if (!PsiBloomFilter.exist(myselfJobInfo.getBloomFilterId())) {
+                throw new RuntimeException("过滤器文件不存在或已损坏：" + FileSystem.PsiBloomFilter.getPath(myselfJobInfo.getBloomFilterId()));
+            }
+            myself.psiBloomFilter = PsiBloomFilter.of(
+                    FileSystem.PsiBloomFilter.getPath(myselfJobInfo.getBloomFilterId())
+            );
         }
 
 
