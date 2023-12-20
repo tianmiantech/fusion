@@ -26,9 +26,9 @@ import com.welab.wefe.common.web.dto.ApiResult;
  * @date 2023/12/18
  */
 @Api(path = "algorithm/list", name = "获取所有算法")
-public class ListAlgorithm extends AbstractApi<ListAlgorithm.Input, ListAlgorithm.Output> {
+public class ListAlgorithmApi extends AbstractApi<ListAlgorithmApi.Input, ListAlgorithmApi.Output> {
     @Override
-    protected ApiResult<ListAlgorithm.Output> handle(ListAlgorithm.Input input) throws Exception {
+    protected ApiResult<ListAlgorithmApi.Output> handle(ListAlgorithmApi.Input input) throws Exception {
         PsiAlgorithm[] values = PsiAlgorithm.values();
         return success(Output.of(values));
     }
