@@ -222,10 +222,10 @@ public class JobService extends AbstractService {
         }
         if (myselfDataResourceInfo.dataResourceType == DataResourceType.PsiBloomFilter) {
             if (!PsiBloomFilter.exist(myselfJobInfo.getBloomFilterId())) {
-                throw new RuntimeException("过滤器文件不存在或已损坏：" + FileSystem.PsiBloomFilter.getPath(myselfJobInfo.getBloomFilterId()));
+                throw new RuntimeException("过滤器文件不存在或已损坏：" + FileSystem.PsiBloomFilter.getDir(myselfJobInfo.getBloomFilterId()));
             }
             myself.psiBloomFilter = PsiBloomFilter.of(
-                    FileSystem.PsiBloomFilter.getPath(myselfJobInfo.getBloomFilterId())
+                    myselfJobInfo.getBloomFilterId()
             );
         }
 

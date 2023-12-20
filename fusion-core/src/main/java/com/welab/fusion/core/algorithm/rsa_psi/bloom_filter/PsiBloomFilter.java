@@ -68,6 +68,13 @@ public class PsiBloomFilter {
     /**
      * 从磁盘中加载 PsiBloomFilter 对象
      */
+    public static PsiBloomFilter of(String id) {
+        return of(FileSystem.PsiBloomFilter.getDir(id));
+    }
+
+    /**
+     * 从磁盘中加载 PsiBloomFilter 对象
+     */
     public static PsiBloomFilter of(Path dir) {
         // 加载元数据
         File metaFile = dir.resolve(META_FILE_NAME).toFile();
@@ -83,7 +90,7 @@ public class PsiBloomFilter {
     }
 
     public static boolean exist(String bloomFilterId) {
-        Path dir = FileSystem.PsiBloomFilter.getPath(bloomFilterId);
+        Path dir = FileSystem.PsiBloomFilter.getDir(bloomFilterId);
         return Files.exists(dir.resolve(META_FILE_NAME)) && Files.exists(dir.resolve(DATA_FILE_NAME));
     }
 
