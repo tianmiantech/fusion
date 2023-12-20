@@ -1,3 +1,4 @@
+import moment from 'moment';
 export const displayChineseCoastTime = (cost_time:number)=>{
     if (typeof cost_time !== 'number' || isNaN(cost_time) || cost_time < 0) {
       return '';
@@ -25,3 +26,11 @@ export const displayChineseCoastTime = (cost_time:number)=>{
     }
     return result;
   }
+
+export const getPersonificationTime = (time:number)=>{
+    return moment(time).startOf('hour').fromNow()
+}
+
+export const getNoramlTime = (time:number)=>{
+    return moment(time).format('YYYY-MM-DD HH:mm:ss')
+}

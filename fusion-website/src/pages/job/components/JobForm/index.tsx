@@ -3,13 +3,13 @@ import { Input, Button, Form, Radio, Upload, Tooltip, Space, Row, Col,Alert,Spin
 import { dataResourceTypeMap, dataSetAddMethodMap,JOB_STATUS, ROLE_TYPE } from '@/constant/dictionary';
 import HashForm from '../HashForm/index';
 import DataSourceForm from '../DataSourceForm';
-import BloomFilterManage from '../BloomFilterManage';
 import { formRuleRequire } from '@/utils/common';
 import { useImmer } from 'use-immer';
 import FileChunkUpload from '@/components/FileChunkUpload'
 import './index.less'
 import lodash from 'lodash'
 import useDetail from "../../hooks/useDetail";
+import BloomFilterFormItem from '../BloomFilterFormItem';
 
 
 interface JobFormDataInterface {
@@ -57,6 +57,23 @@ const JobForm = forwardRef((props:JobFormPropsInterface, ref) => {
     return true
   }
 
+  // 选择布隆过滤器回调
+  const onBloomFilterSelectedCallBack = (hash_config:any) => {
+    formRef.setFieldsValue({hash_config:{
+      ...hash_config,
+      source:'setFieldsValue'
+    }})
+  }
+
+  // 数据源类型变化清空主键设置
+  const onDataSourceTypeChange = (e:any)=>{
+    formRef.setFieldsValue({hash_config:{
+      list:[],
+      source:'setFieldsValue'
+    }})
+    
+  }
+
   return <>
       <Spin spinning={loading} >
       <Row justify="center" className="form-scroll">
@@ -69,7 +86,7 @@ const JobForm = forwardRef((props:JobFormPropsInterface, ref) => {
             >
               <Form.Item style={{marginBottom:0}}  label="样本类型" required>
                 <Form.Item name="data_resource_type" style={{ display: 'inline-block', marginBottom: 0 }} rules={[{ required: true }]}>
-                  <Radio.Group>
+                  <Radio.Group onChange={onDataSourceTypeChange}>
                     {[...dataResourceTypeMap].map(([value, label]) => (
                       <Radio.Button key={value} value={value}>
                         {label}
@@ -100,20 +117,25 @@ const JobForm = forwardRef((props:JobFormPropsInterface, ref) => {
                          </Form.Item>
                         </>
                       } else {
-                       return  <Form.Item style={{marginTop:30}} name="xxxxx" label="选择布隆过滤器" rules={[formRuleRequire()]}>
-                            <Button
-                              onClick={()=>{}}
-                            >选择布隆过滤器</Button> 
+                       return  <Form.Item style={{marginTop:30}} name="bloom_filter_resource_input" label="选择布隆过滤器" rules={[formRuleRequire()]}>
+                            <BloomFilterFormItem onBloomFilterSelectedCallBack={onBloomFilterSelectedCallBack}/>
                         </Form.Item>
                       }
                     }
                   }
                 </Form.Item>
               </Form.Item>
-             
-              <Form.Item name={'hash_config'}>
-                <HashForm disabled={checkFormDisable()} columnList={jobFormData.dataourceColumnList}/> 
+              <Form.Item noStyle shouldUpdate={(prev, cur) => prev.data_resource_type !== cur.data_resource_type }>
+                {({ getFieldValue }) => {
+                  const data_resource_type = getFieldValue('data_resource_type');
+                  const hashFormDisabled = data_resource_type === 'PsiBloomFilter'?true:false
+                  return <Form.Item name={'hash_config'}>
+                    <HashForm disabled={checkFormDisable()||hashFormDisabled} columnList={jobFormData.dataourceColumnList}/> 
+                  </Form.Item>
+
+                }}
               </Form.Item>
+              
               <Form.Item name="remark" label="任务备注">
                 <Input.TextArea rows={4} placeholder="请输入" />
               </Form.Item>
@@ -125,11 +147,6 @@ const JobForm = forwardRef((props:JobFormPropsInterface, ref) => {
       <Row className="operation-area">
        {renderFormAction && renderFormAction()}
       </Row>
-      {/* 布隆过滤器管理 */}
-      <BloomFilterManage
-        open={jobFormData.BFManageOpen}
-        onClose={() => {setJobFormData(g=>{g.BFManageOpen = false})}}
-      />
     </>
 });
 

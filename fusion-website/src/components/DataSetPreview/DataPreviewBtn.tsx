@@ -51,10 +51,9 @@ const DataPreviewBtn = forwardRef((props:UploadDataPropsInterface,ref) => {
 
   useEffect(()=>{
   if(autoLoadPreView && (requestParams.data_source_file || requestParams.sql)){
-
     getPreViewData()
   }
-  },[autoLoadPreView,requestParams])
+  },[autoLoadPreView,requestParams.data_source_file,requestParams.sql])
 
 
   useEffect(()=>{

@@ -47,7 +47,7 @@ const HashForm = (props:HashFormPropsInterface) => {
             {fields.map(({key, name}, index) => (
               <Space key={key} style={{ width: '100%' }}>
                  <Form.Item name={[name, 'method']} className="hash-form-item">
-                  <Select style={{ width: 100 }} placeholder="加密方式">
+                  <Select disabled={disabled} style={{ width: 100 }} placeholder="加密方式">
                     {[...encryMethodMap].map(([value, label]) => (
                       <Select.Option key={value} value={value}>
                         {label}
@@ -56,7 +56,7 @@ const HashForm = (props:HashFormPropsInterface) => {
                   </Select>
                 </Form.Item>
                 <Form.Item name={[name, 'columns']} className="hash-form-item">
-                  <Select mode="multiple" style={{ width: 200 }} placeholder="请选择字段">
+                  <Select disabled={disabled}   mode="multiple" style={{ width: 200 }} placeholder="请选择字段">
                     {columnList.map(feature => (
                       <Select.Option key={feature} value={feature}>
                         {feature}
@@ -79,7 +79,7 @@ const HashForm = (props:HashFormPropsInterface) => {
               </Space>
             ))}
             {
-              fields.length ==0 && !disabled  &&  <Button onClick={()=>{add()}}>设置主键</Button>
+              fields.length ==0 &&  <Button disabled={disabled} onClick={()=>{add()}}>设置主键</Button>
             }
           </>
         )}}

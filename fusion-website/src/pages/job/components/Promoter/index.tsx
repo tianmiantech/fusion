@@ -44,13 +44,14 @@ const Index = forwardRef((props:PromoterPropsInterface,ref) => {
   },{ manual:true})
 
   const submitFormData = async () => {
-    const {data_resource_type,hash_config,remark,table_data_resource_info} = await jobFormRef.current?.validateFields();
+    const {data_resource_type,hash_config,remark,table_data_resource_info=null,bloom_filter_resource_input=null} = await jobFormRef.current?.validateFields();
     const requestParams = {
       remark,
       data_resource:{
         data_resource_type,
+        hash_config,
         table_data_resource_info,
-        hash_config
+        bloom_filter_resource_input
       }
     }
     runCreateJob(requestParams)

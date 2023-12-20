@@ -133,3 +133,12 @@ export const getMyJobProgress = (job_id:string)=>{
     return request.get('/job/get_my_job_progress',{job_id})
 }
 
+export interface QueryBloomFilterListRequestInterface {
+    page_size:number,
+    name:string,
+    page_index:number
+}
+export const queryBloomFilterList= (params:QueryBloomFilterListRequestInterface)=>{
+    return request.post('/bloom_filter/query',params)
+}
+
