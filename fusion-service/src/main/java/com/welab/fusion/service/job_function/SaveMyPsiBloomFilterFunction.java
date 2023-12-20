@@ -79,6 +79,7 @@ public class SaveMyPsiBloomFilterFunction implements com.welab.fusion.core.funct
         // 保存过滤器，供以后复用。
         CreateJobApi.TableDataResourceInput tableDataResourceInfoModel = myself.getTableDataResourceInfoModel();
         BloomFilterDbModel model = new BloomFilterDbModel();
+        model.setId(psiBloomFilter.id);
         model.setName(tableDataResourceInfoModel.buildAutoName() + "(自动生成)");
         model.setAddMethod(AddMethod.AutoGenerate);
         model.setDescription(tableDataResourceInfoModel.buildAutoDescription());
