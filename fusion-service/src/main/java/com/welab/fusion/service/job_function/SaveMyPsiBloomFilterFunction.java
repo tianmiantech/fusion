@@ -82,7 +82,7 @@ public class SaveMyPsiBloomFilterFunction implements com.welab.fusion.core.funct
         model.setAddMethod(AddMethod.AutoGenerate);
         model.setDescription(tableDataResourceInfoModel.buildAutoDescription());
         model.setSql(tableDataResourceInfoModel.sql);
-        model.setHashConfigs(myself.getHashConfig());
+        model.setHashConfig(myself.getHashConfig());
         model.setTotalDataCount(psiBloomFilter.insertedElementCount);
         model.setStorageDir(sinkDir.toAbsolutePath().toString());
         model.setStorageSize(PsiBloomFilter.getDataFile(sinkDir).length());

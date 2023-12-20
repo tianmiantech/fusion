@@ -65,7 +65,7 @@ public class BloomFilterService extends AbstractService {
         model.setAddMethod(input.addMethod);
         model.setDescription(input.description);
         model.setSql(input.sql);
-        model.setHashConfigs(input.hashConfig.toJson());
+        model.setHashConfig(input.hashConfig.toJson());
 
         Progress progress = ProgressManager.startNew(model.getId());
         CommonThreadPool.run(() -> {
