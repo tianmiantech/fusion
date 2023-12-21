@@ -121,7 +121,7 @@ const Index =()=>{
             }
         }
     },{
-        title: '协作方',
+        title: '合作方',
         dataIndex: 'provider',
         key: 'provider',
         width:400,

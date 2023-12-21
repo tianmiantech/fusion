@@ -6,7 +6,7 @@ import lodash from 'lodash'
 import { useRequest } from "ahooks";
 import { JOB_STATUS,JOB_PHASE_LSIT,ROLE_TYPE } from "@/constant/dictionary";
 
-import { getJobDetail,getMergedJobProgress } from "../service";
+import { getJobDetail,getMergedJobProgress,getAlgorithmPhaseList } from "../service";
 
 
 export interface PhasesListItemInterface {
@@ -23,6 +23,12 @@ export interface PhasesListItemInterface {
   speed_in_second:string  //每秒速度
   total_workload:number
 }
+
+export interface PhasesStpesListItemInterface {
+  name:string,
+  phase:string
+
+}
 interface useDetailDataInterface {
     role:'promoter'|'provider'|'',
     status?:string,// 审核状态
@@ -32,6 +38,7 @@ interface useDetailDataInterface {
     partnerJobCurrentProgress?:PhasesListItemInterface|null,
     myselfPhasesList:PhasesListItemInterface[],
     partnerPhasesList:PhasesListItemInterface[],
+    phasesStpesList:PhasesStpesListItemInterface[] //任务详情阶段
 }
 
 
@@ -45,7 +52,7 @@ const useDetail = ()=>{
       partnerJobCurrentProgress:null,//协作方当前任务进度
       myselfPhasesList:[], //我方任务阶段列表
       partnerPhasesList:[],//协作方任务阶段列表
-
+      phasesStpesList:[]
   });
 
   const clearDetailData = ()=>{
@@ -99,13 +106,28 @@ const useDetail = ()=>{
       const res = await getJobDetail(id);
       const {code,data} = res;
       if(code === 0){
-        const {role } = data
+        const {role,algorithm } = data
+
         setDetailData(draft=>{
           draft.role = role;
           draft.jobDetailData = data
         })
+        if(detailData.phasesStpesList.length == 0){
+          runGetAlgorithmPhaseList(algorithm)
+        }
       }
   }, {manual:true})
+
+  //不同的算法有不同的阶段步骤
+  const {run:runGetAlgorithmPhaseList} = useRequest(async (algorithm:string)=>{
+    const res = await getAlgorithmPhaseList(algorithm);
+    const {code,data} = res;
+    if(code === 0){
+      setDetailData(draft=>{
+        draft.phasesStpesList = lodash.get(data,'list',[])
+      })
+    }
+  },{manual:true})
 
   /**
    * 获取多方任务进度

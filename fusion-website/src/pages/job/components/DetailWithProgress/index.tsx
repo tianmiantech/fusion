@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { Row,Col,Card, Space,Button } from 'antd';
+import { Row,Col,Card, Space,Button, Alert } from 'antd';
 import useDetail from "../../hooks/useDetail";
 import JobCard from '../JobCard'
 import ReadOnlyDetailItem from '../ReadOnlyDetailItem'
@@ -148,9 +148,19 @@ const Index = ()=>{
       }
     }
 
+    const renderErrorMsg = ()=>{
+      if(detailData.jobDetailData && detailData.jobDetailData.status === JOB_STATUS.ERROR_ON_RUNNING){
+        return <Col span={24} style={{marginBottom:10}}>
+          <Alert  type="error" message={detailData.jobDetailData.message} />
+          </Col>
+      }
+    }
+
     return <>
           <Card>
+        
               <Row>
+              {renderErrorMsg()}
                 <Col span={12}>
                     <ReadOnlyDetailItem title="发起方" detailInfoData={data.promoterDetail} />
                 </Col>

@@ -89,7 +89,7 @@ const Index = forwardRef((props:PromoterPropsInterface,ref) => {
     <>
       <Row>
         <Col span={12}>
-           <ReadOnlyDetailItem title={'发起方'}  bodyStyle={{ height: 'calc(100vh - 92px)'}} detailInfoData={{...detailData.jobDetailData?.partner,algorithm:detailData.jobDetailData?.algorithm}}/>
+           <ReadOnlyDetailItem title={'发起方'}  bodyStyle={{ height: 'calc(100vh - 92px)'}} detailInfoData={detailData.jobDetailData?.partner}/>
         </Col>
         <Col span={12}>
           <JobCard

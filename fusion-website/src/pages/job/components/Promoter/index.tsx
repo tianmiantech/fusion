@@ -5,8 +5,6 @@ import { useImmer } from 'use-immer';
 import { history } from '@umijs/max';
 import JobForm from "../JobForm";
 import SendJobForm from "../SendJobForm";
-import TaskDetail from "../ReadOnlyDetailItem";
-import RefuseModal from "../RefuseModal";
 import lodash from 'lodash'
 import JobCard from '../JobCard'
 import useDetail from "../../hooks/useDetail";

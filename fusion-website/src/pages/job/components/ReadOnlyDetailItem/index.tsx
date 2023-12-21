@@ -2,12 +2,10 @@ import { useEffect, useState, useRef,useContext, } from "react";
 import { Descriptions,Typography,Button,Popover,ConfigProvider, Steps } from 'antd';
 import {dataResourceTypeMap} from '@/constant/dictionary'
 import lodash from 'lodash'
-import moment from 'moment'
-import {Progress,List} from 'antd'
 import JobCard from '../JobCard'
 import { DataPreviewBtn } from "@/components/DataSetPreview";
 import { ROLE_TYPE } from "@/constant/dictionary";
-import styles from './index.less'
+import useDetail from "../../hooks/useDetail";
 
 interface hashConfigItemInterface {
   columns: string[];
@@ -31,6 +29,7 @@ interface ReadOnlyDetailItemProps {
   detailInfoData:ReadOnlyDetailItemDeetailInfoDataInterface|null,
 }
 const ReadOnlyDetailItem = (props:ReadOnlyDetailItemProps) => {
+  const {detailData} = useDetail();
   const {detailInfoData,title,bodyStyle } = props
   const configContext = useContext(ConfigProvider.ConfigContext);
   const prefixCls = 'portal' || configContext.getPrefixCls();
@@ -53,48 +52,6 @@ const ReadOnlyDetailItem = (props:ReadOnlyDetailItemProps) => {
     return <>
       {result}
     </>
-  }
-
-  const renderUpdateTime = ()=>{
-    const start_time = lodash.get(detailInfoData,'start_time','')
-    return moment(start_time||new Date()).startOf('hour').fromNow()
-  }
-
-  const displayChineseTime = (cost_time:number)=>{
-    if (typeof cost_time !== 'number' || isNaN(cost_time) || cost_time < 0) {
-      return '';
-    }
-    const milliseconds = cost_time % 1000;
-    const seconds = Math.floor((cost_time / 1000) % 60);
-    const minutes = Math.floor((cost_time / (1000 * 60)) % 60);
-    const hours = Math.floor((cost_time / (1000 * 60 * 60)) % 24);
-
-    let result = '';
-
-    if (hours > 0) {
-        result += hours + '小时';
-    }
-
-    if (minutes > 0) {
-        result += minutes + '分钟';
-    }
-
-    if (seconds > 0 || (result === '' && milliseconds > 0)) {
-        result += seconds + '秒';
-    }
-
-    if (milliseconds > 0 && result === '') {
-        result += milliseconds + '毫秒';
-    }
-
-    return result;
-  }
-
-
-  function arrayToParagraphs(array:string[]) {
-    return array.map(function(item) {
-      return <p>{item}</p>;
-    });
   }
 
   const renderTotlDataCount = ()=>{
@@ -131,12 +88,11 @@ const ReadOnlyDetailItem = (props:ReadOnlyDetailItemProps) => {
   return (<JobCard title={title} bodyStyle={bodyStyle} >
       <Descriptions column={1} bordered labelStyle={labelStyle} contentStyle={{paddingTop:10,paddingBottom:10}}>
         <Descriptions.Item label="服务地址">{lodash.get(detailInfoData,'base_url','') }</Descriptions.Item>
-        <Descriptions.Item label="算法类型">{lodash.get(detailInfoData,'algorithm','') }</Descriptions.Item>
+        <Descriptions.Item label="算法类型">{lodash.get(detailData,'jobDetailData.algorithm','') }</Descriptions.Item>
         <Descriptions.Item label="样本类型">{ dataResourceTypeMap.get(lodash.get(detailInfoData,'data_resource_type',''))  }</Descriptions.Item>
         <Descriptions.Item label="数据量" >{ renderTotlDataCount()}</Descriptions.Item>
         <Descriptions.Item label="主键">{renderHashConfig()}</Descriptions.Item>
       </Descriptions>
-      
     </JobCard>
   );
 };

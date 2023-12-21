@@ -152,3 +152,8 @@ export const getBloomFilterDetailById = (id:string)=>{
 export const getAlgorithmList = ()=>{
     return request.get('/algorithm/list')
 }
+
+//获取算法阶段列表
+export const getAlgorithmPhaseList = (algorithm:string)=>{
+    return request.get('/algorithm/list_phase',{algorithm})
+}

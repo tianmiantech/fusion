@@ -5,10 +5,10 @@ import { Card, Steps,Typography,Popover,Row,Col,Progress,List } from 'antd';
 import { ProDescriptions } from '@ant-design/pro-components';
 import {JOB_PHASE_LSIT} from '@/constant/dictionary'
 import lodash from 'lodash'
-import type {PhasesListItemInterface} from '../../hooks/useDetail';
+import type {PhasesListItemInterface,PhasesStpesListItemInterface} from '../../hooks/useDetail';
 import {displayChineseCoastTime} from '@/utils/time'
 import styles from './index.less'
-
+import useDetail from '../../hooks/useDetail';
 
 interface JobProgressProps {
   promoterPhasesList:PhasesListItemInterface[],
@@ -18,35 +18,41 @@ interface JobProgressProps {
 
 
 const JobProgress = (props:JobProgressProps) => {
+    const {detailData} = useDetail();
+
     const {promoterPhasesList,providerPhasesList} = props
     const [stepList, setStepList] = useState<StepProps[]>([]);
     const [currentStep, setCurrentStep] = useState<number>(0);
 
 
     useEffect(()=>{
-      const tmpList = [] as StepProps[]; 
-      const promoterPhasesListLenght = promoterPhasesList.length;
-      const providerPhasesListLenght = providerPhasesList.length;
-      //设置当前步骤
-      setCurrentStep(Math.max(0, Math.min(promoterPhasesListLenght-1, providerPhasesListLenght-1)))
-      for (const [key, description] of JOB_PHASE_LSIT) {
-        const step = {
-          title:description,
-          status:'wait',
-          description:'未执行到此处'
-        } as StepProps
-        const promoterPhasesObj = lodash.find(promoterPhasesList, {job_phase:key},null);
-        const providerPhases = lodash.find(providerPhasesList, {job_phase:key},null);
-        if(promoterPhasesObj || providerPhases ){
-          const myselfStatus = promoterPhasesObj?.status;
-          const partnerStatus = providerPhases?.status;
-          step.status = changeProgressStatusToStepStatus(myselfStatus,partnerStatus);
-          step.description = renderDescription(promoterPhasesObj,providerPhases)
-        }
-        tmpList.push(step)
+      //设置步骤 步骤数据源来自于接口
+      if(detailData.phasesStpesList.length>0){
+        const tmpList = [] as StepProps[]; 
+        const promoterPhasesListLenght = promoterPhasesList.length;
+        const providerPhasesListLenght = providerPhasesList.length;
+        //设置当前步骤
+        setCurrentStep(Math.max(0, Math.min(promoterPhasesListLenght-1, providerPhasesListLenght-1)))
+        detailData.phasesStpesList.map((item:PhasesStpesListItemInterface)=>{
+          const {name,phase} = item;
+          const step = {
+            title:name,
+            status:'wait',
+            description:'未执行到此处'
+          } as StepProps
+          const promoterPhasesObj = lodash.find(promoterPhasesList, {job_phase:phase},null);
+          const providerPhases = lodash.find(providerPhasesList, {job_phase:phase},null);
+          if(promoterPhasesObj || providerPhases ){
+            const myselfStatus = promoterPhasesObj?.status;
+            const partnerStatus = providerPhases?.status;
+            step.status = changeProgressStatusToStepStatus(myselfStatus,partnerStatus);
+            step.description = renderDescription(promoterPhasesObj,providerPhases)
+          }
+          tmpList.push(step)
+        })
+        setStepList(tmpList);
       }
-      setStepList(tmpList);
-    },[promoterPhasesList,providerPhasesList])
+    },[promoterPhasesList,providerPhasesList,detailData.phasesStpesList.length])
 
     const renderDescription = (promoterPhasesObj:PhasesListItemInterface,providerPhases:PhasesListItemInterface)=>{
       return <>
