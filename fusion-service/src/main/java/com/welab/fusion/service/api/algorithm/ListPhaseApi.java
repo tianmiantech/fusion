@@ -24,6 +24,7 @@ import com.welab.wefe.common.web.dto.AbstractApiInput;
 import com.welab.wefe.common.web.dto.ApiResult;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author zane.luo
@@ -43,12 +44,24 @@ public class ListPhaseApi extends AbstractApi<ListPhaseApi.Input, ListPhaseApi.O
     }
 
     public static class Output {
-        public List<JobPhase> list;
+        public List<Item> list;
 
         public static Output of(List<JobPhase> list) {
             Output output = new Output();
-            output.list = list;
+            output.list = list.stream().map(Item::of).collect(Collectors.toList());
             return output;
+        }
+    }
+
+    public static class Item {
+        public JobPhase phase;
+        public String name;
+
+        public static Item of(JobPhase phase) {
+            Item item = new Item();
+            item.phase = phase;
+            item.name = phase.getLabel();
+            return item;
         }
     }
 }

@@ -20,57 +20,46 @@ package com.welab.fusion.core.algorithm;
  * @date 2023/11/10
  */
 public enum JobPhase {
-    /**
-     * 确认成员角色
-     */
-    ConfirmMemberRole,
+
+    ConfirmMemberRole("协商成员角色"),
 
     // region RSA-PSI
-    
-    /**
-     * 生成过滤器
-     */
-    CreatePsiBloomFilter,
-    /**
-     * 下载过滤器
-     */
-    DownloadPsiBloomFilter,
+
+    CreatePsiBloomFilter("生成过滤器"),
+
+    DownloadPsiBloomFilter("下载过滤器"),
     
     // endregion
 
 
     // region ECDH-PSI
-    /**
-     * 加密己方数据
-     */
-    EncryptMyselfData,
-    /**
-     * 下载合作方加密后的数据
-     */
-    DownloadPartnerECEncryptedData,
-    /**
-     * 加密合作方数据
-     */
-    EncryptPartnerData,
-    /**
-     * 下载二次加密后的数据
-     */
-    DownloadSecondaryEncryptedData,
+
+    EncryptMyselfData("加密己方数据"),
+
+    DownloadPartnerECEncryptedData("下载合作方加密后的数据"),
+
+    EncryptPartnerData("加密合作方数据"),
+
+    DownloadSecondaryEncryptedData("下载二次加密后的数据"),
     
     // endregion
     
-    
-    
-    /**
-     * 求交
-     */
-    Intersection,
-    /**
-     * 下载结果
-     */
-    SaveResult;
+
+    Intersection("求交"),
+
+    SaveResult("下载求交结果");
+
+    private final String label;
+
+    JobPhase(String label) {
+        this.label = label;
+    }
 
     public boolean isLastPhase() {
         return this == SaveResult;
+    }
+
+    public String getLabel() {
+        return label;
     }
 }
