@@ -16,6 +16,7 @@
 package com.welab.fusion.service.dto.entity;
 
 import com.welab.fusion.core.Job.JobStatus;
+import com.welab.fusion.core.algorithm.base.PsiAlgorithm;
 import com.welab.fusion.service.constans.JobMemberRole;
 import com.welab.fusion.service.database.entity.JobDbModel;
 import com.welab.wefe.common.fieldvalidate.annotation.Check;
@@ -27,6 +28,8 @@ import java.util.Date;
  * @date 2023/11/29
  */
 public class JobOutputModel extends AbstractOutputModel {
+    @Check(name = "算法")
+    private PsiAlgorithm algorithm;
     @Check(name = "创建任务的成员ID")
     private String creatorMemberId;
     @Check(name = "我方角色")
@@ -60,6 +63,15 @@ public class JobOutputModel extends AbstractOutputModel {
     }
 
     // region getter/setter
+
+
+    public PsiAlgorithm getAlgorithm() {
+        return algorithm;
+    }
+
+    public void setAlgorithm(PsiAlgorithm algorithm) {
+        this.algorithm = algorithm;
+    }
 
     public String getCreatorMemberId() {
         return creatorMemberId;
