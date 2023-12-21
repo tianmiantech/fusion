@@ -293,6 +293,7 @@ public class JobService extends AbstractService {
         JobConfigInput createJobInput = new JobConfigInput();
         createJobInput.jobId = job.getId();
         createJobInput.dataResource = dataResource;
+        createJobInput.algorithm = job.getAlgorithm();
 
         gatewayService.callOtherFusionNode(
                 input.toFusionNodeInfo(),
