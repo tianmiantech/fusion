@@ -17,11 +17,15 @@ package com.welab.fusion.service.service;
 
 import cn.hutool.crypto.digest.SM3;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializeFilter;
+import com.welab.fusion.service.config.BlockForPartnerFieldFilter;
 import com.welab.fusion.service.model.global_config.FusionConfigModel;
 import com.welab.fusion.service.service.base.AbstractService;
 import com.welab.wefe.common.StatusCode;
 import com.welab.wefe.common.crypto.Sm2;
 import com.welab.wefe.common.exception.StatusCodeWithException;
+import com.welab.wefe.common.fieldvalidate.secret.SecretPropertyFilter;
+import com.welab.wefe.common.fieldvalidate.secret.SecretValueFilter;
 import com.welab.wefe.common.http.HttpRequest;
 import com.welab.wefe.common.http.HttpResponse;
 import com.welab.wefe.common.util.JObject;
@@ -112,7 +116,15 @@ public class GatewayService extends AbstractService {
             return null;
         }
 
-        HttpResponse httpResponse = requestOtherFusionNode(target, apiClass, input.toJson());
+        // 使用过滤器对需要保护的字段进行脱敏
+        SerializeFilter[] filter = {
+                BlockForPartnerFieldFilter.instance,
+                SecretPropertyFilter.instance,
+                SecretValueFilter.instance
+        };
+        JSONObject params = JSONObject.parseObject(JSONObject.toJSONString(input, filter));
+
+        HttpResponse httpResponse = requestOtherFusionNode(target, apiClass, params);
         JSONObject json = httpResponse.getBodyAsJson();
         ApiResult apiResult = json.toJavaObject(ApiResult.class);
         if (apiResult.code != 0) {

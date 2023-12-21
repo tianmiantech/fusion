@@ -17,6 +17,7 @@ package com.welab.fusion.service.dto.entity;
 
 import com.alibaba.fastjson.JSONObject;
 import com.welab.fusion.core.data_resource.base.DataResourceType;
+import com.welab.fusion.service.api.job.CreateJobApi;
 import com.welab.fusion.service.constans.JobMemberRole;
 import com.welab.fusion.service.database.entity.JobMemberDbModel;
 import com.welab.fusion.service.database.entity.MemberDbModel;
@@ -51,7 +52,7 @@ public class JobMemberOutputModel extends AbstractOutputModel {
     private String bloomFilterId;
 
     @Check(name = "数据源信息")
-    private JSONObject tableDataResourceInfo;
+    private CreateJobApi.TableDataResourceInput tableDataResourceInfo;
 
     public static JobMemberOutputModel of(MemberDbModel member, JobMemberDbModel jobMember) {
         if (jobMember == null) {
@@ -63,8 +64,15 @@ public class JobMemberOutputModel extends AbstractOutputModel {
             output.memberName = member.getName();
             output.publicKey = member.getPublicKey();
             output.baseUrl = member.getBaseUrl();
+            output.setTableDataResourceInfo(jobMember.getTableDataResourceInfo());
         }
         return output;
+    }
+
+    public void setTableDataResourceInfo(JSONObject tableDataResourceInfo) {
+        if (tableDataResourceInfo != null) {
+            this.tableDataResourceInfo = tableDataResourceInfo.toJavaObject(CreateJobApi.TableDataResourceInput.class);
+        }
     }
 
     // region getter/setter
@@ -141,13 +149,14 @@ public class JobMemberOutputModel extends AbstractOutputModel {
         this.bloomFilterId = bloomFilterId;
     }
 
-    public JSONObject getTableDataResourceInfo() {
+    public CreateJobApi.TableDataResourceInput getTableDataResourceInfo() {
         return tableDataResourceInfo;
     }
 
-    public void setTableDataResourceInfo(JSONObject tableDataResourceInfo) {
+    public void setTableDataResourceInfo(CreateJobApi.TableDataResourceInput tableDataResourceInfo) {
         this.tableDataResourceInfo = tableDataResourceInfo;
     }
+
 
     // endregion
 }

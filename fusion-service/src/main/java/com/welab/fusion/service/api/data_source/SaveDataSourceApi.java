@@ -17,6 +17,7 @@
 package com.welab.fusion.service.api.data_source;
 
 import com.alibaba.fastjson.annotation.JSONField;
+import com.welab.fusion.service.config.BlockForPartnerField;
 import com.welab.fusion.service.service.DataSourceService;
 import com.welab.wefe.common.Convert;
 import com.welab.wefe.common.data.source.JdbcDataSourceParams;
@@ -55,7 +56,8 @@ public class SaveDataSourceApi extends AbstractApi<SaveDataSourceApi.Input, Save
     public static class Input extends AbstractApiInput {
         public DatabaseType databaseType;
 
-        @Secret(maskStrategy = MaskStrategy.BLOCK)
+        @Secret(maskStrategy = MaskStrategy.MAP_WITH_PASSWORD)
+        @BlockForPartnerField
         public Map<String, Object> dataSourceParams;
 
         @JSONField(serialize = false)

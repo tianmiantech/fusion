@@ -23,7 +23,7 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.alibaba.fastjson.support.config.FastJsonConfig;
 import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter;
 import com.welab.wefe.common.TimeSpan;
-import com.welab.wefe.common.fieldvalidate.secret.SecretPropertyPreFilter;
+import com.welab.wefe.common.fieldvalidate.secret.SecretPropertyFilter;
 import com.welab.wefe.common.fieldvalidate.secret.SecretValueFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
@@ -122,7 +122,7 @@ public class AppConfig implements ApplicationListener<ContextRefreshedEvent> {
             filters[i] = config.getSerializeFilters()[i];
         }
 
-        filters[filters.length - 2] = SecretPropertyPreFilter.instance;
+        filters[filters.length - 2] = SecretPropertyFilter.instance;
         filters[filters.length - 1] = SecretValueFilter.instance;
         config.setSerializeFilters(filters);
 
