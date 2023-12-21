@@ -164,12 +164,22 @@ public class JobService extends AbstractService {
                 .findById(job.getPartnerMemberId())
                 .toFusionNodeInfo();
 
-        // 同步给发起方
-        gatewayService.callOtherFusionNode(target, RestartJobApi.class, input);
+        try {
+            // 同步给发起方
+            gatewayService.callOtherFusionNode(target, RestartJobApi.class, input);
 
-        // 创建任务并启动
-        AbstractPsiJob psiJob = createPsiJob(job);
-        FusionJobManager.start(psiJob);
+            // 创建任务并启动
+            AbstractPsiJob psiJob = createPsiJob(job);
+            FusionJobManager.start(psiJob);
+        } catch (Exception e) {
+            job.setStatus(JobStatus.error_on_running);
+            job.setMessage("任务启动失败：" + e.getMessage());
+            job.setEndTime(new Date());
+            job.setCostTime(System.currentTimeMillis() - job.getStartTime().getTime());
+            job.save();
+            throw e;
+        }
+
     }
 
     /**
