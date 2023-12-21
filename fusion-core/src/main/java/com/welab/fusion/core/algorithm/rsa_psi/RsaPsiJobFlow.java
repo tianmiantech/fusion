@@ -21,15 +21,12 @@ import com.welab.fusion.core.algorithm.base.AbstractJobPhaseAction;
 import com.welab.fusion.core.algorithm.rsa_psi.action.*;
 
 import java.util.LinkedHashMap;
-import java.util.Map;
 
 /**
  * @author zane.luo
  * @date 2023/12/18
  */
 public class RsaPsiJobFlow extends AbstractJobFlow {
-    public static final RsaPsiJobFlow INSTANCE = new RsaPsiJobFlow();
-
     private static final LinkedHashMap<JobPhase, Class<? extends AbstractJobPhaseAction>> map = new LinkedHashMap<>();
 
     static {
@@ -39,6 +36,8 @@ public class RsaPsiJobFlow extends AbstractJobFlow {
         map.put(JobPhase.Intersection, IntersectionAction.class);
         map.put(JobPhase.SaveResult, SaveResultAction.class);
     }
+
+    public static final RsaPsiJobFlow INSTANCE = new RsaPsiJobFlow();
 
     public RsaPsiJobFlow() {
         super(map);
