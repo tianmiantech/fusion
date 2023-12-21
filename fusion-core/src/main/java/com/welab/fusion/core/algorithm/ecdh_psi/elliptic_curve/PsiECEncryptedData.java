@@ -64,6 +64,11 @@ public class PsiECEncryptedData {
     public static PsiECEncryptedData of(String id) {
         Path dir = FileSystem.PsiECEncryptedData.getDir(id);
 
+        return of(dir);
+    }
+
+    public static PsiECEncryptedData of(Path dir) {
+
         // 加载元数据
         File metaFile = dir.resolve(META_FILE_NAME).toFile();
         String json = FileUtil.readString(metaFile, StandardCharsets.UTF_8);
