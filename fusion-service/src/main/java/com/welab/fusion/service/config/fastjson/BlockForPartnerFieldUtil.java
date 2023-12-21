@@ -13,18 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.welab.wefe.common.fieldvalidate.secret;
+package com.welab.fusion.service.config.fastjson;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializeFilter;
+import com.welab.wefe.common.fieldvalidate.secret.SecretPropertyFilter;
+import com.welab.wefe.common.fieldvalidate.secret.SecretValueFilter;
 import com.welab.wefe.common.util.ClassUtils;
 import com.welab.wefe.common.util.StringUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
-import java.security.Security;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -33,61 +32,64 @@ import java.util.Set;
  * @author zane
  * @date 2022/7/13
  */
-public class SecretUtil {
-    private static final Logger LOG = LoggerFactory.getLogger(Security.class);
+public class BlockForPartnerFieldUtil {
     /**
-     * Secret 字段的全局缓存
+     * BlockForPartnerField 字段的全局缓存
      */
-    private static final Map<Class, Map<String, Secret>> SECRET_FIELD_MAP = new HashMap<>();
+    private static final Map<Class, Map<String, BlockForPartnerField>> BLOCK_FIELD_MAP = new HashMap<>();
 
     public static JSONObject toJson(Object obj) {
         return JSON.parseObject(toJsonString(obj));
     }
 
     public static String toJsonString(Object obj) {
-        SerializeFilter[] filter = {SecretPropertyFilter.instance, SecretValueFilter.instance};
+        SerializeFilter[] filter = {
+                BlockForPartnerFieldFilter.instance,
+                SecretPropertyFilter.instance,
+                SecretValueFilter.instance
+        };
         return JSON.toJSONString(obj, filter);
     }
 
 
     /**
-     * 获取指定字段的 @Secret 注解
+     * 获取指定字段的 @BlockForPartnerField 注解
      */
-    public static Secret getAnnotation(Class clazz, String fieldName) {
-        if (!SECRET_FIELD_MAP.containsKey(clazz)) {
+    public static BlockForPartnerField getAnnotation(Class clazz, String fieldName) {
+        if (!BLOCK_FIELD_MAP.containsKey(clazz)) {
             extractSecret(clazz);
         }
 
-        return SECRET_FIELD_MAP.get(clazz).get(fieldName);
+        return BLOCK_FIELD_MAP.get(clazz).get(fieldName);
     }
 
     /**
-     * 反射 Class，并缓存其中所有包含 @Secret 的字段。
+     * 反射 Class，并缓存其中所有包含 @BlockForPartnerField 的字段。
      */
     private synchronized static void extractSecret(Class clazz) {
-        if (SECRET_FIELD_MAP.containsKey(clazz)) {
+        if (BLOCK_FIELD_MAP.containsKey(clazz)) {
             return;
         }
         long start = System.currentTimeMillis();
         // 对 clazz 中的所有字段进行检查，并缓存包含 @Secret 的字段
-        HashMap<String, Secret> secretFieldsMap = new HashMap<>(0);
+        HashMap<String, BlockForPartnerField> secretFieldsMap = new HashMap<>(0);
 
         Set<Field> fields = ClassUtils.listFields(clazz, false);
         for (Field field : fields) {
-            Secret secret = field.getAnnotation(Secret.class);
+            BlockForPartnerField annotation = field.getAnnotation(BlockForPartnerField.class);
 
-            // 仅储存包含 @Secret 的字段
-            if (secret != null) {
+            // 仅储存包含 @BlockForPartnerField 的字段
+            if (annotation != null) {
                 String rawName = field.getName();
 
                 // 同时兼容下划线和驼峰命名
                 String underLineCaseName = StringUtil.camelCaseToUnderLineCase(rawName);
                 String cameCaseName = StringUtil.underLineCaseToCamelCase(rawName);
 
-                secretFieldsMap.put(underLineCaseName, secret);
-                secretFieldsMap.put(cameCaseName, secret);
+                secretFieldsMap.put(underLineCaseName, annotation);
+                secretFieldsMap.put(cameCaseName, annotation);
             }
         }
-        SECRET_FIELD_MAP.put(clazz, secretFieldsMap);
+        BLOCK_FIELD_MAP.put(clazz, secretFieldsMap);
     }
 }

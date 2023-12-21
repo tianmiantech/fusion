@@ -17,7 +17,7 @@
 package com.welab.fusion.service.api.data_source;
 
 import com.alibaba.fastjson.annotation.JSONField;
-import com.welab.fusion.service.config.BlockForPartnerField;
+import com.welab.fusion.service.config.fastjson.BlockForPartnerField;
 import com.welab.fusion.service.service.DataSourceService;
 import com.welab.wefe.common.Convert;
 import com.welab.wefe.common.data.source.JdbcDataSourceParams;

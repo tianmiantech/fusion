@@ -13,12 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.welab.fusion.service.config;
+package com.welab.fusion.service.config.fastjson;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import com.alibaba.fastjson.serializer.PropertyFilter;
 
 /**
  * 阻止字段输出到合作方
@@ -26,7 +23,12 @@ import java.lang.annotation.Target;
  * @author zane.luo
  * @date 2023/12/21
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.FIELD)
-public @interface BlockForPartnerField {
+public class BlockForPartnerFieldFilter implements PropertyFilter {
+    public static final BlockForPartnerFieldFilter instance = new BlockForPartnerFieldFilter();
+
+    @Override
+    public boolean apply(Object object, String name, Object value) {
+        BlockForPartnerField annotation = BlockForPartnerFieldUtil.getAnnotation(object.getClass(), name);
+        return annotation == null;
+    }
 }
