@@ -86,7 +86,7 @@ public abstract class AbstractJobFlow {
         try {
             for (Constructor<?> constructor : aClass.getConstructors()) {
                 if (constructor.getParameterCount() == 1) {
-                    return aClass.getConstructor(AbstractPsiJob.class).newInstance(psiJob);
+                    return (AbstractJobPhaseAction) constructor.newInstance(psiJob);
                 }
             }
         } catch (Exception e) {
