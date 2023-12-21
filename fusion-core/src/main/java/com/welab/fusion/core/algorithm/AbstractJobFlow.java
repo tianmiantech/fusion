@@ -18,6 +18,7 @@ package com.welab.fusion.core.algorithm;
 import com.welab.fusion.core.Job.AbstractPsiJob;
 import com.welab.fusion.core.algorithm.base.AbstractJobPhaseAction;
 
+import java.lang.reflect.Constructor;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -83,9 +84,14 @@ public abstract class AbstractJobFlow {
         }
 
         try {
-            return aClass.getConstructor(AbstractPsiJob.class).newInstance(psiJob);
+            for (Constructor<?> constructor : aClass.getConstructors()) {
+                if (constructor.getParameterCount() == 1) {
+                    return aClass.getConstructor(AbstractPsiJob.class).newInstance(psiJob);
+                }
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+        return null;
     }
 }
