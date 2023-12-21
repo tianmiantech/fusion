@@ -30,6 +30,7 @@ export const testDataSource = (parmas:TestDataSourceInterface)=>{
 
 export interface CreateJobRequestInterface {
     remark?:string,
+    algorithm:string,
     data_resource:{
         bloom_filter_resource_input?:{
             bloom_filter_id:string
@@ -142,3 +143,12 @@ export const queryBloomFilterList= (params:QueryBloomFilterListRequestInterface)
     return request.post('/bloom_filter/query',params)
 }
 
+//根据id获取过滤器详情
+export const getBloomFilterDetailById = (id:string)=>{
+    return request.get('bloom_filter/detail',{id})
+}
+
+//获取算法列表
+export const getAlgorithmList = ()=>{
+    return request.get('/algorithm/list')
+}

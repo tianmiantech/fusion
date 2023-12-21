@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, forwardRef, useImperativeHandle } from 'react';
-import { Input, Button, Form, Radio, Upload, Tooltip, Space, Row, Col,Alert,Spin, message } from 'antd';
+import { Input, Button, Form, Radio, Upload, Tooltip, Space, Row, Col,Alert,Spin, message, Select } from 'antd';
 import { dataResourceTypeMap, dataSetAddMethodMap,JOB_STATUS, ROLE_TYPE } from '@/constant/dictionary';
 import HashForm from '../HashForm/index';
 import DataSourceForm from '../DataSourceForm';
@@ -10,11 +10,14 @@ import './index.less'
 import lodash from 'lodash'
 import useDetail from "../../hooks/useDetail";
 import BloomFilterFormItem from '../BloomFilterFormItem';
+import { useRequest } from 'ahooks';
+import {getAlgorithmList} from '../../service'
 
 
 interface JobFormDataInterface {
   BFManageOpen:boolean,
   dataourceColumnList:string[],//数据预览的column列表，用来选择设置hash
+  algorithmList:string[],//算法列表
 }
 
 interface JobFormPropsInterface {
@@ -30,7 +33,20 @@ const JobForm = forwardRef((props:JobFormPropsInterface, ref) => {
 
   const [jobFormData,setJobFormData] = useImmer<JobFormDataInterface>({
     BFManageOpen:false,
-    dataourceColumnList:[]
+    dataourceColumnList:[],
+    algorithmList:[]
+  })
+
+  // 获取算法列表 不使用manual 表示进入进入页面就请求
+  const {run:runGetAlgorithmList} = useRequest(async ()=>{
+    const response = await getAlgorithmList()
+    const {code,data} = response;
+    if(code === 0){
+      const tmpList = lodash.get(data,'list',[])
+      setJobFormData(g=>{
+        g.algorithmList = tmpList;
+      })
+    }
   })
 
  
@@ -51,7 +67,7 @@ const JobForm = forwardRef((props:JobFormPropsInterface, ref) => {
   const checkFormDisable = ()=>{
     const status = lodash.get(detailData,'jobDetailData.status','')
     const role = lodash.get(detailData,'jobDetailData.role','')
-    if(!status || status === JOB_STATUS.EDITING ||(role === ROLE_TYPE.PROVIDER && status === JOB_STATUS.AUDITING) ){
+    if(!status ||(role === ROLE_TYPE.PROVIDER && status === JOB_STATUS.AUDITING) ){
       return false
     }
     return true
@@ -80,10 +96,19 @@ const JobForm = forwardRef((props:JobFormPropsInterface, ref) => {
           <Col lg={{span: 16}} md={{span: 24}}>
             <Form
               form={formRef}
-              initialValues={{data_resource_type:'TableDataSource',add_method:'HttpUpload'}}
+              initialValues={{data_resource_type:'TableDataSource',add_method:'HttpUpload',algorithm:'rsa_psi'}}
               layout="vertical"
               disabled={checkFormDisable()}
             >
+              <Form.Item name="algorithm" label="算法类型" required>
+                <Select style={{width:200}}>
+                  {jobFormData.algorithmList.map((item:string) => (
+                    <Select.Option key={item} value={item}>
+                      {item}
+                    </Select.Option>
+                    ))}
+                </Select>
+              </Form.Item>
               <Form.Item style={{marginBottom:0}}  label="样本类型" required>
                 <Form.Item name="data_resource_type" style={{ display: 'inline-block', marginBottom: 0 }} rules={[{ required: true }]}>
                   <Radio.Group onChange={onDataSourceTypeChange}>

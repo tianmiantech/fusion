@@ -122,38 +122,6 @@ const JobProgress = (props:JobProgressProps) => {
         return 'wait'
     }
 
-
-
-    const renderCustomDotContent = (index:number)=>{
-      const myselfPhasesListLenght = detailData.myselfPhasesList.length;
-      const partnerPhasesListLenght = detailData.partnerPhasesList.length||0;
-      let myselfMsg = '',partnerMsg = '';
-      if(myselfPhasesListLenght>0 && myselfPhasesListLenght-1>=index){
-        myselfMsg = detailData.myselfPhasesList[index].message;
-      }
-      if(partnerPhasesListLenght>0 && partnerPhasesListLenght-1>=index){
-        partnerMsg = detailData.partnerPhasesList[index].message;
-      }
-      if(myselfMsg || partnerMsg){
-        return <>
-        {myselfMsg?<span><strong>【我方】</strong>{myselfMsg}</span> : ''}
-        {myselfMsg?<br/>:''}
-        {partnerMsg?<span><strong>【协作方】</strong>{partnerMsg}</span> : ''}
-        </>
-      }
-      return null
-     
-    }
-    const customDot: StepsProps['progressDot'] = (dot: any, { status, index }: any) => {
-
-      return  <Popover
-      content={renderCustomDotContent(index)
-      }
-    >
-      {dot}
-    </Popover>
-    }
-
     return <Steps
       direction="vertical"
       current={currentStep}

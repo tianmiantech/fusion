@@ -44,9 +44,10 @@ const Index = forwardRef((props:PromoterPropsInterface,ref) => {
   },{ manual:true})
 
   const submitFormData = async () => {
-    const {data_resource_type,hash_config,remark,table_data_resource_info=null,bloom_filter_resource_input=null} = await jobFormRef.current?.validateFields();
+    const {data_resource_type,hash_config,remark,table_data_resource_info=null,bloom_filter_resource_input=null,algorithm} = await jobFormRef.current?.validateFields();
     const requestParams = {
       remark,
+      algorithm,
       data_resource:{
         data_resource_type,
         hash_config,
@@ -90,7 +91,9 @@ const Index = forwardRef((props:PromoterPropsInterface,ref) => {
           data_resource_type: lodash.get(detailData,'jobDetailData.myself.data_resource_type',''),
           hash_config: {...lodash.get(detailData,'jobDetailData.myself.hash_config',''),source:'setFieldsValue'},
           table_data_resource_info:{...lodash.get(detailData,'jobDetailData.myself.table_data_resource_info',{}),source:'setFieldsValue'},
-          add_method:lodash.get(detailData,'jobDetailData.myself.table_data_resource_info.add_method')
+          bloom_filter_resource_input:{bloom_filter_id:lodash.get(detailData,'jobDetailData.myself.bloom_filter_id',''),source:'setFieldsValue'},
+          add_method:lodash.get(detailData,'jobDetailData.myself.table_data_resource_info.add_method'),
+          algorithm:lodash.get(detailData,'jobDetailData.algorithm'),
         })
       }
     },[detailData.jobDetailData])

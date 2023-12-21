@@ -56,7 +56,7 @@ const HashForm = (props:HashFormPropsInterface) => {
                   </Select>
                 </Form.Item>
                 <Form.Item name={[name, 'columns']} className="hash-form-item">
-                  <Select disabled={disabled}   mode="multiple" style={{ width: 200 }} placeholder="请选择字段">
+                  <Select disabled={disabled}   mode="multiple" style={{ width: 300 }} placeholder="请选择字段">
                     {columnList.map(feature => (
                       <Select.Option key={feature} value={feature}>
                         {feature}

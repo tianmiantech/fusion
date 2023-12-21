@@ -35,7 +35,7 @@ const Index =()=>{
     return <Header className={styles.layoutHeader}>
         <div className={styles.headerBar}>
             <div className={styles.left} onClick={()=>{
-                history.back()
+                history.replace('/home')
             }}>
                 主页
             </div>

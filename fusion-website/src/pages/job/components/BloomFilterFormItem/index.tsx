@@ -9,6 +9,7 @@ import { useImmer } from 'use-immer';
 import styles from './index.less';
 import {getNoramlTime} from '@/utils/time'
 import {getFileSizeInHumanReadable} from '@/utils/file'
+import {getBloomFilterDetailById} from '../../service'
 
 interface BloomFilterDataInterface {
   isModalOpen:boolean,
@@ -21,7 +22,7 @@ interface BloomFilterFormItemPropsInterface {
 }
 
 const  BloomFilterFormItem = (props:BloomFilterFormItemPropsInterface) => {
-    const {onBloomFilterSelectedCallBack,onChange} = props
+    const {onBloomFilterSelectedCallBack,onChange,value} = props
 
     const {bloomFilterConfig,checkBloomFilterList} = useBloomFilterFormItem();
 
@@ -30,8 +31,32 @@ const  BloomFilterFormItem = (props:BloomFilterFormItemPropsInterface) => {
       selectedBloomFilterConfig:{
         id:'',
       }
-
     })
+
+    //编辑时，Form主动设置value，将数据进行回填
+    useEffect(()=>{
+      if(value){
+        const source = lodash.get(value,'source','')
+        if(source === "setFieldsValue") {
+         const bloom_filter_id = lodash.get(value,'bloom_filter_id','')
+         if(bloom_filter_id){
+          runGetBloomFilterDetailById(bloom_filter_id)
+         }
+        }
+      }
+    },[value])
+
+    //编辑时获取所有的数据详情
+    const {run:runGetBloomFilterDetailById} = useRequest(async (id:string)=>{
+      const response = await getBloomFilterDetailById(id)
+      const {code,data} = response
+      if(code === 0){
+        setData(g=>{
+          g.selectedBloomFilterConfig = data
+        })
+      }
+    
+    },{manual:true})
 
 
 
