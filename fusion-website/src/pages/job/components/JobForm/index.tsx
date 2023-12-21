@@ -87,7 +87,12 @@ const JobForm = forwardRef((props:JobFormPropsInterface, ref) => {
       list:[],
       source:'setFieldsValue'
     }})
-    
+  }
+  
+  const checkAlgorithmDisable = ()=>{
+    let flag = checkFormDisable();
+    const role = lodash.get(detailData,'jobDetailData.role','')
+    return flag || role === ROLE_TYPE.PROVIDER
   }
 
   return <>
@@ -101,7 +106,7 @@ const JobForm = forwardRef((props:JobFormPropsInterface, ref) => {
               disabled={checkFormDisable()}
             >
               <Form.Item name="algorithm" label="算法类型" required>
-                <Select style={{width:200}}>
+                <Select style={{width:200}} disabled={checkAlgorithmDisable() }>
                   {jobFormData.algorithmList.map((item:string) => (
                     <Select.Option key={item} value={item}>
                       {item}

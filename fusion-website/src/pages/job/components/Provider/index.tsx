@@ -27,7 +27,13 @@ const Index = forwardRef((props:PromoterPropsInterface,ref) => {
 
   const refuseModalRef = useRef<any>();
  
-
+  useEffect(()=>{
+    if(detailData.jobDetailData){
+      jobFormRef.current.setFieldsValue({
+        algorithm:lodash.get(detailData,'jobDetailData.algorithm')
+      })
+    }
+  },[detailData.jobDetailData])
 
   const {run:runAgreeAndStart,loading:agreeAndStartLoading} = useRequest(async (params:CreateJobRequestInterface)=>{
     const reponse = await agreeAndStart(params)
@@ -44,8 +50,10 @@ const Index = forwardRef((props:PromoterPropsInterface,ref) => {
 
   const submitFormData = async () => {
     const {data_resource_type,add_method,hash_config,remark,table_data_resource_info} = await jobFormRef.current?.validateFields();
+    const algorithm = lodash.get(detailData,'jobDetailData.algorithm')
     const requestParams = {
       remark,
+      algorithm,
       job_id:detailData.jobId,
       data_resource:{
         data_resource_type,
@@ -70,7 +78,7 @@ const Index = forwardRef((props:PromoterPropsInterface,ref) => {
       <Button
         type="primary"
         onClick={() => submitFormData()}
-      >通过</Button>
+      >通过并开启任务</Button>
     </Space>
   </Spin>
 
@@ -81,7 +89,7 @@ const Index = forwardRef((props:PromoterPropsInterface,ref) => {
     <>
       <Row>
         <Col span={12}>
-           <ReadOnlyDetailItem title={'发起方'}  bodyStyle={{ height: 'calc(100vh - 92px)'}} detailInfoData={detailData.jobDetailData?.partner}/>
+           <ReadOnlyDetailItem title={'发起方'}  bodyStyle={{ height: 'calc(100vh - 92px)'}} detailInfoData={{...detailData.jobDetailData?.partner,algorithm:detailData.jobDetailData?.algorithm}}/>
         </Col>
         <Col span={12}>
           <JobCard

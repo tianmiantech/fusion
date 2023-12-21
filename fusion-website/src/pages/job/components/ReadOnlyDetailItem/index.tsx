@@ -131,6 +131,7 @@ const ReadOnlyDetailItem = (props:ReadOnlyDetailItemProps) => {
   return (<JobCard title={title} bodyStyle={bodyStyle} >
       <Descriptions column={1} bordered labelStyle={labelStyle} contentStyle={{paddingTop:10,paddingBottom:10}}>
         <Descriptions.Item label="服务地址">{lodash.get(detailInfoData,'base_url','') }</Descriptions.Item>
+        <Descriptions.Item label="算法类型">{lodash.get(detailInfoData,'algorithm','') }</Descriptions.Item>
         <Descriptions.Item label="样本类型">{ dataResourceTypeMap.get(lodash.get(detailInfoData,'data_resource_type',''))  }</Descriptions.Item>
         <Descriptions.Item label="数据量" >{ renderTotlDataCount()}</Descriptions.Item>
         <Descriptions.Item label="主键">{renderHashConfig()}</Descriptions.Item>
