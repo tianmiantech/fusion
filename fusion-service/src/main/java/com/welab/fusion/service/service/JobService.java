@@ -168,7 +168,7 @@ public class JobService extends AbstractService {
         gatewayService.callOtherFusionNode(target, RestartJobApi.class, input);
 
         // 创建任务并启动
-        AbstractPsiJob psiJob = createFusionJob(job);
+        AbstractPsiJob psiJob = createPsiJob(job);
         FusionJobManager.start(psiJob);
     }
 
@@ -208,11 +208,11 @@ public class JobService extends AbstractService {
 
 
         // 创建任务并启动
-        AbstractPsiJob psiJob = createFusionJob(job);
+        AbstractPsiJob psiJob = createPsiJob(job);
         FusionJobManager.start(psiJob);
     }
 
-    private AbstractPsiJob createFusionJob(JobDbModel job) throws Exception {
+    private AbstractPsiJob createPsiJob(JobDbModel job) throws Exception {
         JobMemberDbModel myselfJobInfo = jobMemberService.findMyself(job.getId());
         MemberDbModel myselfInfo = memberService.getMyself();
         DataResourceInfo myselfDataResourceInfo = DataResourceInfo.of(myselfJobInfo.getDataResourceType(), myselfJobInfo.getTotalDataCount(), myselfJobInfo.getHashConfigModel());
