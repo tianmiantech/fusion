@@ -17,6 +17,7 @@ package com.welab.fusion.core.psi;
 
 import cn.hutool.core.codec.Base64;
 import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
+import org.bouncycastle.math.ec.ECCurve;
 import org.bouncycastle.math.ec.ECPoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -140,5 +141,9 @@ public class PsiUtils {
 
     public static String ecPoint2String(ECPoint point) {
         return Base64.encode(point.getEncoded(true));
+    }
+
+    public static ECPoint string2ECPoint(ECCurve ecCurve, String value) {
+        return ecCurve.decodePoint(Base64.decode(value));
     }
 }

@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.welab.fusion.core.algorithm.ecdh_psi.action;
+package com.welab.fusion.core.algorithm.rsa_psi.action;
 
-import com.welab.fusion.core.algorithm.ecdh_psi.EcdhPsiJob;
 import com.welab.fusion.core.Job.AbstractJobMember;
-import com.welab.fusion.core.Job.JobRole;
+import com.welab.fusion.core.algorithm.rsa_psi.RsaPsiJob;
 import com.welab.fusion.core.algorithm.JobPhase;
+import com.welab.fusion.core.Job.JobRole;
 import com.welab.fusion.core.algorithm.base.AbstractJobPhaseAction;
 import com.welab.fusion.core.data_resource.base.DataResourceInfo;
 import com.welab.fusion.core.data_resource.base.DataResourceType;
@@ -33,8 +33,8 @@ import com.welab.fusion.core.data_resource.base.DataResourceType;
  * @author zane.luo
  * @date 2023/11/13
  */
-public class ConfirmMemberRoleAction extends AbstractJobPhaseAction<EcdhPsiJob> {
-    public ConfirmMemberRoleAction(EcdhPsiJob job) {
+public class P1ConfirmMemberRoleAction extends AbstractJobPhaseAction<RsaPsiJob> {
+    public P1ConfirmMemberRoleAction(RsaPsiJob job) {
         super(job);
     }
 

@@ -15,14 +15,11 @@
  */
 package com.welab.fusion.core.algorithm.ecdh_psi.action;
 
-import com.welab.fusion.core.algorithm.ecdh_psi.EcdhPsiJob;
 import com.welab.fusion.core.Job.JobRole;
 import com.welab.fusion.core.algorithm.JobPhase;
 import com.welab.fusion.core.algorithm.base.AbstractJobPhaseAction;
+import com.welab.fusion.core.algorithm.ecdh_psi.EcdhPsiJob;
 import com.welab.fusion.core.algorithm.ecdh_psi.elliptic_curve.PsiECEncryptedData;
-import com.welab.fusion.core.algorithm.ecdh_psi.function.DownloadPartnerPsiECEncryptedDataFunction;
-import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
-import com.welab.fusion.core.algorithm.rsa_psi.function.DownloadPartnerPsiBloomFilterFunction;
 import com.welab.fusion.core.io.FileSystem;
 import com.welab.wefe.common.InformationSize;
 import com.welab.wefe.common.file.decompression.SuperDecompressor;
@@ -35,8 +32,8 @@ import java.nio.file.Path;
  * @author zane.luo
  * @date 2023/11/13
  */
-public class DownloadPartnerECEncryptedDataAction extends AbstractJobPhaseAction<EcdhPsiJob> {
-    public DownloadPartnerECEncryptedDataAction(EcdhPsiJob job) {
+public class P3DownloadPartnerECEncryptedDataAction extends AbstractJobPhaseAction<EcdhPsiJob> {
+    public P3DownloadPartnerECEncryptedDataAction(EcdhPsiJob job) {
         super(job);
     }
 
@@ -47,25 +44,13 @@ public class DownloadPartnerECEncryptedDataAction extends AbstractJobPhaseAction
 
     @Override
     protected void doAction() throws Exception {
-        phaseProgress.setMessage("正在从合作方下载过滤器...");
-        DownloadPartnerPsiECEncryptedDataFunction function = job.getJobFunctions().downloadPartnerPsiECEncryptedDataFunction;
-
-        // 从合作方下载过滤器
-        File file = function.download(
-                job.getJobId(),
-                job.getPartner().memberId,
-                size -> {
-                    phaseProgress.updateTotalWorkload(size);
-                },
-                size -> {
-                    phaseProgress.updateCompletedWorkload(size);
-                });
+        phaseProgress.setMessage("正在下载合作方加密后的数据...");
+        File file = downloadFileFromPartner();
 
         phaseProgress.setMessage("正在解压 zip 文件(" + InformationSize.fromByte(file.length()) + ")...");
         // file 解压至 dir
         Path dir = FileSystem.PsiBloomFilter.getDir(job.getPartner().memberId.replace(":", "_") + "-" + FileUtil.getFileNameWithoutSuffix(file.getName()));
         SuperDecompressor.decompression(file, dir.toAbsolutePath().toString(), false);
-
 
         PsiECEncryptedData psiECEncryptedData = PsiECEncryptedData.of(dir);
 

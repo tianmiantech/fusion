@@ -34,13 +34,13 @@ public enum JobPhase {
 
     // region ECDH-PSI
 
-    EncryptMyselfData("加密己方数据"),
+    ECEncryptMyselfData("加密己方数据"),
 
     DownloadPartnerECEncryptedData("下载合作方加密后的数据"),
 
-    EncryptPartnerData("加密合作方数据"),
+    ECEncryptPartnerData("加密合作方数据"),
 
-    DownloadSecondaryEncryptedData("下载二次加密后的数据"),
+    DownloadSecondaryECEncryptedData("下载二次加密后的数据"),
     
     // endregion
     

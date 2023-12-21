@@ -15,6 +15,7 @@
  */
 package com.welab.fusion.core.algorithm.ecdh_psi.elliptic_curve;
 
+import cn.hutool.core.codec.Base64;
 import org.bouncycastle.jce.ECNamedCurveTable;
 import org.bouncycastle.jce.spec.ECParameterSpec;
 import org.bouncycastle.math.ec.ECCurve;
@@ -273,5 +274,12 @@ public class EllipticCurve {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * 还原 base64 为 ECPoint
+     */
+    public ECPoint base64ToECPoint(String value) {
+        return getEcCurve().decodePoint(Base64.decode(value));
     }
 }

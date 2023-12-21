@@ -45,7 +45,7 @@ public class PsiECEncryptedDataConsumer implements BiConsumer<Long, LinkedHashMa
     /**
      * 用于生成过滤器的线程池
      */
-    private final ThreadPoolExecutor GENERATE_FILTER_THREAD_POOL;
+    private final ThreadPoolExecutor THREAD_POOL;
     private Progress progress;
     /**
      * 保存加密后的数据的文件
@@ -55,7 +55,7 @@ public class PsiECEncryptedDataConsumer implements BiConsumer<Long, LinkedHashMa
 
     public PsiECEncryptedDataConsumer(PsiECEncryptedData psiECEncryptedData, Progress progress) throws IOException {
         this.psiECEncryptedData = psiECEncryptedData;
-        this.GENERATE_FILTER_THREAD_POOL = createThreadPoll();
+        this.THREAD_POOL = createThreadPoll();
         this.progress = progress;
 
         File file = psiECEncryptedData.getDataFile();
@@ -86,15 +86,15 @@ public class PsiECEncryptedDataConsumer implements BiConsumer<Long, LinkedHashMa
     public void accept(Long index, LinkedHashMap<String, Object> row) {
 
         // 避免读取的数据堆积在内存
-        while (GENERATE_FILTER_THREAD_POOL.getQueue().size() > 1000) {
+        while (THREAD_POOL.getQueue().size() > 1000) {
             ThreadUtil.safeSleep(100);
         }
 
         try {
             String key = psiECEncryptedData.hashConfig.hash(row);
 
-            GENERATE_FILTER_THREAD_POOL.execute(() -> {
-                String encrypted = psiECEncryptedData.encrypt(key);
+            THREAD_POOL.execute(() -> {
+                String encrypted = psiECEncryptedData.encryptMyselfData(key);
                 // 将加密后的数据保存到文件
                 try {
                     // 这里写入的必须拼接上换行符之后写入，如果分开写入，在并发的影响下，会导致数据错乱。
@@ -114,20 +114,20 @@ public class PsiECEncryptedDataConsumer implements BiConsumer<Long, LinkedHashMa
     }
 
     public boolean isWorking() {
-        return !getQueue().isEmpty() || GENERATE_FILTER_THREAD_POOL.getActiveCount() > 0;
+        return !getQueue().isEmpty() || THREAD_POOL.getActiveCount() > 0;
     }
 
     public BlockingQueue<Runnable> getQueue() {
-        return GENERATE_FILTER_THREAD_POOL.getQueue();
+        return THREAD_POOL.getQueue();
     }
 
     public int getActiveCount() {
-        return GENERATE_FILTER_THREAD_POOL.getActiveCount();
+        return THREAD_POOL.getActiveCount();
     }
 
     @Override
     public void close() throws IOException {
-        GENERATE_FILTER_THREAD_POOL.shutdownNow();
+        THREAD_POOL.shutdownNow();
         fileWriter.close();
     }
 

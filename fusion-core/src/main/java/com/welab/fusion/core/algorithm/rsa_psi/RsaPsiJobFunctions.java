@@ -15,7 +15,6 @@
  */
 package com.welab.fusion.core.algorithm.rsa_psi;
 
-import com.welab.fusion.core.algorithm.rsa_psi.function.DownloadPartnerPsiBloomFilterFunction;
 import com.welab.fusion.core.algorithm.rsa_psi.function.EncryptRsaPsiRecordsFunction;
 import com.welab.fusion.core.Job.AbstractJobFunctions;
 import com.welab.fusion.core.algorithm.rsa_psi.function.SaveMyPsiBloomFilterFunction;
@@ -26,7 +25,6 @@ import com.welab.fusion.core.algorithm.rsa_psi.function.SaveMyPsiBloomFilterFunc
  */
 public class RsaPsiJobFunctions extends AbstractJobFunctions {
     public SaveMyPsiBloomFilterFunction saveMyPsiBloomFilterFunction;
-    public DownloadPartnerPsiBloomFilterFunction downloadPartnerPsiBloomFilterFunction;
     public EncryptRsaPsiRecordsFunction encryptRsaPsiRecordsFunction;
 
     @Override
@@ -35,9 +33,6 @@ public class RsaPsiJobFunctions extends AbstractJobFunctions {
 
         if (saveMyPsiBloomFilterFunction == null) {
             throw new RuntimeException("JobFunction 中未设置 SaveMyPsiBloomFilterFunction");
-        }
-        if (downloadPartnerPsiBloomFilterFunction == null) {
-            throw new RuntimeException("JobFunction 中未设置 DownloadPartnerPsiBloomFilterFunction");
         }
         if (encryptRsaPsiRecordsFunction == null) {
             throw new RuntimeException("JobFunction 中未设置 EncryptRsaPsiRecordsFunction");

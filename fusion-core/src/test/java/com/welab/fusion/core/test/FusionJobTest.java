@@ -17,8 +17,6 @@ package com.welab.fusion.core.test;
 
 import com.alibaba.fastjson.JSON;
 import com.welab.fusion.core.Job.AbstractPsiJob;
-import com.welab.fusion.core.Job.AbstractJobMember;
-import com.welab.fusion.core.algorithm.base.PsiAlgorithm;
 import com.welab.fusion.core.algorithm.rsa_psi.RsaPsiJob;
 import com.welab.fusion.core.algorithm.rsa_psi.RsaPsiJobFunctions;
 import com.welab.fusion.core.algorithm.rsa_psi.RsaPsiJobMember;
@@ -27,13 +25,12 @@ import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilterCreato
 import com.welab.fusion.core.data_resource.base.DataResourceInfo;
 import com.welab.fusion.core.data_resource.base.DataResourceType;
 import com.welab.fusion.core.data_source.CsvTableDataSourceReader;
-import com.welab.fusion.core.Job.AbstractJobFunctions;
 import com.welab.fusion.core.hash.HashConfig;
 import com.welab.fusion.core.hash.HashConfigItem;
 import com.welab.fusion.core.hash.HashMethod;
 import com.welab.fusion.core.io.FileSystem;
 import com.welab.fusion.core.psi.PsiUtils;
-import com.welab.fusion.core.test.function.DownloadPartnerPsiBloomFilterFunctionImpl;
+import com.welab.fusion.core.test.function.DownloadPartnerFileFunctionImpl;
 import com.welab.fusion.core.test.function.SaveMyPsiBloomFilterFunctionImpl;
 
 import java.io.File;
@@ -112,7 +109,7 @@ public class FusionJobTest {
 
     private static RsaPsiJobFunctions createJobFunctions() {
         RsaPsiJobFunctions jobFunctions = new RsaPsiJobFunctions();
-        jobFunctions.downloadPartnerPsiBloomFilterFunction = new DownloadPartnerPsiBloomFilterFunctionImpl();
+        jobFunctions.downloadPartnerFileFunction = new DownloadPartnerFileFunctionImpl();
         jobFunctions.saveMyPsiBloomFilterFunction = new SaveMyPsiBloomFilterFunctionImpl();
 
         jobFunctions.encryptRsaPsiRecordsFunction = (String memberId, String psiBloomFilterId, List<String> bucket) -> {

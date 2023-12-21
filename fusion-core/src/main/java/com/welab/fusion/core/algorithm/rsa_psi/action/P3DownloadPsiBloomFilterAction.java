@@ -20,7 +20,6 @@ import com.welab.fusion.core.algorithm.rsa_psi.RsaPsiJob;
 import com.welab.fusion.core.algorithm.JobPhase;
 import com.welab.fusion.core.algorithm.base.AbstractJobPhaseAction;
 import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
-import com.welab.fusion.core.algorithm.rsa_psi.function.DownloadPartnerPsiBloomFilterFunction;
 import com.welab.fusion.core.io.FileSystem;
 import com.welab.wefe.common.InformationSize;
 import com.welab.wefe.common.file.decompression.SuperDecompressor;
@@ -33,8 +32,8 @@ import java.nio.file.Path;
  * @author zane.luo
  * @date 2023/11/13
  */
-public class DownloadPsiBloomFilterAction extends AbstractJobPhaseAction<RsaPsiJob> {
-    public DownloadPsiBloomFilterAction(RsaPsiJob job) {
+public class P3DownloadPsiBloomFilterAction extends AbstractJobPhaseAction<RsaPsiJob> {
+    public P3DownloadPsiBloomFilterAction(RsaPsiJob job) {
         super(job);
     }
 
@@ -46,18 +45,9 @@ public class DownloadPsiBloomFilterAction extends AbstractJobPhaseAction<RsaPsiJ
     @Override
     protected void doAction() throws Exception {
         phaseProgress.setMessage("正在从合作方下载过滤器...");
-        DownloadPartnerPsiBloomFilterFunction function = job.getJobFunctions().downloadPartnerPsiBloomFilterFunction;
 
         // 从合作方下载过滤器
-        File file = function.download(
-                job.getJobId(),
-                job.getPartner().memberId,
-                size -> {
-                    phaseProgress.updateTotalWorkload(size);
-                },
-                size -> {
-                    phaseProgress.updateCompletedWorkload(size);
-                });
+        File file = downloadFileFromPartner();
 
         phaseProgress.setMessage("正在解压过滤器 zip 文件(" + InformationSize.fromByte(file.length()) + ")...");
         // file 解压至 dir

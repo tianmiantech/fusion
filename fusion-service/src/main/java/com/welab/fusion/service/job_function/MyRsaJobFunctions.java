@@ -27,7 +27,7 @@ public class MyRsaJobFunctions extends RsaPsiJobFunctions {
     public static final MyRsaJobFunctions INSTANCE = new MyRsaJobFunctions();
 
     private MyRsaJobFunctions() {
-        downloadPartnerPsiBloomFilterFunction = new DownloadPartnerPsiBloomFilterFunction();
+        downloadPartnerFileFunction = new DownloadPartnerFileFunctionImpl();
         encryptRsaPsiRecordsFunction = new EncryptRsaPsiRecordsFunction();
         getPartnerProgressFunction = new GetPartnerProgressFunction();
         saveFusionResultFunction = new SaveFusionResultFunction();

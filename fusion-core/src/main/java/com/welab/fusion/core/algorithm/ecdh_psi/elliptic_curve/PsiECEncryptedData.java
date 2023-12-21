@@ -16,7 +16,9 @@
 package com.welab.fusion.core.algorithm.ecdh_psi.elliptic_curve;
 
 import cn.hutool.core.io.FileUtil;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.annotation.JSONField;
+import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
 import com.welab.fusion.core.hash.HashConfig;
 import com.welab.fusion.core.io.FileSystem;
 import com.welab.fusion.core.psi.PsiUtils;
@@ -55,12 +57,19 @@ public class PsiECEncryptedData {
         data.id = id;
         data.hashConfig = hashConfig;
         data.ecdhPsiParam = ecdhPsiParam;
-        data.dir = FileSystem.PsiEllipticCurveEncryptedData.getDir(id);
+        data.dir = FileSystem.PsiECEncryptedData.getDir(id);
         return data;
     }
 
-    public static PsiECEncryptedData of(Path dir) {
-        return null;
+    public static PsiECEncryptedData of(String id) {
+        Path dir = FileSystem.PsiECEncryptedData.getDir(id);
+
+        // 加载元数据
+        File metaFile = dir.resolve(META_FILE_NAME).toFile();
+        String json = FileUtil.readString(metaFile, StandardCharsets.UTF_8);
+        PsiECEncryptedData result = JSON.parseObject(json).toJavaObject(PsiECEncryptedData.class);
+        result.dir = dir;
+        return result;
     }
 
     @JSONField(serialize = false)
@@ -77,13 +86,22 @@ public class PsiECEncryptedData {
     }
 
     /**
-     * 对主键进行加密
+     * 第一次加密：对主键进行加密
      * 1. hash to point
      * 2. secretKey * point
      */
-    public String encrypt(String key) {
+    public String encryptMyselfData(String key) {
         BigInteger bigIntegerValue = PsiUtils.stringToBigInteger(key);
         ECPoint point = EllipticCurve.INSTANCE.hashToPoint(bigIntegerValue);
+        ECPoint encryptedValue = point.multiply(ecdhPsiParam.secretKey);
+        return PsiUtils.ecPoint2String(encryptedValue);
+    }
+
+    /**
+     * 第二次加密：对合作方的数据进行加密
+     */
+    public String encryptPartnerData(String base64) {
+        ECPoint point = EllipticCurve.INSTANCE.base64ToECPoint(base64);
         ECPoint encryptedValue = point.multiply(ecdhPsiParam.secretKey);
         return PsiUtils.ecPoint2String(encryptedValue);
     }

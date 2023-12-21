@@ -15,10 +15,11 @@
  */
 package com.welab.fusion.service.api.download;
 
+import com.welab.fusion.core.algorithm.JobPhase;
+import com.welab.fusion.core.algorithm.ecdh_psi.elliptic_curve.PsiECEncryptedData;
 import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
 import com.welab.fusion.core.io.FileSystem;
 import com.welab.fusion.service.api.download.base.FileInfo;
-import com.welab.fusion.service.api.download.base.FileType;
 import com.welab.fusion.service.service.JobMemberService;
 import com.welab.wefe.common.StatusCode;
 import com.welab.wefe.common.fieldvalidate.annotation.Check;
@@ -46,18 +47,20 @@ public class GetDownloadFileInfoApi extends AbstractApi<GetDownloadFileInfoApi.I
         File file = findFile(input);
         if (file == null) {
             StatusCode.PARAMETER_VALUE_INVALID
-                    .throwException("未找到 " + input.fileType + " 文件，任务Id：" + input.jobId);
+                    .throwException("未找到 " + input.jobPhase + " 文件，任务Id：" + input.jobId);
         }
         return success(FileInfo.of(file));
     }
 
     private File findFile(Input input) throws IOException {
-        switch (input.fileType) {
-            case BloomFilter:
+        switch (input.jobPhase) {
+            case DownloadPsiBloomFilter:
                 String bloomFilterId = jobMemberService.findMyself(input.jobId).getBloomFilterId();
                 Path dir = FileSystem.PsiBloomFilter.getDir(bloomFilterId);
                 return PsiBloomFilter.of(dir).zip();
-            case FusionResult:
+            case DownloadPartnerECEncryptedData:
+                return PsiECEncryptedData.of(input.jobId).getDataFile();
+            case SaveResult:
                 return FileSystem.FusionResult.getFile(input.jobId);
             default:
                 return null;
@@ -65,14 +68,14 @@ public class GetDownloadFileInfoApi extends AbstractApi<GetDownloadFileInfoApi.I
     }
 
     public static class Input extends AbstractApiInput {
-        @Check(name = "文件类型", require = true)
-        public FileType fileType;
+        @Check(name = "任务阶段", require = true)
+        public JobPhase jobPhase;
         @Check(name = "任务Id", require = true)
         public String jobId;
 
-        public static Input of(FileType fileType, String jobId) {
+        public static Input of(JobPhase jobPhase, String jobId) {
             Input input = new Input();
-            input.fileType = fileType;
+            input.jobPhase = jobPhase;
             input.jobId = jobId;
             return input;
         }

@@ -33,13 +33,13 @@ public class EcdhPsiJobFlow extends AbstractJobFlow {
     private static final LinkedHashMap<JobPhase, Class<? extends AbstractJobPhaseAction>> map = new LinkedHashMap<>();
 
     static {
-        map.put(JobPhase.ConfirmMemberRole, ConfirmMemberRoleAction.class);
-        map.put(JobPhase.EncryptMyselfData, EncryptMyselfDataAction.class);
-        map.put(JobPhase.DownloadPartnerECEncryptedData, DownloadPartnerECEncryptedDataAction.class);
-        map.put(JobPhase.EncryptPartnerData, EncryptMyselfDataAction.class);
-        map.put(JobPhase.DownloadSecondaryEncryptedData, EncryptMyselfDataAction.class);
-        map.put(JobPhase.Intersection, IntersectionAction.class);
-        map.put(JobPhase.SaveResult, SaveResultAction.class);
+        map.put(JobPhase.ConfirmMemberRole, P1ConfirmMemberRoleAction.class);
+        map.put(JobPhase.ECEncryptMyselfData, P2EncryptMyselfDataAction.class);
+        map.put(JobPhase.DownloadPartnerECEncryptedData, P3DownloadPartnerECEncryptedDataAction.class);
+        map.put(JobPhase.ECEncryptPartnerData, P4EncryptPartnerDataAction.class);
+        map.put(JobPhase.DownloadSecondaryECEncryptedData, P5DownloadSecondaryECEncryptedDataAction.class);
+        map.put(JobPhase.Intersection, P6IntersectionAction.class);
+        map.put(JobPhase.SaveResult, P7SaveResultAction.class);
     }
 
     public EcdhPsiJobFlow() {

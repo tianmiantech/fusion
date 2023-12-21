@@ -24,8 +24,8 @@ import com.welab.fusion.core.algorithm.base.AbstractJobPhaseAction;
  * @author zane.luo
  * @date 2023/11/13
  */
-public class SaveResultAction extends AbstractJobPhaseAction<RsaPsiJob> {
-    public SaveResultAction(RsaPsiJob job) {
+public class P5SaveResultAction extends AbstractJobPhaseAction<RsaPsiJob> {
+    public P5SaveResultAction(RsaPsiJob job) {
         super(job);
     }
 

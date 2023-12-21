@@ -15,30 +15,35 @@
  */
 package com.welab.fusion.service.job_function;
 
+import com.welab.fusion.core.algorithm.JobPhase;
+import com.welab.fusion.core.algorithm.ecdh_psi.function.DownloadPartnerFileFunction;
 import com.welab.fusion.core.io.FileSystem;
 import com.welab.fusion.service.api.download.Downloader;
-import com.welab.fusion.service.api.download.base.FileType;
+import com.welab.fusion.service.api.download.base.FileInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.function.Consumer;
 
 /**
  * @author zane.luo
  * @date 2023/11/29
  */
-public class DownloadPartnerPsiBloomFilterFunction implements com.welab.fusion.core.algorithm.rsa_psi.function.DownloadPartnerPsiBloomFilterFunction {
+public class DownloadPartnerFileFunctionImpl implements DownloadPartnerFileFunction {
     protected final Logger LOG = LoggerFactory.getLogger(this.getClass());
 
+
     @Override
-    public File download(String jobId, String partnerId, Consumer<Long> totalSizeConsumer, Consumer<Long> downloadSizeConsumer) throws Exception {
+    public File download(JobPhase jobPhase, String jobId, String partnerId, Consumer<Long> totalSizeConsumer, Consumer<Long> downloadSizeConsumer) throws Exception {
         Downloader downloader = new Downloader(
+                jobPhase,
                 jobId,
                 partnerId,
-                FileType.BloomFilter,
+                // 指定存储路径
                 fileInfo -> {
-                    return FileSystem.getTempDir().resolve("member_" + partnerId.replace(":","_") + "-bf_" + fileInfo.filename);
+                    return buildFilePath(jobPhase, jobId, partnerId, fileInfo);
                 }
         );
 
@@ -47,4 +52,29 @@ public class DownloadPartnerPsiBloomFilterFunction implements com.welab.fusion.c
 
         return downloader.download();
     }
+
+    /**
+     * 构建文件储存路径
+     */
+    private static Path buildFilePath(JobPhase jobPhase, String jobId, String partnerId, FileInfo fileInfo) {
+        switch (jobPhase) {
+            case SaveResult:
+                return FileSystem.FusionResult
+                        .getFile(jobId)
+                        .toPath();
+
+            default:
+                return FileSystem.getTempDir()
+                        .resolve(jobId)
+                        .resolve(
+                                "member_" + partnerId.replace(":", "_")
+                                        + "-" + jobPhase
+                                        + "_" + fileInfo.filename
+                        );
+        }
+
+
+    }
+
+
 }

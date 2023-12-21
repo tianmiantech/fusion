@@ -81,7 +81,8 @@ public class FileSystem {
          */
         Temp,
         PsiBloomFilter,
-        PsiEllipticCurveEncryptedData,
+        PsiECEncryptedData,
+        PsiSecondaryECEncryptedData,
         /**
          * 求交结果
          */
@@ -122,9 +123,18 @@ public class FileSystem {
         }
     }
 
-    public static class PsiEllipticCurveEncryptedData {
+    public static class PsiECEncryptedData {
         public static Path getDir(String id) {
-            return getBaseDir(UseType.PsiEllipticCurveEncryptedData).resolve(id);
+            return getBaseDir(UseType.PsiECEncryptedData).resolve(id);
+        }
+    }
+
+    public static class PsiSecondaryECEncryptedData {
+        public static File getDataFile(String jobId,String memberId) {
+            return getBaseDir(UseType.PsiSecondaryECEncryptedData)
+                    .resolve(jobId)
+                    .resolve(memberId.replace(":", "_")+".data")
+                    .toFile();
         }
     }
 }

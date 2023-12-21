@@ -16,12 +16,12 @@
 package com.welab.fusion.core.algorithm.ecdh_psi;
 
 import com.welab.fusion.core.Job.AbstractJobFunctions;
-import com.welab.fusion.core.algorithm.ecdh_psi.function.DownloadPartnerPsiECEncryptedDataFunction;
+import com.welab.fusion.core.algorithm.ecdh_psi.function.DownloadPartnerFileFunction;
 
 /**
  * @author zane.luo
  * @date 2023/12/20
  */
 public class EcdhPsiJobFunctions extends AbstractJobFunctions {
-    public DownloadPartnerPsiECEncryptedDataFunction downloadPartnerPsiECEncryptedDataFunction;
+
 }

@@ -15,8 +15,9 @@
  */
 package com.welab.fusion.core.test.function;
 
+import com.welab.fusion.core.algorithm.JobPhase;
+import com.welab.fusion.core.algorithm.ecdh_psi.function.DownloadPartnerFileFunction;
 import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
-import com.welab.fusion.core.algorithm.rsa_psi.function.DownloadPartnerPsiBloomFilterFunction;
 import com.welab.fusion.core.io.FileSystem;
 
 import java.io.File;
@@ -27,12 +28,19 @@ import java.util.function.Consumer;
  * @author zane.luo
  * @date 2023/11/15
  */
-public class DownloadPartnerPsiBloomFilterFunctionImpl implements DownloadPartnerPsiBloomFilterFunction {
-    @Override
-    public File download(String memberId, String partnerId, Consumer<Long> totalSizeConsumer, Consumer<Long> downloadSizeConsumer) throws Exception {
-        Path dir = FileSystem.PsiBloomFilter.getDir(partnerId);
-        PsiBloomFilter psiBloomFilter = PsiBloomFilter.of(dir);
+public class DownloadPartnerFileFunctionImpl implements DownloadPartnerFileFunction {
 
-        return psiBloomFilter.zip();
+    @Override
+    public File download(JobPhase jobPhase, String jobId, String partnerId, Consumer<Long> totalSizeConsumer, Consumer<Long> downloadSizeConsumer) throws Exception {
+        switch (jobPhase) {
+            case DownloadPsiBloomFilter:
+                Path dir = FileSystem.PsiBloomFilter.getDir(partnerId);
+                PsiBloomFilter psiBloomFilter = PsiBloomFilter.of(dir);
+
+                return psiBloomFilter.zip();
+
+            default:
+                return null;
+        }
     }
 }

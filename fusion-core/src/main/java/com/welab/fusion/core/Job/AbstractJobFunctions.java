@@ -15,6 +15,7 @@
  */
 package com.welab.fusion.core.Job;
 
+import com.welab.fusion.core.algorithm.ecdh_psi.function.DownloadPartnerFileFunction;
 import com.welab.fusion.core.algorithm.rsa_psi.function.FinishJobFunction;
 import com.welab.fusion.core.algorithm.rsa_psi.function.GetPartnerProgressFunction;
 import com.welab.fusion.core.algorithm.rsa_psi.function.SaveFusionResultFunction;
@@ -31,7 +32,7 @@ import java.util.List;
  */
 public abstract class AbstractJobFunctions {
     public GetPartnerProgressFunction getPartnerProgressFunction;
-
+    public DownloadPartnerFileFunction downloadPartnerFileFunction;
     public SaveFusionResultFunction saveFusionResultFunction;
     public FinishJobFunction finishJobFunction;
 
@@ -39,7 +40,8 @@ public abstract class AbstractJobFunctions {
         List<Tuple2> list = Arrays.asList(
                 Tuple2.of(getPartnerProgressFunction, GetPartnerProgressFunction.class),
                 Tuple2.of(saveFusionResultFunction, SaveFusionResultFunction.class),
-                Tuple2.of(finishJobFunction, FinishJobFunction.class)
+                Tuple2.of(finishJobFunction, FinishJobFunction.class),
+                Tuple2.of(downloadPartnerFileFunction, DownloadPartnerFileFunction.class)
         );
 
         for (Tuple2 tuple2 : list) {

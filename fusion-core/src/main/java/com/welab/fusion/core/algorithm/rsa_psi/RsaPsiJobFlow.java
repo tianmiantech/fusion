@@ -30,11 +30,11 @@ public class RsaPsiJobFlow extends AbstractJobFlow {
     private static final LinkedHashMap<JobPhase, Class<? extends AbstractJobPhaseAction>> map = new LinkedHashMap<>();
 
     static {
-        map.put(JobPhase.ConfirmMemberRole, ConfirmMemberRoleAction.class);
-        map.put(JobPhase.CreatePsiBloomFilter, CreatePsiBloomFilterAction.class);
-        map.put(JobPhase.DownloadPsiBloomFilter, DownloadPsiBloomFilterAction.class);
-        map.put(JobPhase.Intersection, IntersectionAction.class);
-        map.put(JobPhase.SaveResult, SaveResultAction.class);
+        map.put(JobPhase.ConfirmMemberRole, P1ConfirmMemberRoleAction.class);
+        map.put(JobPhase.CreatePsiBloomFilter, P2CreatePsiBloomFilterAction.class);
+        map.put(JobPhase.DownloadPsiBloomFilter, P3DownloadPsiBloomFilterAction.class);
+        map.put(JobPhase.Intersection, P4IntersectionAction.class);
+        map.put(JobPhase.SaveResult, P5SaveResultAction.class);
     }
 
     public static final RsaPsiJobFlow INSTANCE = new RsaPsiJobFlow();

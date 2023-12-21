@@ -22,6 +22,8 @@ import com.welab.fusion.core.progress.JobPhaseProgress;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+
 /**
  * @author zane.luo
  * @date 2023/11/13
@@ -100,6 +102,23 @@ public abstract class AbstractJobPhaseAction<T extends AbstractPsiJob> {
             LOG.info("finished phase: {} spend: {}ms", getPhase(), spend);
         }
 
+    }
+
+    /**
+     * 从合作方下载文件
+     */
+    public File downloadFileFromPartner() throws Exception {
+        return job.getJobFunctions().downloadPartnerFileFunction.download(
+                getPhase(),
+                job.getJobId(),
+                job.getPartner().memberId,
+                size -> {
+                    phaseProgress.updateTotalWorkload(size);
+                },
+                size -> {
+                    phaseProgress.updateCompletedWorkload(size);
+                }
+        );
     }
 
 }

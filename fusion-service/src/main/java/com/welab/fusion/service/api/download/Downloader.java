@@ -15,9 +15,9 @@
  */
 package com.welab.fusion.service.api.download;
 
+import com.welab.fusion.core.algorithm.JobPhase;
 import com.welab.fusion.core.io.FileSystem;
 import com.welab.fusion.service.api.download.base.FileInfo;
-import com.welab.fusion.service.api.download.base.FileType;
 import com.welab.fusion.service.service.GatewayService;
 import com.welab.fusion.service.service.MemberService;
 import com.welab.wefe.common.StatusCode;
@@ -45,10 +45,7 @@ public class Downloader {
     protected final Logger LOG = LoggerFactory.getLogger(this.getClass());
     private static final MemberService memberService = Launcher.getBean(MemberService.class);
     private static final GatewayService gatewayService = Launcher.getBean(GatewayService.class);
-    /**
-     * 文件类型
-     */
-    private FileType fileType;
+    private final JobPhase jobPhase;
     /**
      * 下载后的文件输出路径
      */
@@ -58,15 +55,15 @@ public class Downloader {
     private Consumer<Long> totalSizeConsumer;
     private Consumer<Long> completedSizeConsumer;
 
-    public Downloader(String jobId, String partnerId, FileType fileType, Function<FileInfo, Path> distFilePathGetter) {
+    public Downloader(JobPhase jobPhase, String jobId, String partnerId, Function<FileInfo, Path> distFilePathGetter) {
+        this.jobPhase = jobPhase;
         this.partnerId = partnerId;
         this.jobId = jobId;
-        this.fileType = fileType;
         this.distFilePathGetter = distFilePathGetter;
     }
 
     public File download() throws IOException, StatusCodeWithException {
-        LOG.info("开始从合作方下载 {} 文件，memberId：{}，jobId：{}", fileType, partnerId, jobId);
+        LOG.info("开始从合作方下载文件({})，memberId：{}，jobId：{}", jobPhase, partnerId, jobId);
 
         long start = System.currentTimeMillis();
         FusionNodeInfo partner = memberService.findById(partnerId).toFusionNodeInfo();
@@ -93,7 +90,7 @@ public class Downloader {
         // 合并分片
         File file = mergeChunks(tempDir, distFilePath, fileInfo);
 
-        LOG.info("从合作方下载 {} 文件完成，memberId：{}，jobId：{}，耗时：{}ms", fileType, partnerId, jobId, System.currentTimeMillis() - start);
+        LOG.info("从合作方下载文件完成({})，memberId：{}，jobId：{}，耗时：{}ms", jobPhase, partnerId, jobId, System.currentTimeMillis() - start);
 
         return file;
     }
@@ -131,8 +128,8 @@ public class Downloader {
         if (mergedFile.length() != fileInfo.fileLength) {
             StatusCode.FILE_IO_WRITE_ERROR
                     .throwException(
-                            "从合作方下载 " + fileType +
-                                    " 文件失败，期望大小：" + fileInfo.fileLength +
+                            "从合作方下载文件失败(" + jobPhase
+                                    + ")，期望大小：" + fileInfo.fileLength +
                                     "，实际大小：" + mergedFile.length() + "。"
                     );
         }
@@ -172,7 +169,7 @@ public class Downloader {
         FileInfo fileInfo = gatewayService.callOtherFusionNode(
                 partner,
                 GetDownloadFileInfoApi.class,
-                GetDownloadFileInfoApi.Input.of(fileType, jobId)
+                GetDownloadFileInfoApi.Input.of(jobPhase, jobId)
         );
         return fileInfo;
     }
