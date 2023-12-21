@@ -22,6 +22,7 @@ import com.welab.fusion.core.data_source.CsvTableDataSourceReader;
 import com.welab.fusion.core.data_source.ExcelTableDataSourceReader;
 import com.welab.fusion.core.data_source.SqlTableDataSourceReader;
 import com.welab.fusion.core.io.FileSystem;
+import com.welab.fusion.service.config.fastjson.BlockForPartnerField;
 import com.welab.fusion.service.constans.AddMethod;
 import com.welab.fusion.service.service.BloomFilterService;
 import com.welab.wefe.common.crypto.Md5;
@@ -64,7 +65,7 @@ public class PreviewTableDataSourceApi extends AbstractApi<PreviewTableDataSourc
         public String sql;
 
         @Check(name = "数据源文件")
-        @Secret(maskStrategy = MaskStrategy.BLOCK)
+        @BlockForPartnerField
         public String dataSourceFile;
 
         @JSONField(serialize = false)
