@@ -1,5 +1,5 @@
 import {useRef} from 'react'
-import { Table,Tag ,Button,Card, message, Space} from "antd"
+import { Table,Tag ,Button,Card, message, Space,Spin} from "antd"
 import { TmTable } from "@tianmiantech/pro";
 import type { ColumnsType } from 'antd/es/table';
 import { useRequest,useMount } from "ahooks";
@@ -11,9 +11,10 @@ import { getJobList,deleteJob,restartJob } from "../service";
 import moment from "moment";
 import {dataResourceTypeMap,AddMethodMap,JobStatus,JOB_STATUS,ROLE_TYPE} from '@/constant/dictionary'
 import lodash from 'lodash'
+import {getPersonificationTime} from '@/utils/time'
 
 interface RowProps {
-    createTime:number,
+    created_time:number,
     role:'promoter'|'provider',
     creator_member_id:string,
     remark:string,
@@ -53,7 +54,8 @@ const Index =()=>{
         page_size:10,
         page_index:0,
         total:0,
-        dataSource:[]
+        dataSource:[],
+        isFirstLoading:true//标记是否第一次加载,用于判断是否显示loading
     })
 
     const {run:runGetJobListData,loading:getJobListLoading} = useRequest(async (params)=>{
@@ -62,7 +64,11 @@ const Index =()=>{
         if (code == 0) {
             setJobListData(draft=>{
                 const list = lodash.get(data,'list',[])
+                const total = lodash.get(data,'total',0)
+                draft.total = total;
+                draft.isFirstLoading = false;
                 draft.dataSource = list;
+
             })
             
         }
@@ -91,45 +97,56 @@ const Index =()=>{
         runGetJobListData({page_size:jobListData.page_size,page_index:jobListData.page_index,role:''})
     })
 
+
+    const renderPromoterData = (row:RowProps)=>{
+
+    }
+
     const columns: ColumnsType<RowProps>|any = [{
         title: '任务角色/创建时间',
         dataIndex: 'create',
         key: 'create',
         width:200,
         render:(text:string,row:RowProps)=>{
-            const { createTime = new Date(),role} = row;
+            const { created_time = new Date().getTime(),role} = row;
             return <><Tag color={role==='promoter'?'success':'default'}>{ROLE_TO_CN[`${role}`]}</Tag>
-            <div>{moment(createTime).startOf('hour').fromNow()}</div>
+            <div>{getPersonificationTime(created_time)}</div>
             </>
         }
     },{
-        title: '我方',
-        dataIndex: 'myself',
-        key: 'myself',
+        title: '发起方',
+        dataIndex: 'promoter',
+        key: 'promoter',
         width:400,
         render:(text:string,row:RowProps)=>{
-            const { myself } = row;
-            if(!myself)
-                return<>暂无内容</>
-            else {
-                const { data_resource_type,table_data_resource_info,total_data_count,updated_time } = myself||{};
-                const add_method = lodash.get(table_data_resource_info,'add_method')
-                return <>
-                    <div>数据类型/数据量：{dataResourceTypeMap.get(data_resource_type)}/{total_data_count}</div>
-                    <div>数据来源/更新时间：{AddMethodMap.get(add_method)}/{moment(updated_time).startOf('hour').fromNow()}</div>
-                </>
-            }
+          const { role } = row;
+          //role表示我方这条数据中所处的角色 
+          //展示发起方的数据表示 我方在当前数据中为发起方,则取myself字段，否则取partner字段
+          const key = role===ROLE_TYPE.PROMOTER?'myself':'partner';
+          const dataObj = lodash.get(row,key,null);
+          if(!dataObj)
+              return<>暂无内容</>
+          else {
+              const { data_resource_type,table_data_resource_info,total_data_count,updated_time } = dataObj||{};
+              const add_method = lodash.get(table_data_resource_info,'add_method')
+              return <>
+                  <div>数据类型/数据量：{dataResourceTypeMap.get(data_resource_type)}/{total_data_count}</div>
+                  <div>数据来源/更新时间：{AddMethodMap.get(add_method)}/{getPersonificationTime(updated_time)}</div>
+              </>
+          }
         }
     },{
-        title: '合作方',
+        title: '协作方',
         dataIndex: 'provider',
         key: 'provider',
         width:400,
         render:(text:string,row:RowProps)=>{
-            const { partner=null } = row;
-            if(partner){
-                const member_name = lodash.get(row,'partner.member_name')
-                const base_url  = lodash.get(row,'partner.base_url')
+            const { role } = row;
+            const key = role===ROLE_TYPE.PROMOTER?'myself':'partner';
+            const dataObj = lodash.get(row,key,null);
+            if(dataObj){
+                const member_name = lodash.get(dataObj,'member_name')
+                const base_url  = lodash.get(dataObj,'base_url')
                 return <>{member_name && <div>协作方名称：{member_name}</div>}
                 <div>服务地址：{base_url}</div>
                 </>
@@ -198,6 +215,12 @@ const Index =()=>{
         </div>
     }
 
+    const renderLoading = ()=>{
+        return <div className={styles.container}>
+        <Spin size='large'/>
+        </div>
+    }
+
     const renderList = ()=>{
         return <Card title='任务列表' extra={renderBtn()}>
                 <TmTable
@@ -218,9 +241,18 @@ const Index =()=>{
         </Card>
     }
 
-    return <>
-    {jobListData.dataSource.length>0?renderList():renderNoData()}
-    </>
+    const renderContent = ()=>{ 
+      if(jobListData.isFirstLoading){
+        return renderLoading()
+      } else if(jobListData.dataSource.length === 0){
+        return renderNoData()
+      } else {
+        return renderList()
+      }
+    }
 
-}
+    return <>
+      {renderContent()}
+      </>
+    }
 export default Index

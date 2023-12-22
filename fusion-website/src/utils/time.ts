@@ -28,7 +28,12 @@ export const displayChineseCoastTime = (cost_time:number)=>{
   }
 
 export const getPersonificationTime = (time:number)=>{
-    return moment(time).startOf('hour').fromNow()
+    const now = moment();
+    const before = moment(time);
+    const duration = moment.duration(now.diff(before)).asHours();   
+    if(duration<24)
+        return moment(time).startOf('hour').fromNow()
+    return getNoramlTime(time)
 }
 
 export const getNoramlTime = (time:number)=>{

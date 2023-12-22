@@ -1,9 +1,10 @@
 import {useRef} from 'react'
-import { Layout, Space } from 'antd';
+import { Layout, Badge } from 'antd';
 import styles from './index.less'
-import {SettingOutlined,PlusOutlined,BarsOutlined } from "@ant-design/icons"
+import {SettingOutlined,PlusOutlined,BarsOutlined,MailOutlined} from "@ant-design/icons"
 import GlobalConfigDrawer from '../GlobalConfigDrawer'
 import HistoryListDrawer from '../HistoryListDrawer'
+import AuditingListDrawer from '../AuditingListDrawer';
 import { useLocation,history } from 'umi';
 const { Header, Footer, Sider, Content } = Layout;
 const Index =()=>{
@@ -11,23 +12,18 @@ const Index =()=>{
     const historyListRef:any  = useRef()
     const location = useLocation();
 
-    const renderSetting = ()=>{
-       return  <SettingOutlined className={styles.setting} onClick={()=>{secretKeyDrawerRef?.current?.showDrawer()}}/>
-    }
-
     const showHistory=()=>{
         historyListRef?.current?.showDrawer()
     }
     
     const renderRightContent = ()=>{
+        const iconList = [<AuditingListDrawer/>]
         if (location.pathname.indexOf('/home')==-1) {
-            return <>
-                <PlusOutlined  className={styles.setting} onClick={()=>{history.push('/job/create')}}/>
-                <BarsOutlined  className={styles.setting} onClick={showHistory}/>
-                {renderSetting()}
-            </>
-        } 
-        return renderSetting()
+            iconList.push(<PlusOutlined  className={styles.setting} onClick={()=>{history.push('/job/create')}}/>)
+            iconList.push(<BarsOutlined  className={styles.setting} onClick={showHistory}/>)
+        }
+        iconList.push(<SettingOutlined className={styles.setting} onClick={()=>{secretKeyDrawerRef?.current?.showDrawer()}}/>)
+        return <>{iconList}</>
     }
 
     

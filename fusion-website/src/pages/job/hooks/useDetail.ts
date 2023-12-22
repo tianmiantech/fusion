@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useImmer } from "use-immer";
 import lodash from 'lodash'
 import { useRequest } from "ahooks";
-import { JOB_STATUS,JOB_PHASE_LSIT,ROLE_TYPE } from "@/constant/dictionary";
+import { JOB_STATUS,JOB_PHASE_LSIT } from "@/constant/dictionary";
 
 import { getJobDetail,getMergedJobProgress,getAlgorithmPhaseList } from "../service";
 
