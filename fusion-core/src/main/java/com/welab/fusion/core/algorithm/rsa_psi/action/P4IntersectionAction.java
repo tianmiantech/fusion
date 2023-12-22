@@ -150,7 +150,7 @@ public class P4IntersectionAction extends AbstractJobPhaseAction<RsaPsiJob> {
 
     @Override
     public long getTotalWorkload() {
-        return job.getMyself().tableDataResourceReader.getTotalDataRowCount();
+        return job.getMyself().dataResourceInfo.dataCount;
     }
 
     @Override

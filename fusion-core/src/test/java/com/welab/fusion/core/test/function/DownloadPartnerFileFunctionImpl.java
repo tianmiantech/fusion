@@ -16,7 +16,7 @@
 package com.welab.fusion.core.test.function;
 
 import com.welab.fusion.core.algorithm.JobPhase;
-import com.welab.fusion.core.algorithm.ecdh_psi.function.DownloadPartnerFileFunction;
+import com.welab.fusion.core.algorithm.base.function.DownloadPartnerFileFunction;
 import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
 import com.welab.fusion.core.io.FileSystem;
 

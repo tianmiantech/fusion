@@ -16,7 +16,7 @@
 package com.welab.fusion.service.job_function;
 
 import com.welab.fusion.core.algorithm.JobPhase;
-import com.welab.fusion.core.algorithm.ecdh_psi.function.DownloadPartnerFileFunction;
+import com.welab.fusion.core.algorithm.base.function.DownloadPartnerFileFunction;
 import com.welab.fusion.core.io.FileSystem;
 import com.welab.fusion.service.api.download.Downloader;
 import com.welab.fusion.service.api.download.base.FileInfo;
