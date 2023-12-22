@@ -38,4 +38,8 @@ public class EcdhPsiJobMember extends AbstractJobMember {
         super(memberId, memberName, dataResourceInfo);
     }
 
+    public static EcdhPsiJobMember of(String memberId, String memberName, DataResourceInfo dataResourceInfo) {
+        return new EcdhPsiJobMember(memberId, memberName, dataResourceInfo);
+    }
+
 }

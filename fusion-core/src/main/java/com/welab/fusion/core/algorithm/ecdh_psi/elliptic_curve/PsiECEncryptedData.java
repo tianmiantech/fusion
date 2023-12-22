@@ -18,17 +18,20 @@ package com.welab.fusion.core.algorithm.ecdh_psi.elliptic_curve;
 import cn.hutool.core.io.FileUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.annotation.JSONField;
-import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
 import com.welab.fusion.core.hash.HashConfig;
 import com.welab.fusion.core.io.FileSystem;
 import com.welab.fusion.core.psi.PsiUtils;
+import com.welab.wefe.common.file.compression.impl.Zip;
+import com.welab.wefe.common.util.JObject;
 import org.bouncycastle.math.ec.ECPoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
@@ -109,5 +112,48 @@ public class PsiECEncryptedData {
         ECPoint point = EllipticCurve.INSTANCE.base64ToECPoint(base64);
         ECPoint encryptedValue = point.multiply(ecdhPsiParam.secretKey);
         return PsiUtils.ecPoint2String(encryptedValue);
+    }
+
+    /**
+     * 将 meta 文件与 data 文件打包成 zip 文件
+     *
+     * 这里要注意： meta 文件中对象包含私钥信息，打包前要删除。
+     */
+    public File zip() throws IOException {
+        Path dir = FileSystem.PsiECEncryptedData.getDir(id);
+        File zipFile = dir.resolve(ZIP_FILE_NAME).toFile();
+
+        // 已存在，不反复压缩。
+        if (zipFile.exists()) {
+            return zipFile;
+        }
+
+        // 抹除私钥信息，只保留公钥信息。
+        // 为了避免影响旧对象，先拷贝一个新的。
+        PsiECEncryptedData newPsiECEncryptedData = JObject.create(this).toJavaObject(PsiECEncryptedData.class);
+        newPsiECEncryptedData.ecdhPsiParam.cleanPrivateKey();
+
+        // 抹除后输出到临时目录
+        File tempMetaFile = dir.resolve("temp").resolve(META_FILE_NAME).toFile();
+        tempMetaFile.getParentFile().mkdirs();
+        Files.write(tempMetaFile.toPath(), JSON.toJSONBytes(newPsiECEncryptedData));
+
+        // 压缩文件
+        File dataFile = dir.resolve(DATA_FILE_NAME).toFile();
+        Zip.to(zipFile, tempMetaFile, dataFile);
+
+        return zipFile;
+
+    }
+
+    public void sink() {
+        // 输出元数据
+        File metaFile = dir.resolve(META_FILE_NAME).toFile();
+        try {
+            Files.write(metaFile.toPath(), JSON.toJSONBytes(this));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 }

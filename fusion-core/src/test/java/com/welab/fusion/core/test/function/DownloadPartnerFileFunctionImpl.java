@@ -17,6 +17,7 @@ package com.welab.fusion.core.test.function;
 
 import com.welab.fusion.core.algorithm.JobPhase;
 import com.welab.fusion.core.algorithm.base.function.DownloadPartnerFileFunction;
+import com.welab.fusion.core.algorithm.ecdh_psi.elliptic_curve.PsiECEncryptedData;
 import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
 import com.welab.fusion.core.io.FileSystem;
 
@@ -38,7 +39,14 @@ public class DownloadPartnerFileFunctionImpl implements DownloadPartnerFileFunct
                 PsiBloomFilter psiBloomFilter = PsiBloomFilter.of(dir);
 
                 return psiBloomFilter.zip();
-
+            case DownloadPartnerECEncryptedData:
+                return PsiECEncryptedData.of(jobId).zip();
+            case DownloadSecondaryECEncryptedData:
+                return FileSystem
+                        .PsiSecondaryECEncryptedData
+                        .getDataFile(jobId, partnerId);
+            case SaveResult:
+                return FileSystem.FusionResult.getFile(jobId);
             default:
                 return null;
         }

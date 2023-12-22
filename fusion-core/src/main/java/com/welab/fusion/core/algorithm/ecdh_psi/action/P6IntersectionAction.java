@@ -43,6 +43,7 @@ import java.util.stream.Collectors;
  */
 public class P6IntersectionAction extends AbstractJobPhaseAction<EcdhPsiJob> {
     private static final int batchSize = 100_000;
+    LongAdder progress = new LongAdder();
 
     public P6IntersectionAction(EcdhPsiJob job) {
         super(job);
@@ -51,7 +52,6 @@ public class P6IntersectionAction extends AbstractJobPhaseAction<EcdhPsiJob> {
     @Override
     protected void doAction() throws Exception {
         FusionResult result = job.getJobResult();
-        LongAdder progress = new LongAdder();
         LongAdder fruitCount = new LongAdder();
         File resultFile = FileSystem.FusionResult.getFile(job.getJobId());
 
@@ -94,6 +94,9 @@ public class P6IntersectionAction extends AbstractJobPhaseAction<EcdhPsiJob> {
         result.finish(resultFile, fruitCount.longValue());
     }
 
+    /**
+     * 从我方读取全量数据与协作方二次加密数据的分片进行碰撞
+     */
     private LinkedList<ECPoint> matchOnePartition(Set<ECPoint> partnerPartition) throws IOException {
         LinkedList<ECPoint> fruit = new LinkedList<>();
 
@@ -105,6 +108,10 @@ public class P6IntersectionAction extends AbstractJobPhaseAction<EcdhPsiJob> {
                 if (line == null) {
                     break;
                 }
+
+                progress.increment();
+                phaseProgress.updateCompletedWorkload(progress.longValue());
+
                 if (StringUtil.isBlank(line)) {
                     continue;
                 }
@@ -165,7 +172,9 @@ public class P6IntersectionAction extends AbstractJobPhaseAction<EcdhPsiJob> {
 
     @Override
     public long getTotalWorkload() {
-        return job.getMyself().dataResourceInfo.dataCount;
+        long count1 = job.getMyself().dataResourceInfo.dataCount;
+        long count2 = job.getPartner().dataResourceInfo.dataCount;
+        return count1 * count2;
     }
 
     @Override

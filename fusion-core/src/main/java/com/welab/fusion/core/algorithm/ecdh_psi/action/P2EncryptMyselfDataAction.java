@@ -15,15 +15,13 @@
  */
 package com.welab.fusion.core.algorithm.ecdh_psi.action;
 
-import com.welab.fusion.core.algorithm.ecdh_psi.EcdhPsiJob;
 import com.welab.fusion.core.algorithm.JobPhase;
 import com.welab.fusion.core.algorithm.base.AbstractJobPhaseAction;
+import com.welab.fusion.core.algorithm.ecdh_psi.EcdhPsiJob;
 import com.welab.fusion.core.algorithm.ecdh_psi.elliptic_curve.PsiECEncryptedData;
 import com.welab.fusion.core.algorithm.ecdh_psi.elliptic_curve.PsiECEncryptedDataCreator;
 import com.welab.fusion.core.data_source.AbstractTableDataSourceReader;
 import com.welab.fusion.core.hash.HashConfig;
-
-import java.util.UUID;
 
 /**
  * @author zane.luo
@@ -41,12 +39,13 @@ public class P2EncryptMyselfDataAction extends AbstractJobPhaseAction<EcdhPsiJob
 
         phaseProgress.setMessage("正在对我方数据进行加密...");
         try (PsiECEncryptedDataCreator creator = new PsiECEncryptedDataCreator(
-                UUID.randomUUID().toString().replace("-", ""),
+                job.getJobId(),
                 reader,
                 hashConfig,
                 phaseProgress)
         ) {
             PsiECEncryptedData data = creator.create();
+            data.sink();
 
             // 保存对象至上下文对象，供后续阶段使用。
             job.getMyself().psiECEncryptedData = data;

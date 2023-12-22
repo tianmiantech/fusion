@@ -165,8 +165,8 @@ public class PsiECEncryptedDataCreator implements Closeable {
                 System.out.println("进度：" + progress.getCompletedWorkload() + "," + progress.getSpeedInSecond() + "条/秒");
             });
 
-            // Path dir = Paths.get(file.getParent()).resolve("test-bf");
-            // psiBloomFilter.sink(dir);
+            data.sink();
+
         }
 
         System.out.println("end");

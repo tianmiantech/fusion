@@ -15,6 +15,7 @@
  */
 package com.welab.fusion.core.io;
 
+import com.welab.fusion.core.algorithm.JobPhase;
 import com.welab.wefe.common.util.FileUtil;
 import com.welab.wefe.common.util.OS;
 import com.welab.wefe.common.util.StringUtil;
@@ -80,6 +81,7 @@ public class FileSystem {
          * 临时目录，文件不会长时间保存。
          */
         Temp,
+        JobTemp,
         PsiBloomFilter,
         PsiECEncryptedData,
         PsiSecondaryECEncryptedData,
@@ -107,6 +109,22 @@ public class FileSystem {
         return path;
     }
 
+    public static class JobTemp {
+        public static Path getDir(String jobId) {
+            return getBaseDir(UseType.JobTemp).resolve(jobId);
+        }
+
+        public static File getFile(String jobId, JobPhase jobPhase, String memberId, String filename) {
+            return getDir(jobId)
+                    .resolve(
+                            "member_" + memberId.replace(":", "_")
+                                    + "-" + jobPhase
+                                    + "_" + new File(filename).getName()
+                    )
+                    .toFile();
+        }
+    }
+
     public static class PsiBloomFilter {
         /**
          * 获取指定布隆过滤器所在目录
@@ -130,10 +148,10 @@ public class FileSystem {
     }
 
     public static class PsiSecondaryECEncryptedData {
-        public static File getDataFile(String jobId,String memberId) {
+        public static File getDataFile(String jobId, String memberId) {
             return getBaseDir(UseType.PsiSecondaryECEncryptedData)
                     .resolve(jobId)
-                    .resolve(memberId.replace(":", "_")+".data")
+                    .resolve(memberId.replace(":", "_") + ".data")
                     .toFile();
         }
     }
