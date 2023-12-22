@@ -76,7 +76,7 @@ const AuditingListDrawer: React.FC<AuditingListDrawerProps> = forwardRef((props,
       dataIndex:'action',
       render:()=>(
         <>
-        <Button type="link">去审核</Button>
+        <Button type="link">去审批</Button>
         </>
       )
     }]

@@ -1,7 +1,7 @@
 
 import { useState,useEffect, JSXElementConstructor, ReactElement, ReactNode, ReactPortal } from 'react';
 import type { StepProps,StepsProps} from 'antd';
-import { Card, Steps,Typography,Popover,Row,Col,Progress,List } from 'antd';
+import { Card, Steps,Typography,Popover,Row,Col,Progress,Collapse } from 'antd';
 import { ProDescriptions } from '@ant-design/pro-components';
 import {JOB_PHASE_LSIT} from '@/constant/dictionary'
 import lodash from 'lodash'
@@ -9,6 +9,7 @@ import type {PhasesListItemInterface,PhasesStpesListItemInterface} from '../../h
 import {displayChineseCoastTime} from '@/utils/time'
 import styles from './index.less'
 import useDetail from '../../hooks/useDetail';
+import { useImmer } from 'use-immer';
 
 interface JobProgressProps {
   promoterPhasesList:PhasesListItemInterface[],
@@ -16,13 +17,15 @@ interface JobProgressProps {
 
 }
 
-
+const { Panel } = Collapse;
 const JobProgress = (props:JobProgressProps) => {
     const {detailData} = useDetail();
 
     const {promoterPhasesList,providerPhasesList} = props
     const [stepList, setStepList] = useState<StepProps[]>([]);
     const [currentStep, setCurrentStep] = useState<number>(0);
+    //记录打开的折叠面板
+    const [currentStepOpenKey, setCurrentStepOpenKey] = useState<string[]>([]);
 
 
     useEffect(()=>{
@@ -46,23 +49,33 @@ const JobProgress = (props:JobProgressProps) => {
             const myselfStatus = promoterPhasesObj?.status;
             const partnerStatus = providerPhases?.status;
             step.status = changeProgressStatusToStepStatus(myselfStatus,partnerStatus);
-            step.description = renderDescription(promoterPhasesObj,providerPhases)
+            step.description = renderDescription(promoterPhasesObj,providerPhases,phase)
           }
           tmpList.push(step)
         })
         setStepList(tmpList);
       }
-    },[promoterPhasesList,providerPhasesList,detailData.phasesStpesList.length])
+    },[promoterPhasesList,providerPhasesList,detailData.phasesStpesList.length,currentStepOpenKey.length])
 
-    const renderDescription = (promoterPhasesObj:PhasesListItemInterface,providerPhases:PhasesListItemInterface)=>{
-      return <>
-      <Row >
+    const onCollapseChange = (key:string)=>{
+      const tmpCurrentStepOpenKey = JSON.parse(JSON.stringify(currentStepOpenKey))
+      const index =lodash.findIndex(tmpCurrentStepOpenKey, (item:string)=>item ===key );
+      if(index>-1){
+        tmpCurrentStepOpenKey.splice(index,1);
+      }else{
+        tmpCurrentStepOpenKey.push(key);
+      }
+      setCurrentStepOpenKey(tmpCurrentStepOpenKey)
+    }
 
-          <Col span={12}>
+    const renderDescription = (promoterPhasesObj:PhasesListItemInterface,providerPhases:PhasesListItemInterface,phase:string)=>{
+      return <Collapse activeKey={currentStepOpenKey.includes(phase)?phase:''}  onChange={()=>onCollapseChange(phase)}>
+       <Panel header="进度详情" key={phase}>
+        <Row >
+          <Col span={12} >
             <Card>
               {renderPhasesItem(promoterPhasesObj,'发起方')}
             </Card>
-            
           </Col>
           <Col span={12} >
             {providerPhases && <Card>
@@ -70,13 +83,16 @@ const JobProgress = (props:JobProgressProps) => {
             </Card>}
             
           </Col>
-      </Row>
-      </>
+        </Row>
+      </Panel>
+      </Collapse>
     }
 
 
 
     const renderPhasesItem = (phasesObj:PhasesListItemInterface,title:string)=>{
+      if(!phasesObj)
+        return <></>
       return <>
       <ProDescriptions column={1} title={renderPhasesItemTitle(title,phasesObj)} labelStyle={{textAlign:'right'}}>
         <ProDescriptions.Item label='任务进度'>

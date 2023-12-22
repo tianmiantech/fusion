@@ -1,5 +1,5 @@
 import {useRef} from 'react'
-import { Table,Tag ,Button,Card, message, Space,Spin} from "antd"
+import { Table,Tag ,Button,Card, message, Space,Spin, Badge} from "antd"
 import { TmTable } from "@tianmiantech/pro";
 import type { ColumnsType } from 'antd/es/table';
 import { useRequest,useMount } from "ahooks";
@@ -12,6 +12,7 @@ import moment from "moment";
 import {dataResourceTypeMap,AddMethodMap,JobStatus,JOB_STATUS,ROLE_TYPE} from '@/constant/dictionary'
 import lodash from 'lodash'
 import {getPersonificationTime} from '@/utils/time'
+import {renderHashConfig} from '@/utils/utils'
 
 interface RowProps {
     created_time:number,
@@ -98,18 +99,54 @@ const Index =()=>{
     })
 
 
-    const renderPromoterData = (row:RowProps)=>{
+    const renderContentData = (row:RowProps,dataObj:any)=>{
+        if (!dataObj) {
+            return <>暂无内容</>
+        }
+        const {status,role} = row;
+        if(status === JOB_STATUS.AUDITING && role === ROLE_TYPE.PROMOTER){
+            const member_name = lodash.get(dataObj,'member_name')
+            const base_url  = lodash.get(dataObj,'base_url')
+            return <>{member_name && <div>协作方名称：{member_name}</div>}
+            <div>服务地址：{base_url}</div>
+            </>
+        } else if(status === JOB_STATUS.EDITING){
+            return <>暂无内容</>
+        } else {
+            const { data_resource_type,total_data_count,hash_config} = dataObj||{};
 
+            return <>
+                <div>数据类型/数据量：{dataResourceTypeMap.get(data_resource_type)}/{total_data_count}</div>
+                <div>主键：{renderHashConfig(hash_config)}</div>
+            </>
+        }
+       
     }
 
+        const getBadgeStatus = (status:string)=>{
+            if (status === JOB_STATUS.RUNNING) {
+                return 'processing';
+            } else if (status === JOB_STATUS.SUCCESS) {
+                return 'success';
+            } else if (status === JOB_STATUS.ERROR_ON_RUNNING) {
+                return 'error';
+            } else if (status === JOB_STATUS.AUDITING) {
+                return 'warning';
+            } 
+            else {
+                return 'default';
+            }
+        }
+    
+
     const columns: ColumnsType<RowProps>|any = [{
-        title: '任务角色/创建时间',
+        title: '我方角色/创建时间',
         dataIndex: 'create',
         key: 'create',
         width:200,
         render:(text:string,row:RowProps)=>{
             const { created_time = new Date().getTime(),role} = row;
-            return <><Tag color={role==='promoter'?'success':'default'}>{ROLE_TO_CN[`${role}`]}</Tag>
+            return <><Tag color={role==='promoter'?'success':'blue'}>{ROLE_TO_CN[`${role}`]}</Tag>
             <div>{getPersonificationTime(created_time)}</div>
             </>
         }
@@ -124,16 +161,7 @@ const Index =()=>{
           //展示发起方的数据表示 我方在当前数据中为发起方,则取myself字段，否则取partner字段
           const key = role===ROLE_TYPE.PROMOTER?'myself':'partner';
           const dataObj = lodash.get(row,key,null);
-          if(!dataObj)
-              return<>暂无内容</>
-          else {
-              const { data_resource_type,table_data_resource_info,total_data_count,updated_time } = dataObj||{};
-              const add_method = lodash.get(table_data_resource_info,'add_method')
-              return <>
-                  <div>数据类型/数据量：{dataResourceTypeMap.get(data_resource_type)}/{total_data_count}</div>
-                  <div>数据来源/更新时间：{AddMethodMap.get(add_method)}/{getPersonificationTime(updated_time)}</div>
-              </>
-          }
+          return renderContentData(row,dataObj)
         }
     },{
         title: '协作方',
@@ -142,16 +170,9 @@ const Index =()=>{
         width:400,
         render:(text:string,row:RowProps)=>{
             const { role } = row;
-            const key = role===ROLE_TYPE.PROMOTER?'myself':'partner';
+            const key = role===ROLE_TYPE.PROVIDER?'myself':'partner';
             const dataObj = lodash.get(row,key,null);
-            if(dataObj){
-                const member_name = lodash.get(dataObj,'member_name')
-                const base_url  = lodash.get(dataObj,'base_url')
-                return <>{member_name && <div>协作方名称：{member_name}</div>}
-                <div>服务地址：{base_url}</div>
-                </>
-            } else 
-                return <>暂无内容</>
+            return renderContentData(row,dataObj)
         }
     },{
         title: '状态',
@@ -159,7 +180,7 @@ const Index =()=>{
         key: 'status',
         width:80,
         render:(text:string)=>{
-            return <Tag >{JobStatus.get(text)}</Tag>
+            return <Badge status={getBadgeStatus(text)}  text={JobStatus.get(text)}/>
         }
     },{
         title: '备注',
@@ -170,9 +191,9 @@ const Index =()=>{
         title: '操作',
         fixed: 'right',
         width:120,
-        render:(value:any, record:any, index:number)=> {
-            const defaultList = [<Button type='link' onClick={()=>{actionClickHandle('detail',record)}}>详情</Button>]
+        render:(record:RowProps)=> {
             const {role,status} = record;
+            const defaultList = [<Button type='link' onClick={()=>{actionClickHandle('detail',record)}}>{role===ROLE_TYPE.PROVIDER&& status === JOB_STATUS.AUDITING?'去审批':'详情'}</Button>]
             if(role === ROLE_TYPE.PROMOTER){
                 if(!status || status === JOB_STATUS.EDITING){
                     defaultList.push(<Button type='link' onClick={()=>{actionClickHandle('delete',record)}}>删除</Button>)

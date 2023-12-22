@@ -1,7 +1,7 @@
 import { message } from 'antd';
 import { axiosInstance, iam } from '@tianmiantech/request';
 import utils from '@tianmiantech/util';
-import { getTokenName } from './index';
+import { getTokenName } from './utils';
 import {FUNSION_INITIALIZED_KEY} from '@/constant/dictionary'
 
 const { getToken:getTokenByName, createUUID, formatDate,sleep,removeCookie } = utils;

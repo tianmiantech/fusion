@@ -3,7 +3,7 @@ import React from 'react';
 import { initUser,login,UserRequestParams } from './service'
 import { useRequest } from 'ahooks';
 import { history } from '@umijs/max';
-import {getTokenName} from '@/utils/index'
+import {getTokenName} from '@/utils/utils'
 import {setCookies} from '@tianmiantech/util'
 import lodash from 'lodash'
 import SmUtil from '@/utils/SmUtil';
