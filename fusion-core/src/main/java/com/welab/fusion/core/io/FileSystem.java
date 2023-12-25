@@ -42,6 +42,9 @@ public class FileSystem {
 
     /**
      * 初始化，指定根目录。
+     *
+     * @param fileSystemBaseDir 根目录
+     * @param serverPort        服务端口，用于区分不同的服务，避免在单机上部署多个服务时，文件目录冲突。
      */
     public static void init(String fileSystemBaseDir, String serverPort) throws IOException {
         // 当未指定时，设置默认值。
