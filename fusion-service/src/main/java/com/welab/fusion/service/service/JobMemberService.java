@@ -93,7 +93,6 @@ public class JobMemberService extends AbstractService {
     /**
      * 异步更新资源数据量
      */
-    @Async
     public void updateTotalDataCount(JobConfigInput input) {
         if (input.isRequestFromPartner()) {
             return;

@@ -27,6 +27,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.LongAdder;
 
 /**
  * @author zane.luo
@@ -46,6 +47,7 @@ public class P4EncryptPartnerDataAction extends AbstractJobPhaseAction<EcdhPsiJo
      * 务必使用线程安全的写入方式
      */
     private BufferedWriter fileWriter;
+    private LongAdder progress = new LongAdder();
 
     public P4EncryptPartnerDataAction(EcdhPsiJob job) {
         super(job);
@@ -56,7 +58,7 @@ public class P4EncryptPartnerDataAction extends AbstractJobPhaseAction<EcdhPsiJo
         // 初始化输出文件
         File outputFile = FileSystem
                 .PsiSecondaryECEncryptedData
-                .getDataFile(job.getJobId(), job.getPartner().memberId);
+                .getParentDataFile(job.getJobId(), job.getPartner().memberId);
         outputFile.delete();
         outputFile.getParentFile().mkdirs();
         this.fileWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputFile, false), StandardCharsets.UTF_8));
@@ -78,6 +80,8 @@ public class P4EncryptPartnerDataAction extends AbstractJobPhaseAction<EcdhPsiJo
         }
 
         job.getPartner().secondaryECEncryptedDataFile = outputFile;
+
+        phaseProgress.success();
     }
 
     private void encryptOne(String line) {
@@ -95,6 +99,9 @@ public class P4EncryptPartnerDataAction extends AbstractJobPhaseAction<EcdhPsiJo
             } catch (Exception e) {
                 LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);
             }
+
+            progress.increment();
+            phaseProgress.updateCompletedWorkload(progress.longValue());
         });
     }
 

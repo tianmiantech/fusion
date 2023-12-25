@@ -148,10 +148,17 @@ public class FileSystem {
     }
 
     public static class PsiSecondaryECEncryptedData {
-        public static File getDataFile(String jobId, String memberId) {
+        public static File getParentDataFile(String jobId, String memberId) {
             return getBaseDir(UseType.PsiSecondaryECEncryptedData)
                     .resolve(jobId)
                     .resolve(memberId.replace(":", "_") + ".data")
+                    .toFile();
+        }
+
+        public static File getMyselfDataFile(String jobId) {
+            return getBaseDir(UseType.PsiSecondaryECEncryptedData)
+                    .resolve(jobId)
+                    .resolve("myself.data")
                     .toFile();
         }
     }
