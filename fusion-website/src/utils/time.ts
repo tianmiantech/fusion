@@ -32,7 +32,7 @@ export const getPersonificationTime = (time:number)=>{
     const before = moment(time);
     const duration = moment.duration(now.diff(before)).asHours();   
     if(duration<24)
-        return moment(time).startOf('hour').fromNow()
+        return moment(time).startOf('second').fromNow()
     return getNoramlTime(time)
 }
 
