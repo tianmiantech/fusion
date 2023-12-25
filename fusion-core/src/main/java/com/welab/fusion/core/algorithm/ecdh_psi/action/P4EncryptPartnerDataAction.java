@@ -80,6 +80,8 @@ public class P4EncryptPartnerDataAction extends AbstractJobPhaseAction<EcdhPsiJo
             ThreadUtil.safeSleep(1000);
         }
 
+        this.fileWriter.close();
+
         job.getPartner().secondaryECEncryptedDataFile = outputFile;
 
         phaseProgress.success();
