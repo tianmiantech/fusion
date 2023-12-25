@@ -42,7 +42,7 @@ public class P5DownloadSecondaryECEncryptedDataAction extends AbstractJobPhaseAc
         File file = downloadFileFromPartner();
 
         // 保存到上下文供后续使用
-        job.getPartner().secondaryECEncryptedDataFile = file;
+        job.getMyself().secondaryECEncryptedDataFile = file;
     }
 
     @Override
