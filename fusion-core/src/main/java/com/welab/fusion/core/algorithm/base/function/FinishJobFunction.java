@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.welab.fusion.core.algorithm.rsa_psi.function;
+package com.welab.fusion.core.algorithm.base.function;
 
 import com.welab.fusion.core.progress.JobProgress;
 

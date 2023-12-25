@@ -27,9 +27,6 @@ import java.util.LinkedHashMap;
  * @date 2023/12/18
  */
 public class EcdhPsiJobFlow extends AbstractJobFlow {
-
-    public static final EcdhPsiJobFlow INSTANCE = new EcdhPsiJobFlow();
-
     private static final LinkedHashMap<JobPhase, Class<? extends AbstractJobPhaseAction>> map = new LinkedHashMap<>();
 
     static {
@@ -41,6 +38,8 @@ public class EcdhPsiJobFlow extends AbstractJobFlow {
         map.put(JobPhase.Intersection, P6IntersectionAction.class);
         map.put(JobPhase.SaveResult, P7SaveResultAction.class);
     }
+
+    public static final EcdhPsiJobFlow INSTANCE = new EcdhPsiJobFlow();
 
     public EcdhPsiJobFlow() {
         super(map);

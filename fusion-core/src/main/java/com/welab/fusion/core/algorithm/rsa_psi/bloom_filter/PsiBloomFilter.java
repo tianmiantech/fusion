@@ -167,7 +167,6 @@ public class PsiBloomFilter {
      * 这里要注意： meta 文件中的 RsaPsiParam 对象包含私钥信息，打包前要删除。
      */
     public File zip() throws IOException {
-        Path dir = FileSystem.PsiBloomFilter.getDir(id);
         File zipFile = dir.resolve(ZIP_FILE_NAME).toFile();
 
         // 已存在，不反复压缩。

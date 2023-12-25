@@ -16,7 +16,6 @@
 package com.welab.fusion.core.algorithm.ecdh_psi;
 
 import com.welab.fusion.core.Job.AbstractJobFunctions;
-import com.welab.fusion.core.algorithm.ecdh_psi.function.DownloadPartnerFileFunction;
 
 /**
  * @author zane.luo

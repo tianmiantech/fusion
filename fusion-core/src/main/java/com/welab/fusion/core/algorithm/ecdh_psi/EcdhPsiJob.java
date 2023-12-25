@@ -28,7 +28,7 @@ public class EcdhPsiJob extends AbstractPsiJob {
     private EcdhPsiJobFunctions jobFunctions;
 
     public EcdhPsiJob(String jobId, EcdhPsiJobMember myself, EcdhPsiJobMember partner, EcdhPsiJobFunctions jobFunctions) {
-        super(PsiAlgorithm.rsa_psi, jobId, myself, partner, jobFunctions);
+        super(PsiAlgorithm.ecdh_psi, jobId, myself, partner, jobFunctions);
         this.myself = myself;
         this.partner = partner;
         this.jobFunctions = jobFunctions;

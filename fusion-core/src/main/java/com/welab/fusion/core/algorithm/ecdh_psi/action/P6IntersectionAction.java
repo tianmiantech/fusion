@@ -15,24 +15,25 @@
  */
 package com.welab.fusion.core.algorithm.ecdh_psi.action;
 
-import cn.hutool.core.codec.Base64;
-import com.welab.fusion.core.algorithm.ecdh_psi.EcdhPsiJob;
 import com.welab.fusion.core.Job.FusionResult;
 import com.welab.fusion.core.Job.JobRole;
 import com.welab.fusion.core.algorithm.JobPhase;
 import com.welab.fusion.core.algorithm.base.AbstractJobPhaseAction;
+import com.welab.fusion.core.algorithm.ecdh_psi.EcdhPsiJob;
+import com.welab.fusion.core.algorithm.ecdh_psi.elliptic_curve.EllipticCurve;
 import com.welab.fusion.core.hash.HashConfig;
 import com.welab.fusion.core.io.FileSystem;
-import com.welab.fusion.core.psi.PsiRecord;
-import com.welab.fusion.core.psi.PsiUtils;
-import com.welab.wefe.common.BatchConsumer;
+import com.welab.wefe.common.util.StringUtil;
+import org.bouncycastle.math.ec.ECPoint;
 
-import java.io.File;
-import java.math.BigInteger;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.LongAdder;
 import java.util.stream.Collectors;
 
@@ -41,15 +42,8 @@ import java.util.stream.Collectors;
  * @date 2023/11/13
  */
 public class P6IntersectionAction extends AbstractJobPhaseAction<EcdhPsiJob> {
-    private static final int batchSize = 50000;
-    /**
-     * E
-     */
-    private BigInteger publicExponent;
-    /**
-     * N
-     */
-    private BigInteger publicModulus;
+    private static final int batchSize = 100_000;
+    LongAdder progress = new LongAdder();
 
     public P6IntersectionAction(EcdhPsiJob job) {
         super(job);
@@ -57,12 +51,7 @@ public class P6IntersectionAction extends AbstractJobPhaseAction<EcdhPsiJob> {
 
     @Override
     protected void doAction() throws Exception {
-
-        publicModulus = null;
-        publicExponent = null;
-
         FusionResult result = job.getJobResult();
-        LongAdder progress = new LongAdder();
         LongAdder fruitCount = new LongAdder();
         File resultFile = FileSystem.FusionResult.getFile(job.getJobId());
 
@@ -75,68 +64,104 @@ public class P6IntersectionAction extends AbstractJobPhaseAction<EcdhPsiJob> {
                 StandardOpenOption.CREATE
         );
 
-
-        // 批处理
-        BatchConsumer<PsiRecord> consumer = new BatchConsumer<>(batchSize, 5_000, records -> {
-            try {
-                // 将数据发送到过滤器方加密
-                List<String> encryptedList = null;
-
-                // job.getJobFunctions().encryptRsaPsiRecordsFunction.encrypt(
-                //         job.getJobId(),
-                //         job.getPartner().memberId,
-                //         records.stream().map(x -> x.encodedKey).collect(Collectors.toList())
-                // );
-
-                // 碰撞，并获取交集。
-                List<PsiRecord> fruit = null;
-
-                List<String> lines = fruit.stream()
-                        .map(x -> hashConfig.getIdValuesForCsv(x.row))
-                        .collect(Collectors.toList());
-
-                // 向 resultFile 中写入交集数据
-                Files.write(
-                        resultFile.toPath(),
-                        lines,
-                        StandardCharsets.UTF_8,
-                        StandardOpenOption.APPEND
-                );
-
-                // 更新进度
-                fruitCount.add(fruit.size());
-                progress.add(records.size());
-                phaseProgress.updateCompletedWorkload(progress.longValue());
-            } catch (Exception e) {
-                LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);
-                job.finishJobOnException(e);
+        int partnerPartitionIndex = 0;
+        while (true) {
+            Set<ECPoint> partnerPartition = readPartnerPartition(partnerPartitionIndex);
+            if (partnerPartition.isEmpty()) {
+                break;
             }
-        });
 
-        // 从数据源逐条读取数据集并编码
-        job.getMyself().tableDataResourceReader.readRows((index, row) -> {
+            LinkedList<ECPoint> points = matchOnePartition(partnerPartition);
 
-            PsiRecord record = new PsiRecord();
-            record.row = row;
+            List<String> lines = points.stream()
+                    .map(x -> x.toString())
+                    .collect(Collectors.toList());
 
-            BigInteger blindFactor = PsiUtils.generateBlindingFactor(publicModulus);
-            BigInteger random = blindFactor.modPow(publicExponent, publicModulus);
-            record.inv = blindFactor.modInverse(publicModulus);
+            // 向 resultFile 中写入交集数据
+            Files.write(
+                    resultFile.toPath(),
+                    lines,
+                    StandardCharsets.UTF_8,
+                    StandardOpenOption.APPEND
+            );
 
-            String key = job.getMyself().dataResourceInfo.hashConfig.hash(row);
-            BigInteger h = PsiUtils.stringToBigInteger(key);
-            BigInteger x = h.multiply(random).mod(publicModulus);
-            byte[] bytes = PsiUtils.bigIntegerToBytes(x);
-            record.encodedKey = Base64.encode(bytes);
-
-            consumer.add(record);
-        });
-
-        // 等待消费完成
-        consumer.waitForFinishAndClose();
+            if (partnerPartition.size() < batchSize) {
+                break;
+            }
+        }
 
         // 包装结果
         result.finish(resultFile, fruitCount.longValue());
+    }
+
+    /**
+     * 从我方读取全量数据与协作方二次加密数据的分片进行碰撞
+     */
+    private LinkedList<ECPoint> matchOnePartition(Set<ECPoint> partnerPartition) throws IOException {
+        LinkedList<ECPoint> fruit = new LinkedList<>();
+
+        File myFile = job.getMyself().secondaryECEncryptedDataFile;
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(myFile)))) {
+
+            while (true) {
+                String line = reader.readLine();
+                if (line == null) {
+                    break;
+                }
+
+                progress.increment();
+                phaseProgress.updateCompletedWorkload(progress.longValue());
+
+                if (StringUtil.isBlank(line)) {
+                    continue;
+                }
+
+                ECPoint point = EllipticCurve.INSTANCE.base64ToECPoint(line);
+                if (partnerPartition.contains(point)) {
+                    fruit.add(point);
+                }
+            }
+        }
+
+        return fruit;
+    }
+
+    /**
+     * 从协作方二次加密数据中读取指定分片
+     */
+    private Set<ECPoint> readPartnerPartition(int partitionIndex) throws IOException {
+        Set<ECPoint> result = new HashSet<>(batchSize);
+
+        File file = job.getPartner().secondaryECEncryptedDataFile;
+
+        int skipLineCount = batchSize * partitionIndex;
+        int lineIndex = 0;
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file)))) {
+            while (true) {
+                String line = reader.readLine();
+                lineIndex++;
+
+                if (line == null) {
+                    return result;
+                }
+
+                if (lineIndex < skipLineCount) {
+                    continue;
+                }
+
+                if (StringUtil.isBlank(line)) {
+                    continue;
+                }
+
+                ECPoint point = EllipticCurve.INSTANCE.base64ToECPoint(line);
+                result.add(point);
+
+                if (result.size() == batchSize) {
+                    return result;
+                }
+
+            }
+        }
     }
 
 
@@ -147,7 +172,9 @@ public class P6IntersectionAction extends AbstractJobPhaseAction<EcdhPsiJob> {
 
     @Override
     public long getTotalWorkload() {
-        return job.getMyself().tableDataResourceReader.getTotalDataRowCount();
+        long count1 = job.getMyself().dataResourceInfo.dataCount;
+        long count2 = job.getPartner().dataResourceInfo.dataCount;
+        return count1 * count2;
     }
 
     @Override

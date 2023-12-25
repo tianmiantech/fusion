@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.welab.fusion.core.test;
+package com.welab.fusion.core.test.rsa_psi;
 
 import cn.hutool.core.codec.Base64;
 import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;

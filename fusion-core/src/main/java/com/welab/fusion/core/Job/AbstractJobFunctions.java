@@ -15,8 +15,8 @@
  */
 package com.welab.fusion.core.Job;
 
-import com.welab.fusion.core.algorithm.ecdh_psi.function.DownloadPartnerFileFunction;
-import com.welab.fusion.core.algorithm.rsa_psi.function.FinishJobFunction;
+import com.welab.fusion.core.algorithm.base.function.DownloadPartnerFileFunction;
+import com.welab.fusion.core.algorithm.base.function.FinishJobFunction;
 import com.welab.fusion.core.algorithm.rsa_psi.function.GetPartnerProgressFunction;
 import com.welab.fusion.core.algorithm.rsa_psi.function.SaveFusionResultFunction;
 import com.welab.wefe.common.tuple.Tuple2;

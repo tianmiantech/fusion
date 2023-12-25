@@ -13,15 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.welab.fusion.core.test;
+package com.welab.fusion.core.test.ecdh_psi;
 
 import com.alibaba.fastjson.JSON;
 import com.welab.fusion.core.Job.AbstractPsiJob;
-import com.welab.fusion.core.algorithm.rsa_psi.RsaPsiJob;
-import com.welab.fusion.core.algorithm.rsa_psi.RsaPsiJobFunctions;
-import com.welab.fusion.core.algorithm.rsa_psi.RsaPsiJobMember;
-import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
-import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilterCreator;
+import com.welab.fusion.core.algorithm.ecdh_psi.EcdhPsiJob;
+import com.welab.fusion.core.algorithm.ecdh_psi.EcdhPsiJobFunctions;
+import com.welab.fusion.core.algorithm.ecdh_psi.EcdhPsiJobMember;
 import com.welab.fusion.core.data_resource.base.DataResourceInfo;
 import com.welab.fusion.core.data_resource.base.DataResourceType;
 import com.welab.fusion.core.data_source.CsvTableDataSourceReader;
@@ -29,31 +27,24 @@ import com.welab.fusion.core.hash.HashConfig;
 import com.welab.fusion.core.hash.HashConfigItem;
 import com.welab.fusion.core.hash.HashMethod;
 import com.welab.fusion.core.io.FileSystem;
-import com.welab.fusion.core.psi.PsiUtils;
 import com.welab.fusion.core.test.function.DownloadPartnerFileFunctionImpl;
-import com.welab.fusion.core.test.function.SaveMyPsiBloomFilterFunctionImpl;
 
 import java.io.File;
-import java.nio.file.Path;
-import java.util.List;
 import java.util.UUID;
 
 /**
  * @author zane.luo
  * @date 2023/11/15
  */
-public class FusionJobTest {
+public class EcdhPsiJobTest {
     private static String job_id = UUID.randomUUID().toString().replace("-", "");
-    private static RsaPsiJobMember memberA;
-    private static RsaPsiJobMember memberB;
-    private static AbstractPsiJob memberAJob;
-    private static AbstractPsiJob memberBJob;
+    private static EcdhPsiJobMember memberA;
+    private static EcdhPsiJobMember memberB;
+    private static EcdhPsiJob memberAJob;
+    private static EcdhPsiJob memberBJob;
 
     public static void main(String[] args) throws Exception {
-        // 设置小一点，生成的过滤器体积也小一点，便于测试。
-        PsiBloomFilterCreator.MIN_EXPECTED_INSERTIONS = 10_000;
-
-        FileSystem.init("D:\\data\\wefe\\fusion");
+        FileSystem.init("D:\\data\\fusion");
 
         createJobs();
 
@@ -83,39 +74,35 @@ public class FusionJobTest {
         DataResourceInfo dataResourceInfoB = DataResourceInfo.of(DataResourceType.TableDataSource, readerB.getTotalDataRowCount(), hashConfig);
 
 
-        memberA = RsaPsiJobMember.of("memberA", "memberA", dataResourceInfoA);
+        memberA = EcdhPsiJobMember.of("memberA", "memberA", dataResourceInfoA);
         memberA.tableDataResourceReader = readerA;
 
-        memberB = RsaPsiJobMember.of("memberB", "memberB", dataResourceInfoB);
+        memberB = EcdhPsiJobMember.of("memberB", "memberB", dataResourceInfoB);
         memberB.tableDataResourceReader = readerB;
 
-        memberAJob = new RsaPsiJob(job_id, memberA, memberB, createAJobFunctions());
-        memberBJob = new RsaPsiJob(job_id, memberB, memberA, createBJobFunctions());
+        memberAJob = new EcdhPsiJob(job_id, memberA, memberB, createAJobFunctions());
+        memberBJob = new EcdhPsiJob(job_id, memberB, memberA, createBJobFunctions());
     }
 
-    private static RsaPsiJobFunctions createAJobFunctions() {
-        RsaPsiJobFunctions jobFunctions = createJobFunctions();
+    private static EcdhPsiJobFunctions createAJobFunctions() {
+        EcdhPsiJobFunctions jobFunctions = createJobFunctions();
         jobFunctions.getPartnerProgressFunction = (jobId) -> memberBJob.getMyProgress();
 
         return jobFunctions;
     }
 
-    private static RsaPsiJobFunctions createBJobFunctions() {
-        RsaPsiJobFunctions jobFunctions = createJobFunctions();
+    private static EcdhPsiJobFunctions createBJobFunctions() {
+        EcdhPsiJobFunctions jobFunctions = createJobFunctions();
         jobFunctions.getPartnerProgressFunction = (jobId) -> memberAJob.getMyProgress();
 
         return jobFunctions;
     }
 
-    private static RsaPsiJobFunctions createJobFunctions() {
-        RsaPsiJobFunctions jobFunctions = new RsaPsiJobFunctions();
+    private static EcdhPsiJobFunctions createJobFunctions() {
+        EcdhPsiJobFunctions jobFunctions = new EcdhPsiJobFunctions();
         jobFunctions.downloadPartnerFileFunction = new DownloadPartnerFileFunctionImpl();
-        jobFunctions.saveMyPsiBloomFilterFunction = new SaveMyPsiBloomFilterFunctionImpl();
-
-        jobFunctions.encryptRsaPsiRecordsFunction = (String memberId, String psiBloomFilterId, List<String> bucket) -> {
-            Path dir = FileSystem.PsiBloomFilter.getDir(psiBloomFilterId);
-            PsiBloomFilter psiBloomFilter = PsiBloomFilter.of(dir);
-            return PsiUtils.encryptPsiRecords(psiBloomFilter, bucket);
+        jobFunctions.finishJobFunction = (jobId, myRole) -> {
+            System.out.println("finishJobFunction");
         };
 
         jobFunctions.saveFusionResultFunction = (jobId, myRole, result, totalSizeConsumer, downloadSizeConsumer) -> {

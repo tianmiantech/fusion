@@ -32,4 +32,8 @@ public class EcdhPsiParam {
         param.secretKey = secretKey;
         return param;
     }
+
+    public void cleanPrivateKey() {
+        secretKey = null;
+    }
 }

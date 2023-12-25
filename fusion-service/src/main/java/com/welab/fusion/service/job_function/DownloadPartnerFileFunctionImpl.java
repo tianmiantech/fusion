@@ -16,7 +16,7 @@
 package com.welab.fusion.service.job_function;
 
 import com.welab.fusion.core.algorithm.JobPhase;
-import com.welab.fusion.core.algorithm.ecdh_psi.function.DownloadPartnerFileFunction;
+import com.welab.fusion.core.algorithm.base.function.DownloadPartnerFileFunction;
 import com.welab.fusion.core.io.FileSystem;
 import com.welab.fusion.service.api.download.Downloader;
 import com.welab.fusion.service.api.download.base.FileInfo;
@@ -24,7 +24,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.nio.file.Path;
 import java.util.function.Consumer;
 
 /**
@@ -56,24 +55,14 @@ public class DownloadPartnerFileFunctionImpl implements DownloadPartnerFileFunct
     /**
      * 构建文件储存路径
      */
-    private static Path buildFilePath(JobPhase jobPhase, String jobId, String partnerId, FileInfo fileInfo) {
+    private static File buildFilePath(JobPhase jobPhase, String jobId, String partnerId, FileInfo fileInfo) {
         switch (jobPhase) {
             case SaveResult:
-                return FileSystem.FusionResult
-                        .getFile(jobId)
-                        .toPath();
+                return FileSystem.FusionResult.getFile(jobId);
 
             default:
-                return FileSystem.getTempDir()
-                        .resolve(jobId)
-                        .resolve(
-                                "member_" + partnerId.replace(":", "_")
-                                        + "-" + jobPhase
-                                        + "_" + fileInfo.filename
-                        );
+                return FileSystem.JobTemp.getFile(jobId, jobPhase, partnerId, fileInfo.filename);
         }
-
-
     }
 
 

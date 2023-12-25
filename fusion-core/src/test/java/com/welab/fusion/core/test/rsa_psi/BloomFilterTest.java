@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.welab.fusion.core.test;
+package com.welab.fusion.core.test.rsa_psi;
 
 import com.google.common.base.Charsets;
 import com.google.common.hash.BloomFilter;

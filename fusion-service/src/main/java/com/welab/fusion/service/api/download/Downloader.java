@@ -49,17 +49,17 @@ public class Downloader {
     /**
      * 下载后的文件输出路径
      */
-    Function<FileInfo, Path> distFilePathGetter;
+    Function<FileInfo, File> distFileFileGetter;
     private String partnerId;
     private String jobId;
     private Consumer<Long> totalSizeConsumer;
     private Consumer<Long> completedSizeConsumer;
 
-    public Downloader(JobPhase jobPhase, String jobId, String partnerId, Function<FileInfo, Path> distFilePathGetter) {
+    public Downloader(JobPhase jobPhase, String jobId, String partnerId, Function<FileInfo, File> distFileFileGetter) {
         this.jobPhase = jobPhase;
         this.partnerId = partnerId;
         this.jobId = jobId;
-        this.distFilePathGetter = distFilePathGetter;
+        this.distFileFileGetter = distFileFileGetter;
     }
 
     public File download() throws IOException, StatusCodeWithException {
@@ -75,11 +75,11 @@ public class Downloader {
         }
 
         // 为避免文件名相同造成覆盖，重新设计落地时的文件名。
-        Path distFilePath = distFilePathGetter.apply(fileInfo);
+        File distFile = distFileFileGetter.apply(fileInfo);
         // 先将分片下载到临时目录，合并分片后再移动到目标目录。
         Path tempDir = FileSystem.getTempDir()
                 .resolve(
-                        distFilePath.toFile().getName().replace(".", "_")
+                        distFile.getName().replace(".", "_")
                 );
         tempDir.toFile().delete();
         tempDir.toFile().mkdirs();
@@ -88,7 +88,7 @@ public class Downloader {
         downloadChunks(fileInfo, partner, tempDir);
 
         // 合并分片
-        File file = mergeChunks(tempDir, distFilePath, fileInfo);
+        File file = mergeChunks(tempDir, distFile, fileInfo);
 
         LOG.info("从合作方下载文件完成({})，memberId：{}，jobId：{}，耗时：{}ms", jobPhase, partnerId, jobId, System.currentTimeMillis() - start);
 
@@ -99,22 +99,21 @@ public class Downloader {
      * 合并分片
      *
      * @param dir          分片所在目录
-     * @param distFilePath 合并后的文件路径
+     * @param distFile 合并后的文件路径
      * @param fileInfo     文件信息
      */
-    private File mergeChunks(Path dir, Path distFilePath, FileInfo fileInfo) throws IOException, StatusCodeWithException {
+    private File mergeChunks(Path dir, File distFile, FileInfo fileInfo) throws IOException, StatusCodeWithException {
         File[] parts = dir.toFile().listFiles();
-        File mergedFile = distFilePath.toFile();
-        distFilePath.getParent().toFile().mkdirs();
 
-        if (mergedFile.exists()) {
-            mergedFile.delete();
+        distFile.getParentFile().mkdirs();
+        if (distFile.exists()) {
+            distFile.delete();
         }
 
         for (int i = 0; i < parts.length; i++) {
             File part = dir.resolve(i + ".part").toFile();
 
-            FileOutputStream stream = new FileOutputStream(mergedFile, true);
+            FileOutputStream stream = new FileOutputStream(distFile, true);
             FileUtils.copyFile(part, stream);
             stream.close();
         }
@@ -123,17 +122,17 @@ public class Downloader {
         FileUtils.deleteDirectory(dir.toFile());
 
         // 更新最后修改时间，避免被垃圾文件清理模块删除。
-        mergedFile.setLastModified(System.currentTimeMillis());
+        distFile.setLastModified(System.currentTimeMillis());
 
-        if (mergedFile.length() != fileInfo.fileLength) {
+        if (distFile.length() != fileInfo.fileLength) {
             StatusCode.FILE_IO_WRITE_ERROR
                     .throwException(
                             "从合作方下载文件失败(" + jobPhase
                                     + ")，期望大小：" + fileInfo.fileLength +
-                                    "，实际大小：" + mergedFile.length() + "。"
+                                    "，实际大小：" + distFile.length() + "。"
                     );
         }
-        return mergedFile;
+        return distFile;
     }
 
     /**
