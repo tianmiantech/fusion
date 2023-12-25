@@ -83,7 +83,12 @@ public class CreatePsiJobService extends AbstractService {
         );
 
         EcdhPsiJobMember result = EcdhPsiJobMember.of(member.getId(), member.getName(), dataResourceInfo);
-        if (member.isMyself() && dataResourceInfo.dataResourceType == DataResourceType.TableDataSource) {
+
+        if (!member.isMyself()) {
+            return result;
+        }
+
+        if (dataResourceInfo.dataResourceType == DataResourceType.TableDataSource) {
             CreateJobApi.TableDataResourceInput tableDataResourceInfoModel = jobMember.getTableDataResourceInfoModel();
             result.tableDataResourceReader = tableDataResourceInfoModel.createReader(-1, -1);
         }
@@ -98,13 +103,18 @@ public class CreatePsiJobService extends AbstractService {
                 jobMember.getHashConfigModel()
         );
         RsaPsiJobMember result = RsaPsiJobMember.of(member.getId(), member.getName(), dataResourceInfo);
+
+        if (!member.isMyself()) {
+            return result;
+        }
+
         if (dataResourceInfo.dataResourceType == DataResourceType.TableDataSource) {
             CreateJobApi.TableDataResourceInput tableDataResourceInfoModel = jobMember.getTableDataResourceInfoModel();
             result.tableDataResourceReader = tableDataResourceInfoModel.createReader(-1, -1);
         }
 
 
-        if (member.isMyself() && dataResourceInfo.dataResourceType == DataResourceType.PsiBloomFilter) {
+        if (dataResourceInfo.dataResourceType == DataResourceType.PsiBloomFilter) {
             if (!PsiBloomFilter.exist(jobMember.getBloomFilterId())) {
                 throw new RuntimeException(
                         "过滤器文件不存在或已损坏："
