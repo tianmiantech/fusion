@@ -16,13 +16,14 @@
 package com.welab.fusion.core.algorithm.base;
 
 import com.welab.fusion.core.Job.AbstractPsiJob;
-import com.welab.fusion.core.algorithm.JobPhase;
 import com.welab.fusion.core.Job.JobStatus;
+import com.welab.fusion.core.algorithm.JobPhase;
 import com.welab.fusion.core.progress.JobPhaseProgress;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 
 /**
  * @author zane.luo
@@ -120,5 +121,4 @@ public abstract class AbstractJobPhaseAction<T extends AbstractPsiJob> {
                 }
         );
     }
-
 }

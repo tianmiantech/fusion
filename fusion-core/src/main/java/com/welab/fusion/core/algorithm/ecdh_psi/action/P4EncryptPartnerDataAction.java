@@ -21,10 +21,12 @@ import com.welab.fusion.core.algorithm.JobPhase;
 import com.welab.fusion.core.algorithm.base.AbstractJobPhaseAction;
 import com.welab.fusion.core.algorithm.ecdh_psi.EcdhPsiJob;
 import com.welab.fusion.core.io.FileSystem;
+import com.welab.wefe.common.util.FileUtil;
 import com.welab.wefe.common.util.StringUtil;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -62,11 +64,11 @@ public class P4EncryptPartnerDataAction extends AbstractJobPhaseAction<EcdhPsiJo
                 .getDataFile(job.getJobId());
         outputFile.delete();
         outputFile.getParentFile().mkdirs();
-        this.fileWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputFile, false), StandardCharsets.UTF_8));
+        this.fileWriter = FileUtil.buildBufferedWriter(outputFile);
 
         // 读取合作方的加密数据，使用我方秘钥对其二次加密。
         File partnerData = job.getPartner().psiECEncryptedData.getDataFile();
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(partnerData), StandardCharsets.UTF_8))) {
+        try (BufferedReader reader = FileUtil.buildBufferedReader(partnerData)) {
             while (true) {
                 String line = reader.readLine();
                 if (line == null) {

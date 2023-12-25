@@ -15,6 +15,7 @@
  */
 package com.welab.fusion.core.test.ecdh_psi;
 
+import com.google.common.io.Files;
 import com.welab.fusion.core.algorithm.ecdh_psi.elliptic_curve.EllipticCurve;
 import com.welab.fusion.core.algorithm.ecdh_psi.elliptic_curve.PsiECEncryptedData;
 import com.welab.fusion.core.algorithm.ecdh_psi.elliptic_curve.PsiECEncryptedDataCreator;
@@ -28,6 +29,7 @@ import org.bouncycastle.math.ec.ECPoint;
 
 import java.io.*;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 /**
@@ -47,6 +49,8 @@ public class LocalEcdhTest {
 
         File secondEncryptedDataA = secondEncrypt(psiECEncryptedDataA.getDataFile(), psiECEncryptedDataB.ecdhPsiParam.secretKey);
         File secondEncryptedDataB = secondEncrypt(psiECEncryptedDataB.getDataFile(), psiECEncryptedDataA.ecdhPsiParam.secretKey);
+
+        // Files.readLines(secondEncryptedDataA, StandardCharsets.UTF_8)
     }
 
     private static File secondEncrypt(File file, BigInteger privateKey) throws IOException {
