@@ -23,6 +23,7 @@ import com.welab.fusion.core.algorithm.ecdh_psi.EcdhPsiJob;
 import com.welab.fusion.core.algorithm.ecdh_psi.elliptic_curve.EllipticCurve;
 import com.welab.fusion.core.hash.HashConfig;
 import com.welab.fusion.core.io.FileSystem;
+import com.welab.wefe.common.util.FileUtil;
 import com.welab.wefe.common.util.StringUtil;
 import org.bouncycastle.math.ec.ECPoint;
 
@@ -103,7 +104,7 @@ public class P6IntersectionAction extends AbstractJobPhaseAction<EcdhPsiJob> {
         LinkedList<ECPoint> fruit = new LinkedList<>();
 
         File myFile = job.getMyself().secondaryECEncryptedDataFile;
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(myFile)))) {
+        try (BufferedReader reader = FileUtil.buildBufferedReader(myFile)) {
 
             while (true) {
                 String line = reader.readLine();
@@ -138,7 +139,7 @@ public class P6IntersectionAction extends AbstractJobPhaseAction<EcdhPsiJob> {
 
         int skipLineCount = batchSize * partitionIndex;
         int lineIndex = 0;
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file)))) {
+        try (BufferedReader reader = FileUtil.buildBufferedReader(file)) {
             while (true) {
                 String line = reader.readLine();
                 lineIndex++;

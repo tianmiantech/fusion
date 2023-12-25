@@ -489,6 +489,24 @@ public class FileUtil {
         return totalRowCount;
     }
 
+    public static BufferedReader buildBufferedReader(File file) throws FileNotFoundException {
+        return new BufferedReader(
+                new InputStreamReader(
+                        new FileInputStream(file),
+                        StandardCharsets.UTF_8
+                )
+        );
+    }
+
+    public static BufferedWriter buildBufferedWriter(File file) throws FileNotFoundException {
+        return new BufferedWriter(
+                new OutputStreamWriter(
+                        new FileOutputStream(file, false),
+                        StandardCharsets.UTF_8
+                )
+        );
+    }
+
     public static void main(String[] args) throws IOException {
         // 文件储存路径
        /* File file = new File("D://test.txt");
