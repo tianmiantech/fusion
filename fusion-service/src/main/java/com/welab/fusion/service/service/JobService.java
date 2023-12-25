@@ -70,6 +70,8 @@ public class JobService extends AbstractService {
     private GatewayService gatewayService;
     @Autowired
     private JobMemberService jobMemberService;
+    @Autowired
+    private CreatePsiJobService createPsiJobService;
 
     /**
      * 关闭之前处于运行中的任务
@@ -169,7 +171,7 @@ public class JobService extends AbstractService {
             gatewayService.callOtherFusionNode(target, RestartJobApi.class, input);
 
             // 创建任务并启动
-            AbstractPsiJob psiJob = createPsiJob(job);
+            AbstractPsiJob psiJob = createPsiJobService.createPsiJob(job);
             FusionJobManager.start(psiJob);
         } catch (Exception e) {
             job.setStatus(JobStatus.error_on_running);
@@ -218,35 +220,11 @@ public class JobService extends AbstractService {
 
 
         // 创建任务并启动
-        AbstractPsiJob psiJob = createPsiJob(job);
+        AbstractPsiJob psiJob = createPsiJobService.createPsiJob(job);
         FusionJobManager.start(psiJob);
     }
 
-    private AbstractPsiJob createPsiJob(JobDbModel job) throws Exception {
-        JobMemberDbModel myselfJobInfo = jobMemberService.findMyself(job.getId());
-        MemberDbModel myselfInfo = memberService.getMyself();
-        DataResourceInfo myselfDataResourceInfo = DataResourceInfo.of(myselfJobInfo.getDataResourceType(), myselfJobInfo.getTotalDataCount(), myselfJobInfo.getHashConfigModel());
-        RsaPsiJobMember myself = RsaPsiJobMember.of(myselfInfo.getId(), myselfInfo.getName(), myselfDataResourceInfo);
-        if (myselfDataResourceInfo.dataResourceType == DataResourceType.TableDataSource) {
-            myself.tableDataResourceReader = myselfJobInfo.getTableDataResourceInfoModel().createReader(-1, -1);
-        }
-        if (myselfDataResourceInfo.dataResourceType == DataResourceType.PsiBloomFilter) {
-            if (!PsiBloomFilter.exist(myselfJobInfo.getBloomFilterId())) {
-                throw new RuntimeException("过滤器文件不存在或已损坏：" + FileSystem.PsiBloomFilter.getDir(myselfJobInfo.getBloomFilterId()));
-            }
-            myself.psiBloomFilter = PsiBloomFilter.of(
-                    myselfJobInfo.getBloomFilterId()
-            );
-        }
 
-
-        JobMemberDbModel partnerJobInfo = jobMemberService.findByMemberId(job.getId(), job.getPartnerMemberId());
-        MemberDbModel partnerInfo = memberService.findById(partnerJobInfo.getMemberId());
-        DataResourceInfo partnerDataResourceInfo = DataResourceInfo.of(partnerJobInfo.getDataResourceType(), partnerJobInfo.getTotalDataCount(), partnerJobInfo.getHashConfigModel());
-        RsaPsiJobMember partner = RsaPsiJobMember.of(partnerInfo.getId(), partnerInfo.getName(), partnerDataResourceInfo);
-
-        return new RsaPsiJob(job.getId(), myself, partner, MyRsaJobFunctions.INSTANCE);
-    }
 
 
     /**

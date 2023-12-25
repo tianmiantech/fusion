@@ -15,6 +15,8 @@
  */
 package com.welab.fusion.service.database.entity;
 
+import com.alibaba.fastjson.annotation.JSONField;
+import com.welab.fusion.service.service.MemberService;
 import com.welab.wefe.common.web.dto.FusionNodeInfo;
 
 import javax.persistence.Entity;
@@ -41,6 +43,11 @@ public class MemberDbModel extends AbstractDbModel {
     public FusionNodeInfo toFusionNodeInfo() {
 
         return FusionNodeInfo.of(publicKey, baseUrl);
+    }
+
+    @JSONField(serialize = false)
+    public boolean isMyself() {
+        return MemberService.MYSELF_NAME.equals(getId());
     }
 
     // region getter/setter
