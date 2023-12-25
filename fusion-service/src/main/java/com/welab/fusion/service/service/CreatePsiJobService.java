@@ -83,7 +83,7 @@ public class CreatePsiJobService extends AbstractService {
         );
 
         EcdhPsiJobMember result = EcdhPsiJobMember.of(member.getId(), member.getName(), dataResourceInfo);
-        if (dataResourceInfo.dataResourceType == DataResourceType.TableDataSource) {
+        if (member.isMyself() && dataResourceInfo.dataResourceType == DataResourceType.TableDataSource) {
             CreateJobApi.TableDataResourceInput tableDataResourceInfoModel = jobMember.getTableDataResourceInfoModel();
             result.tableDataResourceReader = tableDataResourceInfoModel.createReader(-1, -1);
         }
