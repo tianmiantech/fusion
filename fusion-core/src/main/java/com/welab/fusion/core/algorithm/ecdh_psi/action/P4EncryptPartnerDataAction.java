@@ -21,6 +21,7 @@ import com.welab.fusion.core.algorithm.JobPhase;
 import com.welab.fusion.core.algorithm.base.AbstractJobPhaseAction;
 import com.welab.fusion.core.algorithm.ecdh_psi.EcdhPsiJob;
 import com.welab.fusion.core.io.FileSystem;
+import com.welab.wefe.common.util.StringUtil;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -85,6 +86,11 @@ public class P4EncryptPartnerDataAction extends AbstractJobPhaseAction<EcdhPsiJo
     }
 
     private void encryptOne(String line) {
+        // 丢弃空行
+        if (StringUtil.isBlank(line)) {
+            return;
+        }
+
         // 避免读取的数据堆积在内存
         while (THREAD_POOL.getQueue().size() > 1000) {
             ThreadUtil.safeSleep(100);
