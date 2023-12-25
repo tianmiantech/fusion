@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef,useContext, } from "react";
+import { useEffect, useState, useRef,useContext, ReactNode} from "react";
 import { Descriptions,Typography,Button,Popover,ConfigProvider, Steps } from 'antd';
 import {dataResourceTypeMap} from '@/constant/dictionary'
 import lodash from 'lodash'
@@ -27,10 +27,11 @@ interface ReadOnlyDetailItemProps {
   title?:string,
   bodyStyle?:any,
   detailInfoData:ReadOnlyDetailItemDeetailInfoDataInterface|null,
+  cardExtra?:ReactNode
 }
 const ReadOnlyDetailItem = (props:ReadOnlyDetailItemProps) => {
   const {detailData} = useDetail();
-  const {detailInfoData,title,bodyStyle } = props
+  const {detailInfoData,title,bodyStyle,cardExtra=null } = props
   const configContext = useContext(ConfigProvider.ConfigContext);
   const prefixCls = 'portal' || configContext.getPrefixCls();
   const labelStyle = {
@@ -85,7 +86,7 @@ const ReadOnlyDetailItem = (props:ReadOnlyDetailItemProps) => {
     }
   }
 
-  return (<JobCard title={title} bodyStyle={bodyStyle} >
+  return (<JobCard title={title} bodyStyle={bodyStyle} extra={cardExtra}>
       <Descriptions column={1} bordered labelStyle={labelStyle} contentStyle={{paddingTop:10,paddingBottom:10}}>
         <Descriptions.Item label="服务地址">{lodash.get(detailInfoData,'base_url','') }</Descriptions.Item>
         <Descriptions.Item label="算法类型">{lodash.get(detailData,'jobDetailData.algorithm','') }</Descriptions.Item>

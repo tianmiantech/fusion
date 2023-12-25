@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { Row,Col,Card, Space,Button, Alert } from 'antd';
+import { Row,Col,Card, Space,Button, Alert,message } from 'antd';
 import useDetail from "../../hooks/useDetail";
 import JobCard from '../JobCard'
 import ReadOnlyDetailItem from '../ReadOnlyDetailItem'
@@ -11,6 +11,8 @@ import { useRequest } from "ahooks";
 import { getPrevResult,downloadResult } from "./service";
 import {ResizableTable} from '@/components/DataSetPreview'
 import './index.less'
+import { restartJob } from '@/pages/home/service'
+
 
 /**
  * 当前访问数据的角色分为发起方，协作方
@@ -156,13 +158,27 @@ const Index = ()=>{
       }
     }
 
+
+    const {run:restartJobData,loading:restartLoading} = useRequest(async (id)=>{
+      const reponse = await restartJob(id)
+      const {code,data} = reponse;
+      if (code == 0) {
+          message.success('重启成功');
+          setTimeout(()=>{ window.location.reload()},800)
+         
+      }
+  },{manual:true})
+
+    const renderRestartBtn = ()=>{
+      return <Button type="link" onClick={()=>{restartJobData(detailData.jobId)}}>重启运行</Button>
+    }
+
     return <>
-          <Card>
-        
+          <Card loading={restartLoading}>
               <Row>
               {renderErrorMsg()}
-                <Col span={12}>
-                    <ReadOnlyDetailItem title="发起方" detailInfoData={data.promoterDetail} />
+                <Col span={12} >
+                    <ReadOnlyDetailItem title="发起方" detailInfoData={data.promoterDetail} cardExtra={renderRestartBtn()}/>
                 </Col>
                 <Col span={12}>
                     <ReadOnlyDetailItem title='协作方'  detailInfoData={data.providerDetail}/>

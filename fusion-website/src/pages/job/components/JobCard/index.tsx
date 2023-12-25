@@ -1,6 +1,7 @@
 import { Card, Row, Col, Button, Space } from 'antd';
+import {ReactNode} from 'react'
 
-const Index = (props: { title: any; children: any;bodyStyle?:any })=>{
+const Index = (props: { title: any; children: any;bodyStyle?:any,extra?:ReactNode })=>{
     const {title,children,...rest} = props
     const cardStyles = {
         headStyle: {
