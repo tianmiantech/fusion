@@ -58,7 +58,7 @@ public class P4EncryptPartnerDataAction extends AbstractJobPhaseAction<EcdhPsiJo
         // 初始化输出文件
         File outputFile = FileSystem
                 .PsiSecondaryECEncryptedData
-                .getParentDataFile(job.getJobId(), job.getPartner().memberId);
+                .getDataFile(job.getJobId());
         outputFile.delete();
         outputFile.getParentFile().mkdirs();
         this.fileWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputFile, false), StandardCharsets.UTF_8));

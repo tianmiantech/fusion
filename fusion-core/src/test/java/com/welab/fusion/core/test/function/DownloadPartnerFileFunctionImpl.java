@@ -44,7 +44,7 @@ public class DownloadPartnerFileFunctionImpl implements DownloadPartnerFileFunct
             case DownloadSecondaryECEncryptedData:
                 return FileSystem
                         .PsiSecondaryECEncryptedData
-                        .getMyselfDataFile(jobId);
+                        .getDataFile(jobId);
             case SaveResult:
                 return FileSystem.FusionResult.getFile(jobId);
             default:
