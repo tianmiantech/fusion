@@ -36,7 +36,7 @@ import java.util.Objects;
  */
 public class EllipticCurve {
     public static final ECParameterSpec EC_PARAMETER_SPEC = ECNamedCurveTable.getParameterSpec("prime256v1");
-    public static final  EllipticCurve INSTANCE = new EllipticCurve();
+    public static final EllipticCurve INSTANCE = new EllipticCurve();
     private static final BigInteger THREE = BigInteger.valueOf(3);
     private static final BigInteger TWO = BigInteger.valueOf(2);
     private static final BigInteger ONE = BigInteger.valueOf(1);
@@ -50,14 +50,13 @@ public class EllipticCurve {
     private ECCurve ecCurve;
     private String name;
 
-    public    ECCurve getEcCurve() {
+    public ECCurve getEcCurve() {
         return this.ecCurve;
     }
 
     public String getName() {
         return this.name;
     }
-
 
 
     BigInteger getN() {
@@ -280,6 +279,10 @@ public class EllipticCurve {
      * 还原 base64 为 ECPoint
      */
     public ECPoint base64ToECPoint(String value) {
-        return getEcCurve().decodePoint(Base64.decode(value));
+        try {
+            return getEcCurve().decodePoint(Base64.decode(value));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }

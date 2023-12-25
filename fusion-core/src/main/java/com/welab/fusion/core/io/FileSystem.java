@@ -36,10 +36,14 @@ public class FileSystem {
     private static final Logger LOG = LoggerFactory.getLogger(FileSystem.class);
     private static Path ROOT_DIR;
 
+    public static void init(String fileSystemBaseDir) throws IOException {
+        init(fileSystemBaseDir, null);
+    }
+
     /**
      * 初始化，指定根目录。
      */
-    public static void init(String fileSystemBaseDir) throws IOException {
+    public static void init(String fileSystemBaseDir, String serverPort) throws IOException {
         // 当未指定时，设置默认值。
         if (StringUtil.isEmpty(fileSystemBaseDir)) {
             fileSystemBaseDir = OS.get() == OS.windows
@@ -48,6 +52,10 @@ public class FileSystem {
         }
 
         ROOT_DIR = Paths.get(fileSystemBaseDir);
+
+        if (StringUtil.isNotBlank(serverPort)) {
+            ROOT_DIR = ROOT_DIR.resolve(serverPort);
+        }
 
         // 创建目录
         File dir = ROOT_DIR.toFile();
