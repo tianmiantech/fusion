@@ -20,7 +20,6 @@ import com.welab.fusion.core.algorithm.JobPhase;
 import com.welab.fusion.core.algorithm.base.AbstractJobPhaseAction;
 import com.welab.fusion.core.algorithm.ecdh_psi.EcdhPsiJob;
 import com.welab.fusion.core.algorithm.ecdh_psi.elliptic_curve.PsiECEncryptedData;
-import com.welab.fusion.core.algorithm.ecdh_psi.function.DownloadPartnerFileFunction;
 import com.welab.fusion.core.io.FileSystem;
 import com.welab.wefe.common.InformationSize;
 import com.welab.wefe.common.file.decompression.SuperDecompressor;
@@ -50,9 +49,14 @@ public class P5DownloadSecondaryECEncryptedDataAction extends AbstractJobPhaseAc
 
         phaseProgress.setMessage("正在解压 zip 文件(" + InformationSize.fromByte(file.length()) + ")...");
         // file 解压至 dir
-        Path dir = FileSystem.PsiBloomFilter.getDir(job.getPartner().memberId.replace(":", "_") + "-" + FileUtil.getFileNameWithoutSuffix(file.getName()));
+        Path dir = FileSystem.getTempDir()
+                .resolve(job.getJobId())
+                .resolve(
+                        job.getPartner().memberId.replace(":", "_")
+                                + "-SecondaryECEncryptedData-"
+                                + FileUtil.getFileNameWithoutSuffix(file.getName())
+                );
         SuperDecompressor.decompression(file, dir.toAbsolutePath().toString(), false);
-
 
         PsiECEncryptedData psiECEncryptedData = PsiECEncryptedData.of(dir);
 
