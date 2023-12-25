@@ -252,7 +252,7 @@ public abstract class AbstractPsiJob implements Closeable {
      */
     private synchronized void gotoPhase(JobPhase phase) {
         if (executedPhases.contains(phase)) {
-            throw new RuntimeException("阶段已执行过，不能重复执行。");
+            throw new RuntimeException("阶段已执行过，不能重复执行：" + phase);
         }
         executedPhases.add(phase);
 
@@ -332,6 +332,7 @@ public abstract class AbstractPsiJob implements Closeable {
     public abstract <T extends AbstractJobMember> T getMyself();
 
     public abstract <T extends AbstractJobMember> T getPartner();
+
     public abstract <T extends AbstractJobFunctions> T getJobFunctions();
 
     // endregion
