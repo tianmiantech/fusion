@@ -14,7 +14,7 @@ import lodash from 'lodash'
 import {getPersonificationTime} from '@/utils/time'
 import {renderHashConfig} from '@/utils/utils'
 
-interface RowProps {
+export interface RowProps {
     created_time:number,
     role:'promoter'|'provider',
     creator_member_id:string,
@@ -99,44 +99,57 @@ const Index =()=>{
     })
 
 
-    const renderContentData = (row:RowProps,dataObj:any)=>{
+    const renderPromoterData = (row:RowProps,dataObj:any)=>{
+        const {status,role} = row;
+        return renderMaindData(row,dataObj)
+    }
+
+    const renderProviderData = (row:RowProps,dataObj:any)=>{
+        const {status,role} = row;
+        if( status === JOB_STATUS.AUDITING ){
+          return renderPartnerUrls(row,dataObj)
+        } else {
+          return renderMaindData(row,dataObj)
+        }
+    }
+
+    const renderMaindData = (row:RowProps,dataObj:any)=>{
         if (!dataObj) {
             return <>暂无内容</>
         }
-        const {status,role} = row;
-        if(status === JOB_STATUS.AUDITING && role === ROLE_TYPE.PROMOTER){
-            const member_name = lodash.get(dataObj,'member_name')
-            const base_url  = lodash.get(dataObj,'base_url')
-            return <>{member_name && <div>协作方名称：{member_name}</div>}
-            <div>服务地址：{base_url}</div>
-            </>
-        } else if(status === JOB_STATUS.EDITING){
-            return <>暂无内容</>
-        } else {
-            const { data_resource_type,total_data_count,hash_config} = dataObj||{};
-
-            return <>
-                <div>数据类型/数据量：{dataResourceTypeMap.get(data_resource_type)}/{total_data_count}</div>
-                <div>主键：{renderHashConfig(hash_config)}</div>
-            </>
-        }
-       
+        const { data_resource_type,total_data_count,hash_config} = dataObj||{};
+        return <>
+            <div>数据类型/数据量：{dataResourceTypeMap.get(data_resource_type)}/{total_data_count}</div>
+            <div>主键：{renderHashConfig(hash_config)}</div>
+        </>
     }
 
-        const getBadgeStatus = (status:string)=>{
-            if (status === JOB_STATUS.RUNNING) {
-                return 'processing';
-            } else if (status === JOB_STATUS.SUCCESS) {
-                return 'success';
-            } else if (status === JOB_STATUS.ERROR_ON_RUNNING) {
-                return 'error';
-            } else if (status === JOB_STATUS.AUDITING) {
-                return 'warning';
-            } 
-            else {
-                return 'default';
-            }
+    const renderPartnerUrls = (row:RowProps,dataObj:any)=>{
+        if (!dataObj) {
+            return <>暂无内容</>
         }
+        const member_name = lodash.get(dataObj,'member_name')
+        const base_url  = lodash.get(dataObj,'base_url')
+        return <>{member_name && <div>协作方名称：{member_name}</div>}
+        <div>服务地址：{base_url}</div>
+        </>
+    }
+
+
+    const getBadgeStatus = (status:string)=>{
+        if (status === JOB_STATUS.RUNNING) {
+            return 'processing';
+        } else if (status === JOB_STATUS.SUCCESS) {
+            return 'success';
+        } else if (status === JOB_STATUS.ERROR_ON_RUNNING) {
+            return 'error';
+        } else if (status === JOB_STATUS.AUDITING) {
+            return 'warning';
+        } 
+        else {
+            return 'default';
+        }
+    }
     
 
     const columns: ColumnsType<RowProps>|any = [{
@@ -156,12 +169,12 @@ const Index =()=>{
         key: 'promoter',
         width:400,
         render:(text:string,row:RowProps)=>{
-          const { role } = row;
+          const { role,id } = row;
           //role表示我方这条数据中所处的角色 
           //展示发起方的数据表示 我方在当前数据中为发起方,则取myself字段，否则取partner字段
           const key = role===ROLE_TYPE.PROMOTER?'myself':'partner';
           const dataObj = lodash.get(row,key,null);
-          return renderContentData(row,dataObj)
+          return renderPromoterData(row,dataObj)
         }
     },{
         title: '协作方',
@@ -169,10 +182,10 @@ const Index =()=>{
         key: 'provider',
         width:400,
         render:(text:string,row:RowProps)=>{
-            const { role } = row;
-            const key = role===ROLE_TYPE.PROVIDER?'myself':'partner';
-            const dataObj = lodash.get(row,key,null);
-            return renderContentData(row,dataObj)
+          const { role,id } = row;
+          const key = role===ROLE_TYPE.PROVIDER?'myself':'partner';
+          const dataObj = lodash.get(row,key,null);
+          return renderProviderData(row,dataObj)
         }
     },{
         title: '状态',

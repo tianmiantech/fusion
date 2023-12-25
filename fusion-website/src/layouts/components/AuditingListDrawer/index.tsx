@@ -1,6 +1,7 @@
 import React,{useState,useImperativeHandle,forwardRef} from 'react'
 import { Button, Table } from 'antd'
 import { Layout, Badge } from 'antd';
+import { history } from 'umi';
 import {SettingOutlined,PlusOutlined,BarsOutlined,MailOutlined} from "@ant-design/icons"
 import { TmDrawer } from '@tianmiantech/pro';
 import { useRequest,useMount } from 'ahooks';
@@ -10,7 +11,8 @@ import { getJobList } from '@/pages/home/service';
 import type {GetJobListRequestInterface} from '@/pages/home/service'
 import styles from './index.less'
 import { ROLE_TYPE,JOB_STATUS } from '@/constant/dictionary';
-
+import {getPersonificationTime} from '@/utils/time'
+import type {RowProps} from '@/pages/home/JobList/index'
 interface AuditingListDrawerProps {
     // Add props here
 }
@@ -20,7 +22,7 @@ const AuditingListDrawer: React.FC<AuditingListDrawerProps> = forwardRef((props,
     const [auditData, setAuditData] = useImmer({
         visible:false,
         showDot:false,
-        auditList:[]
+        auditList:[],
     });
 
     const {run:runGetJobList} = useRequest(async ()=>{
@@ -35,12 +37,14 @@ const AuditingListDrawer: React.FC<AuditingListDrawerProps> = forwardRef((props,
         if(code === 0){
             const listData = lodash.get(data,'list',[])
             const resultData= listData.map((item:any)=>{
+                const jobId = lodash.get(item,'id','')
                 const partner = lodash.get(item,'partner',{})
                 const created_time = lodash.get(item,'created_time','')
                 const updated_time = lodash.get(item,'updated_time','')
                 return {
                     ...partner,
                     created_time:updated_time || created_time,
+                    jobId
                 }
             })
             setAuditData(g=>{
@@ -48,7 +52,7 @@ const AuditingListDrawer: React.FC<AuditingListDrawerProps> = forwardRef((props,
                 g.auditList = resultData
             })
         }
-    },{pollingInterval:3000})
+    },{pollingInterval:10000})
 
     const showDrawer = (values:boolean)=>{
         setAuditData(g=>{
@@ -62,6 +66,12 @@ const AuditingListDrawer: React.FC<AuditingListDrawerProps> = forwardRef((props,
         }
     })
 
+    const goAuditing = (row:RowProps)=>{
+      const jobId = lodash.get(row,'jobId','')
+      history.push(`/job/detail/${jobId}`);
+      showDrawer(false)
+    }
+
     const columnsList = [{
       title:'合作方名称',
       dataIndex:'member_name'
@@ -69,14 +79,17 @@ const AuditingListDrawer: React.FC<AuditingListDrawerProps> = forwardRef((props,
       title:'合作方地址',
       dataIndex:'base_url'
     },{
-      title:'发起时间',
-      dataIndex:'created_time'
+      title:'创建时间',
+      dataIndex:'created_time',
+      render:(text:number)=>{
+        return <>{getPersonificationTime(text)}</>
+      }
     },{
       title:'操作',
       dataIndex:'action',
-      render:()=>(
+      render:(text:string,row:RowProps)=>(
         <>
-        <Button type="link">去审批</Button>
+        <Button type="link" onClick={()=>{goAuditing(row)}}>去审批</Button>
         </>
       )
     }]
