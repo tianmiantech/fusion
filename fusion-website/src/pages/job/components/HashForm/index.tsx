@@ -5,6 +5,7 @@ import { FolderOpenOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import { encryMethodMap } from '@/constant/dictionary';
 import './index.less';
 import lodash from 'lodash'
+import { useMount } from 'ahooks';
 
 export interface HashFormValue {
   list:{
@@ -30,8 +31,11 @@ const HashForm = (props:HashFormPropsInterface) => {
         const valueList = lodash.get(value,'list',[])
         formRef.setFieldValue('valueList',valueList)
       }
+    } else {
+      formRef.setFieldsValue({valueList:[{}]})
     }
   },[value])
+
 
   const onValuesChange = (changedValues:any, allValues:any) => {
     const valueList = lodash.get(allValues,'valueList',[])
@@ -47,7 +51,7 @@ const HashForm = (props:HashFormPropsInterface) => {
             {fields.map(({key, name}, index) => (
               <Space key={key} style={{ width: '100%' }}>
                  <Form.Item name={[name, 'method']} className="hash-form-item">
-                  <Select disabled={disabled} style={{ width: 100 }} placeholder="加密方式">
+                  <Select disabled={disabled} style={{ width: 100 }} placeholder="脱敏方式">
                     {[...encryMethodMap].map(([value, label]) => (
                       <Select.Option key={value} value={value}>
                         {label}
@@ -78,9 +82,9 @@ const HashForm = (props:HashFormPropsInterface) => {
                 </div>
               </Space>
             ))}
-            {
+            {/* {
               fields.length ==0 &&  <Button disabled={disabled} onClick={()=>{add()}}>设置主键</Button>
-            }
+            } */}
           </>
         )}}
       </Form.List>

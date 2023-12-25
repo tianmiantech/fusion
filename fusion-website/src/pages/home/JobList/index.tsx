@@ -18,6 +18,7 @@ export interface RowProps {
     created_time:number,
     role:'promoter'|'provider',
     creator_member_id:string,
+    algorithm:string,
     remark:string,
     partner:string,
     id:string,
@@ -119,7 +120,7 @@ const Index =()=>{
         }
         const { data_resource_type,total_data_count,hash_config} = dataObj||{};
         return <>
-            <div>数据类型/数据量：{dataResourceTypeMap.get(data_resource_type)}/{total_data_count}</div>
+            <div>资源：{dataResourceTypeMap.get(data_resource_type)}/{total_data_count}</div>
             <div>主键：{renderHashConfig(hash_config)}</div>
         </>
     }
@@ -153,14 +154,14 @@ const Index =()=>{
     
 
     const columns: ColumnsType<RowProps>|any = [{
-        title: '我方角色/创建时间',
+        title: '时间/算法',
         dataIndex: 'create',
         key: 'create',
         width:200,
         render:(text:string,row:RowProps)=>{
-            const { created_time = new Date().getTime(),role} = row;
+            const { created_time = new Date().getTime(),role,algorithm} = row;
             return <><Tag color={role==='promoter'?'success':'blue'}>{ROLE_TO_CN[`${role}`]}</Tag>
-            <div>{getPersonificationTime(created_time)}</div>
+            <div>{algorithm}/{getPersonificationTime(created_time)}</div>
             </>
         }
     },{

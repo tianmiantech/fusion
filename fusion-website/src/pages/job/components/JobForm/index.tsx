@@ -115,15 +115,24 @@ const JobForm = forwardRef((props:JobFormPropsInterface, ref) => {
                 </Select>
               </Form.Item>
               <Form.Item style={{marginBottom:0}}  label="样本类型" required>
-                <Form.Item name="data_resource_type" style={{ display: 'inline-block', marginBottom: 0 }} rules={[{ required: true }]}>
-                  <Radio.Group onChange={onDataSourceTypeChange}>
-                    {[...dataResourceTypeMap].map(([value, label]) => (
-                      <Radio.Button key={value} value={value}>
-                        {label}
-                      </Radio.Button>
-                    ))}
-                  </Radio.Group>
+                <Form.Item noStyle shouldUpdate={(prev, cur) => prev.algorithm !== cur.algorithm }>
+                  {({ getFieldValue }) => {
+                      const algorithm = getFieldValue('algorithm'); 
+                      return  <Form.Item name="data_resource_type" style={{ display: 'inline-block', marginBottom: 0 }} rules={[{ required: true }]}>
+                      <Radio.Group onChange={onDataSourceTypeChange}>
+                        {[...dataResourceTypeMap].map(([value, label]) => {
+                          if(algorithm === 'ecdh_psi' && value === 'PsiBloomFilter'){
+                            return null
+                          }
+                          return  <Radio.Button key={value} value={value} >
+                          {label}
+                        </Radio.Button>
+                        })}
+                      </Radio.Group>
+                    </Form.Item>
+                  }}
                 </Form.Item>
+                
                 <Form.Item noStyle shouldUpdate={(prev, cur) => prev.data_resource_type !== cur.data_resource_type|| prev.add_method !== cur.add_method  }>
                   {({ getFieldValue }) => {
                       const data_resource_type = getFieldValue('data_resource_type');
