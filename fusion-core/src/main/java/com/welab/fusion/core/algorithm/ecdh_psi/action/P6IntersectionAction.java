@@ -85,6 +85,8 @@ public class P6IntersectionAction extends AbstractJobPhaseAction<EcdhPsiJob> {
                     StandardOpenOption.APPEND
             );
 
+            fruitCount.add(lines.size());
+
             if (partnerPartition.size() < batchSize) {
                 break;
             }
