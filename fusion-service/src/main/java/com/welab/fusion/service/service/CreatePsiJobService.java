@@ -32,11 +32,13 @@ import com.welab.fusion.service.job_function.MyEcdhJobFunctions;
 import com.welab.fusion.service.job_function.MyRsaJobFunctions;
 import com.welab.fusion.service.service.base.AbstractService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * @author zane.luo
  * @date 2023/12/25
  */
+@Service
 public class CreatePsiJobService extends AbstractService {
     @Autowired
     private MemberService memberService;
