@@ -498,13 +498,15 @@ public class FileUtil {
         );
     }
 
-    public static BufferedWriter buildBufferedWriter(File file) throws FileNotFoundException {
-        file.delete();
+    public static BufferedWriter buildBufferedWriter(File file, boolean append) throws FileNotFoundException {
+        if (!append) {
+            file.delete();
+        }
         file.getParentFile().mkdirs();
 
         return new BufferedWriter(
                 new OutputStreamWriter(
-                        new FileOutputStream(file, false),
+                        new FileOutputStream(file, append),
                         StandardCharsets.UTF_8
                 )
         );

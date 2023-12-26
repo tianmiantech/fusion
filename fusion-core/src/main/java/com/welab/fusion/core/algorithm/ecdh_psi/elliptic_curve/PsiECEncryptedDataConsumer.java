@@ -18,11 +18,14 @@ package com.welab.fusion.core.algorithm.ecdh_psi.elliptic_curve;
 import cn.hutool.core.thread.NamedThreadFactory;
 import cn.hutool.core.thread.ThreadUtil;
 import com.welab.fusion.core.progress.Progress;
+import com.welab.wefe.common.util.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
+import java.io.BufferedWriter;
+import java.io.Closeable;
+import java.io.File;
+import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -61,10 +64,7 @@ public class PsiECEncryptedDataConsumer implements BiConsumer<Long, LinkedHashMa
         this.progress = progress;
 
         File file = psiECEncryptedData.getDataFile();
-        file.delete();
-        file.getParentFile().mkdirs();
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file, false), StandardCharsets.UTF_8));
-        this.fileWriter = writer;
+        this.fileWriter = FileUtil.buildBufferedWriter(file,false);
 
     }
 

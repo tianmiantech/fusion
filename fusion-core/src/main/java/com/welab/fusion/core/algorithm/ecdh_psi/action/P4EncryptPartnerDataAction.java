@@ -63,7 +63,7 @@ public class P4EncryptPartnerDataAction extends AbstractJobPhaseAction<EcdhPsiJo
                 .PsiSecondaryECEncryptedData
                 .getDataFile(job.getJobId());
 
-        this.fileWriter = FileUtil.buildBufferedWriter(outputFile);
+        this.fileWriter = FileUtil.buildBufferedWriter(outputFile, false);
 
         // 读取合作方的加密数据，使用我方秘钥对其二次加密。
         File partnerData = job.getPartner().psiECEncryptedData.getDataFile();
