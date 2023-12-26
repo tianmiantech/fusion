@@ -49,10 +49,8 @@ public class P3DownloadPartnerECEncryptedDataAction extends AbstractJobPhaseActi
         Path dir = file.getParentFile().toPath();
         SuperDecompressor.decompression(file, dir.toAbsolutePath().toString(), false);
 
-        PsiECEncryptedData psiECEncryptedData = PsiECEncryptedData.of(dir);
-
         // 保存到上下文供后续使用
-        job.getPartner().psiECEncryptedData = psiECEncryptedData;
+        job.getPartner().psiECEncryptedData = PsiECEncryptedData.of(dir);
     }
 
     @Override
