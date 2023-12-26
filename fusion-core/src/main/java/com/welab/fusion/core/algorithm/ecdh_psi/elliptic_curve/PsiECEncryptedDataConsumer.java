@@ -91,9 +91,8 @@ public class PsiECEncryptedDataConsumer implements BiConsumer<Long, LinkedHashMa
         }
 
         try {
-            String key = psiECEncryptedData.hashConfig.hash(row);
-
             THREAD_POOL.execute(() -> {
+                String key = psiECEncryptedData.hashConfig.hash(row);
                 String encrypted = psiECEncryptedData.encryptMyselfData(key);
                 // 将加密后的数据保存到文件
                 try {
