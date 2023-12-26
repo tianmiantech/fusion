@@ -30,7 +30,10 @@ import org.bouncycastle.math.ec.ECPoint;
 import java.io.*;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
+import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.atomic.LongAdder;
+import java.util.stream.Collectors;
 
 /**
  * @author zane.luo
@@ -41,6 +44,8 @@ public class LocalEcdhTest {
     private static HashConfig hashConfig = HashConfig.of(HashConfigItem.of(HashMethod.MD5, "id"));
 
     public static void main(String[] args) throws Exception {
+        FileSystem.init(null);
+
         String csv = "promoter-569.csv";
         File file = new File("D:\\data\\wefe\\" + csv);
 
@@ -50,7 +55,23 @@ public class LocalEcdhTest {
         File secondEncryptedDataA = secondEncrypt(psiECEncryptedDataA.getDataFile(), psiECEncryptedDataB.ecdhPsiParam.secretKey);
         File secondEncryptedDataB = secondEncrypt(psiECEncryptedDataB.getDataFile(), psiECEncryptedDataA.ecdhPsiParam.secretKey);
 
-        // Files.readLines(secondEncryptedDataA, StandardCharsets.UTF_8)
+        Set<ECPoint> pointsA = Files.readLines(secondEncryptedDataA, StandardCharsets.UTF_8)
+                .stream()
+                .map(x -> EllipticCurve.INSTANCE.base64ToECPoint(x))
+                .collect(Collectors.toSet());
+
+        Set<ECPoint> pointsB = Files.readLines(secondEncryptedDataB, StandardCharsets.UTF_8)
+                .stream()
+                .map(x -> EllipticCurve.INSTANCE.base64ToECPoint(x))
+                .collect(Collectors.toSet());
+
+        LongAdder count = new LongAdder();
+        for (ECPoint point : pointsA) {
+            if (pointsB.contains(point)) {
+                count.increment();
+            }
+        }
+        System.out.println("found:" + count);
     }
 
     private static File secondEncrypt(File file, BigInteger privateKey) throws IOException {
