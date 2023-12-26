@@ -130,6 +130,10 @@ public class PsiECEncryptedDataCreator implements Closeable {
                 }
             }
 
+            if (consumer.getError() != null) {
+                throw consumer.getError();
+            }
+
             psiECEncryptedData.insertedElementCount = consumer.getInsertedElementCount().longValue();
         }
 

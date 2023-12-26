@@ -28,6 +28,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.LongAdder;
 import java.util.function.BiConsumer;
 
@@ -52,6 +53,7 @@ public class PsiECEncryptedDataConsumer implements BiConsumer<Long, LinkedHashMa
      * 务必使用线程安全的写入方式
      */
     private BufferedWriter fileWriter;
+    private AtomicReference<Exception> error = new AtomicReference<>(null);
 
     public PsiECEncryptedDataConsumer(PsiECEncryptedData psiECEncryptedData, Progress progress) throws IOException {
         this.psiECEncryptedData = psiECEncryptedData;
@@ -90,22 +92,20 @@ public class PsiECEncryptedDataConsumer implements BiConsumer<Long, LinkedHashMa
             ThreadUtil.safeSleep(100);
         }
 
-        try {
-            THREAD_POOL.execute(() -> {
-                String key = psiECEncryptedData.hashConfig.hash(row);
-                String encrypted = psiECEncryptedData.encryptMyselfData(key);
-                // 将加密后的数据保存到文件
-                try {
-                    // 这里写入的必须拼接上换行符之后写入，如果分开写入，在并发的影响下，会导致数据错乱。
-                    this.fileWriter.append(encrypted + System.lineSeparator());
-                } catch (IOException e) {
-                    LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);
-                }
-                insertedElementCount.increment();
-            });
-        } catch (Exception e) {
-            LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);
-        }
+        THREAD_POOL.execute(() -> {
+            String key = psiECEncryptedData.hashConfig.hash(row);
+            String encrypted = psiECEncryptedData.encryptMyselfData(key);
+            // 将加密后的数据保存到文件
+            try {
+                // 这里写入的必须拼接上换行符之后写入，如果分开写入，在并发的影响下，会导致数据错乱。
+                this.fileWriter.append(encrypted + System.lineSeparator());
+            } catch (IOException e) {
+                LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);
+                error.set(e);
+            }
+            insertedElementCount.increment();
+        });
+
     }
 
     public LongAdder getInsertedElementCount() {
@@ -136,5 +136,9 @@ public class PsiECEncryptedDataConsumer implements BiConsumer<Long, LinkedHashMa
 
     public Progress getProgress() {
         return progress;
+    }
+
+    public Exception getError() {
+        return error.get();
     }
 }
