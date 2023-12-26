@@ -19,10 +19,8 @@ import com.welab.fusion.core.Job.AbstractJobMember;
 import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
 import com.welab.fusion.core.data_resource.base.DataResourceInfo;
 import com.welab.fusion.core.data_resource.base.DataResourceType;
-import com.welab.fusion.core.data_source.AbstractTableDataSourceReader;
-import com.welab.wefe.common.util.CloseableUtils;
 
-import java.io.IOException;
+import java.util.List;
 
 /**
  * @author zane.luo
@@ -40,7 +38,12 @@ public class RsaPsiJobMember extends AbstractJobMember {
     }
 
     public static RsaPsiJobMember of(String memberId, String memberName, PsiBloomFilter psiBloomFilter) {
-        DataResourceInfo dataResourceInfo = DataResourceInfo.of(DataResourceType.PsiBloomFilter, psiBloomFilter.insertedElementCount, psiBloomFilter.hashConfig);
+        DataResourceInfo dataResourceInfo = DataResourceInfo.of(
+                DataResourceType.PsiBloomFilter,
+                psiBloomFilter.insertedElementCount,
+                psiBloomFilter.hashConfig,
+                null
+        );
 
         RsaPsiJobMember jobMember = of(memberId, memberName, dataResourceInfo);
         jobMember.psiBloomFilter = psiBloomFilter;

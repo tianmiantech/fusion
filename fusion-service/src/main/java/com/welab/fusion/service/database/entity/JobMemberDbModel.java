@@ -30,6 +30,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import java.util.LinkedHashSet;
+import java.util.List;
 
 /**
  * @author zane.luo
@@ -53,6 +55,9 @@ public class JobMemberDbModel extends AbstractDbModel {
     @Type(type = "json")
     @Column(columnDefinition = "json")
     private JSONObject hashConfig;
+
+    @Check(name = "附加结果字段")
+    private LinkedHashSet<String> additionalResultColumns;
 
     @Check(name = "过滤器Id")
     private String bloomFilterId;
@@ -123,6 +128,14 @@ public class JobMemberDbModel extends AbstractDbModel {
 
     public void setHashConfig(JSONObject hashConfig) {
         this.hashConfig = hashConfig;
+    }
+
+    public LinkedHashSet<String> getAdditionalResultColumns() {
+        return additionalResultColumns;
+    }
+
+    public void setAdditionalResultColumns(LinkedHashSet<String> additionalResultColumns) {
+        this.additionalResultColumns = additionalResultColumns;
     }
 
     public String getBloomFilterId() {

@@ -79,10 +79,15 @@ public class CreatePsiJobService extends AbstractService {
         DataResourceInfo dataResourceInfo = DataResourceInfo.of(
                 jobMember.getDataResourceType(),
                 jobMember.getTotalDataCount(),
-                jobMember.getHashConfigModel()
+                jobMember.getHashConfigModel(),
+                jobMember.getAdditionalResultColumns()
         );
 
-        EcdhPsiJobMember result = EcdhPsiJobMember.of(member.getId(), member.getName(), dataResourceInfo);
+        EcdhPsiJobMember result = EcdhPsiJobMember.of(
+                member.getId(),
+                member.getName(),
+                dataResourceInfo
+        );
 
         if (!member.isMyself()) {
             return result;
@@ -100,9 +105,14 @@ public class CreatePsiJobService extends AbstractService {
         DataResourceInfo dataResourceInfo = DataResourceInfo.of(
                 jobMember.getDataResourceType(),
                 jobMember.getTotalDataCount(),
-                jobMember.getHashConfigModel()
+                jobMember.getHashConfigModel(),
+                jobMember.getAdditionalResultColumns()
         );
-        RsaPsiJobMember result = RsaPsiJobMember.of(member.getId(), member.getName(), dataResourceInfo);
+        RsaPsiJobMember result = RsaPsiJobMember.of(
+                member.getId(),
+                member.getName(),
+                dataResourceInfo
+        );
 
         if (!member.isMyself()) {
             return result;

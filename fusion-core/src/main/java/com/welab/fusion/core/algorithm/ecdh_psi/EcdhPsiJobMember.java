@@ -20,6 +20,7 @@ import com.welab.fusion.core.algorithm.ecdh_psi.elliptic_curve.PsiECEncryptedDat
 import com.welab.fusion.core.data_resource.base.DataResourceInfo;
 
 import java.io.File;
+import java.util.List;
 
 /**
  * @author zane.luo
@@ -34,6 +35,7 @@ public class EcdhPsiJobMember extends AbstractJobMember {
      * 二次加密后的数据文件
      */
     public File secondaryECEncryptedDataFile;
+
     public EcdhPsiJobMember(String memberId, String memberName, DataResourceInfo dataResourceInfo) {
         super(memberId, memberName, dataResourceInfo);
     }

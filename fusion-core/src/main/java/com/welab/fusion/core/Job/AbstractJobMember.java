@@ -15,15 +15,13 @@
  */
 package com.welab.fusion.core.Job;
 
-import com.alibaba.fastjson.annotation.JSONField;
-import com.welab.fusion.core.algorithm.ecdh_psi.elliptic_curve.PsiECEncryptedData;
-import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
 import com.welab.fusion.core.data_resource.base.DataResourceInfo;
 import com.welab.fusion.core.data_source.AbstractTableDataSourceReader;
 import com.welab.wefe.common.util.CloseableUtils;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * @author zane.luo

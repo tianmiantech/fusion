@@ -17,6 +17,9 @@ package com.welab.fusion.core.data_resource.base;
 
 import com.welab.fusion.core.hash.HashConfig;
 
+import java.util.LinkedHashSet;
+import java.util.List;
+
 /**
  * @author zane.luo
  * @date 2023/11/10
@@ -25,12 +28,14 @@ public class DataResourceInfo {
     public long dataCount;
     public DataResourceType dataResourceType;
     public HashConfig hashConfig;
+    public LinkedHashSet<String> additionalResultColumns;
 
-    public static DataResourceInfo of(DataResourceType dataResourceType, long dataCount, HashConfig hashConfig) {
+    public static DataResourceInfo of(DataResourceType dataResourceType, long dataCount, HashConfig hashConfig, LinkedHashSet<String> additionalResultColumns) {
         DataResourceInfo dataResourceInfo = new DataResourceInfo();
         dataResourceInfo.dataCount = dataCount;
         dataResourceInfo.dataResourceType = dataResourceType;
         dataResourceInfo.hashConfig = hashConfig;
+        dataResourceInfo.additionalResultColumns = additionalResultColumns;
         return dataResourceInfo;
     }
 

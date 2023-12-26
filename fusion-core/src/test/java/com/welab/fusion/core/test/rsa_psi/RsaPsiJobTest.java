@@ -79,8 +79,8 @@ public class RsaPsiJobTest {
         CsvTableDataSourceReader readerA = new CsvTableDataSourceReader(file);
         CsvTableDataSourceReader readerB = new CsvTableDataSourceReader(file);
 
-        DataResourceInfo dataResourceInfoA = DataResourceInfo.of(DataResourceType.TableDataSource, readerA.getTotalDataRowCount(), hashConfig);
-        DataResourceInfo dataResourceInfoB = DataResourceInfo.of(DataResourceType.TableDataSource, readerB.getTotalDataRowCount(), hashConfig);
+        DataResourceInfo dataResourceInfoA = DataResourceInfo.of(DataResourceType.TableDataSource, readerA.getTotalDataRowCount(), hashConfig, null);
+        DataResourceInfo dataResourceInfoB = DataResourceInfo.of(DataResourceType.TableDataSource, readerB.getTotalDataRowCount(), hashConfig, null);
 
 
         memberA = RsaPsiJobMember.of("memberA", "memberA", dataResourceInfoA);

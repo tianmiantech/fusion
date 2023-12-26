@@ -21,6 +21,10 @@ import com.welab.fusion.service.api.job.CreateJobApi;
 import com.welab.wefe.common.fieldvalidate.annotation.Check;
 import com.welab.wefe.common.web.dto.AbstractApiInput;
 
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+
 /**
  * @author zane.luo
  * @date 2023/11/28
@@ -39,4 +43,7 @@ public class JobMemberDataResourceInput extends AbstractApiInput {
 
     @Check(name = "主键 hash 方案", require = true)
     public HashConfig hashConfig;
+
+    @Check(name = "附加结果字段")
+    public LinkedHashSet<String> additionalResultColumns;
 }
