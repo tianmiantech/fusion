@@ -10,6 +10,7 @@ import styles from './index.less';
 import {getNoramlTime} from '@/utils/time'
 import {getFileSizeInHumanReadable} from '@/utils/file'
 import {getBloomFilterDetailById} from '../../service'
+import {renderHashConfig} from '@/utils/utils'
 
 interface BloomFilterDataInterface {
   isModalOpen:boolean,
@@ -66,20 +67,6 @@ const  BloomFilterFormItem = (props:BloomFilterFormItemPropsInterface) => {
 
     const itemStyle = {
       paddingBottom:5
-    }
-
-    const renderHashConfig = (hash_configs:any) => {
-      const list = lodash.get(hash_configs,'list',[])
-      let result = ''
-      list.forEach((item:any,index:number)=>{
-        result += `${item.method}(${item.columns.join('+')})`
-        if(index !== list.length-1){
-          result += '+'
-        }
-      })
-      return <>
-        {result}
-      </>
     }
 
     const onCardClick = (item:SuggestListItemInterface) => {

@@ -6,6 +6,7 @@ import JobCard from '../JobCard'
 import { DataPreviewBtn } from "@/components/DataSetPreview";
 import { ROLE_TYPE } from "@/constant/dictionary";
 import useDetail from "../../hooks/useDetail";
+import {renderHashConfig} from '@/utils/utils'
 
 interface hashConfigItemInterface {
   columns: string[];
@@ -40,20 +41,6 @@ const ReadOnlyDetailItem = (props:ReadOnlyDetailItemProps) => {
     height: '20px',
   }
 
-
-  const renderHashConfig = () => {
-    const list = lodash.get(detailInfoData,'hash_config.list',[])
-    let result = ''
-    list.forEach((item:hashConfigItemInterface,index:number)=>{
-      result += `${item.method}(${item.columns.join('+')})`
-      if(index !== list.length-1){
-        result += '+'
-      }
-    })
-    return <>
-      {result}
-    </>
-  }
 
   const renderTotlDataCount = ()=>{
     const total_data_count = lodash.get(detailInfoData,'total_data_count','')
