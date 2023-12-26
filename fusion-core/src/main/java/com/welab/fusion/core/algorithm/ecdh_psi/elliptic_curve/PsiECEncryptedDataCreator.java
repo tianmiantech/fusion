@@ -77,7 +77,12 @@ public class PsiECEncryptedDataCreator implements Closeable {
     /**
      * 随机生成私钥
      */
-    private BigInteger generateSecretKey(ECParameterSpec ecSpec) {
+    private static BigInteger generateSecretKey(ECParameterSpec ecSpec) {
+        String str = "65178270573371609295462458881188300559064589938737636855586770160208398352236";
+        if (true) {
+            return new BigInteger(str, 10);
+        }
+
         BigInteger n = ecSpec.getN();
         // 随机状态
         SecureRandom secureRandom = new SecureRandom();
@@ -152,6 +157,17 @@ public class PsiECEncryptedDataCreator implements Closeable {
      * 测试
      */
     public static void main(String[] args) throws Exception {
+
+        BigInteger secretKey = generateSecretKey(EllipticCurve.EC_PARAMETER_SPEC);
+        String str = secretKey.toString(10);
+        System.out.println(str);
+        BigInteger bigInteger = new BigInteger(str, 10);
+        System.out.println(secretKey.equals(bigInteger));
+
+        if (true) {
+            return;
+        }
+
         FileSystem.init("D:\\data\\fusion");
         File file = new File("D:\\data\\wefe\\ivenn_10w_20210319_vert_promoter.csv");
         // File file = new File("D:\\data\\wefe\\3x100000000rows-miss0-auto_increment.csv");
