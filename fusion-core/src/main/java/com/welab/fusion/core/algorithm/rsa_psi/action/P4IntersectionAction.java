@@ -18,20 +18,25 @@ package com.welab.fusion.core.algorithm.rsa_psi.action;
 import cn.hutool.core.codec.Base64;
 import com.welab.fusion.core.Job.FusionResult;
 import com.welab.fusion.core.Job.JobRole;
-import com.welab.fusion.core.algorithm.rsa_psi.RsaPsiJob;
 import com.welab.fusion.core.algorithm.JobPhase;
 import com.welab.fusion.core.algorithm.base.AbstractJobPhaseAction;
+import com.welab.fusion.core.algorithm.rsa_psi.RsaPsiJob;
+import com.welab.fusion.core.algorithm.rsa_psi.RsaPsiRecord;
 import com.welab.fusion.core.hash.HashConfig;
 import com.welab.fusion.core.io.FileSystem;
-import com.welab.fusion.core.psi.PsiRecord;
-import com.welab.fusion.core.psi.PsiUtils;
+import com.welab.fusion.core.util.PsiUtils;
 import com.welab.wefe.common.BatchConsumer;
+import com.welab.wefe.common.util.FileUtil;
+import com.welab.wefe.common.util.StringUtil;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.concurrent.atomic.LongAdder;
 import java.util.stream.Collectors;
@@ -55,6 +60,25 @@ public class P4IntersectionAction extends AbstractJobPhaseAction<RsaPsiJob> {
         super(job);
     }
 
+    /**
+     * 输出求交结果到 csv 时的表头
+     *
+     * @return
+     */
+    private LinkedHashSet<String> getCsvResultHeader() {
+        // 输出主键相关字段
+        HashConfig hashConfig = job.getMyself().dataResourceInfo.hashConfig;
+        LinkedHashSet<String> csvHeader = hashConfig.getIdHeadersForCsv();
+
+        // 输出附加字段
+        LinkedHashSet<String> additionalResultColumns = job.getMyself().dataResourceInfo.additionalResultColumns;
+        if (additionalResultColumns != null) {
+            csvHeader.addAll(additionalResultColumns);
+        }
+
+        return csvHeader;
+    }
+
     @Override
     protected void doAction() throws Exception {
 
@@ -66,18 +90,19 @@ public class P4IntersectionAction extends AbstractJobPhaseAction<RsaPsiJob> {
         LongAdder fruitCount = new LongAdder();
         File resultFile = FileSystem.FusionResult.getFile(job.getJobId());
 
-        HashConfig hashConfig = job.getMyself().dataResourceInfo.hashConfig;
-        String headLine = hashConfig.getIdHeadersForCsv() + System.lineSeparator();
 
-        Files.write(
-                resultFile.toPath(),
-                headLine.getBytes(StandardCharsets.UTF_8),
-                StandardOpenOption.CREATE
-        );
+        /**
+         * 输出求交结果到 csv 时的表头
+         */
+        LinkedHashSet<String> csvHeader = getCsvResultHeader();
+        String headLine = StringUtil.joinByComma(csvHeader) + System.lineSeparator();
+
+        BufferedWriter writer = FileUtil.buildBufferedWriter(resultFile, false);
+        writer.write(headLine);
 
 
         // 批处理
-        BatchConsumer<PsiRecord> consumer = new BatchConsumer<>(batchSize, 5_000, records -> {
+        BatchConsumer<RsaPsiRecord> consumer = new BatchConsumer<>(batchSize, 5_000, records -> {
             try {
                 // 将数据发送到过滤器方加密
                 List<String> encryptedList = job.getJobFunctions().encryptRsaPsiRecordsFunction.encrypt(
@@ -87,7 +112,7 @@ public class P4IntersectionAction extends AbstractJobPhaseAction<RsaPsiJob> {
                 );
 
                 // 碰撞，并获取交集。
-                List<PsiRecord> fruit = PsiUtils.match(
+                List<RsaPsiRecord> fruit = PsiUtils.match(
                         job.getPartner().psiBloomFilter,
                         records,
                         encryptedList,
@@ -95,7 +120,7 @@ public class P4IntersectionAction extends AbstractJobPhaseAction<RsaPsiJob> {
                 );
 
                 List<String> lines = fruit.stream()
-                        .map(x -> hashConfig.getIdValuesForCsv(x.row))
+                        .map(x -> getValuesForCsv(csvHeader, x.row))
                         .collect(Collectors.toList());
 
                 // 向 resultFile 中写入交集数据
@@ -119,7 +144,7 @@ public class P4IntersectionAction extends AbstractJobPhaseAction<RsaPsiJob> {
         // 从数据源逐条读取数据集并编码
         job.getMyself().tableDataResourceReader.readRows((index, row) -> {
 
-            PsiRecord record = new PsiRecord();
+            RsaPsiRecord record = new RsaPsiRecord();
             record.row = row;
 
             BigInteger blindFactor = PsiUtils.generateBlindingFactor(publicModulus);
@@ -142,6 +167,19 @@ public class P4IntersectionAction extends AbstractJobPhaseAction<RsaPsiJob> {
         result.finish(resultFile, fruitCount.longValue());
     }
 
+    /**
+     * 拼接用于输出到 csv 的主键相关字段列表
+     */
+    public String getValuesForCsv(LinkedHashSet<String> csvHeader, LinkedHashMap<String, Object> row) {
+        List<String> values = csvHeader.stream()
+                .map(x -> {
+                    Object value = row.get(x);
+                    return value == null ? "" : value.toString();
+                })
+                .collect(Collectors.toList());
+
+        return StringUtil.joinByComma(values);
+    }
 
     @Override
     public JobPhase getPhase() {

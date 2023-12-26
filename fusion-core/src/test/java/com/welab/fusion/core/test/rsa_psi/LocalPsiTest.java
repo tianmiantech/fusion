@@ -22,8 +22,8 @@ import com.welab.fusion.core.data_source.CsvTableDataSourceReader;
 import com.welab.fusion.core.hash.HashConfig;
 import com.welab.fusion.core.hash.HashConfigItem;
 import com.welab.fusion.core.hash.HashMethod;
-import com.welab.fusion.core.psi.PsiRecord;
-import com.welab.fusion.core.psi.PsiUtils;
+import com.welab.fusion.core.algorithm.rsa_psi.RsaPsiRecord;
+import com.welab.fusion.core.util.PsiUtils;
 import com.welab.wefe.common.BatchConsumer;
 
 import java.io.File;
@@ -55,7 +55,7 @@ public class LocalPsiTest {
         File resultFile = new File("");
 
         // 批处理
-        BatchConsumer<PsiRecord> consumer = new BatchConsumer<>(10, 5_000, records -> {
+        BatchConsumer<RsaPsiRecord> consumer = new BatchConsumer<>(10, 5_000, records -> {
             try {
                 // 将数据发送到过滤器方加密
                 List<String> encryptedList = PsiUtils.encryptPsiRecords(
@@ -63,7 +63,7 @@ public class LocalPsiTest {
                         records.stream().map(x -> x.encodedKey).collect(Collectors.toList())
                 );
 
-                List<PsiRecord> fruit = PsiUtils.match(
+                List<RsaPsiRecord> fruit = PsiUtils.match(
                         psiBloomFilter,
                         records,
                         encryptedList,
@@ -83,7 +83,7 @@ public class LocalPsiTest {
         // 从数据源逐条读取数据集并编码
         reader.readRows((index, row) -> {
 
-            PsiRecord record = new PsiRecord();
+            RsaPsiRecord record = new RsaPsiRecord();
             record.row = row;
 
             BigInteger blindFactor = PsiUtils.generateBlindingFactor(publicModulus);

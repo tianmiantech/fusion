@@ -29,7 +29,7 @@ import com.welab.fusion.core.hash.HashConfig;
 import com.welab.fusion.core.hash.HashConfigItem;
 import com.welab.fusion.core.hash.HashMethod;
 import com.welab.fusion.core.io.FileSystem;
-import com.welab.fusion.core.psi.PsiUtils;
+import com.welab.fusion.core.util.PsiUtils;
 import com.welab.fusion.core.test.function.DownloadPartnerFileFunctionImpl;
 import com.welab.fusion.core.test.function.SaveMyPsiBloomFilterFunctionImpl;
 

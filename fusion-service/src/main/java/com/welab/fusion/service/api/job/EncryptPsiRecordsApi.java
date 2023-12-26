@@ -17,7 +17,7 @@ package com.welab.fusion.service.api.job;
 
 import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
 import com.welab.fusion.core.io.FileSystem;
-import com.welab.fusion.core.psi.PsiUtils;
+import com.welab.fusion.core.util.PsiUtils;
 import com.welab.fusion.service.service.JobMemberService;
 import com.welab.wefe.common.fieldvalidate.annotation.Check;
 import com.welab.wefe.common.web.api.base.AbstractApi;

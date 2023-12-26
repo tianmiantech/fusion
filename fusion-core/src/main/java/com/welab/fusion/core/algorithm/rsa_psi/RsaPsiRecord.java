@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.welab.fusion.core.psi;
+package com.welab.fusion.core.algorithm.rsa_psi;
 
 import java.math.BigInteger;
 import java.util.LinkedHashMap;
@@ -22,7 +22,7 @@ import java.util.LinkedHashMap;
  * @author zane.luo
  * @date 2023/11/16
  */
-public class PsiRecord {
+public class RsaPsiRecord {
     public BigInteger inv;
     public String encodedKey;
     public LinkedHashMap<String, Object> row;

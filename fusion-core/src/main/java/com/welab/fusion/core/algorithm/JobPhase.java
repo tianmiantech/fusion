@@ -28,7 +28,7 @@ public enum JobPhase {
     CreatePsiBloomFilter("生成过滤器"),
 
     DownloadPsiBloomFilter("下载过滤器"),
-    
+
     // endregion
 
 
@@ -41,12 +41,11 @@ public enum JobPhase {
     ECEncryptPartnerData("加密合作方数据"),
 
     DownloadSecondaryECEncryptedData("下载二次加密后的数据"),
-    
+
     // endregion
-    
 
     Intersection("求交"),
-
+    AppendAdditionalResultColumns("追加附加结果列"),
     SaveResult("下载求交结果");
 
     private final String label;

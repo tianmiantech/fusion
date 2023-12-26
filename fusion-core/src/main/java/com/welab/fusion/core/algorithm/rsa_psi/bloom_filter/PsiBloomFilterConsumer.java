@@ -18,7 +18,7 @@ package com.welab.fusion.core.algorithm.rsa_psi.bloom_filter;
 import cn.hutool.core.thread.NamedThreadFactory;
 import cn.hutool.core.thread.ThreadUtil;
 import com.welab.fusion.core.progress.Progress;
-import com.welab.fusion.core.psi.PsiUtils;
+import com.welab.fusion.core.util.PsiUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

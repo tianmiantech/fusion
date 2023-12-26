@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.welab.fusion.core.psi;
+package com.welab.fusion.core.util;
 
 import cn.hutool.core.codec.Base64;
+import com.welab.fusion.core.algorithm.rsa_psi.RsaPsiRecord;
 import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
 import org.bouncycastle.math.ec.ECCurve;
 import org.bouncycastle.math.ec.ECPoint;
@@ -44,13 +45,13 @@ public class PsiUtils {
      * @param publicModulus  rsa 公钥模数
      * @return 交集
      */
-    public static List<PsiRecord> match(PsiBloomFilter psiBloomFilter, List<PsiRecord> rawRecords, List<String> encryptedKeys, BigInteger publicModulus) {
+    public static List<RsaPsiRecord> match(PsiBloomFilter psiBloomFilter, List<RsaPsiRecord> rawRecords, List<String> encryptedKeys, BigInteger publicModulus) {
         byte[][] ret = new byte[encryptedKeys.size()][];
         for (int i = 0; i < encryptedKeys.size(); i++) {
             ret[i] = Base64.decode(encryptedKeys.get(i));
         }
 
-        List<PsiRecord> fruit = new ArrayList<>();
+        List<RsaPsiRecord> fruit = new ArrayList<>();
         for (int i = 0; i < ret.length; i++) {
             BigInteger y = PsiUtils.bytesToBigInteger(ret[i], 0, ret[i].length);
             BigInteger z = y.multiply(rawRecords.get(i).inv).mod(publicModulus);

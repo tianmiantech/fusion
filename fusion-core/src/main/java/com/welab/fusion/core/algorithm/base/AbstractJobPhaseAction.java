@@ -22,8 +22,7 @@ import com.welab.fusion.core.progress.JobPhaseProgress;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
+import java.io.File;
 
 /**
  * @author zane.luo
@@ -57,7 +56,7 @@ public abstract class AbstractJobPhaseAction<T extends AbstractPsiJob> {
                 0
         );
 
-        this.phaseProgress.setMessage("开始执行阶段动作: " + getPhase());
+        this.phaseProgress.setMessage("开始执行阶段动作: " + getPhase().getLabel());
     }
 
     /**
@@ -87,7 +86,7 @@ public abstract class AbstractJobPhaseAction<T extends AbstractPsiJob> {
             job.getMyProgress().addPhaseProgress(phaseProgress);
 
             if (skipThisAction) {
-                message = "我方跳过此阶段";
+                phaseProgress.skipThisPhase();
             } else {
                 doAction();
             }

@@ -20,7 +20,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.welab.fusion.core.hash.HashConfig;
 import com.welab.fusion.core.io.FileSystem;
-import com.welab.fusion.core.psi.PsiUtils;
+import com.welab.fusion.core.util.PsiUtils;
 import com.welab.wefe.common.file.compression.impl.Zip;
 import com.welab.wefe.common.util.JObject;
 import org.bouncycastle.math.ec.ECPoint;

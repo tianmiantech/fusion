@@ -32,11 +32,6 @@ public class HashConfig extends AbstractCheckModel {
     @Check(name = "主键 hash 方案", require = true)
     public List<HashConfigItem> list = new ArrayList<>();
 
-    /**
-     * 输出求交结果到 csv 时的表头
-     */
-    private LinkedHashSet<String> csvHeader = new LinkedHashSet<>();
-
     public static HashConfig of(HashConfigItem... items) {
         HashConfig config = new HashConfig();
         config.list = Arrays.asList(items);
@@ -66,27 +61,11 @@ public class HashConfig extends AbstractCheckModel {
     /**
      * 拼接用于输出到 csv 的主键相关字段列表
      */
-    public String getIdHeadersForCsv() {
-        if (csvHeader.isEmpty()) {
-            for (HashConfigItem item : list) {
-                csvHeader.addAll(item.columns);
-            }
+    public LinkedHashSet<String> getIdHeadersForCsv() {
+        LinkedHashSet<String> result = new LinkedHashSet<>();
+        for (HashConfigItem item : list) {
+            result.addAll(item.columns);
         }
-
-        return StringUtil.joinByComma(csvHeader);
-    }
-
-    /**
-     * 拼接用于输出到 csv 的主键相关字段列表
-     */
-    public String getIdValuesForCsv(LinkedHashMap<String, Object> row) {
-        List<String> values = csvHeader.stream()
-                .map(x -> {
-                    Object value = row.get(x);
-                    return value == null ? "" : value.toString();
-                })
-                .collect(Collectors.toList());
-
-        return StringUtil.joinByComma(values);
+        return result;
     }
 }
