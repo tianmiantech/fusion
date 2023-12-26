@@ -1,9 +1,14 @@
 
 export const FUNSION_INITIALIZED_KEY = 'fission_initialized';
+
+export const DATARESOURCE_TYPE = {
+  TABLE_DATASOURCE: 'TableDataSource',
+  PSI_BLOOM_FILTER: 'PsiBloomFilter',
+};
 // 样本类型
 export const dataResourceTypeMap = new Map([
-  ['TableDataSource', '数据集'],
-  ['PsiBloomFilter', '布隆过滤器'],
+  [DATARESOURCE_TYPE.TABLE_DATASOURCE, '数据集'],
+  [DATARESOURCE_TYPE.PSI_BLOOM_FILTER, '布隆过滤器'],
 ]);
 
 // 样本选择方式

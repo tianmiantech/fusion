@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef, forwardRef, useImperativeHandle } from 'react';
 import { Input, Button, Form, Radio, Upload, Tooltip, Space, Row, Col,Alert,Spin, message, Select } from 'antd';
-import { dataResourceTypeMap, dataSetAddMethodMap,JOB_STATUS, ROLE_TYPE } from '@/constant/dictionary';
+import { dataResourceTypeMap, dataSetAddMethodMap,JOB_STATUS, ROLE_TYPE,DATARESOURCE_TYPE } from '@/constant/dictionary';
 import HashForm from '../HashForm/index';
 import DataSourceForm from '../DataSourceForm';
 import { formRuleRequire } from '@/utils/common';
@@ -12,6 +12,7 @@ import useDetail from "../../hooks/useDetail";
 import BloomFilterFormItem from '../BloomFilterFormItem';
 import { useRequest } from 'ahooks';
 import {getAlgorithmList} from '../../service'
+
 
 
 interface JobFormDataInterface {
@@ -124,9 +125,9 @@ const JobForm = forwardRef((props:JobFormPropsInterface, ref) => {
                           if(algorithm === 'ecdh_psi' && value === 'PsiBloomFilter'){
                             return null
                           }
-                          return  <Radio.Button key={value} value={value} >
+                          return  <Radio key={value} value={value} >
                           {label}
-                        </Radio.Button>
+                        </Radio>
                         })}
                       </Radio.Group>
                     </Form.Item>
@@ -138,7 +139,7 @@ const JobForm = forwardRef((props:JobFormPropsInterface, ref) => {
                       const data_resource_type = getFieldValue('data_resource_type');
                       const add_method = getFieldValue('add_method');
                       // 选择数据集
-                      if(data_resource_type === 'TableDataSource') {
+                      if(data_resource_type === DATARESOURCE_TYPE.TABLE_DATASOURCE) {
                         return <>
                            <Form.Item style={{marginTop:30}} name="add_method" label="选择样本" rules={[formRuleRequire()]}>
                             <Radio.Group>
@@ -167,13 +168,29 @@ const JobForm = forwardRef((props:JobFormPropsInterface, ref) => {
               <Form.Item noStyle shouldUpdate={(prev, cur) => prev.data_resource_type !== cur.data_resource_type }>
                 {({ getFieldValue }) => {
                   const data_resource_type = getFieldValue('data_resource_type');
-                  const hashFormDisabled = data_resource_type === 'PsiBloomFilter'?true:false
-                  return <Form.Item name={'hash_config'}>
-                    <HashForm disabled={checkFormDisable()||hashFormDisabled} columnList={jobFormData.dataourceColumnList}/> 
-                  </Form.Item>
+                  const hashFormDisabled = data_resource_type === DATARESOURCE_TYPE.PSI_BLOOM_FILTER?true:false
+                  const resultArray = [<Form.Item name={'hash_config'} style={{marginBottom:0}}>
+                        <HashForm disabled={checkFormDisable()||hashFormDisabled} columnList={jobFormData.dataourceColumnList}/> 
+                      </Form.Item>];
+
+                  if(data_resource_type != DATARESOURCE_TYPE.PSI_BLOOM_FILTER){
+                    resultArray.push(<Form.Item name={'additionalResultColumns'} label="附加结果字段">
+                       <Select mode="multiple" style={{ width: 300 }} placeholder="请选择字段">
+                        {jobFormData.dataourceColumnList.map((item:string) => (
+                          <Select.Option key={item} value={item}>
+                            {item}
+                          </Select.Option>
+                          ))}
+                       </Select>
+                    </Form.Item>)
+                  }
+                  return <>
+                  {resultArray}
+                  </>
 
                 }}
               </Form.Item>
+
               
               <Form.Item name="remark" label="任务备注">
                 <Input.TextArea rows={4} placeholder="请输入" />

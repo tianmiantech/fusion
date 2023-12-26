@@ -28,7 +28,10 @@ const HashForm = (props:HashFormPropsInterface) => {
     if(value){
       const source = lodash.get(value,'source','')
       if(source === "setFieldsValue") {
-        const valueList = lodash.get(value,'list',[])
+        const valueList = lodash.get(value,'list',[{}])
+        if(valueList.length == 0) {
+          valueList.push({})
+        }
         formRef.setFieldValue('valueList',valueList)
       }
     } else {
@@ -46,6 +49,8 @@ const HashForm = (props:HashFormPropsInterface) => {
     <>
       <Form.List name="valueList" >
         {(fields, { add, remove,...rest }) => {
+          console.log("fields",fields);
+          
           return(
           <>
             {fields.map(({key, name}, index) => (
@@ -71,11 +76,11 @@ const HashForm = (props:HashFormPropsInterface) => {
 
                 <div className="operation-group">
                  {
-                   !disabled && <MinusCircleTwoTone
+                     (index>0  && !disabled) ? <MinusCircleTwoTone
                     twoToneColor="#ff7875"
                     className="operation-btn minus-btn"
                     onClick={() => remove(index)}
-                  />
+                  />:null
                  }
                   { (index === fields.length - 1  && !disabled) ?
                     <PlusCircleTwoTone className="operation-btn" onClick={() => add()} /> : null }
