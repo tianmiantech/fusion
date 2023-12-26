@@ -20,6 +20,7 @@ import cn.hutool.core.io.IoUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.ReversedLinesFileReader;
+import org.bouncycastle.math.ec.ECPoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,9 +29,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author zane.luo
@@ -510,6 +509,43 @@ public class FileUtil {
                         StandardCharsets.UTF_8
                 )
         );
+    }
+
+    /**
+     * 分片读取文本文件
+     *
+     * @param partitionIndex 分片索引，从 0 开始。
+     * @param batchSize      批大小
+     */
+    public static List<String> readPartition(File file,int partitionIndex, int batchSize) throws IOException {
+        List<String> result = new ArrayList<>(batchSize);
+
+        int skipLineCount = batchSize * partitionIndex;
+        int lineIndex = 0;
+        try (BufferedReader reader = FileUtil.buildBufferedReader(file)) {
+            while (true) {
+                String line = reader.readLine();
+                lineIndex++;
+
+                if (line == null) {
+                    return result;
+                }
+
+                if (lineIndex < skipLineCount) {
+                    continue;
+                }
+
+                if (StringUtil.isBlank(line)) {
+                    continue;
+                }
+
+                result.add(line);
+
+                if (result.size() == batchSize) {
+                    return result;
+                }
+            }
+        }
     }
 
     public static void main(String[] args) throws IOException {

@@ -18,11 +18,13 @@ package com.welab.fusion.core.algorithm.base;
 import com.welab.fusion.core.Job.AbstractPsiJob;
 import com.welab.fusion.core.Job.JobStatus;
 import com.welab.fusion.core.algorithm.JobPhase;
+import com.welab.fusion.core.hash.HashConfig;
 import com.welab.fusion.core.progress.JobPhaseProgress;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.util.LinkedHashSet;
 
 /**
  * @author zane.luo
@@ -107,7 +109,7 @@ public abstract class AbstractJobPhaseAction<T extends AbstractPsiJob> {
     /**
      * 从合作方下载文件
      */
-    public File downloadFileFromPartner() throws Exception {
+    protected File downloadFileFromPartner() throws Exception {
         return job.getJobFunctions().downloadPartnerFileFunction.download(
                 getPhase(),
                 job.getJobId(),
@@ -119,5 +121,33 @@ public abstract class AbstractJobPhaseAction<T extends AbstractPsiJob> {
                     phaseProgress.updateCompletedWorkload(size);
                 }
         );
+    }
+
+    /**
+     * 获取结果文件的 csv header
+     */
+    protected LinkedHashSet<String> getResultFileCsvHeaderOnlyIds() {
+        // 输出主键相关字段
+        HashConfig hashConfig = job.getMyself().dataResourceInfo.hashConfig;
+        LinkedHashSet<String> csvHeader = hashConfig.getIdHeadersForCsv();
+
+        return csvHeader;
+    }
+
+    /**
+     * 获取结果文件的 csv header
+     */
+    protected LinkedHashSet<String> getResultFileCsvHeaderWithAdditionalColumns() {
+        // 输出主键相关字段
+        HashConfig hashConfig = job.getMyself().dataResourceInfo.hashConfig;
+        LinkedHashSet<String> csvHeader = hashConfig.getIdHeadersForCsv();
+
+        // 输出附加字段
+        LinkedHashSet<String> additionalResultColumns = job.getMyself().dataResourceInfo.additionalResultColumns;
+        if (additionalResultColumns != null) {
+            csvHeader.addAll(additionalResultColumns);
+        }
+
+        return csvHeader;
     }
 }

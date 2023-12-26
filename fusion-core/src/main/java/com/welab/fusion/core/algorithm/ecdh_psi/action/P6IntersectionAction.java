@@ -27,7 +27,9 @@ import com.welab.wefe.common.util.FileUtil;
 import com.welab.wefe.common.util.StringUtil;
 import org.bouncycastle.math.ec.ECPoint;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
@@ -54,7 +56,7 @@ public class P6IntersectionAction extends AbstractJobPhaseAction<EcdhPsiJob> {
     protected void doAction() throws Exception {
         FusionResult result = job.getJobResult();
         LongAdder fruitCount = new LongAdder();
-        File resultFile = FileSystem.FusionResult.getFile(job.getJobId());
+        File resultFile = FileSystem.FusionResult.getFileOnlyIds(job.getJobId());
 
         HashConfig hashConfig = job.getMyself().dataResourceInfo.hashConfig;
         String headLine = hashConfig.getIdHeadersForCsv() + System.lineSeparator();
@@ -133,38 +135,16 @@ public class P6IntersectionAction extends AbstractJobPhaseAction<EcdhPsiJob> {
      * 从协作方二次加密数据中读取指定分片
      */
     private Set<ECPoint> readPartnerPartition(int partitionIndex) throws IOException {
-        Set<ECPoint> result = new HashSet<>(batchSize);
-
         File file = job.getPartner().secondaryECEncryptedDataFile;
+        List<String> lines = FileUtil.readPartition(file, partitionIndex, batchSize);
 
-        int skipLineCount = batchSize * partitionIndex;
-        int lineIndex = 0;
-        try (BufferedReader reader = FileUtil.buildBufferedReader(file)) {
-            while (true) {
-                String line = reader.readLine();
-                lineIndex++;
-
-                if (line == null) {
-                    return result;
-                }
-
-                if (lineIndex < skipLineCount) {
-                    continue;
-                }
-
-                if (StringUtil.isBlank(line)) {
-                    continue;
-                }
-
-                ECPoint point = EllipticCurve.INSTANCE.base64ToECPoint(line);
-                result.add(point);
-
-                if (result.size() == batchSize) {
-                    return result;
-                }
-
-            }
+        Set<ECPoint> result = new HashSet<>(batchSize);
+        for (String line : lines) {
+            ECPoint point = EllipticCurve.INSTANCE.base64ToECPoint(line);
+            result.add(point);
         }
+
+        return result;
     }
 
 

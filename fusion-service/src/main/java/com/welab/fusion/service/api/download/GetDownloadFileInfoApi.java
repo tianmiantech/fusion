@@ -63,7 +63,7 @@ public class GetDownloadFileInfoApi extends AbstractApi<GetDownloadFileInfoApi.I
             case DownloadSecondaryECEncryptedData:
                 return FileSystem.PsiSecondaryECEncryptedData.getDataFile(input.jobId);
             case SaveResult:
-                return FileSystem.FusionResult.getFile(input.jobId);
+                return FileSystem.FusionResult.getFileOnlyIds(input.jobId);
             default:
                 return null;
         }

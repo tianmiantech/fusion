@@ -58,7 +58,7 @@ public class DownloadPartnerFileFunctionImpl implements DownloadPartnerFileFunct
     private static File buildFilePath(JobPhase jobPhase, String jobId, String partnerId, FileInfo fileInfo) {
         switch (jobPhase) {
             case SaveResult:
-                return FileSystem.FusionResult.getFile(jobId);
+                return FileSystem.FusionResult.getFileOnlyIds(jobId);
 
             default:
                 return FileSystem.JobTemp.getFile(jobId, jobPhase, partnerId, fileInfo.filename);

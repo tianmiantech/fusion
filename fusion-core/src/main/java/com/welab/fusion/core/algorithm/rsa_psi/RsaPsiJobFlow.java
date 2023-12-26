@@ -34,7 +34,9 @@ public class RsaPsiJobFlow extends AbstractJobFlow {
         map.put(JobPhase.CreatePsiBloomFilter, P2CreatePsiBloomFilterAction.class);
         map.put(JobPhase.DownloadPsiBloomFilter, P3DownloadPsiBloomFilterAction.class);
         map.put(JobPhase.Intersection, P4IntersectionAction.class);
-        map.put(JobPhase.SaveResult, P5SaveResultAction.class);
+        map.put(JobPhase.DownloadIntersection, P5DownloadIntersectionAction.class);
+        map.put(JobPhase.AppendAdditionalResultColumns, P6AppendAdditionalResultColumnsAction.class);
+        map.put(JobPhase.SaveResult, P7SaveResultAction.class);
     }
 
     public static final RsaPsiJobFlow INSTANCE = new RsaPsiJobFlow();

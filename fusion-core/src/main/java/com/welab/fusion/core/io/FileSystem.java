@@ -147,8 +147,11 @@ public class FileSystem {
     }
 
     public static class FusionResult {
-        public static File getFile(String jobId) {
-            return getBaseDir(UseType.FusionResult).resolve(jobId + ".csv").toFile();
+        public static File getFileOnlyIds(String jobId) {
+            return getBaseDir(UseType.FusionResult).resolve(jobId + "-only_ids.csv").toFile();
+        }
+        public static File getFileWithAdditionalColumns(String jobId) {
+            return getBaseDir(UseType.FusionResult).resolve(jobId + "-with_additional_columns.csv").toFile();
         }
     }
 

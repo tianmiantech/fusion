@@ -19,8 +19,6 @@ import com.welab.fusion.core.Job.JobRole;
 import com.welab.fusion.core.Job.FusionResult;
 import com.welab.fusion.core.algorithm.JobPhase;
 import com.welab.fusion.core.data_source.CsvTableDataSourceReader;
-import com.welab.fusion.core.io.FileSystem;
-import com.welab.fusion.service.api.download.Downloader;
 import com.welab.fusion.service.database.entity.JobDbModel;
 import com.welab.fusion.service.service.JobService;
 import com.welab.wefe.common.web.Launcher;
@@ -62,7 +60,7 @@ public class SaveFusionResultFunction implements com.welab.fusion.core.algorithm
                 downloadSizeConsumer
         );
 
-        result.resultFile = file;
+        result.resultFileOnlyIds = file;
         try (CsvTableDataSourceReader reader = new CsvTableDataSourceReader(file)) {
             result.fusionCount = reader.getTotalDataRowCount();
         }
@@ -75,7 +73,7 @@ public class SaveFusionResultFunction implements com.welab.fusion.core.algorithm
      */
     private void saveFusionResult(JobDbModel job, FusionResult result) {
         job.setFusionCount(result.fusionCount);
-        job.setResultFilePath(result.resultFile.getAbsolutePath());
+        job.setResultFilePath(result.resultFileOnlyIds.getAbsolutePath());
         job.setUpdatedTimeNow();
 
         job.save();

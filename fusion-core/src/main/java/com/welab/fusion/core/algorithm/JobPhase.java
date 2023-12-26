@@ -45,8 +45,9 @@ public enum JobPhase {
     // endregion
 
     Intersection("求交"),
-    AppendAdditionalResultColumns("追加附加结果列"),
-    SaveResult("下载求交结果");
+    DownloadIntersection("下载交集"),
+    AppendAdditionalResultColumns("追加附加列"),
+    SaveResult("下载并保存结果");
 
     private final String label;
 

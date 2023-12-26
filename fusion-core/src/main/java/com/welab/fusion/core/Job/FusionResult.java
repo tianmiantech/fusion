@@ -24,7 +24,8 @@ import java.util.Date;
  */
 public class FusionResult {
     public String jobId;
-    public File resultFile;
+    public File resultFileOnlyIds;
+    public File resultFileWithAdditionalColumns;
     public long fusionCount;
     public Date startTime;
     public Date endTime;
@@ -37,8 +38,7 @@ public class FusionResult {
         return fusionResult;
     }
 
-    public void finish(File resultFile, long fusionCount) {
-        this.resultFile = resultFile;
+    public void finish(long fusionCount) {
         this.fusionCount = fusionCount;
         this.endTime = new Date();
         this.costTime = endTime.getTime() - startTime.getTime();
