@@ -12,6 +12,7 @@ import useDetail from "../../hooks/useDetail";
 import BloomFilterFormItem from '../BloomFilterFormItem';
 import { useRequest } from 'ahooks';
 import {getAlgorithmList} from '../../service'
+import {IsEmptyObject} from '@/utils/utils';
 
 
 
@@ -96,6 +97,20 @@ const JobForm = forwardRef((props:JobFormPropsInterface, ref) => {
     return flag || role === ROLE_TYPE.PROVIDER
   }
 
+  const validateSelfField =  (_: any, value:any)  =>{
+    console.log('validateSelfField',value);
+    
+    const result = IsEmptyObject(value)
+    console.log('result',result);
+    if(result){
+
+      return Promise.reject(new Error('此项不能为空'))
+    } else {
+      return Promise.resolve()
+    }
+  }
+
+
   return <>
       <Spin spinning={loading} >
       <Row justify="center" className="form-scroll">
@@ -152,12 +167,12 @@ const JobForm = forwardRef((props:JobFormPropsInterface, ref) => {
                          </Form.Item>
                          <Form.Item name={'table_data_resource_info'}>
                          {add_method === 'HttpUpload'?<FileChunkUpload uploadFinishCallBack={prevColumnsChangeCallBack}  disabled={checkFormDisable()}/>:
-                         <DataSourceForm prevColumnsChangeCallBack={prevColumnsChangeCallBack} disabled={checkFormDisable()}/>
+                            <DataSourceForm prevColumnsChangeCallBack={prevColumnsChangeCallBack} disabled={checkFormDisable()}/>
                           }
                          </Form.Item>
                         </>
                       } else {
-                       return  <Form.Item style={{marginTop:30}} name="bloom_filter_resource_input" label="选择布隆过滤器" rules={[formRuleRequire()]}>
+                       return  <Form.Item style={{marginTop:30}} name="bloom_filter_resource_input" label="选择布隆过滤器" rules={[{ validator: validateSelfField }]}>
                             <BloomFilterFormItem onBloomFilterSelectedCallBack={onBloomFilterSelectedCallBack}/>
                         </Form.Item>
                       }
@@ -169,12 +184,12 @@ const JobForm = forwardRef((props:JobFormPropsInterface, ref) => {
                 {({ getFieldValue }) => {
                   const data_resource_type = getFieldValue('data_resource_type');
                   const hashFormDisabled = data_resource_type === DATARESOURCE_TYPE.PSI_BLOOM_FILTER?true:false
-                  const resultArray = [<Form.Item name={'hash_config'} style={{marginBottom:0}}>
+                  const resultArray = [<Form.Item name={'hash_config'} style={{marginBottom:0}} rules={[{ validator: validateSelfField }]}>
                         <HashForm disabled={checkFormDisable()||hashFormDisabled} columnList={jobFormData.dataourceColumnList}/> 
                       </Form.Item>];
 
                   if(data_resource_type != DATARESOURCE_TYPE.PSI_BLOOM_FILTER){
-                    resultArray.push(<Form.Item name={'additionalResultColumns'} label="附加结果字段">
+                    resultArray.push(<Form.Item name={'additionalResultColumns'} label="附加结果字段" style={{marginTop:20}}>
                        <Select mode="multiple" style={{ width: 300 }} placeholder="请选择字段">
                         {jobFormData.dataourceColumnList.map((item:string) => (
                           <Select.Option key={item} value={item}>

@@ -53,7 +53,9 @@ const Index = forwardRef((props:PromoterPropsInterface,ref) => {
         bloom_filter_resource_input
       }
     }
-    runCreateJob(requestParams)
+    console.log("requestParams",requestParams);
+    
+   // runCreateJob(requestParams)
   }
 
 

@@ -25,4 +25,25 @@ export const renderHashConfig = (hash_config:hashConfigItemInterface) => {
   })
   return result
 }
+
+export const IsEmptyObject =(obj: any): boolean=> {
+  if (obj === null || obj === undefined) {
+    return true;
+  }
+  if (typeof obj === "object") {
+    for (const key in obj) {
+      if (IsEmptyObject(obj[key])) {
+        return true;
+      }
+    }
+  } else if (Array.isArray(obj)) {
+    for (const item of obj) {
+      if (IsEmptyObject(item)) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
   

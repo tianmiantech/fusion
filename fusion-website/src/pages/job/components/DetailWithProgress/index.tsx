@@ -170,7 +170,11 @@ const Index = ()=>{
   },{manual:true})
 
     const renderRestartBtn = ()=>{
-      return <Button type="link" onClick={()=>{restartJobData(detailData.jobId)}}>重启运行</Button>
+      const status = lodash.get(detailData,'jobDetailData.status','')
+      if(status === JOB_STATUS.SUCCESS|| status === JOB_STATUS.ERROR_ON_RUNNING|| status === JOB_STATUS.STOP_ON_RUNNING){
+        return <Button type="link" onClick={()=>{restartJobData(detailData.jobId)}}>重新运行</Button>
+      }
+      return null
     }
 
     return <>

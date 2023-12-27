@@ -114,6 +114,7 @@ const HashForm = (props:HashFormPropsInterface) => {
           </>
         }
         required
+        style={{ marginBottom: 0 }}
       >
         <HashKeyForm />
       </Form.Item>
