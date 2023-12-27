@@ -18,7 +18,7 @@ package com.welab.fusion.core.algorithm.rsa_psi.action;
 import com.welab.fusion.core.Job.JobRole;
 import com.welab.fusion.core.algorithm.rsa_psi.RsaPsiJob;
 import com.welab.fusion.core.algorithm.JobPhase;
-import com.welab.fusion.core.algorithm.base.AbstractJobPhaseAction;
+import com.welab.fusion.core.algorithm.base.phase_action.AbstractJobPhaseAction;
 import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
 import com.welab.fusion.core.io.FileSystem;
 import com.welab.wefe.common.InformationSize;
@@ -44,10 +44,7 @@ public class P3DownloadPsiBloomFilterAction extends AbstractJobPhaseAction<RsaPs
 
     @Override
     protected void doAction() throws Exception {
-        phaseProgress.setMessage("正在从合作方下载过滤器...");
-
-        // 从合作方下载过滤器
-        File file = downloadFileFromPartner();
+        File file = downloadFileFromPartner("正在从合作方下载过滤器...");
 
         phaseProgress.setMessage("正在解压过滤器 zip 文件(" + InformationSize.fromByte(file.length()) + ")...");
         // file 解压至 dir

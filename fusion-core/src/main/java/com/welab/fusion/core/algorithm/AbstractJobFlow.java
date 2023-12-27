@@ -16,7 +16,7 @@
 package com.welab.fusion.core.algorithm;
 
 import com.welab.fusion.core.Job.AbstractPsiJob;
-import com.welab.fusion.core.algorithm.base.AbstractJobPhaseAction;
+import com.welab.fusion.core.algorithm.base.phase_action.AbstractJobPhaseAction;
 
 import java.lang.reflect.Constructor;
 import java.util.Arrays;

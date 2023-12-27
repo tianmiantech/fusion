@@ -17,7 +17,7 @@ package com.welab.fusion.core.algorithm.ecdh_psi.action;
 
 import com.welab.fusion.core.Job.JobRole;
 import com.welab.fusion.core.algorithm.JobPhase;
-import com.welab.fusion.core.algorithm.base.AbstractJobPhaseAction;
+import com.welab.fusion.core.algorithm.base.phase_action.AbstractJobPhaseAction;
 import com.welab.fusion.core.algorithm.ecdh_psi.EcdhPsiJob;
 
 import java.io.File;
@@ -38,8 +38,7 @@ public class P5DownloadSecondaryECEncryptedDataAction extends AbstractJobPhaseAc
 
     @Override
     protected void doAction() throws Exception {
-        phaseProgress.setMessage("正在从合作方下载二次加密后的数据...");
-        File file = downloadFileFromPartner();
+        File file = downloadFileFromPartner("正在从合作方下载二次加密后的数据...");
 
         // 保存到上下文供后续使用
         job.getMyself().secondaryECEncryptedDataFile = file;

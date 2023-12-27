@@ -61,7 +61,15 @@ public class JobPhaseProgress extends Progress {
 
     @JSONField(serialize = false)
     public void skipThisPhase() {
-        finish(JobStatus.success, "我方跳过此阶段");
+        skipThisPhase("我方跳过此阶段");
+    }
+
+    @JSONField(serialize = false)
+    public void skipThisPhase(String message) {
+        if (skipThisPhase) {
+            return;
+        }
+        finish(JobStatus.success, message);
         skipThisPhase = true;
     }
 

@@ -24,8 +24,22 @@ import java.util.Date;
  */
 public class FusionResult {
     public String jobId;
-    public File resultFileOnlyIds;
-    public File resultFileWithAdditionalColumns;
+    /**
+     * 结果文件：包含己方 Key 相关字段和对方的附加字段
+     */
+    public File resultFile;
+    /**
+     * 结果文件：仅包含主键
+     */
+    public File resultFileOnlyKey;
+    /**
+     * 结果文件：包含我方附加列
+     */
+    public File resultFileWithMyselfAdditionalColumns;
+    /**
+     * 结果文件：包含合作方附加列
+     */
+    public File resultFileWithPartnerAdditionalColumns;
     public long fusionCount;
     public Date startTime;
     public Date endTime;
@@ -38,8 +52,7 @@ public class FusionResult {
         return fusionResult;
     }
 
-    public void finish(long fusionCount) {
-        this.fusionCount = fusionCount;
+    public void finish() {
         this.endTime = new Date();
         this.costTime = endTime.getTime() - startTime.getTime();
     }

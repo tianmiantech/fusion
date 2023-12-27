@@ -15,18 +15,13 @@
  */
 package com.welab.fusion.service.job_function;
 
-import com.welab.fusion.core.Job.JobRole;
 import com.welab.fusion.core.Job.FusionResult;
-import com.welab.fusion.core.algorithm.JobPhase;
-import com.welab.fusion.core.data_source.CsvTableDataSourceReader;
+import com.welab.fusion.core.Job.JobRole;
 import com.welab.fusion.service.database.entity.JobDbModel;
 import com.welab.fusion.service.service.JobService;
 import com.welab.wefe.common.web.Launcher;
 
-import java.io.File;
 import java.util.function.Consumer;
-
-import static com.welab.fusion.core.Job.JobRole.follower;
 
 /**
  * @author zane.luo
@@ -39,33 +34,7 @@ public class SaveFusionResultFunction implements com.welab.fusion.core.algorithm
     public void save(String jobId, JobRole myRole, FusionResult result, Consumer<Long> totalSizeConsumer, Consumer<Long> downloadSizeConsumer) throws Exception {
         JobDbModel job = jobService.findById(jobId);
 
-        // 如果我是过滤器提供方，则需要从协作方下载求交结果。
-        if (myRole == follower) {
-            downloadFusionResult(job, result, totalSizeConsumer, downloadSizeConsumer);
-        }
-
         saveFusionResult(job, result);
-    }
-
-    /**
-     * 从协作方下载求交结果
-     */
-    private FusionResult downloadFusionResult(JobDbModel job, FusionResult result, Consumer<Long> totalSizeConsumer, Consumer<Long> downloadSizeConsumer) throws Exception {
-
-        File file = MyRsaJobFunctions.INSTANCE.downloadPartnerFileFunction.download(
-                JobPhase.SaveResult,
-                job.getId(),
-                job.getPartnerMemberId(),
-                totalSizeConsumer,
-                downloadSizeConsumer
-        );
-
-        result.resultFileOnlyIds = file;
-        try (CsvTableDataSourceReader reader = new CsvTableDataSourceReader(file)) {
-            result.fusionCount = reader.getTotalDataRowCount();
-        }
-
-        return result;
     }
 
     /**
@@ -73,7 +42,6 @@ public class SaveFusionResultFunction implements com.welab.fusion.core.algorithm
      */
     private void saveFusionResult(JobDbModel job, FusionResult result) {
         job.setFusionCount(result.fusionCount);
-        job.setResultFilePath(result.resultFileOnlyIds.getAbsolutePath());
         job.setUpdatedTimeNow();
 
         job.save();

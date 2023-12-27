@@ -16,11 +16,11 @@
 package com.welab.fusion.core.algorithm.ecdh_psi.action;
 
 import com.welab.fusion.core.algorithm.JobPhase;
-import com.welab.fusion.core.algorithm.base.AbstractJobPhaseAction;
+import com.welab.fusion.core.algorithm.base.phase_action.AbstractJobPhaseAction;
 import com.welab.fusion.core.algorithm.ecdh_psi.EcdhPsiJob;
 import com.welab.fusion.core.algorithm.ecdh_psi.elliptic_curve.PsiECEncryptedData;
 import com.welab.fusion.core.algorithm.ecdh_psi.elliptic_curve.PsiECEncryptedDataCreator;
-import com.welab.fusion.core.data_source.AbstractTableDataSourceReader;
+import com.welab.fusion.core.data_source.CsvTableDataSourceReader;
 import com.welab.fusion.core.hash.HashConfig;
 
 /**
@@ -34,7 +34,7 @@ public class P2EncryptMyselfDataAction extends AbstractJobPhaseAction<EcdhPsiJob
 
     @Override
     protected void doAction() throws Exception {
-        AbstractTableDataSourceReader reader = job.getMyself().tableDataResourceReader;
+        CsvTableDataSourceReader reader = new CsvTableDataSourceReader(job.getMyself().allOriginalData);
         HashConfig hashConfig = job.getMyself().dataResourceInfo.hashConfig;
 
         phaseProgress.setMessage("正在对我方数据进行加密...");

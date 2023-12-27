@@ -18,7 +18,7 @@ package com.welab.fusion.core.algorithm.ecdh_psi.action;
 import com.welab.fusion.core.Job.FusionResult;
 import com.welab.fusion.core.Job.JobRole;
 import com.welab.fusion.core.algorithm.JobPhase;
-import com.welab.fusion.core.algorithm.base.AbstractJobPhaseAction;
+import com.welab.fusion.core.algorithm.base.phase_action.AbstractJobPhaseAction;
 import com.welab.fusion.core.algorithm.ecdh_psi.EcdhPsiJob;
 import com.welab.fusion.core.algorithm.ecdh_psi.elliptic_curve.EllipticCurve;
 import com.welab.fusion.core.hash.HashConfig;
@@ -56,7 +56,7 @@ public class P6IntersectionAction extends AbstractJobPhaseAction<EcdhPsiJob> {
     protected void doAction() throws Exception {
         FusionResult result = job.getJobResult();
         LongAdder fruitCount = new LongAdder();
-        File resultFile = FileSystem.FusionResult.getFileOnlyIds(job.getJobId());
+        File resultFile = FileSystem.FusionResult.getFileOnlyKeyColumns(job.getJobId());
 
         HashConfig hashConfig = job.getMyself().dataResourceInfo.hashConfig;
         String headLine = hashConfig.getIdHeadersForCsv() + System.lineSeparator();
@@ -70,6 +70,7 @@ public class P6IntersectionAction extends AbstractJobPhaseAction<EcdhPsiJob> {
         int partnerPartitionIndex = 0;
         while (true) {
             Set<ECPoint> partnerPartition = readPartnerPartition(partnerPartitionIndex);
+            partnerPartitionIndex++;
             if (partnerPartition.isEmpty()) {
                 break;
             }
@@ -95,8 +96,7 @@ public class P6IntersectionAction extends AbstractJobPhaseAction<EcdhPsiJob> {
             }
         }
 
-        // 包装结果
-        result.finish(resultFile, fruitCount.longValue());
+        result.fusionCount = fruitCount.longValue();
     }
 
     /**
@@ -136,7 +136,7 @@ public class P6IntersectionAction extends AbstractJobPhaseAction<EcdhPsiJob> {
      */
     private Set<ECPoint> readPartnerPartition(int partitionIndex) throws IOException {
         File file = job.getPartner().secondaryECEncryptedDataFile;
-        List<String> lines = FileUtil.readPartition(file, partitionIndex, batchSize);
+        List<String> lines = FileUtil.readPartitionLines(file, partitionIndex, batchSize, false);
 
         Set<ECPoint> result = new HashSet<>(batchSize);
         for (String line : lines) {

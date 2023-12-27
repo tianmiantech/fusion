@@ -17,7 +17,7 @@ package com.welab.fusion.core.algorithm.ecdh_psi;
 
 import com.welab.fusion.core.algorithm.AbstractJobFlow;
 import com.welab.fusion.core.algorithm.JobPhase;
-import com.welab.fusion.core.algorithm.base.AbstractJobPhaseAction;
+import com.welab.fusion.core.algorithm.base.phase_action.AbstractJobPhaseAction;
 import com.welab.fusion.core.algorithm.ecdh_psi.action.*;
 
 import java.util.LinkedHashMap;
@@ -30,7 +30,7 @@ public class EcdhPsiJobFlow extends AbstractJobFlow {
     private static final LinkedHashMap<JobPhase, Class<? extends AbstractJobPhaseAction>> map = new LinkedHashMap<>();
 
     static {
-        map.put(JobPhase.ConfirmMemberRole, P1ConfirmMemberRoleAction.class);
+        map.put(JobPhase.InitJob, P1ConfirmMemberRoleAction.class);
         map.put(JobPhase.ECEncryptMyselfData, P2EncryptMyselfDataAction.class);
         map.put(JobPhase.DownloadPartnerECEncryptedData, P3DownloadPartnerECEncryptedDataAction.class);
         map.put(JobPhase.ECEncryptPartnerData, P4EncryptPartnerDataAction.class);

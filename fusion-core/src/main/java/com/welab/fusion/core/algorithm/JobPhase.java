@@ -21,7 +21,7 @@ package com.welab.fusion.core.algorithm;
  */
 public enum JobPhase {
 
-    ConfirmMemberRole("协商成员角色"),
+    InitJob("初始化任务"),
 
     // region RSA-PSI
 
@@ -46,7 +46,8 @@ public enum JobPhase {
 
     Intersection("求交"),
     DownloadIntersection("下载交集"),
-    AppendAdditionalResultColumns("追加附加列"),
+    AppendMyselfAdditionalResultColumns("追加我方附加列"),
+    AppendPartnerAdditionalResultColumns("追加合作方附加列"),
     SaveResult("下载并保存结果");
 
     private final String label;

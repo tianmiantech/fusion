@@ -17,10 +17,12 @@
 package com.welab.wefe.common.util;
 
 import cn.hutool.core.io.IoUtil;
+import de.siegmar.fastcsv.reader.CsvParser;
+import de.siegmar.fastcsv.reader.CsvReader;
+import de.siegmar.fastcsv.reader.CsvRow;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.ReversedLinesFileReader;
-import org.bouncycastle.math.ec.ECPoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +31,10 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 /**
  * @author zane.luo
@@ -488,6 +493,11 @@ public class FileUtil {
         return totalRowCount;
     }
 
+    /**
+     * 构建 BufferedReader
+     *
+     * BufferedReader 是线程安全的，可以在多线程中使用。
+     */
     public static BufferedReader buildBufferedReader(File file) throws FileNotFoundException {
         return new BufferedReader(
                 new InputStreamReader(
@@ -497,18 +507,31 @@ public class FileUtil {
         );
     }
 
-    public static BufferedWriter buildBufferedWriter(File file, boolean append) throws FileNotFoundException {
+
+    /**
+     * 构建 BufferedWriter
+     *
+     * BufferedWriter 是线程安全的，可以在多线程中使用。
+     *
+     * @param file   写入的文件
+     * @param append 是否追加，如果不追加，会覆盖已有文件。
+     */
+    public static BufferedWriter buildBufferedWriter(File file, boolean append) {
         if (!append) {
             file.delete();
         }
         file.getParentFile().mkdirs();
 
-        return new BufferedWriter(
-                new OutputStreamWriter(
-                        new FileOutputStream(file, append),
-                        StandardCharsets.UTF_8
-                )
-        );
+        try {
+            return new BufferedWriter(
+                    new OutputStreamWriter(
+                            new FileOutputStream(file, append),
+                            StandardCharsets.UTF_8
+                    )
+            );
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -517,10 +540,61 @@ public class FileUtil {
      * @param partitionIndex 分片索引，从 0 开始。
      * @param batchSize      批大小
      */
-    public static List<String> readPartition(File file,int partitionIndex, int batchSize) throws IOException {
+    public static List<LinkedHashMap<String, Object>> readPartitionRows(File file, int partitionIndex, int batchSize) throws IOException {
+
+        CsvReader reader = new CsvReader();
+        reader.setContainsHeader(false);
+        reader.setSkipEmptyRows(true);
+        CsvParser parser = reader.parse(file, StandardCharsets.UTF_8);
+        List<String> header = parser.nextRow().getFields();
+
+        List<LinkedHashMap<String, Object>> result = new ArrayList<>(batchSize);
+        int skipLineCount = batchSize * partitionIndex;
+        int lineIndex = 0;
+
+        while (true) {
+            CsvRow row = parser.nextRow();
+            lineIndex++;
+
+            if (row == null) {
+                return result;
+            }
+
+            if (lineIndex < skipLineCount) {
+                continue;
+            }
+
+            LinkedHashMap<String, Object> map = new LinkedHashMap<>();
+            for (int i = 0; i < header.size(); i++) {
+                String value = "";
+                if (row.getFieldCount() > i) {
+                    value = row.getField(i);
+                }
+                map.put(header.get(i), value);
+            }
+            result.add(map);
+
+
+            if (result.size() == batchSize) {
+                return result;
+            }
+        }
+    }
+
+    /**
+     * 分片读取文本文件
+     *
+     * @param partitionIndex 分片索引，从 0 开始。
+     * @param batchSize      批大小
+     * @param hasHeader      是否有列头，如果有列头，会跳过第一行。
+     */
+    public static List<String> readPartitionLines(File file, int partitionIndex, int batchSize, boolean hasHeader) throws IOException {
         List<String> result = new ArrayList<>(batchSize);
 
         int skipLineCount = batchSize * partitionIndex;
+        if (hasHeader) {
+            skipLineCount++;
+        }
         int lineIndex = 0;
         try (BufferedReader reader = FileUtil.buildBufferedReader(file)) {
             while (true) {

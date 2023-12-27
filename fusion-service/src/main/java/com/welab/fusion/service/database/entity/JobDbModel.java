@@ -19,10 +19,10 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.welab.fusion.core.Job.JobStatus;
 import com.welab.fusion.core.algorithm.base.PsiAlgorithm;
+import com.welab.fusion.core.io.FileSystem;
 import com.welab.fusion.core.progress.JobProgress;
 import com.welab.fusion.service.constans.JobMemberRole;
 import com.welab.wefe.common.fieldvalidate.annotation.Check;
-import com.welab.wefe.common.util.StringUtil;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.Column;
@@ -51,9 +51,6 @@ public class JobDbModel extends AbstractDbModel {
     private JobMemberRole role;
 
     private String remark;
-
-    @Check(name = "求交结果")
-    private String resultFilePath;
     @Check(name = "交集数量")
     private Long fusionCount;
     @Check(name = "任务开始时间")
@@ -73,10 +70,7 @@ public class JobDbModel extends AbstractDbModel {
 
     @JSONField(serialize = false)
     public File getResultFile() {
-        if (StringUtil.isEmpty(resultFilePath)) {
-            return null;
-        }
-        File file = new File(resultFilePath);
+        File file = FileSystem.FusionResult.getResultFile(getId());
         if (!file.exists()) {
             return null;
         }
@@ -141,14 +135,6 @@ public class JobDbModel extends AbstractDbModel {
 
     public void setRemark(String remark) {
         this.remark = remark;
-    }
-
-    public String getResultFilePath() {
-        return resultFilePath;
-    }
-
-    public void setResultFilePath(String resultFilePath) {
-        this.resultFilePath = resultFilePath;
     }
 
     public Long getFusionCount() {

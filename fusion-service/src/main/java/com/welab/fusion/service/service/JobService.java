@@ -225,8 +225,6 @@ public class JobService extends AbstractService {
     }
 
 
-
-
     /**
      * 保存任务成员
      *
@@ -392,11 +390,9 @@ public class JobService extends AbstractService {
         }
 
         // 删除求交结果
-        if (StringUtil.isNotEmpty(job.getResultFilePath())) {
-            File file = new File(job.getResultFilePath());
-            if (file.exists()) {
-                file.delete();
-            }
+        File file = job.getResultFile();
+        if (file != null && file.exists()) {
+            file.delete();
         }
 
         // 应删尽删

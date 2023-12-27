@@ -16,10 +16,11 @@
 package com.welab.fusion.core.algorithm.rsa_psi.action;
 
 import com.welab.fusion.core.Job.AbstractJobMember;
-import com.welab.fusion.core.algorithm.rsa_psi.RsaPsiJob;
-import com.welab.fusion.core.algorithm.JobPhase;
 import com.welab.fusion.core.Job.JobRole;
-import com.welab.fusion.core.algorithm.base.AbstractJobPhaseAction;
+import com.welab.fusion.core.algorithm.JobPhase;
+import com.welab.fusion.core.algorithm.base.phase_action.AbstractInitJobAction;
+import com.welab.fusion.core.algorithm.base.phase_action.AbstractJobPhaseAction;
+import com.welab.fusion.core.algorithm.rsa_psi.RsaPsiJob;
 import com.welab.fusion.core.data_resource.base.DataResourceInfo;
 import com.welab.fusion.core.data_resource.base.DataResourceType;
 
@@ -33,32 +34,18 @@ import com.welab.fusion.core.data_resource.base.DataResourceType;
  * @author zane.luo
  * @date 2023/11/13
  */
-public class P1ConfirmMemberRoleAction extends AbstractJobPhaseAction<RsaPsiJob> {
-    public P1ConfirmMemberRoleAction(RsaPsiJob job) {
+public class P1InitJobAction extends AbstractInitJobAction<RsaPsiJob> {
+    public P1InitJobAction(RsaPsiJob job) {
         super(job);
-    }
-
-    @Override
-    protected boolean skipThisAction() {
-        return false;
     }
 
     @Override
     public void doAction() throws Exception {
         JobRole role = consultMyRole();
         job.setMyRole(role);
-
         phaseProgress.setMessage("协商完毕，我方角色：" + role);
-    }
 
-    @Override
-    public JobPhase getPhase() {
-        return JobPhase.ConfirmMemberRole;
-    }
-
-    @Override
-    public long getTotalWorkload() {
-        return 1;
+        super.loadOriginalDataToJobWorkspace();
     }
 
     /**

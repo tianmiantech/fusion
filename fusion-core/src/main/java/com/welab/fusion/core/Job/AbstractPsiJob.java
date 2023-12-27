@@ -19,9 +19,10 @@ import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.StrUtil;
 import com.welab.fusion.core.algorithm.AbstractJobFlow;
 import com.welab.fusion.core.algorithm.JobPhase;
-import com.welab.fusion.core.algorithm.base.AbstractJobPhaseAction;
+import com.welab.fusion.core.algorithm.base.phase_action.AbstractJobPhaseAction;
 import com.welab.fusion.core.algorithm.base.PsiAlgorithm;
 import com.welab.fusion.core.data_resource.base.DataResourceType;
+import com.welab.fusion.core.io.FileSystem;
 import com.welab.fusion.core.progress.JobProgress;
 import com.welab.wefe.common.thread.ThreadPool;
 import com.welab.wefe.common.util.CloseableUtils;
@@ -295,11 +296,19 @@ public abstract class AbstractPsiJob implements Closeable {
 
     @Override
     public void close() throws IOException {
+        getJobResult().finish();
+
         scheduleSingleThreadExecutor.shutdownNow();
         actionSingleThreadExecutor.shutdownNow();
 
         CloseableUtils.closeQuietly(myself);
         CloseableUtils.closeQuietly(partner);
+
+        try {
+            FileSystem.JobTemp.clean(jobId);
+        } catch (Exception e) {
+            LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);
+        }
     }
 
     // region getter/setter

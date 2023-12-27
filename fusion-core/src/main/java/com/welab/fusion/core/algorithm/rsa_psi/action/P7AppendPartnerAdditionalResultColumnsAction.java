@@ -13,39 +13,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.welab.fusion.core.algorithm.ecdh_psi.action;
+package com.welab.fusion.core.algorithm.rsa_psi.action;
 
-import com.welab.fusion.core.Job.JobRole;
 import com.welab.fusion.core.algorithm.JobPhase;
 import com.welab.fusion.core.algorithm.base.phase_action.AbstractJobPhaseAction;
 import com.welab.fusion.core.algorithm.rsa_psi.RsaPsiJob;
+import org.apache.commons.collections4.CollectionUtils;
 
 /**
  * @author zane.luo
  * @date 2023/12/26
  */
-public class P7DownloadIntersectionAction extends AbstractJobPhaseAction<RsaPsiJob> {
-    public P7DownloadIntersectionAction(RsaPsiJob job) {
+public class P7AppendPartnerAdditionalResultColumnsAction extends AbstractJobPhaseAction<RsaPsiJob> {
+    public P7AppendPartnerAdditionalResultColumnsAction(RsaPsiJob job) {
         super(job);
     }
 
     @Override
     protected void doAction() throws Exception {
-        job.getJobResult().resultFileOnlyKey = super.downloadFileFromPartner("正在从合作方下载交集...");
+        job.getJobResult().resultFileWithPartnerAdditionalColumns = super.downloadFileFromPartner("正在从合作方下载附加结果字段..");
     }
 
     @Override
     public JobPhase getPhase() {
-        return JobPhase.DownloadIntersection;
+        return JobPhase.AppendPartnerAdditionalResultColumns;
     }
 
     @Override
     public long getTotalWorkload() {
-        return 0;
+        return 1;
     }
 
     @Override
     protected boolean skipThisAction() {
-        return job.getMyJobRole() == JobRole.leader;
+        return CollectionUtils.isNotEmpty(
+                job.getPartner().dataResourceInfo.additionalResultColumns
+        );
     }
 }

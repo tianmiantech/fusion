@@ -18,11 +18,11 @@ package com.welab.fusion.core.algorithm.rsa_psi.action;
 import com.welab.fusion.core.Job.JobRole;
 import com.welab.fusion.core.algorithm.rsa_psi.RsaPsiJob;
 import com.welab.fusion.core.algorithm.JobPhase;
-import com.welab.fusion.core.algorithm.base.AbstractJobPhaseAction;
+import com.welab.fusion.core.algorithm.base.phase_action.AbstractJobPhaseAction;
 import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
 import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilterCreator;
 import com.welab.fusion.core.data_resource.base.DataResourceType;
-import com.welab.fusion.core.data_source.AbstractTableDataSourceReader;
+import com.welab.fusion.core.data_source.CsvTableDataSourceReader;
 import com.welab.fusion.core.hash.HashConfig;
 
 import java.util.UUID;
@@ -34,7 +34,7 @@ import java.util.UUID;
 public class P2CreatePsiBloomFilterAction extends AbstractJobPhaseAction<RsaPsiJob> {
     @Override
     protected void doAction() throws Exception {
-        AbstractTableDataSourceReader reader = job.getMyself().tableDataResourceReader;
+        CsvTableDataSourceReader reader = new CsvTableDataSourceReader(job.getMyself().allOriginalData);
         HashConfig hashConfig = job.getMyself().dataResourceInfo.hashConfig;
 
         phaseProgress.setMessage("正在生成过滤器...");

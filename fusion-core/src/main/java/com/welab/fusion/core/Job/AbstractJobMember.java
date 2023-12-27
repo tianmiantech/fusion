@@ -20,8 +20,8 @@ import com.welab.fusion.core.data_source.AbstractTableDataSourceReader;
 import com.welab.wefe.common.util.CloseableUtils;
 
 import java.io.Closeable;
+import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 /**
  * @author zane.luo
@@ -33,6 +33,15 @@ public abstract class AbstractJobMember implements Closeable {
     public DataResourceInfo dataResourceInfo;
 
     public AbstractTableDataSourceReader tableDataResourceReader;
+    /**
+     * 全量的原始数据文件，仅包含任务需要的字段，明文。
+     */
+    public File allOriginalData;
+
+    /**
+     * 交集部分的原始数据文件，仅包含任务需要的字段，明文。
+     */
+    public File intersectionOriginalData;
 
     public AbstractJobMember(String memberId, String memberName, DataResourceInfo dataResourceInfo) {
         this.memberId = memberId;

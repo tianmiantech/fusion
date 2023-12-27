@@ -134,6 +134,33 @@ public class FileSystem {
                     )
                     .toFile();
         }
+
+        /**
+         * 全量的原始数据
+         */
+        public static File getAllOriginalData(String jobId) {
+            return getDir(jobId)
+                    .resolve("AllOriginalData.csv")
+                    .toFile();
+        }
+
+        /**
+         * 交集部分的原始数据
+         */
+        public static File getIntersectionOriginalData(String jobId) {
+            return getDir(jobId)
+                    .resolve("IntersectionOriginalData.csv")
+                    .toFile();
+        }
+
+
+        /**
+         * 删除目录
+         */
+        public static void clean(String jobId) {
+            File dir = getDir(jobId).toFile();
+            cn.hutool.core.io.FileUtil.clean(dir);
+        }
     }
 
     public static class PsiBloomFilter {
@@ -147,11 +174,20 @@ public class FileSystem {
     }
 
     public static class FusionResult {
-        public static File getFileOnlyIds(String jobId) {
-            return getBaseDir(UseType.FusionResult).resolve(jobId + "-only_ids.csv").toFile();
+        public static File getResultFile(String jobId) {
+            return getBaseDir(UseType.FusionResult).resolve(jobId + "-result.csv").toFile();
         }
-        public static File getFileWithAdditionalColumns(String jobId) {
-            return getBaseDir(UseType.FusionResult).resolve(jobId + "-with_additional_columns.csv").toFile();
+
+        public static File getFileOnlyKey(String jobId) {
+            return getBaseDir(UseType.FusionResult).resolve(jobId + "-only_key.csv").toFile();
+        }
+
+        public static File getFileOnlyKeyColumns(String jobId) {
+            return getBaseDir(UseType.FusionResult).resolve(jobId + "-only_key_columns.csv").toFile();
+        }
+
+        public static File getFileWithMyselfAdditionalColumns(String jobId) {
+            return getBaseDir(UseType.FusionResult).resolve(jobId + "-with_myself_additional_columns.csv").toFile();
         }
     }
 

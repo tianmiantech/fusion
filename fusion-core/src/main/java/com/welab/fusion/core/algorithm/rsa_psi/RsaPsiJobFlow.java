@@ -17,7 +17,7 @@ package com.welab.fusion.core.algorithm.rsa_psi;
 
 import com.welab.fusion.core.algorithm.AbstractJobFlow;
 import com.welab.fusion.core.algorithm.JobPhase;
-import com.welab.fusion.core.algorithm.base.AbstractJobPhaseAction;
+import com.welab.fusion.core.algorithm.base.phase_action.AbstractJobPhaseAction;
 import com.welab.fusion.core.algorithm.rsa_psi.action.*;
 
 import java.util.LinkedHashMap;
@@ -30,13 +30,14 @@ public class RsaPsiJobFlow extends AbstractJobFlow {
     private static final LinkedHashMap<JobPhase, Class<? extends AbstractJobPhaseAction>> map = new LinkedHashMap<>();
 
     static {
-        map.put(JobPhase.ConfirmMemberRole, P1ConfirmMemberRoleAction.class);
+        map.put(JobPhase.InitJob, P1InitJobAction.class);
         map.put(JobPhase.CreatePsiBloomFilter, P2CreatePsiBloomFilterAction.class);
         map.put(JobPhase.DownloadPsiBloomFilter, P3DownloadPsiBloomFilterAction.class);
         map.put(JobPhase.Intersection, P4IntersectionAction.class);
         map.put(JobPhase.DownloadIntersection, P5DownloadIntersectionAction.class);
-        map.put(JobPhase.AppendAdditionalResultColumns, P6AppendAdditionalResultColumnsAction.class);
-        map.put(JobPhase.SaveResult, P7SaveResultAction.class);
+        map.put(JobPhase.AppendMyselfAdditionalResultColumns, P6AppendMyselfAdditionalResultColumnsAction.class);
+        map.put(JobPhase.AppendPartnerAdditionalResultColumns, P7AppendPartnerAdditionalResultColumnsAction.class);
+        map.put(JobPhase.SaveResult, P8SaveResultAction.class);
     }
 
     public static final RsaPsiJobFlow INSTANCE = new RsaPsiJobFlow();

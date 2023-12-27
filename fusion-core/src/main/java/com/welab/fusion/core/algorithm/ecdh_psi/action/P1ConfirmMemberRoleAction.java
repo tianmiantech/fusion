@@ -19,7 +19,7 @@ import com.welab.fusion.core.algorithm.ecdh_psi.EcdhPsiJob;
 import com.welab.fusion.core.Job.AbstractJobMember;
 import com.welab.fusion.core.Job.JobRole;
 import com.welab.fusion.core.algorithm.JobPhase;
-import com.welab.fusion.core.algorithm.base.AbstractJobPhaseAction;
+import com.welab.fusion.core.algorithm.base.phase_action.AbstractJobPhaseAction;
 import com.welab.fusion.core.data_resource.base.DataResourceInfo;
 import com.welab.fusion.core.data_resource.base.DataResourceType;
 
@@ -53,7 +53,7 @@ public class P1ConfirmMemberRoleAction extends AbstractJobPhaseAction<EcdhPsiJob
 
     @Override
     public JobPhase getPhase() {
-        return JobPhase.ConfirmMemberRole;
+        return JobPhase.InitJob;
     }
 
     @Override

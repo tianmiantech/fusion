@@ -13,18 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.welab.fusion.core.algorithm.base;
+package com.welab.fusion.core.algorithm.base.phase_action;
 
 import com.welab.fusion.core.Job.AbstractPsiJob;
 import com.welab.fusion.core.Job.JobStatus;
 import com.welab.fusion.core.algorithm.JobPhase;
 import com.welab.fusion.core.hash.HashConfig;
+import com.welab.fusion.core.io.FileSystem;
 import com.welab.fusion.core.progress.JobPhaseProgress;
+import com.welab.fusion.core.util.Constant;
+import com.welab.wefe.common.util.FileUtil;
+import com.welab.wefe.common.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.IOException;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author zane.luo
@@ -109,7 +118,8 @@ public abstract class AbstractJobPhaseAction<T extends AbstractPsiJob> {
     /**
      * 从合作方下载文件
      */
-    protected File downloadFileFromPartner() throws Exception {
+    protected File downloadFileFromPartner(String message) throws Exception {
+        phaseProgress.setMessage(message);
         return job.getJobFunctions().downloadPartnerFileFunction.download(
                 getPhase(),
                 job.getJobId(),
@@ -124,23 +134,23 @@ public abstract class AbstractJobPhaseAction<T extends AbstractPsiJob> {
     }
 
     /**
-     * 获取结果文件的 csv header
+     * 获取结果文件的 csv header（不包含附加结果列）
      */
-    protected LinkedHashSet<String> getResultFileCsvHeaderOnlyIds() {
+    protected LinkedHashSet<String> getOriginalHeaderOnlyKeyColumns() {
         // 输出主键相关字段
         HashConfig hashConfig = job.getMyself().dataResourceInfo.hashConfig;
-        LinkedHashSet<String> csvHeader = hashConfig.getIdHeadersForCsv();
+        LinkedHashSet<String> csvHeader = new LinkedHashSet<>();
+        csvHeader.add(Constant.KEY_COLUMN_NAME);
+        csvHeader.addAll(hashConfig.getIdHeadersForCsv());
 
         return csvHeader;
     }
 
     /**
-     * 获取结果文件的 csv header
+     * 获取原始文件的 csv header（包含附加结果列）
      */
-    protected LinkedHashSet<String> getResultFileCsvHeaderWithAdditionalColumns() {
-        // 输出主键相关字段
-        HashConfig hashConfig = job.getMyself().dataResourceInfo.hashConfig;
-        LinkedHashSet<String> csvHeader = hashConfig.getIdHeadersForCsv();
+    protected LinkedHashSet<String> getOriginalHeaderWithAdditionalColumns() {
+        LinkedHashSet<String> csvHeader = getOriginalHeaderOnlyKeyColumns();
 
         // 输出附加字段
         LinkedHashSet<String> additionalResultColumns = job.getMyself().dataResourceInfo.additionalResultColumns;
@@ -149,5 +159,63 @@ public abstract class AbstractJobPhaseAction<T extends AbstractPsiJob> {
         }
 
         return csvHeader;
+    }
+
+    /**
+     * 初始化结果文件：仅包含主键列
+     */
+    protected BufferedWriter initResultFileOnlyKey() throws Exception {
+        if (job.getJobResult().resultFileOnlyKey != null) {
+            throw new RuntimeException("resultFileOnlyKey is not null");
+        }
+
+        File file = FileSystem.FusionResult.getFileOnlyKey(job.getJobId());
+        job.getJobResult().resultFileOnlyKey = file;
+
+        return FileUtil.buildBufferedWriter(file, false);
+    }
+
+    /**
+     * 初始化结果文件：交集部分的原始数据
+     */
+    protected BufferedWriter initIntersectionOriginalData() throws IOException {
+        if (job.getMyself().intersectionOriginalData != null) {
+            throw new RuntimeException("intersectionOriginalData is not null");
+        }
+
+        File file = FileSystem.JobTemp.getIntersectionOriginalData(job.getJobId());
+        job.getMyself().intersectionOriginalData = file;
+
+        BufferedWriter writer = FileUtil.buildBufferedWriter(file, false);
+        writer.write(
+                headerToCsvLine(
+                        getOriginalHeaderWithAdditionalColumns()
+                )
+        );
+
+        return writer;
+    }
+
+
+    protected String headerToCsvLine(LinkedHashSet<String> header) {
+        return StringUtil.joinByComma(header) + System.lineSeparator();
+    }
+
+    protected String rowToCsvLine(LinkedHashSet<String> header, LinkedHashMap<String, Object> row) {
+        return rowToCsvLine(header, row, true);
+    }
+
+    protected String rowToCsvLine(LinkedHashSet<String> header, LinkedHashMap<String, Object> row, boolean withNewLine) {
+        List<String> values = header.stream()
+                .map(x -> {
+                    Object value = row.get(x);
+                    return value == null ? "" : value.toString();
+                }).collect(Collectors.toList());
+
+        String line = StringUtil.joinByComma(values);
+        if (withNewLine) {
+            line += System.lineSeparator();
+        }
+        return line;
     }
 }

@@ -16,7 +16,7 @@
 package com.welab.fusion.core.algorithm.ecdh_psi.action;
 
 import com.welab.fusion.core.algorithm.JobPhase;
-import com.welab.fusion.core.algorithm.base.AbstractJobPhaseAction;
+import com.welab.fusion.core.algorithm.base.phase_action.AbstractJobPhaseAction;
 import com.welab.fusion.core.algorithm.ecdh_psi.EcdhPsiJob;
 import com.welab.fusion.core.algorithm.ecdh_psi.elliptic_curve.PsiECEncryptedData;
 import com.welab.wefe.common.InformationSize;
@@ -41,8 +41,7 @@ public class P3DownloadPartnerECEncryptedDataAction extends AbstractJobPhaseActi
 
     @Override
     protected void doAction() throws Exception {
-        phaseProgress.setMessage("正在下载合作方加密后的数据...");
-        File file = downloadFileFromPartner();
+        File file = downloadFileFromPartner("正在下载合作方加密后的数据...");
 
         phaseProgress.setMessage("正在解压 zip 文件(" + InformationSize.fromByte(file.length()) + ")...");
         // file 解压至 dir

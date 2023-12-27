@@ -16,24 +16,19 @@
 package com.welab.fusion.core.algorithm.rsa_psi.action;
 
 import cn.hutool.core.codec.Base64;
-import com.welab.fusion.core.Job.FusionResult;
 import com.welab.fusion.core.Job.JobRole;
 import com.welab.fusion.core.algorithm.JobPhase;
-import com.welab.fusion.core.algorithm.base.AbstractJobPhaseAction;
+import com.welab.fusion.core.algorithm.base.phase_action.AbstractJobPhaseAction;
 import com.welab.fusion.core.algorithm.rsa_psi.RsaPsiJob;
 import com.welab.fusion.core.algorithm.rsa_psi.RsaPsiRecord;
-import com.welab.fusion.core.io.FileSystem;
+import com.welab.fusion.core.data_source.CsvTableDataSourceReader;
 import com.welab.fusion.core.util.PsiUtils;
 import com.welab.wefe.common.BatchConsumer;
 import com.welab.wefe.common.exception.StatusCodeWithException;
-import com.welab.wefe.common.util.FileUtil;
-import com.welab.wefe.common.util.StringUtil;
 
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.concurrent.atomic.LongAdder;
@@ -57,10 +52,10 @@ public class P4IntersectionAction extends AbstractJobPhaseAction<RsaPsiJob> {
      * 交集数据量
      */
     private LongAdder fruitCount = new LongAdder();
-    private BufferedWriter writerForOnlyIds;
-    private LinkedHashSet<String> csvHeaderOnlyIds;
+    private BufferedWriter writerForOnlyKey;
+
     private BufferedWriter writerForWithAdditionalColumns;
-    private LinkedHashSet<String> csvHeaderWithAdditionalColumns;
+    private LinkedHashSet<String> resultHeaderWithAdditionalColumns;
 
     public P4IntersectionAction(RsaPsiJob job) {
         super(job);
@@ -70,55 +65,19 @@ public class P4IntersectionAction extends AbstractJobPhaseAction<RsaPsiJob> {
     @Override
     protected void doAction() throws Exception {
 
-        publicModulus = job.getPartner().psiBloomFilter.rsaPsiParam.publicModulus;
-        publicExponent = job.getPartner().psiBloomFilter.rsaPsiParam.publicExponent;
+        this.publicModulus = job.getPartner().psiBloomFilter.rsaPsiParam.publicModulus;
+        this.publicExponent = job.getPartner().psiBloomFilter.rsaPsiParam.publicExponent;
 
-        FusionResult result = job.getJobResult();
-
-        // 初始化结果文件
-        result.resultFileOnlyIds = initResultFileOnlyIds();
-        result.resultFileWithAdditionalColumns = initResultFileWithAdditionalColumns();
+        this.writerForOnlyKey = super.initResultFileOnlyKey();
 
         // 求交
         intersection();
 
         // 释放资源
-        this.writerForOnlyIds.close();
+        this.writerForOnlyKey.close();
         this.writerForWithAdditionalColumns.close();
 
-        result.finish(fruitCount.longValue());
-    }
-
-    /**
-     * 初始化结果文件：包含附加列
-     */
-    private File initResultFileWithAdditionalColumns() throws Exception {
-        this.csvHeaderWithAdditionalColumns = super.getResultFileCsvHeaderWithAdditionalColumns();
-
-        // 初始化结果文件
-        File file = FileSystem.FusionResult.getFileWithAdditionalColumns(job.getJobId());
-        this.writerForWithAdditionalColumns = FileUtil.buildBufferedWriter(file, false);
-        this.writerForWithAdditionalColumns.write(
-                StringUtil.joinByComma(csvHeaderWithAdditionalColumns) + System.lineSeparator()
-        );
-
-        return file;
-    }
-
-    /**
-     * 初始化结果文件：仅包含 id 列
-     */
-    private File initResultFileOnlyIds() throws Exception {
-
-        this.csvHeaderOnlyIds = super.getResultFileCsvHeaderOnlyIds();
-
-        File file = FileSystem.FusionResult.getFileOnlyIds(job.getJobId());
-        this.writerForOnlyIds = FileUtil.buildBufferedWriter(file, false);
-        this.writerForOnlyIds.write(
-                StringUtil.joinByComma(csvHeaderOnlyIds) + System.lineSeparator()
-        );
-
-        return file;
+        job.getJobResult().fusionCount = fruitCount.longValue();
     }
 
     /**
@@ -126,7 +85,7 @@ public class P4IntersectionAction extends AbstractJobPhaseAction<RsaPsiJob> {
      *
      * @throws StatusCodeWithException
      */
-    private void intersection() throws StatusCodeWithException {
+    private void intersection() throws Exception {
         LongAdder progress = new LongAdder();
         // 批处理
         BatchConsumer<RsaPsiRecord> consumer = new BatchConsumer<>(batchSize, 5_000, records -> {
@@ -146,7 +105,8 @@ public class P4IntersectionAction extends AbstractJobPhaseAction<RsaPsiJob> {
         });
 
         // 从数据源逐条读取数据集并编码
-        job.getMyself().tableDataResourceReader.readRows((index, row) -> {
+        CsvTableDataSourceReader reader = new CsvTableDataSourceReader(job.getMyself().allOriginalData);
+        reader.readRows((index, row) -> {
 
             RsaPsiRecord record = new RsaPsiRecord();
             record.row = row;
@@ -173,12 +133,12 @@ public class P4IntersectionAction extends AbstractJobPhaseAction<RsaPsiJob> {
      */
     private void saveFruits(List<RsaPsiRecord> fruits) throws IOException {
         for (RsaPsiRecord record : fruits) {
-            writerForOnlyIds.write(
-                    buildCsvDataLine(csvHeaderOnlyIds, record.row)
+            this.writerForOnlyKey.write(
+                    job.getMyself().dataResourceInfo.hashConfig.hash(record.row)
             );
 
             writerForWithAdditionalColumns.write(
-                    buildCsvDataLine(csvHeaderWithAdditionalColumns, record.row)
+                    super.rowToCsvLine(resultHeaderWithAdditionalColumns, record.row)
             );
         }
     }
@@ -202,20 +162,6 @@ public class P4IntersectionAction extends AbstractJobPhaseAction<RsaPsiJob> {
                 publicModulus
         );
         return fruits;
-    }
-
-    /**
-     * 拼接用于输出到 csv 的主键相关字段列表
-     */
-    public String buildCsvDataLine(LinkedHashSet<String> csvHeader, LinkedHashMap<String, Object> row) {
-        List<String> values = csvHeader.stream()
-                .map(x -> {
-                    Object value = row.get(x);
-                    return value == null ? "" : value.toString();
-                })
-                .collect(Collectors.toList());
-
-        return StringUtil.joinByComma(values) + System.lineSeparator();
     }
 
     @Override
