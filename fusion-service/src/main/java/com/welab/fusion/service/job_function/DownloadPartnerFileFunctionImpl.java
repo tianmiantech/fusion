@@ -56,13 +56,7 @@ public class DownloadPartnerFileFunctionImpl implements DownloadPartnerFileFunct
      * 构建文件储存路径
      */
     private static File buildFilePath(JobPhase jobPhase, String jobId, String partnerId, FileInfo fileInfo) {
-        switch (jobPhase) {
-            case SaveResult:
-                return FileSystem.FusionResult.getFileOnlyKeyColumns(jobId);
-
-            default:
-                return FileSystem.JobTemp.getFile(jobId, jobPhase, partnerId, fileInfo.filename);
-        }
+        return FileSystem.JobTemp.getFile(jobId, jobPhase, partnerId, fileInfo.filename);
     }
 
 

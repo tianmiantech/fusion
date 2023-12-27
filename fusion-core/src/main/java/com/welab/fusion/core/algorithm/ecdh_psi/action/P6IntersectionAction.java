@@ -56,7 +56,7 @@ public class P6IntersectionAction extends AbstractJobPhaseAction<EcdhPsiJob> {
     protected void doAction() throws Exception {
         FusionResult result = job.getJobResult();
         LongAdder fruitCount = new LongAdder();
-        File resultFile = FileSystem.FusionResult.getFileOnlyKeyColumns(job.getJobId());
+        File resultFile = FileSystem.JobTemp.getFileOnlyKeyColumns(job.getJobId());
 
         HashConfig hashConfig = job.getMyself().dataResourceInfo.hashConfig;
         String headLine = hashConfig.getIdHeadersForCsv() + System.lineSeparator();

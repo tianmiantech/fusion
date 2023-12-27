@@ -46,7 +46,7 @@ public class DownloadPartnerFileFunctionImpl implements DownloadPartnerFileFunct
                         .PsiSecondaryECEncryptedData
                         .getDataFile(jobId);
             case SaveResult:
-                return FileSystem.FusionResult.getFileOnlyKeyColumns(jobId);
+                return FileSystem.JobTemp.getFileOnlyKeyColumns(jobId);
             default:
                 return null;
         }

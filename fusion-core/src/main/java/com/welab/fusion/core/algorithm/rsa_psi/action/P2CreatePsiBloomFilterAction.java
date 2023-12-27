@@ -34,7 +34,7 @@ import java.util.UUID;
 public class P2CreatePsiBloomFilterAction extends AbstractJobPhaseAction<RsaPsiJob> {
     @Override
     protected void doAction() throws Exception {
-        CsvTableDataSourceReader reader = new CsvTableDataSourceReader(job.getMyself().allOriginalData);
+        CsvTableDataSourceReader reader = new CsvTableDataSourceReader(job.getTempJobData().allOriginalData);
         HashConfig hashConfig = job.getMyself().dataResourceInfo.hashConfig;
 
         phaseProgress.setMessage("正在生成过滤器...");

@@ -34,7 +34,7 @@ public class P2EncryptMyselfDataAction extends AbstractJobPhaseAction<EcdhPsiJob
 
     @Override
     protected void doAction() throws Exception {
-        CsvTableDataSourceReader reader = new CsvTableDataSourceReader(job.getMyself().allOriginalData);
+        CsvTableDataSourceReader reader = new CsvTableDataSourceReader(job.getTempJobData().allOriginalData);
         HashConfig hashConfig = job.getMyself().dataResourceInfo.hashConfig;
 
         phaseProgress.setMessage("正在对我方数据进行加密...");

@@ -24,6 +24,7 @@ import com.welab.wefe.common.util.FileUtil;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.util.HashSet;
 import java.util.List;
 
@@ -44,8 +45,9 @@ public class P5DownloadIntersectionAction extends AbstractJobPhaseAction<RsaPsiJ
         FusionResult result = job.getJobResult();
 
         if (job.getMyJobRole() == JobRole.follower) {
-            result.resultFileOnlyKey = super.downloadFileFromPartner("正在从合作方下载交集...");
-            result.fusionCount = FileUtil.getFileLineCount(result.resultFileOnlyKey);
+            File file = super.downloadFileFromPartner("正在从合作方下载交集...");
+            job.getTempJobData().resultFileOnlyKey = file;
+            result.fusionCount = FileUtil.getFileLineCount(file);
         }
 
         phaseProgress.updateTotalWorkload(result.fusionCount);
@@ -56,7 +58,7 @@ public class P5DownloadIntersectionAction extends AbstractJobPhaseAction<RsaPsiJ
         int partitionIndex = 0;
         while (true) {
             List<String> partition = FileUtil.readPartitionLines(
-                    job.getJobResult().resultFileOnlyKey,
+                    job.getTempJobData().resultFileOnlyKey,
                     partitionIndex,
                     batchSize,
                     false
@@ -79,7 +81,7 @@ public class P5DownloadIntersectionAction extends AbstractJobPhaseAction<RsaPsiJ
 
     private void expandOnePartition(List<String> partition) throws Exception {
         HashSet<String> set = new HashSet<>(partition);
-        try (BufferedReader reader = FileUtil.buildBufferedReader(job.getMyself().allOriginalData)) {
+        try (BufferedReader reader = FileUtil.buildBufferedReader(job.getTempJobData().allOriginalData)) {
             while (true) {
                 String line = reader.readLine();
                 if (line == null) {

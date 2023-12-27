@@ -82,7 +82,7 @@ public class P8SaveResultAction extends AbstractJobPhaseAction<RsaPsiJob> {
         int partitionIndex = 0;
         while (true) {
             List<LinkedHashMap<String, Object>> partition = FileUtil.readPartitionRows(
-                    job.getMyself().intersectionOriginalData,
+                    job.getTempJobData().intersectionOriginalData,
                     partitionIndex,
                     batchSize
             );
@@ -126,7 +126,7 @@ public class P8SaveResultAction extends AbstractJobPhaseAction<RsaPsiJob> {
     }
 
     private LinkedHashMap<String, Object> findPartnerRow(String key) throws IOException {
-        File file = job.getJobResult().resultFileWithPartnerAdditionalColumns;
+        File file = job.getTempJobData().resultFileWithPartnerAdditionalColumns;
         CsvReader reader = new CsvReader();
         reader.setContainsHeader(false);
         reader.setSkipEmptyRows(true);

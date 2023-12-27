@@ -31,7 +31,7 @@ public class P7DownloadIntersectionAction extends AbstractJobPhaseAction<RsaPsiJ
 
     @Override
     protected void doAction() throws Exception {
-        job.getJobResult().resultFileOnlyKey = super.downloadFileFromPartner("正在从合作方下载交集...");
+        job.getTempJobData().resultFileOnlyKey = super.downloadFileFromPartner("正在从合作方下载交集...");
     }
 
     @Override

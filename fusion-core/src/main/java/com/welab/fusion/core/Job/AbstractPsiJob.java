@@ -19,8 +19,8 @@ import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.StrUtil;
 import com.welab.fusion.core.algorithm.AbstractJobFlow;
 import com.welab.fusion.core.algorithm.JobPhase;
-import com.welab.fusion.core.algorithm.base.phase_action.AbstractJobPhaseAction;
 import com.welab.fusion.core.algorithm.base.PsiAlgorithm;
+import com.welab.fusion.core.algorithm.base.phase_action.AbstractJobPhaseAction;
 import com.welab.fusion.core.data_resource.base.DataResourceType;
 import com.welab.fusion.core.io.FileSystem;
 import com.welab.fusion.core.progress.JobProgress;
@@ -43,6 +43,7 @@ public abstract class AbstractPsiJob implements Closeable {
     protected final Logger LOG = LoggerFactory.getLogger(this.getClass());
 
     private String jobId;
+    private TempJobData tempJobData = new TempJobData();
     private AbstractJobMember myself;
     private AbstractJobMember partner;
     private JobProgress myProgress = new JobProgress();
@@ -312,6 +313,11 @@ public abstract class AbstractPsiJob implements Closeable {
     }
 
     // region getter/setter
+
+
+    public TempJobData getTempJobData() {
+        return tempJobData;
+    }
 
     public void setMyRole(JobRole jobRole) {
         this.jobRole = jobRole;

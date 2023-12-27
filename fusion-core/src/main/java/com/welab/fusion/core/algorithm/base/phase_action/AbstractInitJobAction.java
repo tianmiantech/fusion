@@ -89,6 +89,6 @@ public abstract class AbstractInitJobAction<T extends AbstractPsiJob> extends Ab
             CloseableUtils.closeQuietly(job.getMyself().tableDataResourceReader);
         }
 
-        job.getMyself().allOriginalData = file;
+        job.getTempJobData().allOriginalData = file;
     }
 }

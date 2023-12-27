@@ -165,12 +165,12 @@ public abstract class AbstractJobPhaseAction<T extends AbstractPsiJob> {
      * 初始化结果文件：仅包含主键列
      */
     protected BufferedWriter initResultFileOnlyKey() throws Exception {
-        if (job.getJobResult().resultFileOnlyKey != null) {
+        if (job.getTempJobData().resultFileOnlyKey != null) {
             throw new RuntimeException("resultFileOnlyKey is not null");
         }
 
-        File file = FileSystem.FusionResult.getFileOnlyKey(job.getJobId());
-        job.getJobResult().resultFileOnlyKey = file;
+        File file = FileSystem.JobTemp.getFileOnlyKey(job.getJobId());
+        job.getTempJobData().resultFileOnlyKey = file;
 
         return FileUtil.buildBufferedWriter(file, false);
     }
@@ -179,12 +179,12 @@ public abstract class AbstractJobPhaseAction<T extends AbstractPsiJob> {
      * 初始化结果文件：交集部分的原始数据
      */
     protected BufferedWriter initIntersectionOriginalData() throws IOException {
-        if (job.getMyself().intersectionOriginalData != null) {
+        if (job.getTempJobData().intersectionOriginalData != null) {
             throw new RuntimeException("intersectionOriginalData is not null");
         }
 
         File file = FileSystem.JobTemp.getIntersectionOriginalData(job.getJobId());
-        job.getMyself().intersectionOriginalData = file;
+        job.getTempJobData().intersectionOriginalData = file;
 
         BufferedWriter writer = FileUtil.buildBufferedWriter(file, false);
         writer.write(

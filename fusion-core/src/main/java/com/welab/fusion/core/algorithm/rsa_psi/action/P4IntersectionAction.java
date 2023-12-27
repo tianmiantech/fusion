@@ -105,7 +105,7 @@ public class P4IntersectionAction extends AbstractJobPhaseAction<RsaPsiJob> {
         });
 
         // 从数据源逐条读取数据集并编码
-        CsvTableDataSourceReader reader = new CsvTableDataSourceReader(job.getMyself().allOriginalData);
+        CsvTableDataSourceReader reader = new CsvTableDataSourceReader(job.getTempJobData().allOriginalData);
         reader.readRows((index, row) -> {
 
             RsaPsiRecord record = new RsaPsiRecord();

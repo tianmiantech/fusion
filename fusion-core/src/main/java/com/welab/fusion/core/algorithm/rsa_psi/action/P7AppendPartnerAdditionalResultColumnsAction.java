@@ -31,7 +31,7 @@ public class P7AppendPartnerAdditionalResultColumnsAction extends AbstractJobPha
 
     @Override
     protected void doAction() throws Exception {
-        job.getJobResult().resultFileWithPartnerAdditionalColumns = super.downloadFileFromPartner("正在从合作方下载附加结果字段..");
+        job.getTempJobData().resultFileWithPartnerAdditionalColumns = super.downloadFileFromPartner("正在从合作方下载附加结果字段..");
     }
 
     @Override

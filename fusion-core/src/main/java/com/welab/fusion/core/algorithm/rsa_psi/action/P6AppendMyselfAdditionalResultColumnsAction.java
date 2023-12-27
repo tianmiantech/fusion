@@ -54,7 +54,7 @@ public class P6AppendMyselfAdditionalResultColumnsAction extends AbstractJobPhas
         LinkedHashSet<String> header = getHeader();
         try (BufferedWriter writer = initFile()) {
 
-            try (CsvTableDataSourceReader reader = new CsvTableDataSourceReader(job.getMyself().intersectionOriginalData)) {
+            try (CsvTableDataSourceReader reader = new CsvTableDataSourceReader(job.getTempJobData().intersectionOriginalData)) {
                 reader.readRows((index, row) -> {
                     try {
                         writer.write(
@@ -91,13 +91,13 @@ public class P6AppendMyselfAdditionalResultColumnsAction extends AbstractJobPhas
      * 初始化结果文件：包含我方附加列
      */
     private BufferedWriter initFile() throws Exception {
-        if (job.getJobResult().resultFileWithMyselfAdditionalColumns != null) {
+        if (job.getTempJobData().resultFileWithMyselfAdditionalColumns != null) {
             throw new RuntimeException("resultFileWithMyselfAdditionalColumns is not null");
         }
 
         // 初始化结果文件
-        File file = FileSystem.FusionResult.getFileWithMyselfAdditionalColumns(job.getJobId());
-        job.getJobResult().resultFileWithMyselfAdditionalColumns = file;
+        File file = FileSystem.JobTemp.getFileWithMyselfAdditionalColumns(job.getJobId());
+        job.getTempJobData().resultFileWithMyselfAdditionalColumns = file;
 
         BufferedWriter writer = FileUtil.buildBufferedWriter(file, false);
         writer.write(

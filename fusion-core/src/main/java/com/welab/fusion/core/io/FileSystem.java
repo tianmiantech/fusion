@@ -154,6 +154,18 @@ public class FileSystem {
         }
 
 
+        public static File getFileOnlyKey(String jobId) {
+            return getDir(jobId).resolve(jobId + "-only_key.csv").toFile();
+        }
+
+        public static File getFileOnlyKeyColumns(String jobId) {
+            return getDir(jobId).resolve(jobId + "-only_key_columns.csv").toFile();
+        }
+
+        public static File getFileWithMyselfAdditionalColumns(String jobId) {
+            return getDir(jobId).resolve(jobId + "-with_myself_additional_columns.csv").toFile();
+        }
+
         /**
          * 删除目录
          */
@@ -176,18 +188,6 @@ public class FileSystem {
     public static class FusionResult {
         public static File getResultFile(String jobId) {
             return getBaseDir(UseType.FusionResult).resolve(jobId + "-result.csv").toFile();
-        }
-
-        public static File getFileOnlyKey(String jobId) {
-            return getBaseDir(UseType.FusionResult).resolve(jobId + "-only_key.csv").toFile();
-        }
-
-        public static File getFileOnlyKeyColumns(String jobId) {
-            return getBaseDir(UseType.FusionResult).resolve(jobId + "-only_key_columns.csv").toFile();
-        }
-
-        public static File getFileWithMyselfAdditionalColumns(String jobId) {
-            return getBaseDir(UseType.FusionResult).resolve(jobId + "-with_myself_additional_columns.csv").toFile();
         }
     }
 
