@@ -13,11 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.welab.fusion.core.algorithm.rsa_psi.action;
+package com.welab.fusion.core.algorithm.base.phase_action;
 
+import com.welab.fusion.core.Job.AbstractPsiJob;
 import com.welab.fusion.core.algorithm.JobPhase;
-import com.welab.fusion.core.algorithm.base.phase_action.AbstractJobPhaseAction;
-import com.welab.fusion.core.algorithm.rsa_psi.RsaPsiJob;
 import com.welab.fusion.core.hash.HashConfig;
 import com.welab.fusion.core.io.FileSystem;
 import com.welab.fusion.core.util.Constant;
@@ -41,14 +40,14 @@ import java.util.stream.Collectors;
  * @author zane.luo
  * @date 2023/11/13
  */
-public class P8SaveResultAction extends AbstractJobPhaseAction<RsaPsiJob> {
+public class P9SaveResultAction<T extends AbstractPsiJob> extends AbstractJobPhaseAction<T> {
     private static final int batchSize = 100_000;
     private BufferedWriter writer;
     private LinkedHashSet<String> myselfHeader;
     private LinkedHashSet<String> partnerHeader;
     private LongAdder progress = new LongAdder();
 
-    public P8SaveResultAction(RsaPsiJob job) {
+    public P9SaveResultAction(T job) {
         super(job);
     }
 

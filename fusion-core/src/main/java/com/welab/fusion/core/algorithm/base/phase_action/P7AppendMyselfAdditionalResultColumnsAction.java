@@ -13,11 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.welab.fusion.core.algorithm.rsa_psi.action;
+package com.welab.fusion.core.algorithm.base.phase_action;
 
+import com.welab.fusion.core.Job.AbstractPsiJob;
 import com.welab.fusion.core.algorithm.JobPhase;
-import com.welab.fusion.core.algorithm.base.phase_action.AbstractJobPhaseAction;
-import com.welab.fusion.core.algorithm.rsa_psi.RsaPsiJob;
 import com.welab.fusion.core.data_source.CsvTableDataSourceReader;
 import com.welab.fusion.core.io.FileSystem;
 import com.welab.fusion.core.util.Constant;
@@ -33,11 +32,8 @@ import java.util.LinkedHashSet;
  * @author zane.luo
  * @date 2023/12/26
  */
-public class P6AppendMyselfAdditionalResultColumnsAction extends AbstractJobPhaseAction<RsaPsiJob> {
-    private static final int batchSize = 100_000;
-
-
-    public P6AppendMyselfAdditionalResultColumnsAction(RsaPsiJob job) {
+public class P7AppendMyselfAdditionalResultColumnsAction<T extends AbstractPsiJob> extends AbstractJobPhaseAction<T> {
+    public P7AppendMyselfAdditionalResultColumnsAction(T job) {
         super(job);
     }
 

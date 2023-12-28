@@ -18,10 +18,12 @@ package com.welab.fusion.core.algorithm.rsa_psi.action;
 import cn.hutool.core.codec.Base64;
 import com.welab.fusion.core.Job.JobRole;
 import com.welab.fusion.core.algorithm.JobPhase;
+import com.welab.fusion.core.algorithm.base.phase_action.AbstractIntersectionAction;
 import com.welab.fusion.core.algorithm.base.phase_action.AbstractJobPhaseAction;
 import com.welab.fusion.core.algorithm.rsa_psi.RsaPsiJob;
 import com.welab.fusion.core.algorithm.rsa_psi.RsaPsiRecord;
 import com.welab.fusion.core.data_source.CsvTableDataSourceReader;
+import com.welab.fusion.core.hash.HashConfig;
 import com.welab.fusion.core.util.PsiUtils;
 import com.welab.wefe.common.BatchConsumer;
 import com.welab.wefe.common.exception.StatusCodeWithException;
@@ -38,7 +40,7 @@ import java.util.stream.Collectors;
  * @author zane.luo
  * @date 2023/11/13
  */
-public class P4IntersectionAction extends AbstractJobPhaseAction<RsaPsiJob> {
+public class P4IntersectionAction extends AbstractIntersectionAction<RsaPsiJob> {
     private static final int batchSize = 50000;
     /**
      * E
@@ -53,9 +55,6 @@ public class P4IntersectionAction extends AbstractJobPhaseAction<RsaPsiJob> {
      */
     private LongAdder fruitCount = new LongAdder();
     private BufferedWriter writerForOnlyKey;
-
-    private BufferedWriter writerForWithAdditionalColumns;
-    private LinkedHashSet<String> resultHeaderWithAdditionalColumns;
 
     public P4IntersectionAction(RsaPsiJob job) {
         super(job);
@@ -75,7 +74,6 @@ public class P4IntersectionAction extends AbstractJobPhaseAction<RsaPsiJob> {
 
         // 释放资源
         this.writerForOnlyKey.close();
-        this.writerForWithAdditionalColumns.close();
 
         job.getJobResult().fusionCount = fruitCount.longValue();
     }
@@ -132,13 +130,10 @@ public class P4IntersectionAction extends AbstractJobPhaseAction<RsaPsiJob> {
      * 将结果写入文件
      */
     private void saveFruits(List<RsaPsiRecord> fruits) throws IOException {
+        HashConfig hashConfig = job.getMyself().dataResourceInfo.hashConfig;
         for (RsaPsiRecord record : fruits) {
             this.writerForOnlyKey.write(
-                    job.getMyself().dataResourceInfo.hashConfig.hash(record.row)
-            );
-
-            writerForWithAdditionalColumns.write(
-                    super.rowToCsvLine(resultHeaderWithAdditionalColumns, record.row)
+                    hashConfig.hash(record.row) + System.lineSeparator()
             );
         }
     }

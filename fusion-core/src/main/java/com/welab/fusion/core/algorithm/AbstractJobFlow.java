@@ -16,7 +16,7 @@
 package com.welab.fusion.core.algorithm;
 
 import com.welab.fusion.core.Job.AbstractPsiJob;
-import com.welab.fusion.core.algorithm.base.phase_action.AbstractJobPhaseAction;
+import com.welab.fusion.core.algorithm.base.phase_action.*;
 
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
@@ -34,6 +34,11 @@ public abstract class AbstractJobFlow {
     private LinkedHashMap<JobPhase, Class<? extends AbstractJobPhaseAction>> phaseActionMap;
 
     public AbstractJobFlow(LinkedHashMap<JobPhase, Class<? extends AbstractJobPhaseAction>> actionMap) {
+        actionMap.put(JobPhase.DownloadIntersection, P6DownloadIntersectionAction.class);
+        actionMap.put(JobPhase.AppendMyselfAdditionalResultColumns, P7AppendMyselfAdditionalResultColumnsAction.class);
+        actionMap.put(JobPhase.AppendPartnerAdditionalResultColumns, P8AppendPartnerAdditionalResultColumnsAction.class);
+        actionMap.put(JobPhase.SaveResult, P9SaveResultAction.class);
+
         this.flow = Arrays.asList(actionMap.keySet().toArray(new JobPhase[0]));
         this.phaseActionMap = actionMap;
     }

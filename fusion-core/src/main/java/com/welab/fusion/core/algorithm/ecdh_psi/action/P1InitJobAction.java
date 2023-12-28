@@ -15,11 +15,10 @@
  */
 package com.welab.fusion.core.algorithm.ecdh_psi.action;
 
-import com.welab.fusion.core.algorithm.ecdh_psi.EcdhPsiJob;
 import com.welab.fusion.core.Job.AbstractJobMember;
 import com.welab.fusion.core.Job.JobRole;
-import com.welab.fusion.core.algorithm.JobPhase;
-import com.welab.fusion.core.algorithm.base.phase_action.AbstractJobPhaseAction;
+import com.welab.fusion.core.algorithm.base.phase_action.AbstractInitJobAction;
+import com.welab.fusion.core.algorithm.ecdh_psi.EcdhPsiJob;
 import com.welab.fusion.core.data_resource.base.DataResourceInfo;
 import com.welab.fusion.core.data_resource.base.DataResourceType;
 
@@ -33,33 +32,20 @@ import com.welab.fusion.core.data_resource.base.DataResourceType;
  * @author zane.luo
  * @date 2023/11/13
  */
-public class P1ConfirmMemberRoleAction extends AbstractJobPhaseAction<EcdhPsiJob> {
-    public P1ConfirmMemberRoleAction(EcdhPsiJob job) {
+public class P1InitJobAction extends AbstractInitJobAction<EcdhPsiJob> {
+    public P1InitJobAction(EcdhPsiJob job) {
         super(job);
-    }
-
-    @Override
-    protected boolean skipThisAction() {
-        return false;
     }
 
     @Override
     public void doAction() throws Exception {
         JobRole role = consultMyRole();
         job.setMyRole(role);
-
         phaseProgress.setMessage("协商完毕，我方角色：" + role);
+
+        super.loadOriginalDataToJobWorkspace();
     }
 
-    @Override
-    public JobPhase getPhase() {
-        return JobPhase.InitJob;
-    }
-
-    @Override
-    public long getTotalWorkload() {
-        return 1;
-    }
 
     /**
      * 协商我方身份

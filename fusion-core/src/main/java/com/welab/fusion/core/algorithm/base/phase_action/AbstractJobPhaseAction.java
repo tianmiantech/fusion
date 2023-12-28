@@ -140,6 +140,7 @@ public abstract class AbstractJobPhaseAction<T extends AbstractPsiJob> {
         // 输出主键相关字段
         HashConfig hashConfig = job.getMyself().dataResourceInfo.hashConfig;
         LinkedHashSet<String> csvHeader = new LinkedHashSet<>();
+        csvHeader.add(Constant.INDEX_COLUMN_NAME);
         csvHeader.add(Constant.KEY_COLUMN_NAME);
         csvHeader.addAll(hashConfig.getIdHeadersForCsv());
 
@@ -160,42 +161,6 @@ public abstract class AbstractJobPhaseAction<T extends AbstractPsiJob> {
 
         return csvHeader;
     }
-
-    /**
-     * 初始化结果文件：仅包含主键列
-     */
-    protected BufferedWriter initResultFileOnlyKey() throws Exception {
-        if (job.getTempJobData().resultFileOnlyKey != null) {
-            throw new RuntimeException("resultFileOnlyKey is not null");
-        }
-
-        File file = FileSystem.JobTemp.getFileOnlyKey(job.getJobId());
-        job.getTempJobData().resultFileOnlyKey = file;
-
-        return FileUtil.buildBufferedWriter(file, false);
-    }
-
-    /**
-     * 初始化结果文件：交集部分的原始数据
-     */
-    protected BufferedWriter initIntersectionOriginalData() throws IOException {
-        if (job.getTempJobData().intersectionOriginalData != null) {
-            throw new RuntimeException("intersectionOriginalData is not null");
-        }
-
-        File file = FileSystem.JobTemp.getIntersectionOriginalData(job.getJobId());
-        job.getTempJobData().intersectionOriginalData = file;
-
-        BufferedWriter writer = FileUtil.buildBufferedWriter(file, false);
-        writer.write(
-                headerToCsvLine(
-                        getOriginalHeaderWithAdditionalColumns()
-                )
-        );
-
-        return writer;
-    }
-
 
     protected String headerToCsvLine(LinkedHashSet<String> header) {
         return StringUtil.joinByComma(header) + System.lineSeparator();

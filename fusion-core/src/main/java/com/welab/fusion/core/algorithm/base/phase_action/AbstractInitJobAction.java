@@ -55,9 +55,10 @@ public abstract class AbstractInitJobAction<T extends AbstractPsiJob> extends Ab
     /**
      * 将数据从数据源转运到工作区以 csv 格式存储
      *
-     * 1. 转运时仅保留任务需要用到的字段
+     * 1. 转运时仅保留任务需要用到的字段，减少数据体积。
      * 2. 由于任务过程中可能多次全量读取原始数据，改为读取转运后的 csv 性能更佳。
      * 3. 为避免任务过程中数据源中的数据发生变化，导致结果不一致，所以在任务开始时，将数据源转运到工作区。
+     * 4. ecdh-psi 在求交时得到的交集为密文，使用 index 与原始明文进行映射，所以需要将原始数据保存在工作区，确保映射关系稳定。
      */
     protected void loadOriginalDataToJobWorkspace() throws IOException, StatusCodeWithException {
         if (job.getMyself().dataResourceInfo.dataResourceType != DataResourceType.TableDataSource) {
@@ -77,7 +78,7 @@ public abstract class AbstractInitJobAction<T extends AbstractPsiJob> extends Ab
                     (index, row) -> {
                         try {
                             String key = job.getMyself().dataResourceInfo.hashConfig.hash(row);
-                            String line = key + "," + rowToCsvLine(header, row);
+                            String line = index + "," + key + "," + rowToCsvLine(header, row);
                             writer.write(line);
                         } catch (IOException e) {
                             throw new RuntimeException(e);

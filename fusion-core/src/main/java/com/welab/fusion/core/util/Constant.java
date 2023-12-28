@@ -20,5 +20,7 @@ package com.welab.fusion.core.util;
  * @date 2023/12/27
  */
 public class Constant {
+    public static final String INDEX_COLUMN_NAME = "i__n__d__e__x";
     public static final String KEY_COLUMN_NAME = "k__e__y";
+    public static final int KEY_COLUMN_INDEX = 1;
 }

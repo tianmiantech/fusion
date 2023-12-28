@@ -17,7 +17,7 @@ package com.welab.fusion.core.algorithm.rsa_psi;
 
 import com.welab.fusion.core.algorithm.AbstractJobFlow;
 import com.welab.fusion.core.algorithm.JobPhase;
-import com.welab.fusion.core.algorithm.base.phase_action.AbstractJobPhaseAction;
+import com.welab.fusion.core.algorithm.base.phase_action.*;
 import com.welab.fusion.core.algorithm.rsa_psi.action.*;
 
 import java.util.LinkedHashMap;
@@ -34,10 +34,6 @@ public class RsaPsiJobFlow extends AbstractJobFlow {
         map.put(JobPhase.CreatePsiBloomFilter, P2CreatePsiBloomFilterAction.class);
         map.put(JobPhase.DownloadPsiBloomFilter, P3DownloadPsiBloomFilterAction.class);
         map.put(JobPhase.Intersection, P4IntersectionAction.class);
-        map.put(JobPhase.DownloadIntersection, P5DownloadIntersectionAction.class);
-        map.put(JobPhase.AppendMyselfAdditionalResultColumns, P6AppendMyselfAdditionalResultColumnsAction.class);
-        map.put(JobPhase.AppendPartnerAdditionalResultColumns, P7AppendPartnerAdditionalResultColumnsAction.class);
-        map.put(JobPhase.SaveResult, P8SaveResultAction.class);
     }
 
     public static final RsaPsiJobFlow INSTANCE = new RsaPsiJobFlow();

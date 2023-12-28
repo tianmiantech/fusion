@@ -18,6 +18,7 @@ package com.welab.fusion.core.algorithm.ecdh_psi.elliptic_curve;
 import cn.hutool.core.thread.NamedThreadFactory;
 import cn.hutool.core.thread.ThreadUtil;
 import com.welab.fusion.core.progress.Progress;
+import com.welab.fusion.core.util.Constant;
 import com.welab.wefe.common.util.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,8 +65,14 @@ public class PsiECEncryptedDataConsumer implements BiConsumer<Long, LinkedHashMa
         this.progress = progress;
 
         File file = psiECEncryptedData.getDataFile();
-        this.fileWriter = FileUtil.buildBufferedWriter(file,false);
+        this.fileWriter = FileUtil.buildBufferedWriter(file, false);
 
+        // 写入列头
+        this.fileWriter.write(
+                Constant.INDEX_COLUMN_NAME + ","
+                        + Constant.KEY_COLUMN_NAME
+                        + System.lineSeparator()
+        );
     }
 
     /**
@@ -97,8 +104,21 @@ public class PsiECEncryptedDataConsumer implements BiConsumer<Long, LinkedHashMa
             String encrypted = psiECEncryptedData.encryptMyselfData(key);
             // 将加密后的数据保存到文件
             try {
-                // 这里写入的必须拼接上换行符之后写入，如果分开写入，在并发的影响下，会导致数据错乱。
-                this.fileWriter.append(encrypted + System.lineSeparator());
+
+                /**
+                 * 后续求交得到的交集是密文
+                 * 需要根据 index 找到对应的明文数据
+                 * 所以这里必须把映射关系存起来
+                 */
+                Object indexValue = row.get(Constant.INDEX_COLUMN_NAME);
+                if (indexValue == null) {
+                    indexValue = index;
+                }
+
+                String line = indexValue + "," + encrypted + System.lineSeparator();
+
+                // 这里必须拼接好整行之后一次性写入，如果分开写入，在并发的影响下数据会错乱。
+                this.fileWriter.append(line);
             } catch (IOException e) {
                 LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);
                 error.set(e);

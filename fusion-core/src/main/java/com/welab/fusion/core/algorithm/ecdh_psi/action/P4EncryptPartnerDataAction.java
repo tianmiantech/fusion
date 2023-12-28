@@ -20,13 +20,15 @@ import cn.hutool.core.thread.ThreadUtil;
 import com.welab.fusion.core.algorithm.JobPhase;
 import com.welab.fusion.core.algorithm.base.phase_action.AbstractJobPhaseAction;
 import com.welab.fusion.core.algorithm.ecdh_psi.EcdhPsiJob;
+import com.welab.fusion.core.data_source.CsvTableDataSourceReader;
 import com.welab.fusion.core.io.FileSystem;
+import com.welab.fusion.core.util.Constant;
 import com.welab.wefe.common.util.FileUtil;
-import com.welab.wefe.common.util.StringUtil;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.IOException;
+import java.util.LinkedHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -58,23 +60,14 @@ public class P4EncryptPartnerDataAction extends AbstractJobPhaseAction<EcdhPsiJo
 
     @Override
     protected void doAction() throws Exception {
-        // 初始化输出文件
-        File outputFile = FileSystem
-                .PsiSecondaryECEncryptedData
-                .getDataFile(job.getJobId());
-
-        this.fileWriter = FileUtil.buildBufferedWriter(outputFile, false);
+        this.fileWriter = initFile();
 
         // 读取合作方的加密数据，使用我方秘钥对其二次加密。
         File partnerData = job.getPartner().psiECEncryptedData.getDataFile();
-        try (BufferedReader reader = FileUtil.buildBufferedReader(partnerData)) {
-            while (true) {
-                String line = reader.readLine();
-                if (line == null) {
-                    break;
-                }
-                encryptOne(line);
-            }
+        try (CsvTableDataSourceReader reader = new CsvTableDataSourceReader(partnerData)) {
+            reader.readRows((index, row) -> {
+                encryptOne(row);
+            });
         }
 
         while (isWorking()) {
@@ -82,17 +75,12 @@ public class P4EncryptPartnerDataAction extends AbstractJobPhaseAction<EcdhPsiJo
         }
 
         this.fileWriter.close();
-
-        job.getPartner().secondaryECEncryptedDataFile = outputFile;
-
-        phaseProgress.success();
     }
 
-    private void encryptOne(String line) {
-        // 丢弃空行
-        if (StringUtil.isBlank(line)) {
-            return;
-        }
+    /**
+     * 对一行数据进行二次加密，并将加密结果写入文件。
+     */
+    private void encryptOne(LinkedHashMap<String, Object> row) {
 
         // 避免读取的数据堆积在内存
         while (THREAD_POOL.getQueue().size() > 1000) {
@@ -100,11 +88,14 @@ public class P4EncryptPartnerDataAction extends AbstractJobPhaseAction<EcdhPsiJo
         }
 
         THREAD_POOL.execute(() -> {
-            String encrypted = job.getMyself().psiECEncryptedData.encryptPartnerData(line);
-            // 将加密后的数据保存到文件
+            String key = row.get(Constant.KEY_COLUMN_NAME).toString();
+            String encrypted = job.getMyself().psiECEncryptedData.encryptPartnerData(key);
             try {
-                // 这里写入的必须拼接上换行符之后写入，如果分开写入，在并发的影响下，会导致数据错乱。
-                this.fileWriter.append(encrypted + System.lineSeparator());
+                String line = row.get(Constant.INDEX_COLUMN_NAME) + ","
+                        + encrypted
+                        + System.lineSeparator();
+
+                this.fileWriter.append(line);
             } catch (Exception e) {
                 LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);
             }
@@ -112,6 +103,28 @@ public class P4EncryptPartnerDataAction extends AbstractJobPhaseAction<EcdhPsiJo
             progress.increment();
             phaseProgress.updateCompletedWorkload(progress.longValue());
         });
+    }
+
+    private BufferedWriter initFile() throws IOException {
+        // 初始化输出文件
+        File outputFile = FileSystem
+                .PsiSecondaryECEncryptedData
+                .getDataFile(job.getJobId());
+
+        outputFile.delete();
+        outputFile.getParentFile().mkdirs();
+        job.getPartner().secondaryECEncryptedDataFile = outputFile;
+
+        BufferedWriter writer = FileUtil.buildBufferedWriter(outputFile, false);
+
+        // 写入列头
+        writer.write(
+                Constant.INDEX_COLUMN_NAME + ","
+                        + Constant.KEY_COLUMN_NAME
+                        + System.lineSeparator()
+        );
+
+        return writer;
     }
 
     private boolean isWorking() {

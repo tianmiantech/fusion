@@ -13,30 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.welab.fusion.core.algorithm.rsa_psi.action;
+package com.welab.fusion.core.algorithm.base.phase_action;
 
+import com.welab.fusion.core.Job.AbstractPsiJob;
 import com.welab.fusion.core.Job.FusionResult;
 import com.welab.fusion.core.Job.JobRole;
 import com.welab.fusion.core.algorithm.JobPhase;
-import com.welab.fusion.core.algorithm.base.phase_action.AbstractJobPhaseAction;
-import com.welab.fusion.core.algorithm.rsa_psi.RsaPsiJob;
+import com.welab.fusion.core.io.FileSystem;
+import com.welab.fusion.core.util.Constant;
 import com.welab.wefe.common.util.FileUtil;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 
 /**
  * @author zane.luo
- * @date 2023/12/26
+ * @date 2023/12/28
  */
-public class P5DownloadIntersectionAction extends AbstractJobPhaseAction<RsaPsiJob> {
+public class P6DownloadIntersectionAction<T extends AbstractPsiJob> extends AbstractJobPhaseAction<T> {
     private static final int batchSize = 100_000;
     private BufferedWriter writer;
 
-    public P5DownloadIntersectionAction(RsaPsiJob job) {
+    public P6DownloadIntersectionAction(T job) {
         super(job);
     }
 
@@ -50,10 +52,19 @@ public class P5DownloadIntersectionAction extends AbstractJobPhaseAction<RsaPsiJ
             result.fusionCount = FileUtil.getFileLineCount(file);
         }
 
+        createIntersectionOriginalData(result);
+    }
+
+    /**
+     * 根据求交结果，将全量的明文减少到交集范围的明文。
+     *
+     * 由于明文数据不能传输，所以求交结果为 hash，这里要根据 hash 还原明文，顺便减少后续需要处理的数据量。
+     */
+    private void createIntersectionOriginalData(FusionResult result) throws Exception {
         phaseProgress.updateTotalWorkload(result.fusionCount);
         phaseProgress.setMessage("正在将交集密文还原为我方字段...");
 
-        this.writer = super.initIntersectionOriginalData();
+        this.writer = initIntersectionOriginalData();
 
         int partitionIndex = 0;
         while (true) {
@@ -88,12 +99,33 @@ public class P5DownloadIntersectionAction extends AbstractJobPhaseAction<RsaPsiJ
                     break;
                 }
 
-                String key = line.split(",")[0];
+                String key = line.split(",")[Constant.KEY_COLUMN_INDEX];
                 if (set.contains(key)) {
                     writer.write(line + System.lineSeparator());
                 }
             }
         }
+    }
+
+    /**
+     * 初始化结果文件：交集部分的原始数据
+     */
+    private BufferedWriter initIntersectionOriginalData() throws IOException {
+        if (job.getTempJobData().intersectionOriginalData != null) {
+            throw new RuntimeException("intersectionOriginalData is not null");
+        }
+
+        File file = FileSystem.JobTemp.getIntersectionOriginalData(job.getJobId());
+        job.getTempJobData().intersectionOriginalData = file;
+
+        BufferedWriter writer = FileUtil.buildBufferedWriter(file, false);
+        writer.write(
+                headerToCsvLine(
+                        getOriginalHeaderWithAdditionalColumns()
+                )
+        );
+
+        return writer;
     }
 
     @Override
@@ -103,7 +135,7 @@ public class P5DownloadIntersectionAction extends AbstractJobPhaseAction<RsaPsiJ
 
     @Override
     public long getTotalWorkload() {
-        return 0;
+        return 1;
     }
 
     @Override

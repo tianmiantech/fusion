@@ -15,36 +15,33 @@
  */
 package com.welab.fusion.core.algorithm.ecdh_psi.action;
 
-import com.welab.fusion.core.Job.FusionResult;
 import com.welab.fusion.core.Job.JobRole;
 import com.welab.fusion.core.algorithm.JobPhase;
+import com.welab.fusion.core.algorithm.base.phase_action.AbstractIntersectionAction;
 import com.welab.fusion.core.algorithm.base.phase_action.AbstractJobPhaseAction;
 import com.welab.fusion.core.algorithm.ecdh_psi.EcdhPsiJob;
 import com.welab.fusion.core.algorithm.ecdh_psi.elliptic_curve.EllipticCurve;
+import com.welab.fusion.core.data_source.CsvTableDataSourceReader;
 import com.welab.fusion.core.hash.HashConfig;
 import com.welab.fusion.core.io.FileSystem;
+import com.welab.fusion.core.util.Constant;
 import com.welab.wefe.common.util.FileUtil;
-import com.welab.wefe.common.util.StringUtil;
 import org.bouncycastle.math.ec.ECPoint;
 
-import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.StandardOpenOption;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.LongAdder;
-import java.util.stream.Collectors;
 
 /**
  * @author zane.luo
  * @date 2023/11/13
  */
-public class P6IntersectionAction extends AbstractJobPhaseAction<EcdhPsiJob> {
+public class P6IntersectionAction extends AbstractIntersectionAction<EcdhPsiJob> {
     private static final int batchSize = 100_000;
     LongAdder progress = new LongAdder();
 
@@ -54,81 +51,140 @@ public class P6IntersectionAction extends AbstractJobPhaseAction<EcdhPsiJob> {
 
     @Override
     protected void doAction() throws Exception {
-        FusionResult result = job.getJobResult();
-        LongAdder fruitCount = new LongAdder();
-        File resultFile = FileSystem.JobTemp.getFileOnlyKeyColumns(job.getJobId());
 
+        // 求交
+        File intersection = intersection();
+
+        // 生成供合作方使用的交集文件
+        createIntersectionFile(intersection);
+
+        intersection.delete();
         HashConfig hashConfig = job.getMyself().dataResourceInfo.hashConfig;
-        String headLine = hashConfig.getIdHeadersForCsv() + System.lineSeparator();
+    }
 
-        Files.write(
-                resultFile.toPath(),
-                headLine.getBytes(StandardCharsets.UTF_8),
-                StandardOpenOption.CREATE
-        );
-
-        int partnerPartitionIndex = 0;
+    /**
+     * 生成供合作方使用的交集文件（在安全性上可暴露、可传输）
+     */
+    private void createIntersectionFile(File indexListFile) throws Exception {
+        BufferedWriter writer = super.initResultFileOnlyKey();
+        int partitionIndex = 0;
         while (true) {
-            Set<ECPoint> partnerPartition = readPartnerPartition(partnerPartitionIndex);
-            partnerPartitionIndex++;
+            List<String> partition = FileUtil.readPartitionLines(
+                    job.getTempJobData().resultFileOnlyKey,
+                    partitionIndex,
+                    batchSize,
+                    false
+            );
+            partitionIndex++;
+            if (partition.isEmpty()) {
+                break;
+            }
+
+            // 得到的交集信息是我方数据的索引
+            // LinkedList<String> indexList = matchOnePartition(partition);
+
+
+            // 交集写入文件
+            // for (String line : indexList) {
+            //     writer.write(line + System.lineSeparator());
+            // }
+
+            if (partition.size() < batchSize) {
+                break;
+            }
+        }
+        //
+        // try (CsvTableDataSourceReader reader = new CsvTableDataSourceReader(indexListFile)) {
+        //     try (BufferedWriter writer = FileUtil.buildBufferedWriter(intersectionFile, false)) {
+        //         reader.readRows(
+        //                 (index, row) -> {
+        //                     String line = row.get(Constant.INDEX_COLUMN_NAME).toString();
+        //                     try {
+        //                         writer.write(line + System.lineSeparator());
+        //                     } catch (IOException e) {
+        //                         throw new RuntimeException(e);
+        //                     }
+        //                 }
+        //         );
+        //     }
+        // }
+        //
+        // job.getTempJobData().resultFileOnlyKey = intersectionFile;
+    }
+
+
+    /**
+     * @return 交集文件，其内容为我方原始数据的索引。
+     */
+    private File intersection() throws Exception {
+        long count1 = job.getMyself().dataResourceInfo.dataCount;
+        long count2 = job.getPartner().dataResourceInfo.dataCount;
+        phaseProgress.updateTotalWorkload(count1 * count2);
+
+        // 这里使用密文进行求交，交集结果储存数据对应明文数据的索引。
+        File file = FileSystem.JobTemp
+                .getDir(job.getJobId())
+                .resolve("intersection-index.data")
+                .toFile();
+
+        BufferedWriter writer = FileUtil.buildBufferedWriter(file, false);
+        LongAdder fruitCount = new LongAdder();
+
+        int partitionIndex = 0;
+        while (true) {
+            Set<ECPoint> partnerPartition = readPartnerPartition(partitionIndex);
+            partitionIndex++;
             if (partnerPartition.isEmpty()) {
                 break;
             }
 
-            LinkedList<ECPoint> points = matchOnePartition(partnerPartition);
+            // 得到的交集信息是我方数据的索引
+            LinkedList<String> indexList = matchOnePartition(partnerPartition);
+            fruitCount.add(indexList.size());
 
-            List<String> lines = points.stream()
-                    .map(x -> x.toString())
-                    .collect(Collectors.toList());
-
-            // 向 resultFile 中写入交集数据
-            Files.write(
-                    resultFile.toPath(),
-                    lines,
-                    StandardCharsets.UTF_8,
-                    StandardOpenOption.APPEND
-            );
-
-            fruitCount.add(lines.size());
+            // 交集写入文件
+            for (String line : indexList) {
+                writer.write(line + System.lineSeparator());
+            }
 
             if (partnerPartition.size() < batchSize) {
                 break;
             }
         }
+        writer.close();
 
-        result.fusionCount = fruitCount.longValue();
+        job.getJobResult().fusionCount = fruitCount.longValue();
+
+        return file;
     }
 
     /**
      * 从我方读取全量数据与协作方二次加密数据的分片进行碰撞
      */
-    private LinkedList<ECPoint> matchOnePartition(Set<ECPoint> partnerPartition) throws IOException {
-        LinkedList<ECPoint> fruit = new LinkedList<>();
+    private LinkedList<String> matchOnePartition(Set<ECPoint> partnerPartition) throws Exception {
+        LinkedList<String> fruits = new LinkedList<>();
 
         File myFile = job.getMyself().secondaryECEncryptedDataFile;
-        try (BufferedReader reader = FileUtil.buildBufferedReader(myFile)) {
+        try (CsvTableDataSourceReader reader = new CsvTableDataSourceReader(myFile)) {
 
-            while (true) {
-                String line = reader.readLine();
-                if (line == null) {
-                    break;
-                }
+            reader.readRows(
+                    (index, row) -> {
+                        String key = row.get(Constant.KEY_COLUMN_NAME).toString();
+                        ECPoint point = EllipticCurve.INSTANCE.base64ToECPoint(key);
+                        if (partnerPartition.contains(point)) {
+                            fruits.add(
+                                    row.get(Constant.INDEX_COLUMN_NAME).toString()
+                            );
+                        }
 
-                progress.increment();
-                phaseProgress.updateCompletedWorkload(progress.longValue());
+                        progress.increment();
+                        phaseProgress.updateCompletedWorkload(progress.longValue());
+                    }
+            );
 
-                if (StringUtil.isBlank(line)) {
-                    continue;
-                }
-
-                ECPoint point = EllipticCurve.INSTANCE.base64ToECPoint(line);
-                if (partnerPartition.contains(point)) {
-                    fruit.add(point);
-                }
-            }
         }
 
-        return fruit;
+        return fruits;
     }
 
     /**
@@ -136,7 +192,12 @@ public class P6IntersectionAction extends AbstractJobPhaseAction<EcdhPsiJob> {
      */
     private Set<ECPoint> readPartnerPartition(int partitionIndex) throws IOException {
         File file = job.getPartner().secondaryECEncryptedDataFile;
-        List<String> lines = FileUtil.readPartitionLines(file, partitionIndex, batchSize, false);
+        List<String> lines = FileUtil.readPartitionLines(
+                file,
+                partitionIndex,
+                batchSize,
+                false
+        );
 
         Set<ECPoint> result = new HashSet<>(batchSize);
         for (String line : lines) {
@@ -155,9 +216,7 @@ public class P6IntersectionAction extends AbstractJobPhaseAction<EcdhPsiJob> {
 
     @Override
     public long getTotalWorkload() {
-        long count1 = job.getMyself().dataResourceInfo.dataCount;
-        long count2 = job.getPartner().dataResourceInfo.dataCount;
-        return count1 * count2;
+        return 1;
     }
 
     @Override
