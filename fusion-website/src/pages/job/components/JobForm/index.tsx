@@ -98,12 +98,8 @@ const JobForm = forwardRef((props:JobFormPropsInterface, ref) => {
   }
 
   const validateSelfField =  (_: any, value:any)  =>{
-    console.log('validateSelfField',value);
-    
     const result = IsEmptyObject(value)
-    console.log('result',result);
     if(result){
-
       return Promise.reject(new Error('此项不能为空'))
     } else {
       return Promise.resolve()
@@ -165,14 +161,14 @@ const JobForm = forwardRef((props:JobFormPropsInterface, ref) => {
                               ))}
                             </Radio.Group>
                          </Form.Item>
-                         <Form.Item name={'table_data_resource_info'}>
+                         <Form.Item name={'table_data_resource_info'}   rules={[{ validator: validateSelfField }]}>
                          {add_method === 'HttpUpload'?<FileChunkUpload uploadFinishCallBack={prevColumnsChangeCallBack}  disabled={checkFormDisable()}/>:
                             <DataSourceForm prevColumnsChangeCallBack={prevColumnsChangeCallBack} disabled={checkFormDisable()}/>
                           }
                          </Form.Item>
                         </>
                       } else {
-                       return  <Form.Item style={{marginTop:30}} name="bloom_filter_resource_input" label="选择布隆过滤器" rules={[{ validator: validateSelfField }]}>
+                       return  <Form.Item style={{marginTop:30}} name="bloom_filter_resource_input" label="选择布隆过滤器" rules={[formRuleRequire('此行不能为空')]}>
                             <BloomFilterFormItem onBloomFilterSelectedCallBack={onBloomFilterSelectedCallBack}/>
                         </Form.Item>
                       }
