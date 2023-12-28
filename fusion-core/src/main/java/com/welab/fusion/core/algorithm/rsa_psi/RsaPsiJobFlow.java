@@ -15,14 +15,13 @@
  */
 package com.welab.fusion.core.algorithm.rsa_psi;
 
+import com.welab.fusion.core.Job.base.JobPhase;
 import com.welab.fusion.core.algorithm.base.AbstractJobFlow;
 import com.welab.fusion.core.algorithm.base.phase_action.AbstractJobPhaseAction;
 import com.welab.fusion.core.algorithm.rsa_psi.phase.P1InitJobAction;
 import com.welab.fusion.core.algorithm.rsa_psi.phase.P2CreatePsiBloomFilterAction;
 import com.welab.fusion.core.algorithm.rsa_psi.phase.P3DownloadPsiBloomFilterAction;
 import com.welab.fusion.core.algorithm.rsa_psi.phase.P4IntersectionAction;
-import com.welab.fusion.core.Job.base.JobPhase;
-import com.welab.fusion.core.algorithm.rsa_psi.action.*;
 
 import java.util.LinkedHashMap;
 

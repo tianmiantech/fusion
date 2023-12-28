@@ -15,11 +15,9 @@
  */
 package com.welab.fusion.core.algorithm.ecdh_psi;
 
+import com.welab.fusion.core.Job.base.JobPhase;
 import com.welab.fusion.core.algorithm.base.AbstractJobFlow;
 import com.welab.fusion.core.algorithm.base.phase_action.AbstractJobPhaseAction;
-import com.welab.fusion.core.Job.algorithm.ecdh_psi.phase.*;
-import com.welab.fusion.core.Job.base.JobPhase;
-import com.welab.fusion.core.algorithm.ecdh_psi.action.*;
 import com.welab.fusion.core.algorithm.ecdh_psi.phase.*;
 
 import java.util.LinkedHashMap;
