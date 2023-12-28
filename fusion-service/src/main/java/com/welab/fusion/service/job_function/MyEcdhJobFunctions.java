@@ -15,7 +15,7 @@
  */
 package com.welab.fusion.service.job_function;
 
-import com.welab.fusion.core.Job.algorithm.ecdh_psi.EcdhPsiJobFunctions;
+import com.welab.fusion.core.algorithm.ecdh_psi.EcdhPsiJobFunctions;
 
 /**
  * fusion-service 中的 JobFunctions

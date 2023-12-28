@@ -15,7 +15,7 @@
  */
 package com.welab.fusion.service.api.algorithm;
 
-import com.welab.fusion.core.Job.algorithm.base.PsiAlgorithm;
+import com.welab.fusion.core.algorithm.base.PsiAlgorithm;
 import com.welab.wefe.common.web.api.base.AbstractApi;
 import com.welab.wefe.common.web.api.base.Api;
 import com.welab.wefe.common.web.dto.AbstractApiInput;

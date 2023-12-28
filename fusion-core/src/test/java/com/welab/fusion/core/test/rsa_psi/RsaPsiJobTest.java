@@ -17,11 +17,11 @@ package com.welab.fusion.core.test.rsa_psi;
 
 import com.alibaba.fastjson.JSON;
 import com.welab.fusion.core.Job.AbstractPsiJob;
-import com.welab.fusion.core.Job.algorithm.rsa_psi.RsaPsiJob;
-import com.welab.fusion.core.Job.algorithm.rsa_psi.RsaPsiJobFunctions;
-import com.welab.fusion.core.Job.algorithm.rsa_psi.RsaPsiJobMember;
-import com.welab.fusion.core.Job.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
-import com.welab.fusion.core.Job.algorithm.rsa_psi.bloom_filter.PsiBloomFilterCreator;
+import com.welab.fusion.core.algorithm.rsa_psi.RsaPsiJob;
+import com.welab.fusion.core.algorithm.rsa_psi.RsaPsiJobFunctions;
+import com.welab.fusion.core.algorithm.rsa_psi.RsaPsiJobMember;
+import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
+import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilterCreator;
 import com.welab.fusion.core.Job.data_resource.DataResourceInfo;
 import com.welab.fusion.core.Job.data_resource.DataResourceType;
 import com.welab.fusion.core.io.data_source.CsvTableDataSourceReader;

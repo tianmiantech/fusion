@@ -15,7 +15,7 @@
  */
 package com.welab.fusion.service.dto;
 
-import com.welab.fusion.core.Job.algorithm.base.PsiAlgorithm;
+import com.welab.fusion.core.algorithm.base.PsiAlgorithm;
 import com.welab.wefe.common.fieldvalidate.annotation.Check;
 import com.welab.wefe.common.fieldvalidate.secret.MaskStrategy;
 import com.welab.wefe.common.fieldvalidate.secret.Secret;

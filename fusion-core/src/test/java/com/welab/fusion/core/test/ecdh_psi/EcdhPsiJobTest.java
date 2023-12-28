@@ -16,9 +16,9 @@
 package com.welab.fusion.core.test.ecdh_psi;
 
 import com.alibaba.fastjson.JSON;
-import com.welab.fusion.core.Job.algorithm.ecdh_psi.EcdhPsiJob;
-import com.welab.fusion.core.Job.algorithm.ecdh_psi.EcdhPsiJobFunctions;
-import com.welab.fusion.core.Job.algorithm.ecdh_psi.EcdhPsiJobMember;
+import com.welab.fusion.core.algorithm.ecdh_psi.EcdhPsiJob;
+import com.welab.fusion.core.algorithm.ecdh_psi.EcdhPsiJobFunctions;
+import com.welab.fusion.core.algorithm.ecdh_psi.EcdhPsiJobMember;
 import com.welab.fusion.core.Job.data_resource.DataResourceInfo;
 import com.welab.fusion.core.Job.data_resource.DataResourceType;
 import com.welab.fusion.core.io.data_source.CsvTableDataSourceReader;

@@ -15,10 +15,10 @@
  */
 package com.welab.fusion.core.Job.base;
 
-import com.welab.fusion.core.Job.algorithm.base.function.DownloadPartnerFileFunction;
-import com.welab.fusion.core.Job.algorithm.base.function.FinishJobFunction;
-import com.welab.fusion.core.Job.algorithm.rsa_psi.function.GetPartnerProgressFunction;
-import com.welab.fusion.core.Job.algorithm.rsa_psi.function.SaveFusionResultFunction;
+import com.welab.fusion.core.algorithm.base.function.DownloadPartnerFileFunction;
+import com.welab.fusion.core.algorithm.base.function.FinishJobFunction;
+import com.welab.fusion.core.algorithm.rsa_psi.function.GetPartnerProgressFunction;
+import com.welab.fusion.core.algorithm.rsa_psi.function.SaveFusionResultFunction;
 import com.welab.wefe.common.tuple.Tuple2;
 
 import java.util.Arrays;

@@ -16,8 +16,8 @@
 package com.welab.fusion.service.api.download;
 
 import com.welab.fusion.core.Job.base.JobPhase;
-import com.welab.fusion.core.Job.algorithm.ecdh_psi.elliptic_curve.PsiECEncryptedData;
-import com.welab.fusion.core.Job.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
+import com.welab.fusion.core.algorithm.ecdh_psi.elliptic_curve.PsiECEncryptedData;
+import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
 import com.welab.fusion.core.io.FileSystem;
 import com.welab.fusion.service.api.download.base.FileInfo;
 import com.welab.fusion.service.service.JobMemberService;

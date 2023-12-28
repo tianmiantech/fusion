@@ -16,8 +16,8 @@
 package com.welab.fusion.core.util;
 
 import cn.hutool.core.codec.Base64;
-import com.welab.fusion.core.Job.algorithm.rsa_psi.RsaPsiRecord;
-import com.welab.fusion.core.Job.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
+import com.welab.fusion.core.algorithm.rsa_psi.RsaPsiRecord;
+import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
 import org.bouncycastle.math.ec.ECCurve;
 import org.bouncycastle.math.ec.ECPoint;
 import org.slf4j.Logger;

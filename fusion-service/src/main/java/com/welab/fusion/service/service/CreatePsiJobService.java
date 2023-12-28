@@ -16,11 +16,11 @@
 package com.welab.fusion.service.service;
 
 import com.welab.fusion.core.Job.AbstractPsiJob;
-import com.welab.fusion.core.Job.algorithm.ecdh_psi.EcdhPsiJob;
-import com.welab.fusion.core.Job.algorithm.ecdh_psi.EcdhPsiJobMember;
-import com.welab.fusion.core.Job.algorithm.rsa_psi.RsaPsiJob;
-import com.welab.fusion.core.Job.algorithm.rsa_psi.RsaPsiJobMember;
-import com.welab.fusion.core.Job.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
+import com.welab.fusion.core.algorithm.ecdh_psi.EcdhPsiJob;
+import com.welab.fusion.core.algorithm.ecdh_psi.EcdhPsiJobMember;
+import com.welab.fusion.core.algorithm.rsa_psi.RsaPsiJob;
+import com.welab.fusion.core.algorithm.rsa_psi.RsaPsiJobMember;
+import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
 import com.welab.fusion.core.Job.data_resource.DataResourceInfo;
 import com.welab.fusion.core.Job.data_resource.DataResourceType;
 import com.welab.fusion.core.io.FileSystem;
