@@ -18,13 +18,13 @@ package com.welab.fusion.core.algorithm.ecdh_psi.action;
 import com.welab.fusion.core.Job.JobRole;
 import com.welab.fusion.core.algorithm.JobPhase;
 import com.welab.fusion.core.algorithm.base.phase_action.AbstractIntersectionAction;
-import com.welab.fusion.core.algorithm.base.phase_action.AbstractJobPhaseAction;
 import com.welab.fusion.core.algorithm.ecdh_psi.EcdhPsiJob;
 import com.welab.fusion.core.algorithm.ecdh_psi.elliptic_curve.EllipticCurve;
 import com.welab.fusion.core.data_source.CsvTableDataSourceReader;
 import com.welab.fusion.core.hash.HashConfig;
 import com.welab.fusion.core.io.FileSystem;
 import com.welab.fusion.core.util.Constant;
+import com.welab.wefe.common.exception.StatusCodeWithException;
 import com.welab.wefe.common.util.FileUtil;
 import org.bouncycastle.math.ec.ECPoint;
 
@@ -60,56 +60,6 @@ public class P6IntersectionAction extends AbstractIntersectionAction<EcdhPsiJob>
 
         intersection.delete();
         HashConfig hashConfig = job.getMyself().dataResourceInfo.hashConfig;
-    }
-
-    /**
-     * 生成供合作方使用的交集文件（在安全性上可暴露、可传输）
-     */
-    private void createIntersectionFile(File indexListFile) throws Exception {
-        BufferedWriter writer = super.initResultFileOnlyKey();
-        int partitionIndex = 0;
-        while (true) {
-            List<String> partition = FileUtil.readPartitionLines(
-                    job.getTempJobData().resultFileOnlyKey,
-                    partitionIndex,
-                    batchSize,
-                    false
-            );
-            partitionIndex++;
-            if (partition.isEmpty()) {
-                break;
-            }
-
-            // 得到的交集信息是我方数据的索引
-            // LinkedList<String> indexList = matchOnePartition(partition);
-
-
-            // 交集写入文件
-            // for (String line : indexList) {
-            //     writer.write(line + System.lineSeparator());
-            // }
-
-            if (partition.size() < batchSize) {
-                break;
-            }
-        }
-        //
-        // try (CsvTableDataSourceReader reader = new CsvTableDataSourceReader(indexListFile)) {
-        //     try (BufferedWriter writer = FileUtil.buildBufferedWriter(intersectionFile, false)) {
-        //         reader.readRows(
-        //                 (index, row) -> {
-        //                     String line = row.get(Constant.INDEX_COLUMN_NAME).toString();
-        //                     try {
-        //                         writer.write(line + System.lineSeparator());
-        //                     } catch (IOException e) {
-        //                         throw new RuntimeException(e);
-        //                     }
-        //                 }
-        //         );
-        //     }
-        // }
-        //
-        // job.getTempJobData().resultFileOnlyKey = intersectionFile;
     }
 
 
@@ -208,6 +158,56 @@ public class P6IntersectionAction extends AbstractIntersectionAction<EcdhPsiJob>
         return result;
     }
 
+    /**
+     * 生成供合作方使用的交集文件（在安全性上可暴露、可传输）
+     */
+    private void createIntersectionFile(File indexListFile) throws Exception {
+        int partitionIndex = 0;
+        HashConfig hashConfig = job.getMyself().dataResourceInfo.hashConfig;
+
+        try (BufferedWriter writer = super.initResultFileOnlyKey()) {
+            while (true) {
+                List<String> partition = FileUtil.readPartitionLines(
+                        indexListFile,
+                        partitionIndex,
+                        batchSize,
+                        false
+                );
+                partitionIndex++;
+                if (partition.isEmpty()) {
+                    break;
+                }
+
+                writeOnePartition(partition, hashConfig, writer);
+
+
+                if (partition.size() < batchSize) {
+                    break;
+                }
+            }
+        }
+    }
+
+    private void writeOnePartition(List<String> partition, HashConfig hashConfig, BufferedWriter writer) throws IOException, StatusCodeWithException {
+        Set<String> set = new HashSet<>(partition);
+        try (CsvTableDataSourceReader reader = new CsvTableDataSourceReader(job.getTempJobData().allOriginalData)) {
+            reader.readRows(
+                    (index, row) -> {
+                        String lineIndex = row.get(Constant.INDEX_COLUMN_NAME).toString();
+                        if (set.contains(lineIndex)) {
+                            try {
+                                String key = hashConfig.hash(row);
+                                writer.write(key + System.lineSeparator());
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                    }
+            );
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     @Override
     public JobPhase getPhase() {
