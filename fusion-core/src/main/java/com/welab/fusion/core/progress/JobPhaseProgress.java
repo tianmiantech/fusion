@@ -16,8 +16,8 @@
 package com.welab.fusion.core.progress;
 
 import com.alibaba.fastjson.annotation.JSONField;
-import com.welab.fusion.core.Job.JobStatus;
-import com.welab.fusion.core.algorithm.JobPhase;
+import com.welab.fusion.core.Job.base.JobStatus;
+import com.welab.fusion.core.Job.base.JobPhase;
 
 /**
  * 关于某阶段的任务进度

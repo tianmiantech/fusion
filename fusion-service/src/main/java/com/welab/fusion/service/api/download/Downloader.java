@@ -15,7 +15,7 @@
  */
 package com.welab.fusion.service.api.download;
 
-import com.welab.fusion.core.algorithm.JobPhase;
+import com.welab.fusion.core.Job.base.JobPhase;
 import com.welab.fusion.core.io.FileSystem;
 import com.welab.fusion.service.api.download.base.FileInfo;
 import com.welab.fusion.service.service.GatewayService;

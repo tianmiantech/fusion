@@ -17,10 +17,10 @@ package com.welab.fusion.service.api.data_source;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.annotation.JSONField;
-import com.welab.fusion.core.data_source.AbstractTableDataSourceReader;
-import com.welab.fusion.core.data_source.CsvTableDataSourceReader;
-import com.welab.fusion.core.data_source.ExcelTableDataSourceReader;
-import com.welab.fusion.core.data_source.SqlTableDataSourceReader;
+import com.welab.fusion.core.io.data_source.AbstractTableDataSourceReader;
+import com.welab.fusion.core.io.data_source.CsvTableDataSourceReader;
+import com.welab.fusion.core.io.data_source.ExcelTableDataSourceReader;
+import com.welab.fusion.core.io.data_source.SqlTableDataSourceReader;
 import com.welab.fusion.core.io.FileSystem;
 import com.welab.fusion.service.config.fastjson.BlockForPartnerField;
 import com.welab.fusion.service.constans.AddMethod;

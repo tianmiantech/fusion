@@ -16,13 +16,7 @@
 package com.welab.fusion.service.service;
 
 import com.welab.fusion.core.Job.AbstractPsiJob;
-import com.welab.fusion.core.Job.JobStatus;
-import com.welab.fusion.core.algorithm.rsa_psi.RsaPsiJob;
-import com.welab.fusion.core.algorithm.rsa_psi.RsaPsiJobMember;
-import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
-import com.welab.fusion.core.data_resource.base.DataResourceInfo;
-import com.welab.fusion.core.data_resource.base.DataResourceType;
-import com.welab.fusion.core.io.FileSystem;
+import com.welab.fusion.core.Job.base.JobStatus;
 import com.welab.fusion.core.progress.JobProgress;
 import com.welab.fusion.service.api.job.*;
 import com.welab.fusion.service.constans.JobMemberRole;
@@ -37,7 +31,6 @@ import com.welab.fusion.service.dto.JobMemberDataResourceInput;
 import com.welab.fusion.service.dto.base.PagingOutput;
 import com.welab.fusion.service.dto.entity.JobMemberOutputModel;
 import com.welab.fusion.service.dto.entity.JobOutputModel;
-import com.welab.fusion.service.job_function.MyRsaJobFunctions;
 import com.welab.fusion.service.model.FusionJobManager;
 import com.welab.fusion.service.service.base.AbstractService;
 import com.welab.wefe.common.StatusCode;

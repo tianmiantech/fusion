@@ -18,7 +18,7 @@ package com.welab.fusion.service.database.entity;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.vladmihalcea.hibernate.type.json.JsonStringType;
-import com.welab.fusion.core.data_resource.base.DataResourceType;
+import com.welab.fusion.core.Job.data_resource.DataResourceType;
 import com.welab.fusion.core.hash.HashConfig;
 import com.welab.fusion.service.api.job.CreateJobApi;
 import com.welab.fusion.service.constans.JobMemberRole;
@@ -31,7 +31,6 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import java.util.LinkedHashSet;
-import java.util.List;
 
 /**
  * @author zane.luo

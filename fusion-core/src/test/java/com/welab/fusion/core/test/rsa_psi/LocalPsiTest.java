@@ -16,13 +16,13 @@
 package com.welab.fusion.core.test.rsa_psi;
 
 import cn.hutool.core.codec.Base64;
-import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
-import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilterCreator;
-import com.welab.fusion.core.data_source.CsvTableDataSourceReader;
+import com.welab.fusion.core.Job.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
+import com.welab.fusion.core.Job.algorithm.rsa_psi.bloom_filter.PsiBloomFilterCreator;
+import com.welab.fusion.core.io.data_source.CsvTableDataSourceReader;
 import com.welab.fusion.core.hash.HashConfig;
 import com.welab.fusion.core.hash.HashConfigItem;
 import com.welab.fusion.core.hash.HashMethod;
-import com.welab.fusion.core.algorithm.rsa_psi.RsaPsiRecord;
+import com.welab.fusion.core.Job.algorithm.rsa_psi.RsaPsiRecord;
 import com.welab.fusion.core.util.PsiUtils;
 import com.welab.wefe.common.BatchConsumer;
 

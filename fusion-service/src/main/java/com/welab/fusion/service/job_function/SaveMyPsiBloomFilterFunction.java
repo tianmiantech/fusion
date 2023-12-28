@@ -15,8 +15,8 @@
  */
 package com.welab.fusion.service.job_function;
 
-import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
-import com.welab.fusion.core.data_resource.base.DataResourceType;
+import com.welab.fusion.core.Job.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
+import com.welab.fusion.core.Job.data_resource.DataResourceType;
 import com.welab.fusion.service.api.job.CreateJobApi;
 import com.welab.fusion.service.constans.AddMethod;
 import com.welab.fusion.service.database.entity.BloomFilterDbModel;
@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
  * @author zane.luo
  * @date 2023/11/29
  */
-public class SaveMyPsiBloomFilterFunction implements com.welab.fusion.core.algorithm.rsa_psi.function.SaveMyPsiBloomFilterFunction {
+public class SaveMyPsiBloomFilterFunction implements com.welab.fusion.core.Job.algorithm.rsa_psi.function.SaveMyPsiBloomFilterFunction {
     protected final Logger LOG = LoggerFactory.getLogger(this.getClass());
     private static final JobMemberService jobMemberService = Launcher.getBean(JobMemberService.class);
     private static final BloomFilterService bloomFilterService = Launcher.getBean(BloomFilterService.class);

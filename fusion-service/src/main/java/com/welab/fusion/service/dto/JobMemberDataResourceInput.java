@@ -15,15 +15,13 @@
  */
 package com.welab.fusion.service.dto;
 
-import com.welab.fusion.core.data_resource.base.DataResourceType;
+import com.welab.fusion.core.Job.data_resource.DataResourceType;
 import com.welab.fusion.core.hash.HashConfig;
 import com.welab.fusion.service.api.job.CreateJobApi;
 import com.welab.wefe.common.fieldvalidate.annotation.Check;
 import com.welab.wefe.common.web.dto.AbstractApiInput;
 
 import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * @author zane.luo

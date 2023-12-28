@@ -15,8 +15,8 @@
  */
 package com.welab.fusion.service.service;
 
-import com.welab.fusion.core.data_resource.base.DataResourceType;
-import com.welab.fusion.core.data_source.AbstractTableDataSourceReader;
+import com.welab.fusion.core.Job.data_resource.DataResourceType;
+import com.welab.fusion.core.io.data_source.AbstractTableDataSourceReader;
 import com.welab.fusion.service.api.job.SendJobToProviderApi;
 import com.welab.fusion.service.constans.JobMemberRole;
 import com.welab.fusion.service.database.base.MySpecification;
@@ -28,7 +28,6 @@ import com.welab.fusion.service.dto.JobConfigInput;
 import com.welab.fusion.service.dto.JobMemberDataResourceInput;
 import com.welab.fusion.service.service.base.AbstractService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.net.URISyntaxException;

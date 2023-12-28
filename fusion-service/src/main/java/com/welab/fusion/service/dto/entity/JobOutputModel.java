@@ -15,8 +15,8 @@
  */
 package com.welab.fusion.service.dto.entity;
 
-import com.welab.fusion.core.Job.JobStatus;
-import com.welab.fusion.core.algorithm.base.PsiAlgorithm;
+import com.welab.fusion.core.Job.base.JobStatus;
+import com.welab.fusion.core.Job.algorithm.base.PsiAlgorithm;
 import com.welab.fusion.service.constans.JobMemberRole;
 import com.welab.fusion.service.database.entity.JobDbModel;
 import com.welab.wefe.common.fieldvalidate.annotation.Check;

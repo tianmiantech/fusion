@@ -15,7 +15,7 @@
  */
 package com.welab.fusion.core.io;
 
-import com.welab.fusion.core.algorithm.JobPhase;
+import com.welab.fusion.core.Job.base.JobPhase;
 import com.welab.wefe.common.util.FileUtil;
 import com.welab.wefe.common.util.OS;
 import com.welab.wefe.common.util.StringUtil;

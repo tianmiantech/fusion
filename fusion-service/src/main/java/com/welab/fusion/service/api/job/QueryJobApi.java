@@ -15,7 +15,7 @@
  */
 package com.welab.fusion.service.api.job;
 
-import com.welab.fusion.core.Job.JobStatus;
+import com.welab.fusion.core.Job.base.JobStatus;
 import com.welab.fusion.service.constans.JobMemberRole;
 import com.welab.fusion.service.dto.base.PagingInput;
 import com.welab.fusion.service.dto.base.PagingOutput;

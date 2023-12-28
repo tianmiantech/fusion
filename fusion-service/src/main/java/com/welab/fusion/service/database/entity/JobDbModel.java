@@ -17,8 +17,8 @@ package com.welab.fusion.service.database.entity;
 
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
-import com.welab.fusion.core.Job.JobStatus;
-import com.welab.fusion.core.algorithm.base.PsiAlgorithm;
+import com.welab.fusion.core.Job.base.JobStatus;
+import com.welab.fusion.core.Job.algorithm.base.PsiAlgorithm;
 import com.welab.fusion.core.io.FileSystem;
 import com.welab.fusion.core.progress.JobProgress;
 import com.welab.fusion.service.constans.JobMemberRole;

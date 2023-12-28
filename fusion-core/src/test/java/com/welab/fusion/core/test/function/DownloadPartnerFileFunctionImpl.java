@@ -15,10 +15,10 @@
  */
 package com.welab.fusion.core.test.function;
 
-import com.welab.fusion.core.algorithm.JobPhase;
-import com.welab.fusion.core.algorithm.base.function.DownloadPartnerFileFunction;
-import com.welab.fusion.core.algorithm.ecdh_psi.elliptic_curve.PsiECEncryptedData;
-import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
+import com.welab.fusion.core.Job.base.JobPhase;
+import com.welab.fusion.core.Job.algorithm.base.function.DownloadPartnerFileFunction;
+import com.welab.fusion.core.Job.algorithm.ecdh_psi.elliptic_curve.PsiECEncryptedData;
+import com.welab.fusion.core.Job.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
 import com.welab.fusion.core.io.FileSystem;
 
 import java.io.File;

@@ -26,7 +26,7 @@ import com.welab.wefe.common.web.dto.FusionNodeInfo;
  * @author zane.luo
  * @date 2023/11/29
  */
-public class GetPartnerProgressFunction implements com.welab.fusion.core.algorithm.rsa_psi.function.GetPartnerProgressFunction {
+public class GetPartnerProgressFunction implements com.welab.fusion.core.Job.algorithm.rsa_psi.function.GetPartnerProgressFunction {
     private static final GatewayService gatewayService = Launcher.getBean(GatewayService.class);
     private static final JobService jobService = Launcher.getBean(JobService.class);
 

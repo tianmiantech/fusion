@@ -16,7 +16,7 @@
 package com.welab.fusion.service.dto.entity;
 
 import com.alibaba.fastjson.JSONObject;
-import com.welab.fusion.core.data_resource.base.DataResourceType;
+import com.welab.fusion.core.Job.data_resource.DataResourceType;
 import com.welab.fusion.service.api.job.CreateJobApi;
 import com.welab.fusion.service.constans.JobMemberRole;
 import com.welab.fusion.service.database.entity.JobMemberDbModel;

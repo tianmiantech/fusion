@@ -27,7 +27,7 @@ import java.util.List;
  * @author zane.luo
  * @date 2023/11/29
  */
-public class EncryptRsaPsiRecordsFunction implements com.welab.fusion.core.algorithm.rsa_psi.function.EncryptRsaPsiRecordsFunction {
+public class EncryptRsaPsiRecordsFunction implements com.welab.fusion.core.Job.algorithm.rsa_psi.function.EncryptRsaPsiRecordsFunction {
     private static final MemberService memberService = Launcher.getBean(MemberService.class);
     private static final GatewayService gatewayService = Launcher.getBean(GatewayService.class);
 

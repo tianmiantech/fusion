@@ -15,8 +15,8 @@
  */
 package com.welab.fusion.core.test.function;
 
-import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
-import com.welab.fusion.core.algorithm.rsa_psi.function.SaveMyPsiBloomFilterFunction;
+import com.welab.fusion.core.Job.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
+import com.welab.fusion.core.Job.algorithm.rsa_psi.function.SaveMyPsiBloomFilterFunction;
 
 /**
  * @author zane.luo

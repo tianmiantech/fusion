@@ -16,10 +16,10 @@
 package com.welab.fusion.core.test.ecdh_psi;
 
 import com.google.common.io.Files;
-import com.welab.fusion.core.algorithm.ecdh_psi.elliptic_curve.EllipticCurve;
-import com.welab.fusion.core.algorithm.ecdh_psi.elliptic_curve.PsiECEncryptedData;
-import com.welab.fusion.core.algorithm.ecdh_psi.elliptic_curve.PsiECEncryptedDataCreator;
-import com.welab.fusion.core.data_source.CsvTableDataSourceReader;
+import com.welab.fusion.core.Job.algorithm.ecdh_psi.elliptic_curve.EllipticCurve;
+import com.welab.fusion.core.Job.algorithm.ecdh_psi.elliptic_curve.PsiECEncryptedData;
+import com.welab.fusion.core.Job.algorithm.ecdh_psi.elliptic_curve.PsiECEncryptedDataCreator;
+import com.welab.fusion.core.io.data_source.CsvTableDataSourceReader;
 import com.welab.fusion.core.hash.HashConfig;
 import com.welab.fusion.core.hash.HashConfigItem;
 import com.welab.fusion.core.hash.HashMethod;

@@ -15,7 +15,7 @@
  */
 package com.welab.fusion.service.api.job;
 
-import com.welab.fusion.core.data_source.CsvTableDataSourceReader;
+import com.welab.fusion.core.io.data_source.CsvTableDataSourceReader;
 import com.welab.fusion.service.api.data_source.PreviewTableDataSourceApi;
 import com.welab.fusion.service.database.entity.JobDbModel;
 import com.welab.fusion.service.service.JobService;

@@ -15,7 +15,7 @@
  */
 package com.welab.fusion.service.job_function;
 
-import com.welab.fusion.core.algorithm.rsa_psi.RsaPsiJobFunctions;
+import com.welab.fusion.core.Job.algorithm.rsa_psi.RsaPsiJobFunctions;
 
 /**
  * fusion-service 中的 JobFunctions

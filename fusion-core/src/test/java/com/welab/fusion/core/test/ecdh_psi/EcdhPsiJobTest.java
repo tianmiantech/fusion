@@ -16,13 +16,12 @@
 package com.welab.fusion.core.test.ecdh_psi;
 
 import com.alibaba.fastjson.JSON;
-import com.welab.fusion.core.Job.AbstractPsiJob;
-import com.welab.fusion.core.algorithm.ecdh_psi.EcdhPsiJob;
-import com.welab.fusion.core.algorithm.ecdh_psi.EcdhPsiJobFunctions;
-import com.welab.fusion.core.algorithm.ecdh_psi.EcdhPsiJobMember;
-import com.welab.fusion.core.data_resource.base.DataResourceInfo;
-import com.welab.fusion.core.data_resource.base.DataResourceType;
-import com.welab.fusion.core.data_source.CsvTableDataSourceReader;
+import com.welab.fusion.core.Job.algorithm.ecdh_psi.EcdhPsiJob;
+import com.welab.fusion.core.Job.algorithm.ecdh_psi.EcdhPsiJobFunctions;
+import com.welab.fusion.core.Job.algorithm.ecdh_psi.EcdhPsiJobMember;
+import com.welab.fusion.core.Job.data_resource.DataResourceInfo;
+import com.welab.fusion.core.Job.data_resource.DataResourceType;
+import com.welab.fusion.core.io.data_source.CsvTableDataSourceReader;
 import com.welab.fusion.core.hash.HashConfig;
 import com.welab.fusion.core.hash.HashConfigItem;
 import com.welab.fusion.core.hash.HashMethod;

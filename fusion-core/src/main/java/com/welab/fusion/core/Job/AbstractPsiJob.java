@@ -17,11 +17,11 @@ package com.welab.fusion.core.Job;
 
 import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.StrUtil;
-import com.welab.fusion.core.algorithm.AbstractJobFlow;
-import com.welab.fusion.core.algorithm.JobPhase;
-import com.welab.fusion.core.algorithm.base.PsiAlgorithm;
-import com.welab.fusion.core.algorithm.base.phase_action.AbstractJobPhaseAction;
-import com.welab.fusion.core.data_resource.base.DataResourceType;
+import com.welab.fusion.core.Job.base.*;
+import com.welab.fusion.core.Job.algorithm.base.AbstractJobFlow;
+import com.welab.fusion.core.Job.algorithm.base.PsiAlgorithm;
+import com.welab.fusion.core.Job.algorithm.base.phase_action.AbstractJobPhaseAction;
+import com.welab.fusion.core.Job.data_resource.DataResourceType;
 import com.welab.fusion.core.io.FileSystem;
 import com.welab.fusion.core.progress.JobProgress;
 import com.welab.wefe.common.thread.ThreadPool;
@@ -43,7 +43,7 @@ public abstract class AbstractPsiJob implements Closeable {
     protected final Logger LOG = LoggerFactory.getLogger(this.getClass());
 
     private String jobId;
-    private TempJobData tempJobData = new TempJobData();
+    private JobTempData jobTempData = new JobTempData();
     private AbstractJobMember myself;
     private AbstractJobMember partner;
     private JobProgress myProgress = new JobProgress();
@@ -51,7 +51,7 @@ public abstract class AbstractPsiJob implements Closeable {
     private ThreadPool actionSingleThreadExecutor;
     private ThreadPool scheduleSingleThreadExecutor;
     private AbstractJobFunctions jobFunctions;
-    private FusionResult fusionResult;
+    private PsiJobResult psiJobResult;
     private PsiAlgorithm algorithm;
     private AbstractJobFlow jobFlow;
     /**
@@ -69,7 +69,7 @@ public abstract class AbstractPsiJob implements Closeable {
         this.partner = partner;
         this.jobFunctions = jobFunctions;
 
-        this.fusionResult = FusionResult.of(jobId);
+        this.psiJobResult = PsiJobResult.of(jobId);
 
         this.actionSingleThreadExecutor = new ThreadPool("job-" + jobId + "-action-executor");
         this.scheduleSingleThreadExecutor = new ThreadPool("job-" + jobId + "-schedule");
@@ -315,8 +315,8 @@ public abstract class AbstractPsiJob implements Closeable {
     // region getter/setter
 
 
-    public TempJobData getTempJobData() {
-        return tempJobData;
+    public JobTempData getJobTempData() {
+        return jobTempData;
     }
 
     public void setMyRole(JobRole jobRole) {
@@ -335,8 +335,8 @@ public abstract class AbstractPsiJob implements Closeable {
         return jobId;
     }
 
-    public FusionResult getJobResult() {
-        return fusionResult;
+    public PsiJobResult getJobResult() {
+        return psiJobResult;
     }
 
     // endregion

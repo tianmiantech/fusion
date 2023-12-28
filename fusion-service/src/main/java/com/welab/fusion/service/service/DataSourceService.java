@@ -15,7 +15,7 @@
  */
 package com.welab.fusion.service.service;
 
-import com.welab.fusion.core.data_resource.base.DataResourceType;
+import com.welab.fusion.core.Job.data_resource.DataResourceType;
 import com.welab.fusion.service.api.bloom_filter.AddBloomFilterApi;
 import com.welab.fusion.service.api.data_source.SaveDataSourceApi;
 import com.welab.fusion.service.api.data_source.TestDataSourceApi;

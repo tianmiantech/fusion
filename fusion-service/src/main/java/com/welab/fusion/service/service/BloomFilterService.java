@@ -15,11 +15,10 @@
  */
 package com.welab.fusion.service.service;
 
-import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
-import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilterCreator;
-import com.welab.fusion.core.data_source.AbstractTableDataSourceReader;
+import com.welab.fusion.core.Job.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
+import com.welab.fusion.core.Job.algorithm.rsa_psi.bloom_filter.PsiBloomFilterCreator;
+import com.welab.fusion.core.io.data_source.AbstractTableDataSourceReader;
 import com.welab.fusion.core.hash.HashConfig;
-import com.welab.fusion.core.io.FileSystem;
 import com.welab.fusion.core.progress.Progress;
 import com.welab.fusion.service.api.bloom_filter.AddBloomFilterApi;
 import com.welab.fusion.service.api.bloom_filter.QueryBloomFilterApi;
@@ -39,7 +38,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Date;
 

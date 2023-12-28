@@ -16,8 +16,8 @@
 package com.welab.fusion.core.progress;
 
 import com.alibaba.fastjson.JSONObject;
-import com.welab.fusion.core.Job.JobStatus;
-import com.welab.fusion.core.algorithm.JobPhase;
+import com.welab.fusion.core.Job.base.JobStatus;
+import com.welab.fusion.core.Job.base.JobPhase;
 import com.welab.wefe.common.util.JObject;
 
 import java.util.ArrayList;
