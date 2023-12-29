@@ -21,6 +21,7 @@ import com.welab.fusion.core.Job.base.JobPhase;
 import com.welab.wefe.common.util.JObject;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -28,6 +29,10 @@ import java.util.List;
  * @date 2023/11/10
  */
 public class JobProgress {
+    /**
+     * 开始时间
+     */
+    protected Date startTime = new Date();
     public List<JobPhaseProgress> phases = new ArrayList<>();
 
     public void addPhaseProgress(JobPhaseProgress phaseProgress) {
@@ -103,7 +108,6 @@ public class JobProgress {
      */
     public void finish(JobStatus status, String message) {
         getCurrentPhaseProgress().finish(status, message);
-
     }
 
     /**
@@ -119,5 +123,29 @@ public class JobProgress {
 
     public JSONObject toJson() {
         return JObject.create(this);
+    }
+
+    public Date getStartTime() {
+        return startTime;
+    }
+
+    public Date getEndTime() {
+        if (!getJobStatus().isFinished()) {
+            return null;
+        }
+
+        return getCurrentPhaseProgress().getEndTime();
+    }
+
+    /**
+     * 耗时
+     */
+    public long getCostTime() {
+        Date endTime = getEndTime();
+        if (endTime == null) {
+            return System.currentTimeMillis() - startTime.getTime();
+        }
+
+        return endTime.getTime() - startTime.getTime();
     }
 }
