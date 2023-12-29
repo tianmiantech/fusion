@@ -86,7 +86,7 @@ public abstract class AbstractJobPhaseAction<T extends AbstractPsiJob> {
 
             // 初始化当前阶段进度
             if (!skipThisAction) {
-                phaseProgress.updateCompletedWorkload(getTotalWorkload());
+                phaseProgress.updateTotalWorkload(getTotalWorkload());
             }
 
             // 添加当前阶段进度到总进度
