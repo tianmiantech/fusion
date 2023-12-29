@@ -122,12 +122,7 @@ public class JobService extends AbstractService {
 
         jobRepository.save(job);
 
-        if (input.isRequestFromMyself()) {
-            saveJobMember(JobMemberRole.promoter, input);
-        }
-        if (input.isRequestFromPartner()) {
-            saveJobMember(JobMemberRole.provider, input);
-        }
+        saveJobMember(JobMemberRole.promoter, input);
 
         return job.getId();
     }
