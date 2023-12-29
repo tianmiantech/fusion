@@ -121,6 +121,10 @@ public class RsaPsiJobTest {
         jobFunctions.saveFusionResultFunction = (jobId, myRole, result, totalSizeConsumer, downloadSizeConsumer) -> {
             System.out.println(JSON.toJSONString(result, true));
         };
+
+        jobFunctions.finishJobFunction = (jobId, progress) -> {
+            System.out.println("finish job:" + jobId);
+        };
         return jobFunctions;
     }
 

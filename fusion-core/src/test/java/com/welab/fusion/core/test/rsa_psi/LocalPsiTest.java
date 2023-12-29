@@ -18,6 +18,7 @@ package com.welab.fusion.core.test.rsa_psi;
 import cn.hutool.core.codec.Base64;
 import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
 import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilterCreator;
+import com.welab.fusion.core.io.FileSystem;
 import com.welab.fusion.core.io.data_source.CsvTableDataSourceReader;
 import com.welab.fusion.core.hash.HashConfig;
 import com.welab.fusion.core.hash.HashConfigItem;
@@ -41,6 +42,7 @@ public class LocalPsiTest {
     private static HashConfig hashConfig = HashConfig.of(HashConfigItem.of(HashMethod.MD5, "id"));
 
     public static void main(String[] args) throws Exception {
+        FileSystem.init("D:\\data\\fusion\\");
         String csv = "promoter-569.csv";
         File file = new File("D:\\data\\wefe\\" + csv);
 
@@ -70,8 +72,6 @@ public class LocalPsiTest {
                         publicModulus
                 );
 
-
-                System.out.println("fruit size: " + fruit.size());
                 // 更新进度
                 fruitCount.add(fruit.size());
                 progress.add(records.size());
@@ -101,6 +101,8 @@ public class LocalPsiTest {
 
         // 等待消费完成
         consumer.waitForFinishAndClose();
+
+        System.out.println("fruit size: " + fruitCount);
     }
 
     private static PsiBloomFilter createPsiBloomFilter(File file) throws Exception {

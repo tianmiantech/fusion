@@ -19,6 +19,7 @@ import cn.hutool.core.thread.ThreadUtil;
 import com.google.common.base.Charsets;
 import com.google.common.hash.BloomFilter;
 import com.google.common.hash.Funnels;
+import com.welab.fusion.core.io.FileSystem;
 import com.welab.fusion.core.progress.Progress;
 import com.welab.fusion.core.io.data_source.AbstractTableDataSourceReader;
 import com.welab.fusion.core.io.data_source.CsvTableDataSourceReader;
@@ -175,6 +176,7 @@ public class PsiBloomFilterCreator implements Closeable {
      * 测试
      */
     public static void main(String[] args) throws Exception {
+        FileSystem.init("D:\\data\\wefe\\test");
         // MIN_EXPECTED_INSERTIONS = 1_000_000_000;
         File file = new File("D:\\data\\wefe\\ivenn_10w_20210319_vert_promoter.csv");
         // File file = new File("D:\\data\\wefe\\3x100000000rows-miss0-auto_increment.csv");
