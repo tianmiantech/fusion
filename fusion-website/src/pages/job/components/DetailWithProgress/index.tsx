@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { Row,Col,Card, Space,Button, Alert,message } from 'antd';
+import { Row,Col,Card, Space,Button, Alert,message,Descriptions,Badge } from 'antd';
 import useDetail from "../../hooks/useDetail";
 import JobCard from '../JobCard'
 import ReadOnlyDetailItem from '../ReadOnlyDetailItem'
@@ -177,10 +177,31 @@ const Index = ()=>{
       return null
     }
 
+    const renderPublicInfo = ()=>{
+      return <>
+       <Descriptions bordered>
+        <Descriptions.Item label="算法类型">{lodash.get(detailData,'jobDetailData.algorithm','') }</Descriptions.Item>
+        <Descriptions.Item label="创建时间">{lodash.get(detailData,'jobDetailData.created_time') }</Descriptions.Item>
+        <Descriptions.Item label="耗时" >{ lodash.get(detailData,'jobDetailData.cost_time','') }</Descriptions.Item>
+       </Descriptions>
+      </>
+    }
+
+    const renderPublicInfoTitle = ()=>{
+      if(detailData.jobDetailData && detailData.jobDetailData.status === JOB_STATUS.ERROR_ON_RUNNING){
+        return <>任务信息<span style={{color:'red',fontSize:12}}>（{detailData.jobDetailData.message}）</span></>
+      }
+      return '任务信息'
+    }
+
     return <>
-          <Card loading={restartLoading}>
+          <Badge.Ribbon text="Hippies" color="cyan">
+            <Card title={renderPublicInfoTitle()} style={{marginTop:8}}>
+              {renderPublicInfo()}
+            </Card>
+          </Badge.Ribbon>
+          <Card title='多方详情' loading={restartLoading} style={{marginTop:10}}>
               <Row>
-              {renderErrorMsg()}
                 <Col span={12} >
                     <ReadOnlyDetailItem title="发起方" detailInfoData={data.promoterDetail} cardExtra={renderRestartBtn()}/>
                 </Col>
