@@ -25,6 +25,7 @@ import com.welab.wefe.common.fieldvalidate.annotation.Check;
 
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import java.util.LinkedHashSet;
 
 /**
  * @author zane.luo
@@ -47,7 +48,8 @@ public class JobMemberOutputModel extends AbstractOutputModel {
 
     @Check(name = "主键hash生成方法")
     private JSONObject hashConfig;
-
+    @Check(name = "附加结果字段")
+    private LinkedHashSet<String> additionalResultColumns;
     @Check(name = "过滤器Id")
     private String bloomFilterId;
 
@@ -139,6 +141,14 @@ public class JobMemberOutputModel extends AbstractOutputModel {
 
     public void setHashConfig(JSONObject hashConfig) {
         this.hashConfig = hashConfig;
+    }
+
+    public LinkedHashSet<String> getAdditionalResultColumns() {
+        return additionalResultColumns;
+    }
+
+    public void setAdditionalResultColumns(LinkedHashSet<String> additionalResultColumns) {
+        this.additionalResultColumns = additionalResultColumns;
     }
 
     public String getBloomFilterId() {

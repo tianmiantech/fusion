@@ -22,14 +22,12 @@ import com.welab.fusion.core.Job.data_resource.DataResourceType;
 import com.welab.fusion.core.hash.HashConfig;
 import com.welab.fusion.service.api.job.CreateJobApi;
 import com.welab.fusion.service.constans.JobMemberRole;
+import com.welab.fusion.service.database.base.StringSetConverter;
 import com.welab.wefe.common.fieldvalidate.annotation.Check;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
+import javax.persistence.*;
 import java.util.LinkedHashSet;
 
 /**
@@ -56,6 +54,7 @@ public class JobMemberDbModel extends AbstractDbModel {
     private JSONObject hashConfig;
 
     @Check(name = "附加结果字段")
+    @Convert(converter = StringSetConverter.class)
     private LinkedHashSet<String> additionalResultColumns;
 
     @Check(name = "过滤器Id")
