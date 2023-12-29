@@ -84,23 +84,29 @@ public class Downloader {
         tempDir.toFile().delete();
         tempDir.toFile().mkdirs();
 
-        // 分片下载
-        downloadChunks(fileInfo, partner, tempDir);
+        if (fileInfo.fileLength > 0) {
+            // 分片下载
+            downloadChunks(fileInfo, partner, tempDir);
 
-        // 合并分片
-        File file = mergeChunks(tempDir, distFile, fileInfo);
+            // 合并分片
+            mergeChunks(tempDir, distFile, fileInfo);
+        }
+        // 文件大小为0时，直接创建空文件。
+        else {
+            distFile.createNewFile();
+        }
 
         LOG.info("从合作方下载文件完成({})，memberId：{}，jobId：{}，耗时：{}ms", jobPhase, partnerId, jobId, System.currentTimeMillis() - start);
 
-        return file;
+        return distFile;
     }
 
     /**
      * 合并分片
      *
-     * @param dir          分片所在目录
+     * @param dir      分片所在目录
      * @param distFile 合并后的文件路径
-     * @param fileInfo     文件信息
+     * @param fileInfo 文件信息
      */
     private File mergeChunks(Path dir, File distFile, FileInfo fileInfo) throws IOException, StatusCodeWithException {
         File[] parts = dir.toFile().listFiles();
