@@ -67,7 +67,7 @@ public class SaveMyPsiBloomFilterFunction implements com.welab.fusion.core.algor
 
         // 更新自己的数据源类型
         JobMemberDbModel myself = jobMemberService.findMyself(jobId);
-        myself.setDataResourceType(DataResourceType.PsiBloomFilter);
+        // myself.setDataResourceType(DataResourceType.PsiBloomFilter);
         myself.setBloomFilterId(psiBloomFilter.id);
         myself.setUpdatedTimeNow();
         myself.save();
