@@ -114,6 +114,8 @@ public class JobMemberService extends AbstractService {
             }
         }
 
+        input.dataResource.totalDataCount = totalDataCount;
+
         JobMemberDbModel model = findMyself(input.jobId);
         if (model != null) {
             model.setTotalDataCount(totalDataCount);
