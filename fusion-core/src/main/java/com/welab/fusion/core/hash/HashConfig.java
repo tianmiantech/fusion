@@ -16,10 +16,10 @@
 package com.welab.fusion.core.hash;
 
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.annotation.JSONField;
 import com.welab.wefe.common.fieldvalidate.AbstractCheckModel;
 import com.welab.wefe.common.fieldvalidate.annotation.Check;
 import com.welab.wefe.common.util.JObject;
-import com.welab.wefe.common.util.StringUtil;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -48,6 +48,7 @@ public class HashConfig extends AbstractCheckModel {
         return JObject.create(this);
     }
 
+    @JSONField(serialize = false)
     public boolean isEmpty() {
         return list.isEmpty();
     }
@@ -61,6 +62,7 @@ public class HashConfig extends AbstractCheckModel {
     /**
      * 拼接用于输出到 csv 的主键相关字段列表
      */
+    @JSONField(serialize = false)
     public LinkedHashSet<String> getIdHeadersForCsv() {
         LinkedHashSet<String> result = new LinkedHashSet<>();
         for (HashConfigItem item : list) {
