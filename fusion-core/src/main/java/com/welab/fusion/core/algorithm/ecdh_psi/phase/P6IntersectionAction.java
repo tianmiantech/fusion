@@ -31,10 +31,7 @@ import org.bouncycastle.math.ec.ECPoint;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.LongAdder;
 
 /**
@@ -141,16 +138,16 @@ public class P6IntersectionAction extends AbstractIntersectionAction<EcdhPsiJob>
      */
     private Set<ECPoint> readPartnerPartition(int partitionIndex) throws IOException {
         File file = job.getPartner().secondaryECEncryptedDataFile;
-        List<String> lines = FileUtil.readPartitionLines(
+        List<LinkedHashMap<String, Object>> rows = FileUtil.readPartitionRows(
                 file,
                 partitionIndex,
-                batchSize,
-                false
+                batchSize
         );
 
-        Set<ECPoint> result = new HashSet<>(batchSize);
-        for (String line : lines) {
-            ECPoint point = EllipticCurve.INSTANCE.base64ToECPoint(line);
+        Set<ECPoint> result = new HashSet<>(rows.size());
+        for (LinkedHashMap<String, Object> row : rows) {
+            String key = row.get(Constant.KEY_COLUMN_NAME).toString();
+            ECPoint point = EllipticCurve.INSTANCE.base64ToECPoint(key);
             result.add(point);
         }
 
