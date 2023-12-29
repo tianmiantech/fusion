@@ -19,7 +19,7 @@ export const isQianKun = () => {
 // 全局变量
 export function getBaseURL(){
   //return "http://localhost:8080/fusion"
-  return "http://172.31.21.36:7070/fusion"
+  return "http://172.31.21.36:9090/fusion"
   //return "https://xbd-dev.tianmiantech.com/fusion-01"
   if(window._wefeApi){
       /** 提供给客户快速修改请求地址，一般通过修改html head */

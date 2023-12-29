@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { Row,Col,Card, Space,Button, Alert,message,Descriptions,Badge } from 'antd';
+import { Row,Col,Card, Space,Button, Alert,message,Descriptions,Spin } from 'antd';
 import useDetail from "../../hooks/useDetail";
 import JobCard from '../JobCard'
 import ReadOnlyDetailItem from '../ReadOnlyDetailItem'
@@ -194,25 +194,23 @@ const Index = ()=>{
       return '任务信息'
     }
 
-    return <>
-          <Badge.Ribbon text="Hippies" color="cyan">
-            <Card title={renderPublicInfoTitle()} style={{marginTop:8}}>
+    return <Spin spinning={restartLoading}>
+            <Card title={renderPublicInfoTitle()} style={{marginTop:8}} extra={renderResultbtn()}>
               {renderPublicInfo()}
             </Card>
-          </Badge.Ribbon>
-          <Card title='多方详情' loading={restartLoading} style={{marginTop:10}}>
-              <Row>
-                <Col span={12} >
-                    <ReadOnlyDetailItem title="发起方" detailInfoData={data.promoterDetail} cardExtra={renderRestartBtn()}/>
-                </Col>
-                <Col span={12}>
-                    <ReadOnlyDetailItem title='协作方'  detailInfoData={data.providerDetail}/>
-                </Col>
-              </Row>
-          </Card>
-          <Card title='任务进度' style={{marginTop:8}} extra={renderResultbtn()}>
-              <JobProgress promoterPhasesList={data.promoterPhasesList} providerPhasesList={data.providerPhasesList}/>
-          </Card>
+            <Card title='多方详情' style={{marginTop:10}}>
+                <Row>
+                  <Col span={12} >
+                      <ReadOnlyDetailItem title="发起方" detailInfoData={data.promoterDetail} cardExtra={renderRestartBtn()}/>
+                  </Col>
+                  <Col span={12}>
+                      <ReadOnlyDetailItem title='协作方'  detailInfoData={data.providerDetail}/>
+                  </Col>
+                </Row>
+            </Card>
+            <Card title='任务进度' style={{marginTop:8}} >
+                <JobProgress promoterPhasesList={data.promoterPhasesList} providerPhasesList={data.providerPhasesList}/>
+            </Card>
             
             <ResizableTable
               open={data.previewOpen}
@@ -220,6 +218,6 @@ const Index = ()=>{
               columns={data.previewData.columns}
               dataSource={data.previewData.dataSource}
             />
-      </>
+      </Spin>
 }
 export default Index

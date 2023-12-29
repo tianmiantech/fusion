@@ -3,6 +3,7 @@
 import {useState,useImperativeHandle,forwardRef} from 'react'
 import { Button, Drawer,Input,Spin,Form, message,Row } from 'antd'
 import { TmDrawer } from '@tianmiantech/pro';
+import { history } from '@umijs/max';
 import styles from './index.less'
 import { useRequest,useMount } from 'ahooks';
 import { useImmer } from 'use-immer';
@@ -87,6 +88,7 @@ const Index = forwardRef((props,ref)=>{
         okText='保存'
         onOk={runUpdateGlobalConfig}
         loading={getGlobalConfigLaoding||updateGlobalConfigLoading||testPartnerConntentLoading}
+        extra={<Button type="link" style={{color:'white'}} onClick={()=>{history.push('/user/add')}}>新增用户</Button>}
        >
         <Spin spinning={okLoading}>
             <Form  layout="vertical"  form={formRef}>
