@@ -15,10 +15,10 @@
  */
 package com.welab.fusion.core.algorithm.rsa_psi.phase;
 
+import com.welab.fusion.core.Job.base.JobPhase;
+import com.welab.fusion.core.Job.base.JobRole;
 import com.welab.fusion.core.algorithm.base.phase_action.AbstractJobPhaseAction;
 import com.welab.fusion.core.algorithm.rsa_psi.RsaPsiJob;
-import com.welab.fusion.core.Job.base.JobRole;
-import com.welab.fusion.core.Job.base.JobPhase;
 import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
 import com.welab.fusion.core.io.FileSystem;
 import com.welab.wefe.common.InformationSize;
@@ -48,7 +48,7 @@ public class P3DownloadPsiBloomFilterAction extends AbstractJobPhaseAction<RsaPs
 
         phaseProgress.setMessage("正在解压过滤器 zip 文件(" + InformationSize.fromByte(file.length()) + ")...");
         // file 解压至 dir
-        Path dir = FileSystem.PsiBloomFilter.getDir(job.getPartner().memberId.replace(":", "_") + "-" + FileUtil.getFileNameWithoutSuffix(file.getName()));
+        Path dir = FileSystem.JobTemp.getDir(job.getJobId()).resolve(FileUtil.getFileNameWithoutSuffix(file.getName()));
         SuperDecompressor.decompression(file, dir.toAbsolutePath().toString(), false);
 
 

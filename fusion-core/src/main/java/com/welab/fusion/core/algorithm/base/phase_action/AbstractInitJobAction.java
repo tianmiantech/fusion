@@ -19,6 +19,7 @@ import com.welab.fusion.core.Job.AbstractPsiJob;
 import com.welab.fusion.core.Job.base.JobPhase;
 import com.welab.fusion.core.Job.data_resource.DataResourceType;
 import com.welab.fusion.core.io.FileSystem;
+import com.welab.fusion.core.util.Constant;
 import com.welab.wefe.common.exception.StatusCodeWithException;
 import com.welab.wefe.common.util.CloseableUtils;
 import com.welab.wefe.common.util.FileUtil;
@@ -77,9 +78,14 @@ public abstract class AbstractInitJobAction<T extends AbstractPsiJob> extends Ab
             job.getMyself().tableDataResourceReader.readRows(
                     (index, row) -> {
                         try {
+
                             String key = job.getMyself().dataResourceInfo.hashConfig.hash(row);
-                            String line = index + "," + key + "," + rowToCsvLine(header, row);
-                            writer.write(line);
+                            row.put(Constant.INDEX_COLUMN_NAME, index);
+                            row.put(Constant.KEY_COLUMN_NAME, key);
+
+                            writer.write(
+                                    rowToCsvLine(header, row)
+                            );
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }
