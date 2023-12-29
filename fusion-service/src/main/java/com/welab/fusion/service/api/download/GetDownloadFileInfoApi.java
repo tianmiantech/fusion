@@ -62,8 +62,10 @@ public class GetDownloadFileInfoApi extends AbstractApi<GetDownloadFileInfoApi.I
                 return PsiECEncryptedData.of(input.jobId).zip();
             case DownloadSecondaryECEncryptedData:
                 return FileSystem.PsiSecondaryECEncryptedData.getDataFile(input.jobId);
-            case SaveResult:
-                return FileSystem.JobTemp.getFileOnlyKeyColumns(input.jobId);
+            case DownloadIntersection:
+                return FileSystem.JobTemp.getFileOnlyKey(input.jobId);
+            case AppendPartnerAdditionalResultColumns:
+                return FileSystem.JobTemp.getFileWithMyselfAdditionalColumns(input.jobId);
             default:
                 return null;
         }
