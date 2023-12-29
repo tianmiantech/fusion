@@ -17,10 +17,11 @@ package com.welab.fusion.core.algorithm.base.phase_action;
 
 import com.welab.fusion.core.Job.AbstractPsiJob;
 import com.welab.fusion.core.Job.PsiJobResult;
-import com.welab.fusion.core.Job.base.JobRole;
 import com.welab.fusion.core.Job.base.JobPhase;
+import com.welab.fusion.core.Job.base.JobRole;
 import com.welab.fusion.core.io.FileSystem;
 import com.welab.fusion.core.util.Constant;
+import com.welab.wefe.common.util.CloseableUtils;
 import com.welab.wefe.common.util.FileUtil;
 
 import java.io.BufferedReader;
@@ -64,30 +65,34 @@ public class P6DownloadIntersectionAction<T extends AbstractPsiJob> extends Abst
         phaseProgress.updateTotalWorkload(result.fusionCount);
         phaseProgress.setMessage("正在将交集密文还原为我方字段...");
 
-        this.writer = initIntersectionOriginalData();
+        try {
+            this.writer = initIntersectionOriginalData();
 
-        int partitionIndex = 0;
-        while (true) {
-            List<String> partition = FileUtil.readPartitionLines(
-                    job.getJobTempData().resultFileOnlyKey,
-                    partitionIndex,
-                    batchSize,
-                    false
-            );
-            partitionIndex++;
+            int partitionIndex = 0;
+            while (true) {
+                List<String> partition = FileUtil.readPartitionLines(
+                        job.getJobTempData().resultFileOnlyKey,
+                        partitionIndex,
+                        batchSize,
+                        false
+                );
+                partitionIndex++;
 
-            if (partition.isEmpty()) {
-                break;
+                if (partition.isEmpty()) {
+                    break;
+                }
+
+                expandOnePartition(partition);
+
+                if (partition.size() < batchSize) {
+                    break;
+                }
             }
 
-            expandOnePartition(partition);
-
-            if (partition.size() < batchSize) {
-                break;
-            }
+        } finally {
+            CloseableUtils.closeQuietly(this.writer);
         }
 
-        this.writer.close();
     }
 
     private void expandOnePartition(List<String> partition) throws Exception {
