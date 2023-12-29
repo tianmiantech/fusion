@@ -16,13 +16,13 @@
 package com.welab.fusion.core.algorithm.rsa_psi.phase;
 
 import cn.hutool.core.codec.Base64;
+import com.welab.fusion.core.Job.base.JobPhase;
+import com.welab.fusion.core.Job.base.JobRole;
 import com.welab.fusion.core.algorithm.base.phase_action.AbstractIntersectionAction;
 import com.welab.fusion.core.algorithm.rsa_psi.RsaPsiJob;
-import com.welab.fusion.core.Job.base.JobRole;
-import com.welab.fusion.core.Job.base.JobPhase;
 import com.welab.fusion.core.algorithm.rsa_psi.RsaPsiRecord;
-import com.welab.fusion.core.io.data_source.CsvTableDataSourceReader;
 import com.welab.fusion.core.hash.HashConfig;
+import com.welab.fusion.core.io.data_source.CsvTableDataSourceReader;
 import com.welab.fusion.core.util.PsiUtils;
 import com.welab.wefe.common.BatchConsumer;
 import com.welab.wefe.common.exception.StatusCodeWithException;
@@ -39,7 +39,6 @@ import java.util.stream.Collectors;
  * @date 2023/11/13
  */
 public class P4IntersectionAction extends AbstractIntersectionAction<RsaPsiJob> {
-    private static final int batchSize = 50000;
     /**
      * E
      */
@@ -83,8 +82,8 @@ public class P4IntersectionAction extends AbstractIntersectionAction<RsaPsiJob> 
      */
     private void intersection() throws Exception {
         LongAdder progress = new LongAdder();
-        // 批处理
-        BatchConsumer<RsaPsiRecord> consumer = new BatchConsumer<>(batchSize, 5_000, records -> {
+        // 批处理，这里5万数据加密要三分钟，五千数据大概3秒，不要太大，也不要太小。
+        BatchConsumer<RsaPsiRecord> consumer = new BatchConsumer<>(50_000, 5_000, records -> {
             try {
                 List<RsaPsiRecord> fruits = matchOneBatch(records);
 

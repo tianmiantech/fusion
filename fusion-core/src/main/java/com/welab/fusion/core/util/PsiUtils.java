@@ -74,8 +74,8 @@ public class PsiUtils {
         BigInteger cq = psiBloomFilter.rsaPsiParam.getCq();
 
         List<String> result = new ArrayList<>(list.size());
-        for (int i = 0; i < list.size(); i++) {
-            byte[] bytes = Base64.decode(list.get(i));
+        list.parallelStream().forEach(item -> {
+            byte[] bytes = Base64.decode(item);
             BigInteger x = PsiUtils.bytesToBigInteger(bytes, 0, bytes.length);
 
             // crt优化后
@@ -86,7 +86,7 @@ public class PsiUtils {
             byte[] encrypted = PsiUtils.bigIntegerToBytes(y);
             String base64 = Base64.encode(encrypted);
             result.add(base64);
-        }
+        });
 
         return result;
     }
