@@ -73,6 +73,7 @@ public class P4IntersectionAction extends AbstractIntersectionAction<RsaPsiJob> 
         this.writerForOnlyKey.close();
 
         job.getJobResult().fusionCount = fruitCount.longValue();
+        phaseProgress.setMessage("求交完毕，交集：" + fruitCount);
     }
 
     /**

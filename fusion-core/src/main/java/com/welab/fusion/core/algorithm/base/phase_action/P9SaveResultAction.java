@@ -130,7 +130,11 @@ public class P9SaveResultAction<T extends AbstractPsiJob> extends AbstractJobPha
         reader.setContainsHeader(false);
         reader.setSkipEmptyRows(true);
         CsvParser parser = reader.parse(file, StandardCharsets.UTF_8);
-        List<String> header = parser.nextRow().getFields();
+        CsvRow headerRow = parser.nextRow();
+        if (headerRow == null) {
+            return null;
+        }
+        List<String> header = headerRow.getFields();
 
         while (true) {
             CsvRow row = parser.nextRow();

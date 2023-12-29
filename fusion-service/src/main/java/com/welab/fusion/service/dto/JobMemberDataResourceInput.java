@@ -18,6 +18,7 @@ package com.welab.fusion.service.dto;
 import com.welab.fusion.core.Job.data_resource.DataResourceType;
 import com.welab.fusion.core.hash.HashConfig;
 import com.welab.fusion.service.api.job.CreateJobApi;
+import com.welab.wefe.common.exception.StatusCodeWithException;
 import com.welab.wefe.common.fieldvalidate.annotation.Check;
 import com.welab.wefe.common.web.dto.AbstractApiInput;
 
@@ -44,4 +45,18 @@ public class JobMemberDataResourceInput extends AbstractApiInput {
 
     @Check(name = "附加结果字段")
     public LinkedHashSet<String> additionalResultColumns;
+
+    @Override
+    public void checkAndStandardize() throws StatusCodeWithException {
+        super.checkAndStandardize();
+
+        // 去重，主键相关的字段不应该出现在附加结果字段中。
+        if (additionalResultColumns != null) {
+            LinkedHashSet<String> idHeaders = hashConfig.getIdHeadersForCsv();
+            for (String column : idHeaders) {
+                additionalResultColumns.remove(column);
+            }
+        }
+
+    }
 }

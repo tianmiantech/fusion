@@ -59,7 +59,6 @@ public class P6IntersectionAction extends AbstractIntersectionAction<EcdhPsiJob>
         createIntersectionFile(intersection);
 
         intersection.delete();
-        HashConfig hashConfig = job.getMyself().dataResourceInfo.hashConfig;
     }
 
 
@@ -104,7 +103,7 @@ public class P6IntersectionAction extends AbstractIntersectionAction<EcdhPsiJob>
         writer.close();
 
         job.getJobResult().fusionCount = fruitCount.longValue();
-
+        phaseProgress.setMessage("求交完毕，交集：" + fruitCount);
         return file;
     }
 
