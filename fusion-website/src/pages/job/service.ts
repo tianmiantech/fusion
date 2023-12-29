@@ -44,6 +44,7 @@ export interface CreateJobRequestInterface {
         },
         data_resource_type:'TableDataSource'|'PsiBloomFilter'
         hash_config?:{list:HashFormValue[]}
+        additional_result_columns?:string[]
     },
 }
 /**

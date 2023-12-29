@@ -185,7 +185,7 @@ const JobForm = forwardRef((props:JobFormPropsInterface, ref) => {
                       </Form.Item>];
 
                   if(data_resource_type != DATARESOURCE_TYPE.PSI_BLOOM_FILTER){
-                    resultArray.push(<Form.Item name={'additionalResultColumns'} label="附加结果字段" style={{marginTop:20}}>
+                    resultArray.push(<Form.Item name={'additional_result_columns'} label="附加结果字段" style={{marginTop:20}}>
                        <Select mode="multiple" style={{ width: 300 }} placeholder="请选择字段">
                         {jobFormData.dataourceColumnList.map((item:string) => (
                           <Select.Option key={item} value={item}>

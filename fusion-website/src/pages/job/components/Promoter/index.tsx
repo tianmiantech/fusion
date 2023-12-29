@@ -42,7 +42,7 @@ const Index = forwardRef((props:PromoterPropsInterface,ref) => {
   },{ manual:true})
 
   const submitFormData = async () => {
-    const {data_resource_type,hash_config,remark,table_data_resource_info=null,bloom_filter_resource_input=null,algorithm} = await jobFormRef.current?.validateFields();
+    const {data_resource_type,hash_config,remark,table_data_resource_info=null,bloom_filter_resource_input=null,algorithm,additional_result_columns} = await jobFormRef.current?.validateFields();
     const requestParams = {
       remark,
       algorithm,
@@ -50,7 +50,8 @@ const Index = forwardRef((props:PromoterPropsInterface,ref) => {
         data_resource_type,
         hash_config,
         table_data_resource_info,
-        bloom_filter_resource_input
+        bloom_filter_resource_input,
+        additional_result_columns
       }
     }
     runCreateJob(requestParams)

@@ -12,6 +12,7 @@ import { getPrevResult,downloadResult } from "./service";
 import {ResizableTable} from '@/components/DataSetPreview'
 import './index.less'
 import { restartJob } from '@/pages/home/service'
+import TruncatedString from "@/components/TruncatedString";
 
 
 /**
@@ -140,24 +141,28 @@ const Index = ()=>{
       return;
     },{manual:true})
 
-    //如果任务运行成功，则
-    const renderResultbtn = ()=>{
-      if(detailData.jobDetailData && detailData.jobDetailData.status === JOB_STATUS.SUCCESS){
-        return <Space>
-          <Button loading={getPrevResultLoading} onClick={()=>runGetPrevResult(detailData.jobId)}>预览结果</Button>
-          <Button loading={downloadResultLoading}  onClick={()=>{runDownloadResult(detailData.jobId)}}>下载结果</Button>
+    const getLoading = ()=>{
+      if(getPrevResultLoading || downloadResultLoading){
+        return true
+      }
+      return false
+    }
+
+    const renderPublicInfoExtra = ()=>{
+      const status = lodash.get(detailData,'jobDetailData.status','')
+      const btnArray = []
+      if(status === JOB_STATUS.SUCCESS|| status === JOB_STATUS.ERROR_ON_RUNNING|| status === JOB_STATUS.STOP_ON_RUNNING){
+        btnArray.push(<Button type="link" onClick={()=>{restartJobData(detailData.jobId)}}>重新运行</Button>)
+      }
+      //如果任务成功，显示预览结果和下载结果按钮
+      if(status === JOB_STATUS.SUCCESS){
+        btnArray.push(<Button type="link" loading={getPrevResultLoading} onClick={()=>runGetPrevResult(detailData.jobId)}>预览结果</Button>)
+        btnArray.push(<Button type="link" loading={downloadResultLoading}  onClick={()=>{runDownloadResult(detailData.jobId)}}>下载结果</Button>)
+      }
+      return <Space>
+        {btnArray}
         </Space>
-      }
     }
-
-    const renderErrorMsg = ()=>{
-      if(detailData.jobDetailData && detailData.jobDetailData.status === JOB_STATUS.ERROR_ON_RUNNING){
-        return <Col span={24} style={{marginBottom:10}}>
-          <Alert  type="error" message={detailData.jobDetailData.message} />
-          </Col>
-      }
-    }
-
 
     const {run:restartJobData,loading:restartLoading} = useRequest(async (id)=>{
       const reponse = await restartJob(id)
@@ -167,15 +172,7 @@ const Index = ()=>{
           setTimeout(()=>{ window.location.reload()},800)
          
       }
-  },{manual:true})
-
-    const renderRestartBtn = ()=>{
-      const status = lodash.get(detailData,'jobDetailData.status','')
-      if(status === JOB_STATUS.SUCCESS|| status === JOB_STATUS.ERROR_ON_RUNNING|| status === JOB_STATUS.STOP_ON_RUNNING){
-        return <Button type="link" onClick={()=>{restartJobData(detailData.jobId)}}>重新运行</Button>
-      }
-      return null
-    }
+    },{manual:true})
 
     const renderPublicInfo = ()=>{
       return <>
@@ -189,19 +186,19 @@ const Index = ()=>{
 
     const renderPublicInfoTitle = ()=>{
       if(detailData.jobDetailData && detailData.jobDetailData.status === JOB_STATUS.ERROR_ON_RUNNING){
-        return <>任务信息<span style={{color:'red',fontSize:12}}>（{detailData.jobDetailData.message}）</span></>
+        return <>任务信息 <TruncatedString style={{color:'red',fontSize:12}} text={`（${detailData.jobDetailData.message}）`}/></>
       }
       return '任务信息'
     }
 
     return <Spin spinning={restartLoading}>
-            <Card title={renderPublicInfoTitle()} style={{marginTop:8}} extra={renderResultbtn()}>
+            <Card title={renderPublicInfoTitle()} style={{marginTop:8}} extra={renderPublicInfoExtra()}>
               {renderPublicInfo()}
             </Card>
             <Card title='多方详情' style={{marginTop:10}}>
                 <Row>
                   <Col span={12} >
-                      <ReadOnlyDetailItem title="发起方" detailInfoData={data.promoterDetail} cardExtra={renderRestartBtn()}/>
+                      <ReadOnlyDetailItem title="发起方" detailInfoData={data.promoterDetail}/>
                   </Col>
                   <Col span={12}>
                       <ReadOnlyDetailItem title='协作方'  detailInfoData={data.providerDetail}/>
