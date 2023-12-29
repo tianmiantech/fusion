@@ -47,7 +47,7 @@ public class GetDownloadFileInfoApi extends AbstractApi<GetDownloadFileInfoApi.I
         File file = findFile(input);
         if (file == null) {
             StatusCode.PARAMETER_VALUE_INVALID
-                    .throwException("未找到 " + input.jobPhase + " 文件，任务Id：" + input.jobId);
+                    .throwException("未找到 " + input.jobPhase + " 阶段需要的文件，任务Id：" + input.jobId);
         }
         return success(FileInfo.of(file));
     }
