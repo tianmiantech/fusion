@@ -15,9 +15,9 @@
  */
 package com.welab.fusion.core.algorithm.ecdh_psi;
 
-import com.welab.fusion.core.algorithm.ecdh_psi.elliptic_curve.PsiECEncryptedData;
 import com.welab.fusion.core.Job.base.AbstractJobMember;
 import com.welab.fusion.core.Job.data_resource.DataResourceInfo;
+import com.welab.fusion.core.algorithm.ecdh_psi.elliptic_curve.PsiECEncryptedData;
 
 import java.io.File;
 
@@ -35,12 +35,12 @@ public class EcdhPsiJobMember extends AbstractJobMember {
      */
     public File secondaryECEncryptedDataFile;
 
-    public EcdhPsiJobMember(String memberId, String memberName, DataResourceInfo dataResourceInfo) {
-        super(memberId, memberName, dataResourceInfo);
+    public EcdhPsiJobMember(boolean isPromoter, String memberId, String memberName, DataResourceInfo dataResourceInfo) {
+        super(isPromoter, memberId, memberName, dataResourceInfo);
     }
 
-    public static EcdhPsiJobMember of(String memberId, String memberName, DataResourceInfo dataResourceInfo) {
-        return new EcdhPsiJobMember(memberId, memberName, dataResourceInfo);
+    public static EcdhPsiJobMember of(boolean isPromoter, String memberId, String memberName, DataResourceInfo dataResourceInfo) {
+        return new EcdhPsiJobMember(isPromoter, memberId, memberName, dataResourceInfo);
     }
 
 }

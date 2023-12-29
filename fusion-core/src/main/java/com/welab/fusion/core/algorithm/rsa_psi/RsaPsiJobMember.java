@@ -16,9 +16,9 @@
 package com.welab.fusion.core.algorithm.rsa_psi;
 
 import com.welab.fusion.core.Job.base.AbstractJobMember;
-import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
 import com.welab.fusion.core.Job.data_resource.DataResourceInfo;
 import com.welab.fusion.core.Job.data_resource.DataResourceType;
+import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
 
 /**
  * @author zane.luo
@@ -27,15 +27,15 @@ import com.welab.fusion.core.Job.data_resource.DataResourceType;
 public class RsaPsiJobMember extends AbstractJobMember {
     public PsiBloomFilter psiBloomFilter;
 
-    public RsaPsiJobMember(String memberId, String memberName, DataResourceInfo dataResourceInfo) {
-        super(memberId, memberName, dataResourceInfo);
+    public RsaPsiJobMember(boolean isPromoter, String memberId, String memberName, DataResourceInfo dataResourceInfo) {
+        super(isPromoter, memberId, memberName, dataResourceInfo);
     }
 
-    public static RsaPsiJobMember of(String memberId, String memberName, DataResourceInfo dataResourceInfo) {
-        return new RsaPsiJobMember(memberId, memberName, dataResourceInfo);
+    public static RsaPsiJobMember of(boolean isPromoter, String memberId, String memberName, DataResourceInfo dataResourceInfo) {
+        return new RsaPsiJobMember(isPromoter, memberId, memberName, dataResourceInfo);
     }
 
-    public static RsaPsiJobMember of(String memberId, String memberName, PsiBloomFilter psiBloomFilter) {
+    public static RsaPsiJobMember of(boolean isPromoter, String memberId, String memberName, PsiBloomFilter psiBloomFilter) {
         DataResourceInfo dataResourceInfo = DataResourceInfo.of(
                 DataResourceType.PsiBloomFilter,
                 psiBloomFilter.insertedElementCount,
@@ -43,7 +43,7 @@ public class RsaPsiJobMember extends AbstractJobMember {
                 null
         );
 
-        RsaPsiJobMember jobMember = of(memberId, memberName, dataResourceInfo);
+        RsaPsiJobMember jobMember = of(isPromoter, memberId, memberName, dataResourceInfo);
         jobMember.psiBloomFilter = psiBloomFilter;
         return jobMember;
     }

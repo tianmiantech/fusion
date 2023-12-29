@@ -17,21 +17,21 @@ package com.welab.fusion.core.test.rsa_psi;
 
 import com.alibaba.fastjson.JSON;
 import com.welab.fusion.core.Job.AbstractPsiJob;
+import com.welab.fusion.core.Job.data_resource.DataResourceInfo;
+import com.welab.fusion.core.Job.data_resource.DataResourceType;
 import com.welab.fusion.core.algorithm.rsa_psi.RsaPsiJob;
 import com.welab.fusion.core.algorithm.rsa_psi.RsaPsiJobFunctions;
 import com.welab.fusion.core.algorithm.rsa_psi.RsaPsiJobMember;
 import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
 import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilterCreator;
-import com.welab.fusion.core.Job.data_resource.DataResourceInfo;
-import com.welab.fusion.core.Job.data_resource.DataResourceType;
-import com.welab.fusion.core.io.data_source.CsvTableDataSourceReader;
 import com.welab.fusion.core.hash.HashConfig;
 import com.welab.fusion.core.hash.HashConfigItem;
 import com.welab.fusion.core.hash.HashMethod;
 import com.welab.fusion.core.io.FileSystem;
-import com.welab.fusion.core.util.PsiUtils;
+import com.welab.fusion.core.io.data_source.CsvTableDataSourceReader;
 import com.welab.fusion.core.test.function.DownloadPartnerFileFunctionImpl;
 import com.welab.fusion.core.test.function.SaveMyPsiBloomFilterFunctionImpl;
+import com.welab.fusion.core.util.PsiUtils;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -83,10 +83,10 @@ public class RsaPsiJobTest {
         DataResourceInfo dataResourceInfoB = DataResourceInfo.of(DataResourceType.TableDataSource, readerB.getTotalDataRowCount(), hashConfig, null);
 
 
-        memberA = RsaPsiJobMember.of("memberA", "memberA", dataResourceInfoA);
+        memberA = RsaPsiJobMember.of(true, "memberA", "memberA", dataResourceInfoA);
         memberA.tableDataResourceReader = readerA;
 
-        memberB = RsaPsiJobMember.of("memberB", "memberB", dataResourceInfoB);
+        memberB = RsaPsiJobMember.of(false, "memberB", "memberB", dataResourceInfoB);
         memberB.tableDataResourceReader = readerB;
 
         memberAJob = new RsaPsiJob(job_id, memberA, memberB, createAJobFunctions());

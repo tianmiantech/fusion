@@ -16,16 +16,16 @@
 package com.welab.fusion.core.test.ecdh_psi;
 
 import com.alibaba.fastjson.JSON;
+import com.welab.fusion.core.Job.data_resource.DataResourceInfo;
+import com.welab.fusion.core.Job.data_resource.DataResourceType;
 import com.welab.fusion.core.algorithm.ecdh_psi.EcdhPsiJob;
 import com.welab.fusion.core.algorithm.ecdh_psi.EcdhPsiJobFunctions;
 import com.welab.fusion.core.algorithm.ecdh_psi.EcdhPsiJobMember;
-import com.welab.fusion.core.Job.data_resource.DataResourceInfo;
-import com.welab.fusion.core.Job.data_resource.DataResourceType;
-import com.welab.fusion.core.io.data_source.CsvTableDataSourceReader;
 import com.welab.fusion.core.hash.HashConfig;
 import com.welab.fusion.core.hash.HashConfigItem;
 import com.welab.fusion.core.hash.HashMethod;
 import com.welab.fusion.core.io.FileSystem;
+import com.welab.fusion.core.io.data_source.CsvTableDataSourceReader;
 import com.welab.fusion.core.test.function.DownloadPartnerFileFunctionImpl;
 
 import java.io.File;
@@ -73,10 +73,10 @@ public class EcdhPsiJobTest {
         DataResourceInfo dataResourceInfoB = DataResourceInfo.of(DataResourceType.TableDataSource, readerB.getTotalDataRowCount(), hashConfig, null);
 
 
-        memberA = EcdhPsiJobMember.of("memberA", "memberA", dataResourceInfoA);
+        memberA = EcdhPsiJobMember.of(true, "memberA", "memberA", dataResourceInfoA);
         memberA.tableDataResourceReader = readerA;
 
-        memberB = EcdhPsiJobMember.of("memberB", "memberB", dataResourceInfoB);
+        memberB = EcdhPsiJobMember.of(false, "memberB", "memberB", dataResourceInfoB);
         memberB.tableDataResourceReader = readerB;
 
         memberAJob = new EcdhPsiJob(job_id, memberA, memberB, createAJobFunctions());

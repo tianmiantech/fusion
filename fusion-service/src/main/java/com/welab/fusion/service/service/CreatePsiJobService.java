@@ -25,6 +25,7 @@ import com.welab.fusion.core.Job.data_resource.DataResourceInfo;
 import com.welab.fusion.core.Job.data_resource.DataResourceType;
 import com.welab.fusion.core.io.FileSystem;
 import com.welab.fusion.service.api.job.CreateJobApi;
+import com.welab.fusion.service.constans.JobMemberRole;
 import com.welab.fusion.service.database.entity.JobDbModel;
 import com.welab.fusion.service.database.entity.JobMemberDbModel;
 import com.welab.fusion.service.database.entity.MemberDbModel;
@@ -84,6 +85,7 @@ public class CreatePsiJobService extends AbstractService {
         );
 
         EcdhPsiJobMember result = EcdhPsiJobMember.of(
+                jobMember.getRole() == JobMemberRole.promoter,
                 member.getId(),
                 member.getName(),
                 dataResourceInfo
@@ -109,6 +111,7 @@ public class CreatePsiJobService extends AbstractService {
                 jobMember.getAdditionalResultColumns()
         );
         RsaPsiJobMember result = RsaPsiJobMember.of(
+                jobMember.getRole() == JobMemberRole.promoter,
                 member.getId(),
                 member.getName(),
                 dataResourceInfo

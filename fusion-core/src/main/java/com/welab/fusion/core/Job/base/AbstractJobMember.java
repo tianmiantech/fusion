@@ -27,13 +27,15 @@ import java.io.IOException;
  * @date 2023/11/10
  */
 public abstract class AbstractJobMember implements Closeable {
+    public boolean isPromoter;
     public String memberId;
     public String memberName;
     public DataResourceInfo dataResourceInfo;
 
     public AbstractTableDataSourceReader tableDataResourceReader;
 
-    public AbstractJobMember(String memberId, String memberName, DataResourceInfo dataResourceInfo) {
+    public AbstractJobMember(boolean isPromoter, String memberId, String memberName, DataResourceInfo dataResourceInfo) {
+        this.isPromoter = isPromoter;
         this.memberId = memberId;
         this.memberName = memberName;
         this.dataResourceInfo = dataResourceInfo;

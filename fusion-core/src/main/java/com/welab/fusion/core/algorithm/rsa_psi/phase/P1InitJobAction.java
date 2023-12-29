@@ -15,12 +15,12 @@
  */
 package com.welab.fusion.core.algorithm.rsa_psi.phase;
 
-import com.welab.fusion.core.algorithm.rsa_psi.RsaPsiJob;
 import com.welab.fusion.core.Job.base.AbstractJobMember;
 import com.welab.fusion.core.Job.base.JobRole;
-import com.welab.fusion.core.algorithm.base.phase_action.AbstractInitJobAction;
 import com.welab.fusion.core.Job.data_resource.DataResourceInfo;
 import com.welab.fusion.core.Job.data_resource.DataResourceType;
+import com.welab.fusion.core.algorithm.base.phase_action.AbstractInitJobAction;
+import com.welab.fusion.core.algorithm.rsa_psi.RsaPsiJob;
 
 /**
  * 确认成员角色
@@ -87,18 +87,16 @@ public class P1InitJobAction extends AbstractInitJobAction<RsaPsiJob> {
             throw new Exception("不支持双方都为过滤器");
         }
 
-        // 双方数据量相同，根据名称 hash code 判定身份。
+        // 双方数据量相同，谁创建任务谁是 leader。
         // 这种情况角色分配不重要，重要的是多方判定结果一致。
         if (myDataResourceInfo.dataCount == partnerDataResourceInfo.dataCount) {
-            int myHash = myself.memberName.hashCode();
-            int partnerHash = partner.memberName.hashCode();
-            if (myHash == partnerHash) {
-                throw new Exception("双方成员名称不能相同");
+            if (myself.isPromoter == partner.isPromoter) {
+                throw new RuntimeException("错误的任务，双方角色相同");
             }
 
-            return myHash > partnerHash
-                    ? JobRole.follower
-                    : JobRole.leader;
+            return myself.isPromoter
+                    ? JobRole.leader
+                    : JobRole.follower;
         }
 
         // 双方数据量不同，数据量大的生成过滤器。
