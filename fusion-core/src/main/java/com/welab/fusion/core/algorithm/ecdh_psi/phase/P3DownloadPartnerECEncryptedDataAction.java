@@ -43,7 +43,7 @@ public class P3DownloadPartnerECEncryptedDataAction extends AbstractJobPhaseActi
     protected void doAction() throws Exception {
         File file = downloadFileFromPartner("正在下载合作方加密后的数据...");
 
-        phaseProgress.setMessage("正在解压 zip 文件(" + InformationSize.fromByte(file.length()) + ")...");
+        phaseProgress.setMessageAndLog("正在解压 zip 文件(" + InformationSize.fromByte(file.length()) + ")...");
         // file 解压至 dir
         Path dir = file.getParentFile().toPath();
         SuperDecompressor.decompression(file, dir.toAbsolutePath().toString(), false);

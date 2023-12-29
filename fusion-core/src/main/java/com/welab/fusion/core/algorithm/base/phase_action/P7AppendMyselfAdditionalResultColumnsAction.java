@@ -45,7 +45,7 @@ public class P7AppendMyselfAdditionalResultColumnsAction<T extends AbstractPsiJo
      */
     @Override
     protected void doAction() throws Exception {
-        phaseProgress.setMessage("正在拼接我方附加结果列...");
+        phaseProgress.setMessageAndLog("正在拼接我方附加结果列...");
 
         LinkedHashSet<String> header = getHeader();
         try (BufferedWriter writer = initFile()) {

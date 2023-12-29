@@ -63,7 +63,7 @@ public class P6DownloadIntersectionAction<T extends AbstractPsiJob> extends Abst
      */
     private void createIntersectionOriginalData(PsiJobResult result) throws Exception {
         phaseProgress.updateTotalWorkload(result.fusionCount);
-        phaseProgress.setMessage("正在将交集密文还原为我方字段...");
+        phaseProgress.setMessageAndLog("正在将交集密文还原为我方字段...");
 
         try {
             this.writer = initIntersectionOriginalData();

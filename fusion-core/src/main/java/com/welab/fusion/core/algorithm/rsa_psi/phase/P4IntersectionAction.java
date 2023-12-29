@@ -73,7 +73,7 @@ public class P4IntersectionAction extends AbstractIntersectionAction<RsaPsiJob> 
         this.writerForOnlyKey.close();
 
         job.getJobResult().fusionCount = fruitCount.longValue();
-        phaseProgress.setMessage("求交完毕，交集：" + fruitCount);
+        phaseProgress.setMessageAndLog("求交完毕，交集：" + fruitCount);
     }
 
     /**
@@ -98,6 +98,7 @@ public class P4IntersectionAction extends AbstractIntersectionAction<RsaPsiJob> 
                 fruitCount.add(fruits.size());
                 progress.add(records.size());
                 phaseProgress.updateCompletedWorkload(progress.longValue());
+                phaseProgress.setMessage("已找到交集：" + fruitCount);
             } catch (Exception e) {
                 LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);
                 job.finishJobOnException(e);

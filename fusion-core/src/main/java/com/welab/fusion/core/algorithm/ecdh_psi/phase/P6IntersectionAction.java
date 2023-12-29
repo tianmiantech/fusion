@@ -87,6 +87,7 @@ public class P6IntersectionAction extends AbstractIntersectionAction<EcdhPsiJob>
             // 得到的交集信息是我方数据的索引
             LinkedList<String> indexList = matchOnePartition(partnerPartition);
             fruitCount.add(indexList.size());
+            phaseProgress.setMessage("已找到交集：" + fruitCount);
 
             // 交集写入文件
             for (String line : indexList) {
@@ -100,7 +101,7 @@ public class P6IntersectionAction extends AbstractIntersectionAction<EcdhPsiJob>
         writer.close();
 
         job.getJobResult().fusionCount = fruitCount.longValue();
-        phaseProgress.setMessage("求交完毕，交集：" + fruitCount);
+        phaseProgress.setMessageAndLog("求交完毕，交集：" + fruitCount);
         return file;
     }
 

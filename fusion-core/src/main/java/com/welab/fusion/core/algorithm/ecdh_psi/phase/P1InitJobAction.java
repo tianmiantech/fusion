@@ -41,7 +41,7 @@ public class P1InitJobAction extends AbstractInitJobAction<EcdhPsiJob> {
     public void doAction() throws Exception {
         JobRole role = consultMyRole();
         job.setMyRole(role);
-        phaseProgress.setMessage("协商完毕，我方角色：" + role);
+        phaseProgress.setMessageAndLog("协商完毕，我方角色：" + role);
 
         super.loadOriginalDataToJobWorkspace();
     }

@@ -63,7 +63,7 @@ public abstract class AbstractJobPhaseAction<T extends AbstractPsiJob> {
                 0
         );
 
-        this.phaseProgress.setMessage("开始执行阶段动作: " + getPhase().getLabel());
+        this.phaseProgress.setMessageAndLog("开始执行阶段动作: " + getPhase().getLabel());
     }
 
     /**
@@ -115,7 +115,7 @@ public abstract class AbstractJobPhaseAction<T extends AbstractPsiJob> {
      * 从合作方下载文件
      */
     protected File downloadFileFromPartner(String message) throws Exception {
-        phaseProgress.setMessage(message);
+        phaseProgress.setMessageAndLog(message);
         return job.getJobFunctions().downloadPartnerFileFunction.download(
                 getPhase(),
                 job.getJobId(),

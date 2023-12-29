@@ -37,7 +37,7 @@ public class P2EncryptMyselfDataAction extends AbstractJobPhaseAction<EcdhPsiJob
         CsvTableDataSourceReader reader = new CsvTableDataSourceReader(job.getJobTempData().allOriginalData);
         HashConfig hashConfig = job.getMyself().dataResourceInfo.hashConfig;
 
-        phaseProgress.setMessage("正在对我方数据进行加密...");
+        phaseProgress.setMessageAndLog("正在对我方数据进行加密...");
         try (PsiECEncryptedDataCreator creator = new PsiECEncryptedDataCreator(
                 job.getJobId(),
                 reader,

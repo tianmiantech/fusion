@@ -53,7 +53,7 @@ public class P9SaveResultAction<T extends AbstractPsiJob> extends AbstractJobPha
 
     @Override
     protected void doAction() throws Exception {
-        phaseProgress.setMessage("正在生成最终求交结果文件...");
+        phaseProgress.setMessageAndLog("正在生成最终求交结果文件...");
         createResultFile();
 
         // 储存结果
@@ -65,7 +65,7 @@ public class P9SaveResultAction<T extends AbstractPsiJob> extends AbstractJobPha
                 downloadSize -> phaseProgress.updateCompletedWorkload(downloadSize)
         );
 
-        phaseProgress.setMessage("结果已保存");
+        phaseProgress.setMessageAndLog("结果已保存");
     }
 
     /**

@@ -37,7 +37,7 @@ public class P2CreatePsiBloomFilterAction extends AbstractJobPhaseAction<RsaPsiJ
         CsvTableDataSourceReader reader = new CsvTableDataSourceReader(job.getJobTempData().allOriginalData);
         HashConfig hashConfig = job.getMyself().dataResourceInfo.hashConfig;
 
-        phaseProgress.setMessage("正在生成过滤器...");
+        phaseProgress.setMessageAndLog("正在生成过滤器...");
         // 生成过滤器
         try (PsiBloomFilterCreator creator = new PsiBloomFilterCreator(
                 UUID.randomUUID().toString().replace("-", ""),
@@ -51,7 +51,7 @@ public class P2CreatePsiBloomFilterAction extends AbstractJobPhaseAction<RsaPsiJ
             job.getMyself().psiBloomFilter = psiBloomFilter;
 
             // 保存过滤器
-            phaseProgress.setMessage("过滤器生成完毕，正在保存...");
+            phaseProgress.setMessageAndLog("过滤器生成完毕，正在保存...");
             job.getJobFunctions().saveMyPsiBloomFilterFunction.save(job.getJobId(), psiBloomFilter);
         }
     }
@@ -74,13 +74,13 @@ public class P2CreatePsiBloomFilterAction extends AbstractJobPhaseAction<RsaPsiJ
     protected boolean skipThisAction() {
         // 角色不是过滤器方，不生成。
         if (job.getMyJobRole() == JobRole.leader) {
-            phaseProgress.setMessage("我方为数据集提供方，无需生成过滤器。");
+            phaseProgress.setMessageAndLog("我方为数据集提供方，无需生成过滤器。");
             return true;
         }
 
         // 资源类型已经是过滤器，不生成。
         if (job.getMyself().dataResourceInfo.dataResourceType == DataResourceType.PsiBloomFilter) {
-            phaseProgress.setMessage("使用已有过滤器，无需生成。");
+            phaseProgress.setMessageAndLog("使用已有过滤器，无需生成。");
             return true;
         }
 

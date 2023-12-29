@@ -66,7 +66,7 @@ public abstract class AbstractInitJobAction<T extends AbstractPsiJob> extends Ab
             return;
         }
 
-        phaseProgress.setMessage("正在从数据源加载数据至工作区...");
+        phaseProgress.setMessageAndLog("正在从数据源加载数据至工作区...");
         phaseProgress.updateTotalWorkload(job.getMyself().dataResourceInfo.dataCount);
         phaseProgress.updateCompletedWorkload(0);
 

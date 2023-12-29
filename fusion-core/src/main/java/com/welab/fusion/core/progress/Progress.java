@@ -162,6 +162,10 @@ public class Progress {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public void setMessageAndLog(String message) {
+        this.message = message;
 
         synchronized (logs) {
             if (logs.size() > 100) {

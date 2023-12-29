@@ -85,16 +85,16 @@ public class BloomFilterService extends AbstractService {
 
     private void create(BloomFilterDbModel model, Progress progress, AbstractTableDataSourceReader dataSourceReader, HashConfig hashConfig) throws Exception {
 
-        progress.setMessage("正在统计数据总量...");
+        progress.setMessageAndLog("正在统计数据总量...");
         progress.updateTotalWorkload(dataSourceReader.getTotalDataRowCount());
 
-        progress.setMessage("正在生成过滤器...");
+        progress.setMessageAndLog("正在生成过滤器...");
         // 生成过滤器
         try (PsiBloomFilterCreator creator = new PsiBloomFilterCreator(model.getId(), dataSourceReader, hashConfig, progress)) {
 
             PsiBloomFilter psiBloomFilter = creator.create();
 
-            progress.setMessage("过滤器生成完毕，正在储存...");
+            progress.setMessageAndLog("过滤器生成完毕，正在储存...");
             psiBloomFilter.sink();
 
             // 填充 model

@@ -46,7 +46,7 @@ public class P3DownloadPsiBloomFilterAction extends AbstractJobPhaseAction<RsaPs
     protected void doAction() throws Exception {
         File file = downloadFileFromPartner("正在从合作方下载过滤器...");
 
-        phaseProgress.setMessage("正在解压过滤器 zip 文件(" + InformationSize.fromByte(file.length()) + ")...");
+        phaseProgress.setMessageAndLog("正在解压过滤器 zip 文件(" + InformationSize.fromByte(file.length()) + ")...");
         // file 解压至 dir
         Path dir = FileSystem.JobTemp.getDir(job.getJobId()).resolve(FileUtil.getFileNameWithoutSuffix(file.getName()));
         SuperDecompressor.decompression(file, dir.toAbsolutePath().toString(), false);
@@ -56,7 +56,7 @@ public class P3DownloadPsiBloomFilterAction extends AbstractJobPhaseAction<RsaPs
         InformationSize size = InformationSize.fromByte(psiBloomFilter.getDataFile().length());
 
         LOG.info("正在加载过滤器，job_id：{}，psiBloomFilter:{}", job.getJobId(), psiBloomFilter.id);
-        phaseProgress.setMessage("正在加载过滤器(" + size + ")...");
+        phaseProgress.setMessageAndLog("正在加载过滤器(" + size + ")...");
         // 将过滤器文件加载到内存是个很重的操作，所以是按需加载的，调用 getBloomFilter() 可触发加载。
         psiBloomFilter.getBloomFilter();
         LOG.info(
