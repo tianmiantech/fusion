@@ -49,8 +49,7 @@ const Index = forwardRef((props:PromoterPropsInterface,ref) => {
 
 
   const submitFormData = async () => {
-    const {data_resource_type,add_method,hash_config,remark,table_data_resource_info} = await jobFormRef.current?.validateFields();
-    const algorithm = lodash.get(detailData,'jobDetailData.algorithm')
+    const {data_resource_type,add_method,hash_config,remark,algorithm,table_data_resource_info,additional_result_columns,bloom_filter_resource_input=null} = await jobFormRef.current?.validateFields();
     const requestParams = {
       remark,
       algorithm,
@@ -59,7 +58,9 @@ const Index = forwardRef((props:PromoterPropsInterface,ref) => {
         data_resource_type,
         table_data_resource_info,
         hash_config,
-        add_method
+        add_method,
+        additional_result_columns,
+        bloom_filter_resource_input
       }
     }
     runAgreeAndStart(requestParams)

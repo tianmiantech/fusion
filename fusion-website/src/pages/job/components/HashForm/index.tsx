@@ -49,8 +49,6 @@ const HashForm = (props:HashFormPropsInterface) => {
     <>
       <Form.List name="valueList" >
         {(fields, { add, remove,...rest }) => {
-          console.log("fields",fields);
-          
           return(
           <>
             {fields.map(({key, name}, index) => (
@@ -99,20 +97,7 @@ const HashForm = (props:HashFormPropsInterface) => {
   return (
     <Form onValuesChange={onValuesChange} form={formRef}>
       <Form.Item
-        label={
-          <>
-            <Tooltip
-              placement="top"
-              title={<span>* 设置的融合主键是标明样本的对齐字段；<br/>
-              * 设置的融合主键不宜过长，主键的hash处理后的长度越长对齐耗时越多；<br/>
-              * 如需多个样本标识，建议字段拼接后用一种hash方式处理(例：MD5(account+cnid))；<br/>
-              * 设置的融合主键需要和合作方的过滤器的融合主键处理方式一致。</span>}
-              overlayStyle={{ maxWidth: 350 }}
-            >
-              设置融合主键hash方式&nbsp;<QuestionCircleOutlined />
-            </Tooltip>
-          </>
-        }
+        label={'设置融合主键hash方式'}
         required
         style={{ marginBottom: 0 }}
       >

@@ -10,7 +10,7 @@ import './index.less'
 import lodash from 'lodash'
 import useDetail from "../../hooks/useDetail";
 import BloomFilterFormItem from '../BloomFilterFormItem';
-import { useRequest } from 'ahooks';
+import { useRequest,useUnmount } from 'ahooks';
 import {getAlgorithmList} from '../../service'
 import {IsEmptyObject} from '@/utils/utils';
 
@@ -49,6 +49,10 @@ const JobForm = forwardRef((props:JobFormPropsInterface, ref) => {
         g.algorithmList = tmpList;
       })
     }
+  })
+
+  useUnmount(()=>{
+    formRef.resetFields();
   })
 
  

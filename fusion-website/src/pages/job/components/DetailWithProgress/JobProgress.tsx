@@ -35,7 +35,7 @@ const JobProgress = (props:JobProgressProps) => {
         const promoterPhasesListLenght = promoterPhasesList.length;
         const providerPhasesListLenght = providerPhasesList.length;
         //设置当前步骤
-        setCurrentStep(Math.max(0, Math.min(promoterPhasesListLenght-1, providerPhasesListLenght-1)))
+        setCurrentStep(Math.max(0, Math.max(promoterPhasesListLenght-1, providerPhasesListLenght-1)))
         detailData.phasesStpesList.map((item:PhasesStpesListItemInterface)=>{
           const {name,phase} = item;
           const step = {
@@ -144,6 +144,7 @@ const JobProgress = (props:JobProgressProps) => {
         return 'wait'
     }
 
+    
     return <Steps
       direction="vertical"
       current={currentStep}

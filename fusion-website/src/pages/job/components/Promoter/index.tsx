@@ -93,6 +93,7 @@ const Index = forwardRef((props:PromoterPropsInterface,ref) => {
           bloom_filter_resource_input:{bloom_filter_id:lodash.get(detailData,'jobDetailData.myself.bloom_filter_id',''),source:'setFieldsValue'},
           add_method:lodash.get(detailData,'jobDetailData.myself.table_data_resource_info.add_method'),
           algorithm:lodash.get(detailData,'jobDetailData.algorithm'),
+          additional_result_columns:lodash.get(detailData,'jobDetailData.myself.additional_result_columns',[]),
         })
       }
     },[detailData.jobDetailData])
