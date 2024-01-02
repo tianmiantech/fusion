@@ -56,6 +56,7 @@ public class P3DownloadPsiBloomFilterAction extends AbstractJobPhaseAction<RsaPs
         InformationSize size = InformationSize.fromByte(psiBloomFilter.getDataFile().length());
 
         LOG.info("正在加载过滤器，job_id：{}，psiBloomFilter:{}", job.getJobId(), psiBloomFilter.id);
+        phaseProgress.successSoon();
         phaseProgress.setMessageAndLog("正在加载过滤器(" + size + ")...");
         // 将过滤器文件加载到内存是个很重的操作，所以是按需加载的，调用 getBloomFilter() 可触发加载。
         psiBloomFilter.getBloomFilter();
