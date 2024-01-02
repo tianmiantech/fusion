@@ -43,6 +43,9 @@ const Index = forwardRef((props:PromoterPropsInterface,ref) => {
       setDetailData(g=>{
         g.jobId = lodash.get(data,'job_id');
       })
+      setTimeout(()=>{
+        history.push('/job/list')
+      },800)
     }  
   },{ manual:true})
 
