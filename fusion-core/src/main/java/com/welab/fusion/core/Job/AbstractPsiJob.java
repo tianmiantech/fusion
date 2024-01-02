@@ -306,7 +306,7 @@ public abstract class AbstractPsiJob implements Closeable {
         CloseableUtils.closeQuietly(partner);
 
         try {
-            // FileSystem.JobTemp.clean(jobId);
+            FileSystem.JobTemp.clean(jobId);
         } catch (Exception e) {
             LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);
         }

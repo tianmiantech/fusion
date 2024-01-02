@@ -171,7 +171,12 @@ public class FileSystem {
          */
         public static void clean(String jobId) {
             File dir = getDir(jobId).toFile();
-            cn.hutool.core.io.FileUtil.clean(dir);
+            try {
+                cn.hutool.core.io.FileUtil.clean(dir);
+                dir.delete();
+            } catch (Exception e) {
+                LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);
+            }
         }
     }
 
