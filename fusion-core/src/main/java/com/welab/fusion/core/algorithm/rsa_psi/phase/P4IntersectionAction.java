@@ -85,7 +85,7 @@ public class P4IntersectionAction extends AbstractIntersectionAction<RsaPsiJob> 
         LongAdder progress = new LongAdder();
         /**
          * 批处理
-         * 这里 5 万数据加密要 13 秒（使用了并行处理，测试数据来自华为笔记本）
+         * 这里 5 万数据加密要 20 秒（使用了并行处理，测试数据来自华为笔记本）
          * 建议这里设置 5 秒左右一批，不要太大，也不要太小。
          */
         BatchConsumer<RsaPsiRecord> consumer = new BatchConsumer<>(10_000, 5_000, records -> {
