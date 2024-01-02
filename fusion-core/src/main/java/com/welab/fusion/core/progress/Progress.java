@@ -175,6 +175,16 @@ public class Progress {
         }
     }
 
+    /**
+     * 强制设置进度为 99%
+     */
+    public void successSoon() {
+        if (this.totalWorkload < 1) {
+            this.totalWorkload = 100;
+        }
+        this.completedWorkload = this.totalWorkload * 99 / 100;
+    }
+
     // region getter/setter
 
     public String getModelId() {

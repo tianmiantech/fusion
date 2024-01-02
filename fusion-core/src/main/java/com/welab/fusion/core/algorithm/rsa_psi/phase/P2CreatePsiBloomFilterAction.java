@@ -51,6 +51,7 @@ public class P2CreatePsiBloomFilterAction extends AbstractJobPhaseAction<RsaPsiJ
             job.getMyself().psiBloomFilter = psiBloomFilter;
 
             // 保存过滤器
+            phaseProgress.successSoon();
             phaseProgress.setMessageAndLog("过滤器生成完毕，正在保存...");
             job.getJobFunctions().saveMyPsiBloomFilterFunction.save(job.getJobId(), psiBloomFilter);
         }
