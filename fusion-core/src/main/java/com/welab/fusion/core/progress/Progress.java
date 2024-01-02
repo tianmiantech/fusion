@@ -137,7 +137,7 @@ public class Progress {
 
         return BigDecimal.valueOf(completedWorkload)
                 .multiply(BigDecimal.valueOf(100))
-                .divide(BigDecimal.valueOf(totalWorkload), 3, RoundingMode.HALF_UP)
+                .divide(BigDecimal.valueOf(totalWorkload), 2, RoundingMode.HALF_UP)
                 .doubleValue();
     }
 
