@@ -102,9 +102,12 @@ public class PsiBloomFilterConsumer implements BiConsumer<Long, LinkedHashMap<St
 
         BigInteger rp = h.modPow(rsaPsiParam.getEp(), rsaPsiParam.privatePrimeP);
         BigInteger rq = h.modPow(rsaPsiParam.getEq(), rsaPsiParam.privatePrimeQ);
-        BigInteger z = (rp.multiply(rsaPsiParam.getCp())
-                .add(rq.multiply(rsaPsiParam.getCq())))
-                .remainder(rsaPsiParam.publicModulus);
+        BigInteger z = (
+                rp
+                        .multiply(rsaPsiParam.getCp())
+                        .add(rq.multiply(rsaPsiParam.getCq()))
+        ).remainder(rsaPsiParam.publicModulus);
+
         return z;
     }
 
