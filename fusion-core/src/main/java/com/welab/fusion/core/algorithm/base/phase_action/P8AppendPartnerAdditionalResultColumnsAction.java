@@ -45,7 +45,7 @@ public class P8AppendPartnerAdditionalResultColumnsAction<T extends AbstractPsiJ
 
     @Override
     protected boolean skipThisAction() {
-        return CollectionUtils.isNotEmpty(
+        return CollectionUtils.isEmpty(
                 job.getPartner().dataResourceInfo.additionalResultColumns
         );
     }
