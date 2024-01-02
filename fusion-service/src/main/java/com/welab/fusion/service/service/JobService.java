@@ -257,6 +257,7 @@ public class JobService extends AbstractService {
         dataResource.dataResourceType = promoter.getDataResourceType();
         dataResource.totalDataCount = promoter.getTotalDataCount();
         dataResource.hashConfig = promoter.getHashConfigModel();
+        dataResource.additionalResultColumns = promoter.getAdditionalResultColumns();
 
         JobConfigInput createJobInput = new JobConfigInput();
         createJobInput.jobId = job.getId();
