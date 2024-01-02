@@ -46,14 +46,11 @@ public class PsiUtils {
      * @return 交集
      */
     public static List<RsaPsiRecord> match(PsiBloomFilter psiBloomFilter, List<RsaPsiRecord> rawRecords, List<String> encryptedKeys, BigInteger publicModulus) {
-        byte[][] ret = new byte[encryptedKeys.size()][];
-        for (int i = 0; i < encryptedKeys.size(); i++) {
-            ret[i] = Base64.decode(encryptedKeys.get(i));
-        }
 
         List<RsaPsiRecord> fruit = new ArrayList<>();
-        for (int i = 0; i < ret.length; i++) {
-            BigInteger y = PsiUtils.bytesToBigInteger(ret[i], 0, ret[i].length);
+        for (int i = 0; i < encryptedKeys.size(); i++) {
+            byte[] encryptedKey = Base64.decode(encryptedKeys.get(i));
+            BigInteger y = PsiUtils.bytesToBigInteger(encryptedKey, 0, encryptedKey.length);
             BigInteger z = y.multiply(rawRecords.get(i).inv).mod(publicModulus);
             if (psiBloomFilter.contains(z)) {
                 fruit.add(rawRecords.get(i));

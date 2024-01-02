@@ -24,7 +24,7 @@ import java.util.concurrent.*;
  * @date 2023/5/17
  */
 public class ThreadPool {
-    private ThreadPoolExecutor THREAD_POOL;
+    private ThreadPoolExecutor threadPoolExecutor;
 
     public ThreadPool(String threadNamePrefix) {
         this(threadNamePrefix, Runtime.getRuntime().availableProcessors());
@@ -35,7 +35,7 @@ public class ThreadPool {
      */
     public ThreadPool(String threadNamePrefix, int poolSize) {
         ThreadFactory threadFactory = new NamedThreadFactory(threadNamePrefix, false);
-        this.THREAD_POOL = new ThreadPoolExecutor(
+        this.threadPoolExecutor = new ThreadPoolExecutor(
                 poolSize,
                 poolSize,
                 100L,
@@ -46,23 +46,23 @@ public class ThreadPool {
     }
 
     public void execute(Runnable someThing) {
-        THREAD_POOL.execute(someThing);
+        threadPoolExecutor.execute(someThing);
     }
 
     public void stop() {
-        THREAD_POOL.shutdownNow();
+        threadPoolExecutor.shutdownNow();
     }
 
 
     public <T> Future<T> submit(Callable<T> someThing) {
-        return THREAD_POOL.submit(someThing);
+        return threadPoolExecutor.submit(someThing);
     }
 
     /**
      * Add an asynchronous task, and the accounting amount will be reduced after the task is executed
      */
     public void execute(Runnable someThing, CountDownLatch countDownLatch) {
-        THREAD_POOL.execute(() -> {
+        threadPoolExecutor.execute(() -> {
             try {
                 someThing.run();
             } finally {
@@ -72,18 +72,26 @@ public class ThreadPool {
     }
 
     public int actionThreadCount() {
-        return THREAD_POOL.getActiveCount();
+        return threadPoolExecutor.getActiveCount();
     }
 
     public int size() {
-        return THREAD_POOL.getQueue().size();
+        return threadPoolExecutor.getQueue().size();
     }
 
     public void shutdown() {
-        THREAD_POOL.shutdown();
+        threadPoolExecutor.shutdown();
     }
 
     public void shutdownNow() {
-        THREAD_POOL.shutdownNow();
+        threadPoolExecutor.shutdownNow();
+    }
+
+    public BlockingQueue<Runnable> getQueue() {
+        return threadPoolExecutor.getQueue();
+    }
+
+    public boolean isWorking() {
+        return !threadPoolExecutor.getQueue().isEmpty() || threadPoolExecutor.getActiveCount() > 0;
     }
 }

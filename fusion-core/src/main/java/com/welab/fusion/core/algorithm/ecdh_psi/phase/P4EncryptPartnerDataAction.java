@@ -15,23 +15,20 @@
  */
 package com.welab.fusion.core.algorithm.ecdh_psi.phase;
 
-import cn.hutool.core.thread.NamedThreadFactory;
 import cn.hutool.core.thread.ThreadUtil;
 import com.welab.fusion.core.Job.base.JobPhase;
 import com.welab.fusion.core.algorithm.base.phase_action.AbstractJobPhaseAction;
 import com.welab.fusion.core.algorithm.ecdh_psi.EcdhPsiJob;
-import com.welab.fusion.core.io.data_source.CsvTableDataSourceReader;
 import com.welab.fusion.core.io.FileSystem;
+import com.welab.fusion.core.io.data_source.CsvTableDataSourceReader;
 import com.welab.fusion.core.util.Constant;
+import com.welab.wefe.common.thread.ThreadPool;
 import com.welab.wefe.common.util.FileUtil;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.util.LinkedHashMap;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.LongAdder;
 
 /**
@@ -39,13 +36,10 @@ import java.util.concurrent.atomic.LongAdder;
  * @date 2023/12/20
  */
 public class P4EncryptPartnerDataAction extends AbstractJobPhaseAction<EcdhPsiJob> {
-    private final ThreadPoolExecutor THREAD_POOL = new ThreadPoolExecutor(
-            Runtime.getRuntime().availableProcessors() - 2,
-            Runtime.getRuntime().availableProcessors() - 2,
-            10L,
-            TimeUnit.SECONDS,
-            new LinkedBlockingQueue<>(),
-            new NamedThreadFactory("encrypt_partner_data-thread-pool-", true)
+    private final ThreadPool THREAD_POOL = new ThreadPool(
+            "encrypt_partner_data-thread-pool-",
+            Runtime.getRuntime().availableProcessors() - 2
+
     );
     /**
      * 保存加密后的数据的文件
@@ -70,10 +64,11 @@ public class P4EncryptPartnerDataAction extends AbstractJobPhaseAction<EcdhPsiJo
             });
         }
 
-        while (isWorking()) {
+        while (THREAD_POOL.isWorking()) {
             ThreadUtil.safeSleep(1000);
         }
 
+        THREAD_POOL.shutdownNow();
         this.fileWriter.close();
     }
 
@@ -125,10 +120,6 @@ public class P4EncryptPartnerDataAction extends AbstractJobPhaseAction<EcdhPsiJo
         );
 
         return writer;
-    }
-
-    private boolean isWorking() {
-        return !THREAD_POOL.getQueue().isEmpty() || THREAD_POOL.getActiveCount() > 0;
     }
 
     @Override

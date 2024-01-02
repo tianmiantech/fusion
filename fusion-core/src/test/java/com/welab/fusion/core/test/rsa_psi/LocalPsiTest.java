@@ -16,14 +16,14 @@
 package com.welab.fusion.core.test.rsa_psi;
 
 import cn.hutool.core.codec.Base64;
+import com.welab.fusion.core.algorithm.rsa_psi.RsaPsiRecord;
 import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
 import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilterCreator;
-import com.welab.fusion.core.io.FileSystem;
-import com.welab.fusion.core.io.data_source.CsvTableDataSourceReader;
 import com.welab.fusion.core.hash.HashConfig;
 import com.welab.fusion.core.hash.HashConfigItem;
 import com.welab.fusion.core.hash.HashMethod;
-import com.welab.fusion.core.algorithm.rsa_psi.RsaPsiRecord;
+import com.welab.fusion.core.io.FileSystem;
+import com.welab.fusion.core.io.data_source.CsvTableDataSourceReader;
 import com.welab.fusion.core.util.PsiUtils;
 import com.welab.wefe.common.BatchConsumer;
 
@@ -42,8 +42,12 @@ public class LocalPsiTest {
     private static HashConfig hashConfig = HashConfig.of(HashConfigItem.of(HashMethod.MD5, "id"));
 
     public static void main(String[] args) throws Exception {
+        PsiBloomFilterCreator.MIN_EXPECTED_INSERTIONS = 1000000;
         FileSystem.init("D:\\data\\fusion\\");
-        String csv = "promoter-569.csv";
+        // String csv = "promoter-569.csv";
+        // String csv = "10.csv";
+        // String csv = "ivenn_10w_20210319_vert_promoter.csv";
+        String csv = "wefe_horz_train_provider_5560_standard--01.csv";
         File file = new File("D:\\data\\wefe\\" + csv);
 
         PsiBloomFilter psiBloomFilter = createPsiBloomFilter(file);
@@ -54,10 +58,9 @@ public class LocalPsiTest {
 
         LongAdder progress = new LongAdder();
         LongAdder fruitCount = new LongAdder();
-        File resultFile = new File("");
 
         // 批处理
-        BatchConsumer<RsaPsiRecord> consumer = new BatchConsumer<>(10, 5_000, records -> {
+        BatchConsumer<RsaPsiRecord> consumer = new BatchConsumer<>(1000, 5_000, records -> {
             try {
                 // 将数据发送到过滤器方加密
                 List<String> encryptedList = PsiUtils.encryptPsiRecords(
