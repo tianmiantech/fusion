@@ -74,7 +74,7 @@ public class PsiUtils {
         BigInteger cq = psiBloomFilter.rsaPsiParam.getCq();
 
         List<String> result = new ArrayList<>(list.size());
-        list.parallelStream().forEach(item -> {
+        list.stream().forEach(item -> {
             byte[] bytes = Base64.decode(item);
             BigInteger x = PsiUtils.bytesToBigInteger(bytes, 0, bytes.length);
 
