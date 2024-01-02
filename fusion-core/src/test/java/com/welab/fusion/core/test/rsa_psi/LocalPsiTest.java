@@ -42,6 +42,7 @@ public class LocalPsiTest {
     private static HashConfig hashConfig = HashConfig.of(HashConfigItem.of(HashMethod.MD5, "id"));
 
     public static void main(String[] args) throws Exception {
+        long start = System.currentTimeMillis();
         PsiBloomFilterCreator.MIN_EXPECTED_INSERTIONS = 1000000;
         FileSystem.init("D:\\data\\fusion\\");
         // String csv = "promoter-569.csv";
@@ -105,6 +106,8 @@ public class LocalPsiTest {
         // 等待消费完成
         consumer.waitForFinishAndClose();
 
+        long spend = System.currentTimeMillis() - start;
+        System.out.println("spend: " + spend);
         System.out.println("fruit size: " + fruitCount);
     }
 

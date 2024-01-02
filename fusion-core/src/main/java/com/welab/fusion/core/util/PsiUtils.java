@@ -26,8 +26,10 @@ import org.slf4j.LoggerFactory;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author zane.luo
@@ -47,16 +49,28 @@ public class PsiUtils {
      */
     public static List<RsaPsiRecord> match(PsiBloomFilter psiBloomFilter, List<RsaPsiRecord> rawRecords, List<String> encryptedKeys, BigInteger publicModulus) {
 
-        List<RsaPsiRecord> fruit = new ArrayList<>();
+        // 将明文与密文使用 map 包装为一一对应的 entry，便于下面使用并行流计算。
+        Map<String, RsaPsiRecord> map = new HashMap<>(encryptedKeys.size());
         for (int i = 0; i < encryptedKeys.size(); i++) {
-            byte[] encryptedKey = Base64.decode(encryptedKeys.get(i));
-            BigInteger y = PsiUtils.bytesToBigInteger(encryptedKey, 0, encryptedKey.length);
-            BigInteger z = y.multiply(rawRecords.get(i).inv).mod(publicModulus);
-            if (psiBloomFilter.contains(z)) {
-                fruit.add(rawRecords.get(i));
-            }
+            map.put(
+                    encryptedKeys.get(i),
+                    rawRecords.get(i)
+            );
         }
-        return fruit;
+
+        return map.entrySet()
+                // 并行处理
+                .parallelStream()
+                .filter(entry -> {
+                    String encryptedKey = entry.getKey();
+                    RsaPsiRecord rawRecord = entry.getValue();
+
+                    BigInteger y = PsiUtils.bytesToBigInteger(Base64.decode(encryptedKey));
+                    BigInteger z = y.multiply(rawRecord.inv).mod(publicModulus);
+                    return psiBloomFilter.contains(z);
+                })
+                .map(x -> x.getValue())
+                .collect(Collectors.toList());
     }
 
     /**
@@ -70,22 +84,22 @@ public class PsiUtils {
         BigInteger cp = psiBloomFilter.rsaPsiParam.getCp();
         BigInteger cq = psiBloomFilter.rsaPsiParam.getCq();
 
-        List<String> result = new ArrayList<>(list.size());
-        list.stream().forEach(item -> {
-            byte[] bytes = Base64.decode(item);
-            BigInteger x = PsiUtils.bytesToBigInteger(bytes, 0, bytes.length);
+        return list
+                // 并行处理，但是要保证返回结果顺序一致。
+                .parallelStream().map(item -> {
+                    byte[] bytes = Base64.decode(item);
+                    BigInteger x = PsiUtils.bytesToBigInteger(bytes);
 
-            // crt优化后
-            BigInteger rp = x.modPow(d.remainder(p.subtract(BigInteger.valueOf(1))), p);
-            BigInteger rq = x.modPow(d.remainder(q.subtract(BigInteger.valueOf(1))), q);
-            BigInteger y = (rp.multiply(cp).add(rq.multiply(cq))).remainder(n);
+                    // crt优化后
+                    BigInteger rp = x.modPow(d.remainder(p.subtract(BigInteger.valueOf(1))), p);
+                    BigInteger rq = x.modPow(d.remainder(q.subtract(BigInteger.valueOf(1))), q);
+                    BigInteger y = (rp.multiply(cp).add(rq.multiply(cq))).remainder(n);
 
-            byte[] encrypted = PsiUtils.bigIntegerToBytes(y);
-            String base64 = Base64.encode(encrypted);
-            result.add(base64);
-        });
+                    byte[] encrypted = PsiUtils.bigIntegerToBytes(y);
+                    return Base64.encode(encrypted);
+                })
+                .collect(Collectors.toList());
 
-        return result;
     }
 
     /**
@@ -113,15 +127,8 @@ public class PsiUtils {
         return new BigInteger(1, input);
     }
 
-    public static BigInteger bytesToBigInteger(byte[] bytes, int inOff, int inLen) {
-
-        if (inOff == 0 || inLen == bytes.length) {
-            return new BigInteger(1, bytes);
-        } else {
-            byte[] block = new byte[inLen];
-            System.arraycopy(bytes, inOff, block, 0, inLen);
-            return new BigInteger(1, block);
-        }
+    public static BigInteger bytesToBigInteger(byte[] bytes) {
+        return new BigInteger(1, bytes);
     }
 
     public static byte[] bigIntegerToBytes(BigInteger input) {
@@ -141,7 +148,4 @@ public class PsiUtils {
         return Base64.encode(point.getEncoded(true));
     }
 
-    public static ECPoint string2ECPoint(ECCurve ecCurve, String value) {
-        return ecCurve.decodePoint(Base64.decode(value));
-    }
 }
