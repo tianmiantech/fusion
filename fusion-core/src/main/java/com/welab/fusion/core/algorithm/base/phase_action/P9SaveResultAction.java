@@ -201,7 +201,7 @@ public class P9SaveResultAction<T extends AbstractPsiJob> extends AbstractJobPha
             LinkedHashSet<String> header = new LinkedHashSet<>();
 
             // 输出附加字段
-            LinkedHashSet<String> additionalResultColumns = job.getMyself().dataResourceInfo.additionalResultColumns;
+            LinkedHashSet<String> additionalResultColumns = job.getPartner().dataResourceInfo.additionalResultColumns;
             if (additionalResultColumns != null) {
                 header.addAll(additionalResultColumns);
             }
