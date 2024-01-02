@@ -16,7 +16,6 @@
 package com.welab.fusion.core.progress;
 
 import cn.hutool.core.date.DateUtil;
-import com.welab.wefe.common.Convert;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -128,26 +127,30 @@ public class Progress {
     /**
      * 进度，百分比，0 ~ 100。
      */
-    public int getPercent() {
+    public double getPercent() {
         if (totalWorkload == 0) {
-            return 100;
+            return BigDecimal.valueOf(100).doubleValue();
         }
         if (completedWorkload <= 0) {
-            return 0;
+            return BigDecimal.ZERO.doubleValue();
         }
 
-        return Convert.toInt(completedWorkload * 100L / totalWorkload);
+        return BigDecimal.valueOf(completedWorkload)
+                .multiply(BigDecimal.valueOf(100))
+                .divide(BigDecimal.valueOf(totalWorkload), 3, RoundingMode.HALF_UP)
+                .doubleValue();
     }
 
     /**
      * 预计剩余时间
      */
     public long getEstimatedRemainingTime() {
-        if (getPercent() <= 0 || getCostTime() <= 0) {
+        double percent = getPercent();
+        if (percent <= 0 || getCostTime() <= 0) {
             return -1;
         }
 
-        if (getPercent() == 100) {
+        if (percent == 100) {
             return 0;
         }
 
