@@ -87,7 +87,7 @@ public class PsiECEncryptedDataConsumer implements BiConsumer<Long, LinkedHashMa
                 10L,
                 TimeUnit.SECONDS,
                 new LinkedBlockingQueue<>(),
-                new NamedThreadFactory("generate-filter-thread-pool-", true)
+                new NamedThreadFactory("generate-filter-thread-pool-", false)
         );
     }
 

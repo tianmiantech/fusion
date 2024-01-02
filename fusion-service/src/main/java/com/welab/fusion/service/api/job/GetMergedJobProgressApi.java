@@ -15,12 +15,10 @@
  */
 package com.welab.fusion.service.api.job;
 
+import com.welab.fusion.core.Job.base.JobStatus;
 import com.welab.fusion.core.progress.JobProgress;
-import com.welab.fusion.service.database.entity.JobMemberDbModel;
 import com.welab.fusion.service.service.GatewayService;
-import com.welab.fusion.service.service.JobMemberService;
 import com.welab.fusion.service.service.JobService;
-import com.welab.fusion.service.service.MemberService;
 import com.welab.wefe.common.fieldvalidate.annotation.Check;
 import com.welab.wefe.common.web.api.base.AbstractApi;
 import com.welab.wefe.common.web.api.base.Api;
@@ -56,6 +54,10 @@ public class GetMergedJobProgressApi extends AbstractApi<GetMergedJobProgressApi
                 GetMyJobProgressApi.class,
                 GetMyJobProgressApi.Input.of(input.jobId)
         );
+
+        if (myselfProgress.getJobStatus() == JobStatus.running && partnerProgress.getJobStatus().isFinished()) {
+            jobService.finishOnPartnerFinished(input.jobId);
+        }
 
         return success(Output.of(myselfProgress, partnerProgress));
     }

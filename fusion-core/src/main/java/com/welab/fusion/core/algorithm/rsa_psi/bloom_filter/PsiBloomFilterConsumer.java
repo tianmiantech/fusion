@@ -47,12 +47,12 @@ public class PsiBloomFilterConsumer implements BiConsumer<Long, LinkedHashMap<St
     /**
      * 用于生成过滤器的线程池
      */
-    private final ThreadPoolExecutor GENERATE_FILTER_THREAD_POOL;
+    private final ThreadPoolExecutor THREAD_POOL;
     private Progress progress;
 
     public PsiBloomFilterConsumer(PsiBloomFilter psiBloomFilter, Progress progress) {
         this.psiBloomFilter = psiBloomFilter;
-        GENERATE_FILTER_THREAD_POOL = createThreadPoll();
+        THREAD_POOL = createThreadPoll();
         this.progress = progress;
     }
 
@@ -68,7 +68,7 @@ public class PsiBloomFilterConsumer implements BiConsumer<Long, LinkedHashMap<St
                 10L,
                 TimeUnit.SECONDS,
                 new LinkedBlockingQueue<>(),
-                new NamedThreadFactory("generate-filter-thread-pool-", true)
+                new NamedThreadFactory("generate-filter-thread-pool-", false)
         );
     }
 
@@ -76,13 +76,14 @@ public class PsiBloomFilterConsumer implements BiConsumer<Long, LinkedHashMap<St
     public void accept(Long index, LinkedHashMap<String, Object> row) {
 
         // 避免读取的数据堆积在内存
-        while (GENERATE_FILTER_THREAD_POOL.getQueue().size() > 1000) {
-            ThreadUtil.safeSleep(100);
+        while (THREAD_POOL.getQueue().size() > 1000) {
+            ThreadUtil.sleep(100);
         }
 
         try {
-            String key = psiBloomFilter.hashConfig.hash(row);
-            GENERATE_FILTER_THREAD_POOL.execute(() -> {
+
+            THREAD_POOL.execute(() -> {
+                String key = psiBloomFilter.hashConfig.hash(row);
                 BigInteger z = encrypt(key);
                 psiBloomFilter.getBloomFilter().put(z.toString());
                 insertedElementCount.increment();
@@ -112,20 +113,20 @@ public class PsiBloomFilterConsumer implements BiConsumer<Long, LinkedHashMap<St
     }
 
     public boolean isWorking() {
-        return !getQueue().isEmpty() || GENERATE_FILTER_THREAD_POOL.getActiveCount() > 0;
+        return !getQueue().isEmpty() || THREAD_POOL.getActiveCount() > 0;
     }
 
     public BlockingQueue<Runnable> getQueue() {
-        return GENERATE_FILTER_THREAD_POOL.getQueue();
+        return THREAD_POOL.getQueue();
     }
 
     public int getActiveCount() {
-        return GENERATE_FILTER_THREAD_POOL.getActiveCount();
+        return THREAD_POOL.getActiveCount();
     }
 
     @Override
     public void close() throws IOException {
-        GENERATE_FILTER_THREAD_POOL.shutdownNow();
+        THREAD_POOL.shutdownNow();
     }
 
     public void refreshProgress() {

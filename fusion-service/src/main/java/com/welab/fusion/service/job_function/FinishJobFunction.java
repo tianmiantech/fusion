@@ -17,12 +17,8 @@ package com.welab.fusion.service.job_function;
 
 
 import com.welab.fusion.core.progress.JobProgress;
-import com.welab.fusion.service.database.entity.JobDbModel;
-import com.welab.fusion.service.model.FusionJobManager;
 import com.welab.fusion.service.service.JobService;
 import com.welab.wefe.common.web.Launcher;
-
-import java.util.Date;
 
 /**
  * @author zane.luo
@@ -33,21 +29,6 @@ public class FinishJobFunction implements com.welab.fusion.core.algorithm.base.f
 
     @Override
     public void finish(String jobId, JobProgress progress) throws Exception {
-        JobDbModel job = jobService.findById(jobId);
-
-        if (job.getStatus().isFinished()) {
-            return;
-        }
-
-        job.setEndTime(new Date());
-        job.setCostTime(job.getEndTime().getTime() - job.getStartTime().getTime());
-        job.setStatus(progress.getJobStatus());
-        job.setMessage(progress.getMessage());
-        job.setProgressDetail(progress.toJson());
-        job.setUpdatedTimeNow();
-
-        job.save();
-
-        FusionJobManager.remove(jobId);
+        jobService.finish(jobId, progress);
     }
 }

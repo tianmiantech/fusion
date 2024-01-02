@@ -84,6 +84,37 @@ public class JobService extends AbstractService {
         }
     }
 
+    public void finishOnPartnerFinished(String jobId) {
+        JobDbModel job = findById(jobId);
+
+        if (job.getStatus().isFinished()) {
+            return;
+        }
+        JobProgress progress = job.getProgressModel();
+        progress.finish(JobStatus.error_on_running, "合作方已停止，我方跟随其结束任务。");
+
+        finish(jobId, progress);
+    }
+
+    public void finish(String jobId, JobProgress progress) {
+        JobDbModel job = findById(jobId);
+
+        if (job.getStatus().isFinished()) {
+            return;
+        }
+
+        job.setEndTime(new Date());
+        job.setCostTime(job.getEndTime().getTime() - job.getStartTime().getTime());
+        job.setStatus(progress.getJobStatus());
+        job.setMessage(progress.getMessage());
+        job.setProgressDetail(progress.toJson());
+        job.setUpdatedTimeNow();
+
+        job.save();
+
+        FusionJobManager.remove(jobId);
+    }
+
     /**
      * 创建任务
      */
