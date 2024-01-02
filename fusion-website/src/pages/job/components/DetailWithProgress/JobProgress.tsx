@@ -2,8 +2,8 @@
 import { useState,useEffect, JSXElementConstructor, ReactElement, ReactNode, ReactPortal } from 'react';
 import type { StepProps,StepsProps} from 'antd';
 import { Card, Steps,Typography,Popover,Row,Col,Progress,Collapse } from 'antd';
+import { LoadingOutlined, SmileOutlined, CheckCircleOutlined, UserOutlined,CloseCircleOutlined } from '@ant-design/icons';
 import { ProDescriptions } from '@ant-design/pro-components';
-import {JOB_PHASE_LSIT} from '@/constant/dictionary'
 import lodash from 'lodash'
 import type {PhasesListItemInterface,PhasesStpesListItemInterface} from '../../hooks/useDetail';
 import {displayChineseCoastTime} from '@/utils/time'
@@ -23,7 +23,6 @@ const JobProgress = (props:JobProgressProps) => {
 
     const {promoterPhasesList,providerPhasesList} = props
     const [stepList, setStepList] = useState<StepProps[]>([]);
-    const [currentStep, setCurrentStep] = useState<number>(0);
     //记录打开的折叠面板
     const [currentStepOpenKey, setCurrentStepOpenKey] = useState<string[]>([]);
 
@@ -32,24 +31,34 @@ const JobProgress = (props:JobProgressProps) => {
       //设置步骤 步骤数据源来自于接口
       if(detailData.phasesStpesList.length>0){
         const tmpList = [] as StepProps[]; 
-        const promoterPhasesListLenght = promoterPhasesList.length;
-        const providerPhasesListLenght = providerPhasesList.length;
-        //设置当前步骤
-        setCurrentStep(Math.max(0, Math.max(promoterPhasesListLenght-1, providerPhasesListLenght-1)))
-        detailData.phasesStpesList.map((item:PhasesStpesListItemInterface)=>{
+        detailData.phasesStpesList.map((item:PhasesStpesListItemInterface,index:number)=>{
           const {name,phase} = item;
           const step = {
             title:name,
             status:'wait',
-            description:'未执行到此处'
+            description:'未执行到此处',
+            icon:<SmileOutlined />
           } as StepProps
           const promoterPhasesObj = lodash.find(promoterPhasesList, {job_phase:phase},null);
           const providerPhases = lodash.find(providerPhasesList, {job_phase:phase},null);
           if(promoterPhasesObj || providerPhases ){
             const myselfStatus = promoterPhasesObj?.status;
             const partnerStatus = providerPhases?.status;
-            step.status = changeProgressStatusToStepStatus(myselfStatus,partnerStatus);
+            console.log('myselfStatus',myselfStatus);
+            console.log('partnerStatus',partnerStatus);
+            
+            const status = changeProgressStatusToStepStatus(myselfStatus,partnerStatus);
+            step.status = status;
+            step.icon = getIconByStatus(status);
             step.description = renderDescription(promoterPhasesObj,providerPhases,phase)
+            // 展示正在进行的步骤
+            // if(status === 'process'){
+            //   const tmpCurrentStepOpenKey = JSON.parse(JSON.stringify(currentStepOpenKey))
+            //   if(!tmpCurrentStepOpenKey.includes(phase)){
+            //     tmpCurrentStepOpenKey.push(phase);
+            //   }
+            //   setCurrentStepOpenKey(tmpCurrentStepOpenKey)
+            // }
           }
           tmpList.push(step)
         })
@@ -93,14 +102,19 @@ const JobProgress = (props:JobProgressProps) => {
     const renderPhasesItem = (phasesObj:PhasesListItemInterface,title:string)=>{
       if(!phasesObj)
         return <></>
+      const {skip_this_phase} = phasesObj;
       return <>
       <ProDescriptions column={1} title={renderPhasesItemTitle(title,phasesObj)} labelStyle={{textAlign:'right'}}>
-        <ProDescriptions.Item label='任务进度'>
-          <Progress style={{width:'70%'}} percent={lodash.get(phasesObj,'percent',0)} />
-        </ProDescriptions.Item>
-        <ProDescriptions.Item label='耗时'>
-          {displayChineseCoastTime(lodash.get(phasesObj,'cost_time',0))}
-        </ProDescriptions.Item> 
+        {
+          !skip_this_phase && <>
+            <ProDescriptions.Item label='任务进度'>
+             <Progress style={{width:'70%'}} percent={lodash.get(phasesObj,'percent',0)} />
+            </ProDescriptions.Item>
+            <ProDescriptions.Item label='耗时'>
+              {displayChineseCoastTime(lodash.get(phasesObj,'cost_time',0))}
+            </ProDescriptions.Item> 
+          </>
+        }
         <ProDescriptions.Item label='日志' >
           {renderLogs(lodash.get(phasesObj,'logs',[]))}
         </ProDescriptions.Item> 
@@ -134,20 +148,35 @@ const JobProgress = (props:JobProgressProps) => {
      * @returns 
      */
     const changeProgressStatusToStepStatus = (myselfStatus:string,partnerStatus:string) => {
+      console.log(myselfStatus,partnerStatus);   
       if(myselfStatus === 'failed' || partnerStatus === 'failed'){
         return 'error';
-      } else if(myselfStatus === 'doing' || partnerStatus === 'doing'){
+      } else if(myselfStatus === 'running' || partnerStatus === 'running' ){
         return 'process';
       } else if(myselfStatus === 'completed' && partnerStatus === 'completed') {
         return 'finish';
-      } else 
+      } else if (myselfStatus === 'completed' || partnerStatus === 'completed') { //有一方完成，另一方未完成表示在执行中
+        return 'process';
+      }
         return 'wait'
     }
 
+    const getIconByStatus = (status:string)=>{
+      if(status === 'error'){
+        return <CloseCircleOutlined />
+      }else if(status === 'process'){
+        return <LoadingOutlined />
+      }else if(status === 'finish'){
+        return <CheckCircleOutlined />
+      } 
+      return <SmileOutlined />
+    }
+
+    console.log('stepList',stepList);
+    
     
     return <Steps
       direction="vertical"
-      current={currentStep}
       items={stepList}
     />
 }

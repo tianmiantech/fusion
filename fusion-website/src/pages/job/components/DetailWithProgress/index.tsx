@@ -1,10 +1,17 @@
 import { useEffect, useState, useRef } from "react";
-import { Row,Col,Card, Space,Button, Alert,message,Descriptions,Spin } from 'antd';
+import { Row,Col,Card, Space,Button, Tag,message,Descriptions,Spin } from 'antd';
+import {
+  CheckCircleOutlined,
+  ClockCircleOutlined,
+  CloseCircleOutlined,
+  ExclamationCircleOutlined,
+  MinusCircleOutlined,
+  SyncOutlined,
+} from '@ant-design/icons';
 import useDetail from "../../hooks/useDetail";
-import JobCard from '../JobCard'
 import ReadOnlyDetailItem from '../ReadOnlyDetailItem'
 import JobProgress from "./JobProgress";
-import {ROLE_TYPE,JOB_STATUS} from '@/constant/dictionary'
+import {ROLE_TYPE,JOB_STATUS,JobStatus} from '@/constant/dictionary'
 import lodash from 'lodash'
 import { useImmer } from "use-immer";
 import { useRequest } from "ahooks";
@@ -13,6 +20,7 @@ import {ResizableTable} from '@/components/DataSetPreview'
 import './index.less'
 import { restartJob } from '@/pages/home/service'
 import TruncatedString from "@/components/TruncatedString";
+import {getPersonificationTime} from '@/utils/time'
 
 
 /**
@@ -174,12 +182,35 @@ const Index = ()=>{
       }
     },{manual:true})
 
+    const renderJobStatus = (status:string)=>{
+      const text = JobStatus.get(status)
+      let color = 'default'
+      let icon = <ClockCircleOutlined/>
+      if(status === JOB_STATUS.SUCCESS){
+        color = 'success'
+        icon = <CheckCircleOutlined />
+      } else if(status === JOB_STATUS.ERROR_ON_RUNNING || status === JOB_STATUS.DISAGREE){
+        color = 'error'
+        icon = <CloseCircleOutlined />
+      } else if(status === JOB_STATUS.STOP_ON_RUNNING){
+        color = 'warning'
+        icon = <MinusCircleOutlined />
+      } else if(status === JOB_STATUS.RUNNING){
+        color = 'processing'
+        icon = <SyncOutlined spin />
+      } else if(status === JOB_STATUS.AUDITING){
+        color = 'default'
+        icon = <ExclamationCircleOutlined />
+      }
+      return <Tag style={{fontSize:'16px',paddingTop:4,paddingBottom:4}} color={color} icon={icon}>{text}</Tag>
+    }
+
     const renderPublicInfo = ()=>{
       return <>
-       <Descriptions bordered>
+       <Descriptions bordered column={2}>
         <Descriptions.Item label="算法类型">{lodash.get(detailData,'jobDetailData.algorithm','') }</Descriptions.Item>
-        <Descriptions.Item label="创建时间">{lodash.get(detailData,'jobDetailData.created_time') }</Descriptions.Item>
-        <Descriptions.Item label="耗时" >{ lodash.get(detailData,'jobDetailData.cost_time','') }</Descriptions.Item>
+        <Descriptions.Item label="创建时间">{getPersonificationTime(lodash.get(detailData,'jobDetailData.created_time')) }</Descriptions.Item>
+        <Descriptions.Item span={2} label="状态" >{ renderJobStatus(lodash.get(detailData,'jobDetailData.status','')) }</Descriptions.Item>
        </Descriptions>
       </>
     }

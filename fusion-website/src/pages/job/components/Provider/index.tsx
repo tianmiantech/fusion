@@ -22,7 +22,7 @@ interface PromoterPropsInterface {
  */
 const Index = forwardRef((props:PromoterPropsInterface,ref) => {
  
-  const { detailData,setDetailData } = useDetail()
+  const { detailData,clearDetailData } = useDetail()
   const jobFormRef = useRef<any>();
 
   const refuseModalRef = useRef<any>();
@@ -40,9 +40,7 @@ const Index = forwardRef((props:PromoterPropsInterface,ref) => {
     const {code,data} = reponse;
     if(code === 0){
       message.success('操作成功')
-      setDetailData(g=>{
-        g.jobId = lodash.get(data,'job_id');
-      })
+      clearDetailData()
       setTimeout(()=>{
         history.push('/job/list')
       },800)

@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useImmer } from "use-immer";
 import lodash from 'lodash'
 import { useRequest } from "ahooks";
-import { JOB_STATUS,JOB_PHASE_LSIT } from "@/constant/dictionary";
+import { JOB_STATUS } from "@/constant/dictionary";
 
 import { getJobDetail,getMergedJobProgress,getAlgorithmPhaseList } from "../service";
 
@@ -21,7 +21,8 @@ export interface PhasesListItemInterface {
   start_time:string,
   status:'doing'|'completed'|'failed', //状态
   speed_in_second:string  //每秒速度
-  total_workload:number
+  total_workload:number,
+  skip_this_phase:boolean,//是否跳过
 }
 
 export interface PhasesStpesListItemInterface {
@@ -148,7 +149,7 @@ const useDetail = ()=>{
         draft.myselfPhasesList = myselfPhasesList;
       })
       //如果任务阶段步骤完成，则取消轮询，并且重新获取任务详情
-      const tmplength = JOB_PHASE_LSIT.size
+      const tmplength = lodash.get(detailData,'phasesStpesList.length',0);
       if(partnerPhasesList.length === tmplength && myselfPhasesList.length===tmplength && status === JOB_STATUS.RUNNING){
         runGetJobDetail(id);
       } 

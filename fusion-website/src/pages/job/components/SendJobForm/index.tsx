@@ -7,6 +7,7 @@ import {testPartnerConntent,TestPartnerConntentRequestInterface,sendJobToProvide
 import useDetail from '../../hooks/useDetail';
 import lodash from 'lodash'
 import { JOB_STATUS } from '@/constant/dictionary';
+import { formRuleRequire } from '@/utils/common';
 import styles from './index.less'
 
 interface SendJobFormPropsInterface {
@@ -18,7 +19,7 @@ const SendJobForm = forwardRef((props:SendJobFormPropsInterface, ref) => {
 
   const [formRef] = Form.useForm();
 
-  const {detailData} = useDetail()
+  const {detailData,clearDetailData} = useDetail()
 
   useEffect(()=>{
     if(detailData.jobDetailData){
@@ -48,6 +49,7 @@ const SendJobForm = forwardRef((props:SendJobFormPropsInterface, ref) => {
     const {code} = reponse;
     if(code === 0) {
       message.success('发送成功')
+      clearDetailData()
       setTimeout(()=>{
         history.push('/home')
       },800)
@@ -112,10 +114,10 @@ const SendJobForm = forwardRef((props:SendJobFormPropsInterface, ref) => {
               服务地址&nbsp;<QuestionCircleOutlined />
             </Tooltip>
           </>
-          }  name="base_url" rules={[{required:true}]}>
+          }  name="base_url" rules={[formRuleRequire('请输入服务地址')]}>
               <Input placeholder='请输入' />
             </Form.Item>
-            <Form.Item name="public_key" label="公钥"  rules={[{required:true}]}>
+            <Form.Item name="public_key" label="公钥"  rules={[formRuleRequire()]}>
               <Input.TextArea placeholder='请输入' rows={4} />
             </Form.Item>
             <Form.Item>

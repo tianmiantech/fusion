@@ -59,12 +59,3 @@ export const JobStatus = new Map([
   [JOB_STATUS.ERROR_ON_RUNNING,'运行出错'],
   [JOB_STATUS.SUCCESS,'运行成功']
 ])
-
-// 任务阶段
-export const JOB_PHASE_LSIT = new Map([
-  ['ConfirmMemberRole', '协商成员角色'],
-  ['CreatePsiBloomFilter', '生成过滤器'],
-  ['DownloadPsiBloomFilter', '下载过滤器'],
-  ['Intersection', '求交'],
-  ['SaveResult', '保存结果'],
-])
