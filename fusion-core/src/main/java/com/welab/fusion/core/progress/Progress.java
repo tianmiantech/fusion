@@ -15,11 +15,13 @@
  */
 package com.welab.fusion.core.progress;
 
-import com.welab.wefe.common.Convert;
+import cn.hutool.core.date.DateUtil;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -32,11 +34,11 @@ public class Progress {
     /**
      * 总工作量
      */
-    protected long totalWorkload;
+    protected long totalWorkload = -1;
     /**
      * 已完成工作量
      */
-    protected long completedWorkload;
+    protected long completedWorkload = -1;
     /**
      * 速度，以秒为单位。
      */
@@ -54,6 +56,10 @@ public class Progress {
      */
     protected Date endTime;
     protected String message;
+    /**
+     * message 记录
+     */
+    private List<String> logs = new ArrayList<>();
     private ProgressStatus status;
 
     public static Progress of(String modelId, long totalWorkload) {
@@ -94,9 +100,13 @@ public class Progress {
     public synchronized void updateCompletedWorkload(long completedWorkload) {
         BigDecimal increment = BigDecimal.valueOf(completedWorkload - this.completedWorkload);
         BigDecimal cost = BigDecimal.valueOf(System.currentTimeMillis() - lastUpdateCompletedWorkloadTime);
-        this.speedInSecond = increment.divide(cost, 5, RoundingMode.HALF_UP)
-                .multiply(BigDecimal.valueOf(1_000))
-                .longValue();
+        if (cost.intValue() > 0) {
+            this.speedInSecond = increment.divide(cost, 5, RoundingMode.HALF_UP)
+                    .multiply(BigDecimal.valueOf(1_000))
+                    .longValue();
+        } else {
+            this.speedInSecond = 0;
+        }
 
         this.lastUpdateCompletedWorkloadTime = System.currentTimeMillis();
         this.completedWorkload = completedWorkload;
@@ -117,22 +127,32 @@ public class Progress {
     /**
      * 进度，百分比，0 ~ 100。
      */
-    public int getPercent() {
-        if (completedWorkload <= 0 || totalWorkload <= 0) {
-            return 0;
+    public double getPercent() {
+        if (totalWorkload == 0) {
+            return BigDecimal.valueOf(100).doubleValue();
+        }
+        if (completedWorkload <= 0) {
+            return BigDecimal.ZERO.doubleValue();
         }
 
-        return Convert.toInt(completedWorkload * 100L / totalWorkload);
+        return BigDecimal.valueOf(completedWorkload)
+                .multiply(BigDecimal.valueOf(100))
+                .divide(BigDecimal.valueOf(totalWorkload), 2, RoundingMode.HALF_UP)
+                .doubleValue();
     }
 
     /**
      * 预计剩余时间
      */
     public long getEstimatedRemainingTime() {
-        if (getPercent() <= 0 || getCostTime() <= 0) {
+        double percent = getPercent();
+        if (percent <= 0 || getCostTime() <= 0) {
             return -1;
         }
 
+        if (percent == 100) {
+            return 0;
+        }
 
         return BigDecimal.valueOf(totalWorkload - completedWorkload)
                 .divide(BigDecimal.valueOf(completedWorkload), 5, RoundingMode.HALF_UP)
@@ -143,8 +163,40 @@ public class Progress {
         this.totalWorkload = totalWorkload;
     }
 
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public void setMessageAndLog(String message) {
+        this.message = message;
+
+        synchronized (logs) {
+            if (logs.size() > 100) {
+                logs.remove(0);
+            }
+            logs.add("[" + DateUtil.now() + "] " + message);
+        }
+    }
+
+    /**
+     * 强制设置进度为 99%
+     */
+    public void successSoon() {
+        if (this.totalWorkload < 1) {
+            this.totalWorkload = 100;
+        }
+        this.completedWorkload = this.totalWorkload * 99 / 100;
+    }
 
     // region getter/setter
+
+    public String getModelId() {
+        return modelId;
+    }
+
+    public void setModelId(String modelId) {
+        this.modelId = modelId;
+    }
 
     public String getSessionId() {
         return sessionId;
@@ -170,6 +222,22 @@ public class Progress {
         this.completedWorkload = completedWorkload;
     }
 
+    public long getSpeedInSecond() {
+        return speedInSecond;
+    }
+
+    public void setSpeedInSecond(long speedInSecond) {
+        this.speedInSecond = speedInSecond;
+    }
+
+    public long getLastUpdateCompletedWorkloadTime() {
+        return lastUpdateCompletedWorkloadTime;
+    }
+
+    public void setLastUpdateCompletedWorkloadTime(long lastUpdateCompletedWorkloadTime) {
+        this.lastUpdateCompletedWorkloadTime = lastUpdateCompletedWorkloadTime;
+    }
+
     public Date getStartTime() {
         return startTime;
     }
@@ -190,16 +258,20 @@ public class Progress {
         return message;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
+    public List<String> getLogs() {
+        return logs;
     }
 
-    public long getSpeedInSecond() {
-        return speedInSecond;
+    public void setLogs(List<String> logs) {
+        this.logs = logs;
     }
 
     public ProgressStatus getStatus() {
         return status;
+    }
+
+    public void setStatus(ProgressStatus status) {
+        this.status = status;
     }
 
     // endregion

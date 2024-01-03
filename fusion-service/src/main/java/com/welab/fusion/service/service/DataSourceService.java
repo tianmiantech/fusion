@@ -15,12 +15,14 @@
  */
 package com.welab.fusion.service.service;
 
+import com.welab.fusion.core.Job.data_resource.DataResourceType;
 import com.welab.fusion.service.api.bloom_filter.AddBloomFilterApi;
 import com.welab.fusion.service.api.data_source.SaveDataSourceApi;
 import com.welab.fusion.service.api.data_source.TestDataSourceApi;
 import com.welab.fusion.service.constans.AddMethod;
 import com.welab.fusion.service.database.entity.DataSourceDbModel;
 import com.welab.fusion.service.database.repository.DataSourceRepository;
+import com.welab.fusion.service.dto.JobConfigInput;
 import com.welab.fusion.service.dto.entity.DataSourceOutputModel;
 import com.welab.fusion.service.service.base.AbstractService;
 import com.welab.wefe.common.ModelMapper;
@@ -81,14 +83,14 @@ public class DataSourceService extends AbstractService {
         return ModelMapper.maps(all, DataSourceOutputModel.class);
     }
 
-    public void testDataSource(TestDataSourceApi.Input input) throws StatusCodeWithException {
+    public String testDataSource(TestDataSourceApi.Input input) {
         JdbcDataSourceClient client = StringUtil.isNotEmpty(input.id)
                 // 前端传了 id，从数据库取出数据源配置
                 ? dataSourceRepository.findById(input.id).orElse(null).getJdbcDataSourceClient()
                 // 前端没传 id，直接用前端传的数据源配置
                 : SuperDataSourceClient.create(input.databaseType.name(), input.dataSourceParams);
 
-        client.test();
+        return client.test();
     }
 
     /**
@@ -109,6 +111,7 @@ public class DataSourceService extends AbstractService {
 
         if (model == null) {
             model = new DataSourceDbModel();
+            model.setId(input.databaseType + "-" + input.getHost() + ":" + input.getPort());
         }
 
         model.setName(dataSourceClient.getParams().name);
@@ -128,6 +131,10 @@ public class DataSourceService extends AbstractService {
      */
     @Async
     public void trySave(AddBloomFilterApi.Input input) {
+        if (input.isRequestFromPartner()) {
+            return;
+        }
+
         // 不是数据库类型的数据源，不创建。
         if (input.addMethod != AddMethod.Database) {
             return;
@@ -135,6 +142,32 @@ public class DataSourceService extends AbstractService {
 
         try {
             save(input);
+        } catch (StatusCodeWithException e) {
+            LOG.error(e.getClass().getSimpleName() + " 自动保存数据源失败：" + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * 由创建/启动触发的创建数据源
+     * 由于这里创建数据源是个顺带的操作，所以仅作尝试，失败时不抛出异常。
+     */
+    public void trySave(JobConfigInput input) {
+        if (input.isRequestFromPartner()) {
+            return;
+        }
+
+        // 不是数据集类型的数据源，不创建。
+        if (input.dataResource.dataResourceType != DataResourceType.TableDataSource) {
+            return;
+        }
+
+        // 不是数据库类型的数据源，不创建。
+        if (input.dataResource.tableDataResourceInfo.addMethod != AddMethod.Database) {
+            return;
+        }
+
+        try {
+            save(input.dataResource.tableDataResourceInfo);
         } catch (StatusCodeWithException e) {
             LOG.error(e.getClass().getSimpleName() + " 自动保存数据源失败：" + e.getMessage(), e);
         }

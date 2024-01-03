@@ -15,15 +15,35 @@
  */
 package com.welab.fusion.service.job_function;
 
-import com.welab.fusion.core.Job.FusionResult;
+import com.welab.fusion.core.Job.PsiJobResult;
+import com.welab.fusion.core.Job.base.JobRole;
+import com.welab.fusion.service.database.entity.JobDbModel;
+import com.welab.fusion.service.service.JobService;
+import com.welab.wefe.common.web.Launcher;
+
+import java.util.function.Consumer;
 
 /**
  * @author zane.luo
  * @date 2023/11/29
  */
-public class SaveFusionResultFunction implements com.welab.fusion.core.function.SaveFusionResultFunction {
-    @Override
-    public void save(FusionResult result) {
+public class SaveFusionResultFunction implements com.welab.fusion.core.algorithm.rsa_psi.function.SaveFusionResultFunction {
+    private static final JobService jobService = Launcher.getBean(JobService.class);
 
+    @Override
+    public void save(String jobId, JobRole myRole, PsiJobResult result, Consumer<Long> totalSizeConsumer, Consumer<Long> downloadSizeConsumer) throws Exception {
+        JobDbModel job = jobService.findById(jobId);
+
+        saveFusionResult(job, result);
+    }
+
+    /**
+     * 保存求交结果到本地
+     */
+    private void saveFusionResult(JobDbModel job, PsiJobResult result) {
+        job.setFusionCount(result.fusionCount);
+        job.setUpdatedTimeNow();
+
+        job.save();
     }
 }

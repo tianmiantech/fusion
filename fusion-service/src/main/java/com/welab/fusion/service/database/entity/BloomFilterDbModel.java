@@ -58,7 +58,7 @@ public class BloomFilterDbModel extends AbstractDbModel {
      */
     @Type(type = "json")
     @Column(columnDefinition = "json")
-    private JSONObject hashConfigs;
+    private JSONObject hashConfig;
 
     /**
      * 布隆过滤器添加方式
@@ -69,6 +69,11 @@ public class BloomFilterDbModel extends AbstractDbModel {
      * sql语句
      */
     private String sql;
+
+    /**
+     * 唯一标识，用于去重。
+     */
+    private String key;
 
     // region getter/setter
 
@@ -112,12 +117,12 @@ public class BloomFilterDbModel extends AbstractDbModel {
         this.totalDataCount = totalDataCount;
     }
 
-    public JSONObject getHashConfigs() {
-        return hashConfigs;
+    public JSONObject getHashConfig() {
+        return hashConfig;
     }
 
-    public void setHashConfigs(JSONObject hashConfigs) {
-        this.hashConfigs = hashConfigs;
+    public void setHashConfig(JSONObject hashConfig) {
+        this.hashConfig = hashConfig;
     }
 
     public AddMethod getAddMethod() {
@@ -134,6 +139,14 @@ public class BloomFilterDbModel extends AbstractDbModel {
 
     public void setSql(String sql) {
         this.sql = sql;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 
     // endregion

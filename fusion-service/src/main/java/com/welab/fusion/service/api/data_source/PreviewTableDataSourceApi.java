@@ -15,19 +15,23 @@
  */
 package com.welab.fusion.service.api.data_source;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.annotation.JSONField;
-import com.welab.fusion.core.data_source.AbstractTableDataSourceReader;
-import com.welab.fusion.core.data_source.CsvTableDataSourceReader;
-import com.welab.fusion.core.data_source.ExcelTableDataSourceReader;
-import com.welab.fusion.core.data_source.SqlTableDataSourceReader;
+import com.welab.fusion.core.io.data_source.AbstractTableDataSourceReader;
+import com.welab.fusion.core.io.data_source.CsvTableDataSourceReader;
+import com.welab.fusion.core.io.data_source.ExcelTableDataSourceReader;
+import com.welab.fusion.core.io.data_source.SqlTableDataSourceReader;
 import com.welab.fusion.core.io.FileSystem;
+import com.welab.fusion.service.config.fastjson.BlockForPartnerField;
 import com.welab.fusion.service.constans.AddMethod;
 import com.welab.fusion.service.service.BloomFilterService;
+import com.welab.wefe.common.crypto.Md5;
 import com.welab.wefe.common.data.source.JdbcDataSourceClient;
 import com.welab.wefe.common.data.source.SuperDataSourceClient;
 import com.welab.wefe.common.fieldvalidate.annotation.Check;
 import com.welab.wefe.common.fieldvalidate.secret.MaskStrategy;
 import com.welab.wefe.common.fieldvalidate.secret.Secret;
+import com.welab.wefe.common.util.FileUtil;
 import com.welab.wefe.common.web.api.base.AbstractApi;
 import com.welab.wefe.common.web.api.base.Api;
 import com.welab.wefe.common.web.dto.ApiResult;
@@ -61,7 +65,7 @@ public class PreviewTableDataSourceApi extends AbstractApi<PreviewTableDataSourc
         public String sql;
 
         @Check(name = "数据源文件")
-        @Secret(maskStrategy = MaskStrategy.BLOCK)
+        @BlockForPartnerField
         public String dataSourceFile;
 
         @JSONField(serialize = false)
@@ -70,6 +74,30 @@ public class PreviewTableDataSourceApi extends AbstractApi<PreviewTableDataSourc
                 return new File(dataSourceFile);
             } else {
                 return FileSystem.getTempDir().resolve(dataSourceFile).toFile();
+            }
+        }
+
+        /**
+         * 生成名称，供自动生成过滤器时使用。
+         */
+        @JSONField(serialize = false)
+        public String buildAutoName() {
+            if (addMethod == AddMethod.Database) {
+                return databaseType + "_" + Md5.of(JSON.toJSONString(dataSourceParams) + sql);
+            } else {
+                return FileUtil.getFileNameWithoutSuffix(dataSourceFile);
+            }
+        }
+
+        /**
+         * 生成描述，供自动生成过滤器时使用。
+         */
+        @JSONField(serialize = false)
+        public String buildAutoDescription() {
+            if (addMethod == AddMethod.Database) {
+                return databaseType + ": " + sql;
+            } else {
+                return "File: " + dataSourceFile;
             }
         }
 

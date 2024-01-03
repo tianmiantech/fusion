@@ -18,17 +18,17 @@ package com.welab.fusion.service.database.entity;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.vladmihalcea.hibernate.type.json.JsonStringType;
-import com.welab.fusion.core.data_resource.base.DataResourceType;
+import com.welab.fusion.core.Job.data_resource.DataResourceType;
 import com.welab.fusion.core.hash.HashConfig;
+import com.welab.fusion.service.api.job.CreateJobApi;
 import com.welab.fusion.service.constans.JobMemberRole;
+import com.welab.fusion.service.database.base.StringSetConverter;
 import com.welab.wefe.common.fieldvalidate.annotation.Check;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
+import javax.persistence.*;
+import java.util.LinkedHashSet;
 
 /**
  * @author zane.luo
@@ -53,6 +53,10 @@ public class JobMemberDbModel extends AbstractDbModel {
     @Column(columnDefinition = "json")
     private JSONObject hashConfig;
 
+    @Check(name = "附加结果字段")
+    @Convert(converter = StringSetConverter.class)
+    private LinkedHashSet<String> additionalResultColumns;
+
     @Check(name = "过滤器Id")
     private String bloomFilterId;
 
@@ -67,6 +71,11 @@ public class JobMemberDbModel extends AbstractDbModel {
             return null;
         }
         return hashConfig.toJavaObject(HashConfig.class);
+    }
+
+    @JSONField(serialize = false)
+    public CreateJobApi.TableDataResourceInput getTableDataResourceInfoModel() {
+        return this.tableDataResourceInfo.toJavaObject(CreateJobApi.TableDataResourceInput.class);
     }
 
     // region getter/setter
@@ -119,6 +128,14 @@ public class JobMemberDbModel extends AbstractDbModel {
         this.hashConfig = hashConfig;
     }
 
+    public LinkedHashSet<String> getAdditionalResultColumns() {
+        return additionalResultColumns;
+    }
+
+    public void setAdditionalResultColumns(LinkedHashSet<String> additionalResultColumns) {
+        this.additionalResultColumns = additionalResultColumns;
+    }
+
     public String getBloomFilterId() {
         return bloomFilterId;
     }
@@ -134,7 +151,6 @@ public class JobMemberDbModel extends AbstractDbModel {
     public void setTableDataResourceInfo(JSONObject tableDataResourceInfo) {
         this.tableDataResourceInfo = tableDataResourceInfo;
     }
-
 
     // endregion
 }

@@ -74,11 +74,7 @@ public class MemberService extends AbstractService {
                     .throwException("未设置“对外服务地址”，请在全局配置中填写，供其它节点通信。");
         }
 
-        MemberInputModel input = new MemberInputModel();
-        input.setName(MYSELF_NAME);
-        input.setBaseUrl(config.publicServiceBaseUrl);
-        input.setPublicKey(config.publicKey);
-        return save(input);
+        return save(MYSELF_NAME, config.publicServiceBaseUrl, config.publicKey);
     }
 
     /**
@@ -97,7 +93,17 @@ public class MemberService extends AbstractService {
     }
 
     public MemberDbModel save(MemberInputModel input) throws Exception {
-        return save(input.getName(), input.getBaseUrl(), input.getPublicKey());
+        // 如果输入的是自己，不保存。
+        FusionConfigModel config = globalConfigService.getFusionConfig();
+        if (config != null && StringUtil.isNotEmpty(config.publicServiceBaseUrl)) {
+            String myselfId = MemberService.buildMemberId(config.publicServiceBaseUrl);
+            String inputId = MemberService.buildMemberId(input.getBaseUrl());
+            if (inputId.equals(myselfId)) {
+                return null;
+            }
+        }
+
+        return save(input.getMember_name(), input.getBaseUrl(), input.getPublicKey());
     }
 
     public synchronized MemberDbModel save(String name, String baseUrl, String publicKey) throws Exception {
@@ -108,12 +114,22 @@ public class MemberService extends AbstractService {
             name = MemberService.buildMemberId(baseUrl);
         }
 
-        MemberDbModel model = findByUrl(baseUrl);
+        String memberId = buildMemberId(baseUrl);
+        MemberDbModel model = MYSELF_NAME.equals(name)
+                ? memberRepository.findByName(MYSELF_NAME)
+                : findById(memberId);
 
         // 有则更新，无则新增。
         if (model == null) {
             model = new MemberDbModel();
+            model.setId(
+                    MYSELF_NAME.equals(name)
+                            // myself 的 id 固定，不允许修改。
+                            ? MYSELF_NAME
+                            : memberId
+            );
         }
+
 
         /**
          * 仅在以下两种情况下设置名称，避免在未指定名称时覆盖。
@@ -131,8 +147,13 @@ public class MemberService extends AbstractService {
         return model;
     }
 
-    public static String buildMemberId(String baseUrl) throws URISyntaxException {
-        URI uri = new URI(baseUrl);
+    public static String buildMemberId(String baseUrl) {
+        URI uri = null;
+        try {
+            uri = new URI(baseUrl);
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
         return uri.getHost() + ":" + uri.getPort();
     }
 
@@ -141,12 +162,16 @@ public class MemberService extends AbstractService {
     }
 
     public MemberDbModel findById(String id) {
+        if (id == null) {
+            return null;
+        }
         return memberRepository.findById(id).orElse(null);
     }
 
     public List<MemberOutputModel> list(String name) {
         MySpecification<MemberDbModel> where = Where
                 .create()
+                .notEqual("name", MYSELF_NAME)
                 .contains("name", name)
                 .build();
 
@@ -155,6 +180,9 @@ public class MemberService extends AbstractService {
     }
 
     public void delete(String id) {
+        if (MYSELF_NAME.equals(id)) {
+            throw new RuntimeException("不能删除自己");
+        }
         memberRepository.deleteById(id);
     }
 
@@ -170,15 +198,17 @@ public class MemberService extends AbstractService {
      */
     public void testConnection(MemberInputModel input) throws Exception {
         // 请求来自己方前端，发起请求访问合作方的 TestConnectApi。
-        if (input.fromMyselfFrontEnd()) {
+        if (input.isRequestFromMyself()) {
+            MemberDbModel myself = getMyself();
             gatewayService.callOtherFusionNode(
-                    FusionNodeInfo.of(input.getBaseUrl(), input.getPublicKey()),
-                    TestConnectApi.class
+                    FusionNodeInfo.of(input.getPublicKey(), input.getBaseUrl()),
+                    TestConnectApi.class,
+                    MemberInputModel.of(myself.getPublicKey(), myself.getBaseUrl())
             );
         }
 
         // 别人请求我，我请求回去。
-        if (input.fromOtherFusionNode()) {
+        if (input.isRequestFromPartner()) {
             gatewayService.callOtherFusionNode(
                     FusionNodeInfo.of(input.caller.publicKey, input.caller.baseUrl),
                     AliveApi.class
@@ -193,7 +223,6 @@ public class MemberService extends AbstractService {
             // ignore
         }
     }
-
 
     public FusionNodeInfo getPartnerFusionNodeInfo(String memberId) {
         return findById(memberId).toFusionNodeInfo();

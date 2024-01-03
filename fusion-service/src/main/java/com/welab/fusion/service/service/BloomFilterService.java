@@ -15,19 +15,16 @@
  */
 package com.welab.fusion.service.service;
 
-import com.welab.fusion.core.progress.Progress;
-import com.welab.fusion.core.bloom_filter.PsiBloomFilter;
-import com.welab.fusion.core.bloom_filter.PsiBloomFilterCreator;
-import com.welab.fusion.core.data_source.AbstractTableDataSourceReader;
-import com.welab.fusion.core.data_source.CsvTableDataSourceReader;
-import com.welab.fusion.core.data_source.ExcelTableDataSourceReader;
-import com.welab.fusion.core.data_source.SqlTableDataSourceReader;
+import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
+import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilterCreator;
+import com.welab.fusion.core.io.data_source.AbstractTableDataSourceReader;
 import com.welab.fusion.core.hash.HashConfig;
-import com.welab.fusion.core.io.FileSystem;
+import com.welab.fusion.core.progress.Progress;
 import com.welab.fusion.service.api.bloom_filter.AddBloomFilterApi;
-import com.welab.fusion.service.api.data_source.PreviewTableDataSourceApi;
 import com.welab.fusion.service.api.bloom_filter.QueryBloomFilterApi;
 import com.welab.fusion.service.api.bloom_filter.UpdateBloomFilterApi;
+import com.welab.fusion.service.api.data_source.PreviewTableDataSourceApi;
+import com.welab.fusion.service.constans.AddMethod;
 import com.welab.fusion.service.database.base.MySpecification;
 import com.welab.fusion.service.database.base.Where;
 import com.welab.fusion.service.database.entity.BloomFilterDbModel;
@@ -37,13 +34,10 @@ import com.welab.fusion.service.dto.entity.BloomFilterOutputModel;
 import com.welab.fusion.service.model.ProgressManager;
 import com.welab.fusion.service.service.base.AbstractService;
 import com.welab.wefe.common.CommonThreadPool;
-import com.welab.wefe.common.data.source.JdbcDataSourceClient;
-import com.welab.wefe.common.data.source.SuperDataSourceClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -69,7 +63,7 @@ public class BloomFilterService extends AbstractService {
         model.setAddMethod(input.addMethod);
         model.setDescription(input.description);
         model.setSql(input.sql);
-        model.setHashConfigs(input.hashConfig.toJson());
+        model.setHashConfig(input.hashConfig.toJson());
 
         Progress progress = ProgressManager.startNew(model.getId());
         CommonThreadPool.run(() -> {
@@ -91,23 +85,23 @@ public class BloomFilterService extends AbstractService {
 
     private void create(BloomFilterDbModel model, Progress progress, AbstractTableDataSourceReader dataSourceReader, HashConfig hashConfig) throws Exception {
 
-        progress.setMessage("正在统计数据总量...");
+        progress.setMessageAndLog("正在统计数据总量...");
         progress.updateTotalWorkload(dataSourceReader.getTotalDataRowCount());
 
-        progress.setMessage("正在生成过滤器...");
+        progress.setMessageAndLog("正在生成过滤器...");
         // 生成过滤器
         try (PsiBloomFilterCreator creator = new PsiBloomFilterCreator(model.getId(), dataSourceReader, hashConfig, progress)) {
 
             PsiBloomFilter psiBloomFilter = creator.create();
 
-            progress.setMessage("过滤器生成完毕，正在储存...");
-            Path sinkDir = FileSystem.PsiBloomFilter.getPath(model.getId());
-            psiBloomFilter.sink(sinkDir);
+            progress.setMessageAndLog("过滤器生成完毕，正在储存...");
+            psiBloomFilter.sink();
 
             // 填充 model
             model.setTotalDataCount(dataSourceReader.getTotalDataRowCount());
-            model.setStorageDir(sinkDir.toAbsolutePath().toString());
-            model.setStorageSize(PsiBloomFilter.getDataFile(sinkDir).length());
+            model.setStorageDir(psiBloomFilter.getDir().toAbsolutePath().toString());
+            model.setStorageSize(psiBloomFilter.getDataFile().length());
+            model.setKey(psiBloomFilter.hashCode() + "");
         } catch (Exception e) {
             LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);
             throw e;
@@ -118,14 +112,17 @@ public class BloomFilterService extends AbstractService {
      * 预览数据源中的数据
      */
     public PreviewTableDataSourceApi.Output previewTableDataSource(PreviewTableDataSourceApi.Input input) throws Exception {
-        AbstractTableDataSourceReader reader = input.createReader(100, -1);
+        try (AbstractTableDataSourceReader reader = input.createReader(100, -1)){
 
-        PreviewTableDataSourceApi.Output output = new PreviewTableDataSourceApi.Output();
-        output.header = reader.getHeader();
-        output.rows = new ArrayList<>(100);
+            PreviewTableDataSourceApi.Output output = new PreviewTableDataSourceApi.Output();
+            output.header = reader.getHeader();
+            output.rows = new ArrayList<>(100);
 
-        reader.readRows((index, row) -> output.rows.add(row));
-        return output;
+            reader.readRows((index, row) -> output.rows.add(row));
+            return output;
+        }
+
+
     }
 
     /**
@@ -169,5 +166,13 @@ public class BloomFilterService extends AbstractService {
         model.setDescription(input.description);
         model.setUpdatedTime(new Date());
         model.save();
+    }
+
+    public BloomFilterDbModel findAutoGenerateByKey(int key) {
+        MySpecification<BloomFilterDbModel> where = Where.create()
+                .equal("addMethod", AddMethod.AutoGenerate)
+                .equal("key", key)
+                .build();
+        return bloomFilterRepository.findOne(where).orElse(null);
     }
 }

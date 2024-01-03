@@ -27,7 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author zane.luo
  * @date 2023/11/27
  */
-@Api(path = "job/disagree", name = "协作方拒绝任务")
+@Api(path = "job/disagree", name = "协作方拒绝任务", allowAccessWithSign = true)
 public class DisagreeJobApi extends AbstractApi<DisagreeJobApi.Input, DisagreeJobApi.Output> {
     @Autowired
     private JobService jobService;

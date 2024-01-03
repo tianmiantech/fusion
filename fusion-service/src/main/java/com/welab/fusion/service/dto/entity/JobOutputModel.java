@@ -15,22 +15,35 @@
  */
 package com.welab.fusion.service.dto.entity;
 
-import com.welab.fusion.core.Job.JobStatus;
+import com.welab.fusion.core.Job.base.JobStatus;
+import com.welab.fusion.core.algorithm.base.PsiAlgorithm;
 import com.welab.fusion.service.constans.JobMemberRole;
 import com.welab.fusion.service.database.entity.JobDbModel;
 import com.welab.wefe.common.fieldvalidate.annotation.Check;
+
+import java.util.Date;
 
 /**
  * @author zane.luo
  * @date 2023/11/29
  */
 public class JobOutputModel extends AbstractOutputModel {
+    @Check(name = "算法")
+    private PsiAlgorithm algorithm;
     @Check(name = "创建任务的成员ID")
     private String creatorMemberId;
     @Check(name = "我方角色")
     private JobMemberRole role;
     @Check(name = "任务备注")
     private String remark;
+    @Check(name = "交集数量")
+    private Long fusionCount;
+    @Check(name = "任务开始时间")
+    private Date startTime;
+    @Check(name = "任务结束时间")
+    private Date endTime;
+    @Check(name = "任务耗时")
+    private Long costTime;
     @Check(name = "任务状态")
     private JobStatus status;
     @Check(name = "任务状态对应的消息")
@@ -48,6 +61,15 @@ public class JobOutputModel extends AbstractOutputModel {
     }
 
     // region getter/setter
+
+
+    public PsiAlgorithm getAlgorithm() {
+        return algorithm;
+    }
+
+    public void setAlgorithm(PsiAlgorithm algorithm) {
+        this.algorithm = algorithm;
+    }
 
     public String getCreatorMemberId() {
         return creatorMemberId;
@@ -71,6 +93,38 @@ public class JobOutputModel extends AbstractOutputModel {
 
     public void setRemark(String remark) {
         this.remark = remark;
+    }
+
+    public Long getFusionCount() {
+        return fusionCount;
+    }
+
+    public void setFusionCount(Long fusionCount) {
+        this.fusionCount = fusionCount;
+    }
+
+    public Date getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
+    }
+
+    public Date getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(Date endTime) {
+        this.endTime = endTime;
+    }
+
+    public Long getCostTime() {
+        return costTime;
+    }
+
+    public void setCostTime(Long costTime) {
+        this.costTime = costTime;
     }
 
     public JobStatus getStatus() {

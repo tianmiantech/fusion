@@ -18,6 +18,7 @@ package com.welab.fusion.service.api.data_source;
 
 import com.welab.fusion.service.service.DataSourceService;
 import com.welab.wefe.common.fieldvalidate.annotation.Check;
+import com.welab.wefe.common.util.StringUtil;
 import com.welab.wefe.common.web.api.base.AbstractApi;
 import com.welab.wefe.common.web.api.base.Api;
 import com.welab.wefe.common.web.dto.ApiResult;
@@ -33,12 +34,12 @@ public class TestDataSourceApi extends AbstractApi<TestDataSourceApi.Input, Test
 
     @Override
     protected ApiResult<Output> handle(Input input) throws Exception {
-        try {
-            dataSourceService.testDataSource(input);
-            return success(Output.success());
-        } catch (Exception e) {
-            return success(Output.fail(e.getMessage()));
-        }
+        String message = dataSourceService.testDataSource(input);
+        return success(
+                StringUtil.isEmpty(message)
+                        ? Output.success()
+                        : Output.fail(message)
+        );
     }
 
     public static class Input extends SaveDataSourceApi.Input {

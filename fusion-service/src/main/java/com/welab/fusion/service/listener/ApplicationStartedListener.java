@@ -18,6 +18,7 @@ package com.welab.fusion.service.listener;
 
 import com.welab.fusion.core.io.FileSystem;
 import com.welab.fusion.service.service.GlobalConfigService;
+import com.welab.fusion.service.service.JobService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +28,6 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.nio.file.Paths;
 
 /**
  * Monitor the message queue and process chat messages
@@ -41,8 +41,12 @@ public class ApplicationStartedListener implements ApplicationListener<Applicati
 
     @Value("${fusion.file-system.base-dir:}")
     private String fileSystemBaseDir;
+    @Value("${server.port:}")
+    private String serverPort;
     @Autowired
     private GlobalConfigService globalConfigService;
+    @Autowired
+    private JobService jobService;
 
     @Override
     public void onApplicationEvent(ApplicationStartedEvent event) {
@@ -57,10 +61,14 @@ public class ApplicationStartedListener implements ApplicationListener<Applicati
 
         // 初始化文件系统
         try {
-            FileSystem.init(fileSystemBaseDir);
+            FileSystem.init(fileSystemBaseDir, serverPort);
         } catch (IOException e) {
             LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);
             System.exit(-1);
         }
+
+        // 关闭之前处于运行中的任务
+        jobService.finishAllJob();
+
     }
 }

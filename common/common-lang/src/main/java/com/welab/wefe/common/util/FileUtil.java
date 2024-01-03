@@ -17,23 +17,30 @@
 package com.welab.wefe.common.util;
 
 import cn.hutool.core.io.IoUtil;
+import de.siegmar.fastcsv.reader.CsvParser;
+import de.siegmar.fastcsv.reader.CsvReader;
+import de.siegmar.fastcsv.reader.CsvRow;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.input.ReversedLinesFileReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 /**
  * @author zane.luo
  */
 public class FileUtil {
+    private static final Logger LOG = LoggerFactory.getLogger(FileUtil.class);
 
     public static boolean isImage(File file) {
         if (file.isDirectory()) {
@@ -438,11 +445,181 @@ public class FileUtil {
      * 获取文件创建时间
      */
     public static Date getCreateTime(File file) throws IOException {
-        // 根据文件的绝对路径获取Path
-        Path path = Paths.get(file.getAbsolutePath());
         // 根据path获取文件的基本属性类
-        BasicFileAttributes attrs = Files.readAttributes(path, BasicFileAttributes.class);
+        BasicFileAttributes attrs = Files.readAttributes(
+                file.toPath(),
+                BasicFileAttributes.class
+        );
         return new Date(attrs.creationTime().toMillis());
+    }
+
+    /**
+     * 获取文件行数
+     *
+     * 最终行数会剔除掉文件尾部的空行行数
+     */
+    public static long getFileLineCount(File file) {
+        long totalRowCount = 0;
+        try (LineNumberReader lineNumberReader = new LineNumberReader(new FileReader(file))) {
+            lineNumberReader.skip(Long.MAX_VALUE);
+            // 计算行数时，不包含列头。
+            totalRowCount = lineNumberReader.getLineNumber() - 1L;
+        } catch (IOException e) {
+            LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);
+            return 0;
+        }
+
+        // 如果最后一行是空行，行数减一。
+        if (totalRowCount > 0) {
+            try (ReversedLinesFileReader reversedLinesReader = new ReversedLinesFileReader(file, StandardCharsets.UTF_8)) {
+                String lastLine;
+
+                // 去除空行
+                while (true) {
+                    lastLine = reversedLinesReader.readLine();
+
+                    if (StringUtil.isBlank(lastLine)) {
+                        totalRowCount--;
+                    } else {
+                        break;
+                    }
+                }
+
+            } catch (Exception e) {
+                LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);
+            }
+        }
+
+        return totalRowCount;
+    }
+
+    /**
+     * 构建 BufferedReader
+     *
+     * BufferedReader 是线程安全的，可以在多线程中使用。
+     */
+    public static BufferedReader buildBufferedReader(File file) throws FileNotFoundException {
+        return new BufferedReader(
+                new InputStreamReader(
+                        new FileInputStream(file),
+                        StandardCharsets.UTF_8
+                )
+        );
+    }
+
+
+    /**
+     * 构建 BufferedWriter
+     *
+     * BufferedWriter 是线程安全的，可以在多线程中使用。
+     *
+     * @param file   写入的文件
+     * @param append 是否追加，如果不追加，会覆盖已有文件。
+     */
+    public static BufferedWriter buildBufferedWriter(File file, boolean append) {
+        if (!append) {
+            file.delete();
+        }
+        file.getParentFile().mkdirs();
+
+        try {
+            return new BufferedWriter(
+                    new OutputStreamWriter(
+                            new FileOutputStream(file, append),
+                            StandardCharsets.UTF_8
+                    )
+            );
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * 分片读取文本文件
+     *
+     * @param partitionIndex 分片索引，从 0 开始。
+     * @param batchSize      批大小
+     */
+    public static List<LinkedHashMap<String, Object>> readPartitionRows(File file, int partitionIndex, int batchSize) throws IOException {
+
+        CsvReader reader = new CsvReader();
+        reader.setContainsHeader(false);
+        reader.setSkipEmptyRows(true);
+        CsvParser parser = reader.parse(file, StandardCharsets.UTF_8);
+        List<String> header = parser.nextRow().getFields();
+
+        List<LinkedHashMap<String, Object>> result = new ArrayList<>(batchSize);
+        int skipLineCount = batchSize * partitionIndex;
+        int lineIndex = 0;
+
+        while (true) {
+            CsvRow row = parser.nextRow();
+            lineIndex++;
+
+            if (row == null) {
+                return result;
+            }
+
+            if (lineIndex < skipLineCount) {
+                continue;
+            }
+
+            LinkedHashMap<String, Object> map = new LinkedHashMap<>();
+            for (int i = 0; i < header.size(); i++) {
+                String value = "";
+                if (row.getFieldCount() > i) {
+                    value = row.getField(i);
+                }
+                map.put(header.get(i), value);
+            }
+            result.add(map);
+
+
+            if (result.size() == batchSize) {
+                return result;
+            }
+        }
+    }
+
+    /**
+     * 分片读取文本文件
+     *
+     * @param partitionIndex 分片索引，从 0 开始。
+     * @param batchSize      批大小
+     * @param hasHeader      是否有列头，如果有列头，会跳过第一行。
+     */
+    public static List<String> readPartitionLines(File file, int partitionIndex, int batchSize, boolean hasHeader) throws IOException {
+        List<String> result = new ArrayList<>(batchSize);
+
+        int skipLineCount = batchSize * partitionIndex;
+        if (hasHeader) {
+            skipLineCount++;
+        }
+        int lineIndex = 0;
+        try (BufferedReader reader = FileUtil.buildBufferedReader(file)) {
+            while (true) {
+                String line = reader.readLine();
+                lineIndex++;
+
+                if (line == null) {
+                    return result;
+                }
+
+                if (lineIndex < skipLineCount) {
+                    continue;
+                }
+
+                if (StringUtil.isBlank(line)) {
+                    continue;
+                }
+
+                result.add(line);
+
+                if (result.size() == batchSize) {
+                    return result;
+                }
+            }
+        }
     }
 
     public static void main(String[] args) throws IOException {

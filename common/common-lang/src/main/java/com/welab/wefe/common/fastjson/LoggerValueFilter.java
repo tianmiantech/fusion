@@ -18,6 +18,7 @@ package com.welab.wefe.common.fastjson;
 import com.alibaba.fastjson.serializer.ValueFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.FileSystemResource;
 
 import java.io.File;
@@ -64,6 +65,8 @@ public class LoggerValueFilter implements ValueFilter {
                 return process(object, name, (File) value);
             } else if (value instanceof FileSystemResource) {
                 return process(object, name, (FileSystemResource) value);
+            } else if (value instanceof ByteArrayResource) {
+                return process(object, name, (ByteArrayResource) value);
             }
         } catch (Exception e) {
             LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);
@@ -71,6 +74,10 @@ public class LoggerValueFilter implements ValueFilter {
         }
 
         return value;
+    }
+
+    public Object process(Object object, String name, ByteArrayResource byteArrayResource) throws IOException {
+        return byteArrayResource.getFilename() + "(" + byteArrayResource.contentLength() + "bytes)";
     }
 
     public Object process(Object object, String name, FileSystemResource file) throws IOException {

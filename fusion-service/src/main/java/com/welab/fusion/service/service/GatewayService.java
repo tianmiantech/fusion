@@ -17,6 +17,7 @@ package com.welab.fusion.service.service;
 
 import cn.hutool.crypto.digest.SM3;
 import com.alibaba.fastjson.JSONObject;
+import com.welab.fusion.service.config.fastjson.BlockForPartnerFieldUtil;
 import com.welab.fusion.service.model.global_config.FusionConfigModel;
 import com.welab.fusion.service.service.base.AbstractService;
 import com.welab.wefe.common.StatusCode;
@@ -26,12 +27,10 @@ import com.welab.wefe.common.http.HttpRequest;
 import com.welab.wefe.common.http.HttpResponse;
 import com.welab.wefe.common.util.JObject;
 import com.welab.wefe.common.util.StringUtil;
+import com.welab.wefe.common.web.Launcher;
 import com.welab.wefe.common.web.api.base.AbstractApi;
 import com.welab.wefe.common.web.api.base.Api;
-import com.welab.wefe.common.web.dto.AbstractApiInput;
-import com.welab.wefe.common.web.dto.ApiResult;
-import com.welab.wefe.common.web.dto.FusionNodeInfo;
-import com.welab.wefe.common.web.dto.NoneApiInput;
+import com.welab.wefe.common.web.dto.*;
 import org.springframework.stereotype.Service;
 
 /**
@@ -44,17 +43,17 @@ public class GatewayService extends AbstractService {
     /**
      * 请求合作方接口
      */
-    private HttpResponse requestOtherFusionNode(String targetUrl, String partnerPublicKey) throws StatusCodeWithException {
-        return requestOtherFusionNode(targetUrl, partnerPublicKey, new JSONObject());
+    private HttpResponse requestOtherFusionNode(FusionNodeInfo target, Class<? extends AbstractApi> apiClass) throws StatusCodeWithException {
+        return requestOtherFusionNode(target, apiClass, new JSONObject());
     }
 
     /**
      * 请求合作方接口
      *
-     * @param targetUrl        目标地址
-     * @param partnerPublicKey 合作方公钥
+     * @param target   目标节点信息
+     * @param apiClass 目标接口
      */
-    private HttpResponse requestOtherFusionNode(String targetUrl, String partnerPublicKey, JSONObject params) throws StatusCodeWithException {
+    public HttpResponse requestOtherFusionNode(FusionNodeInfo target, Class<? extends AbstractApi> apiClass, JSONObject params) throws StatusCodeWithException {
         FusionConfigModel config = globalConfigService.getFusionConfig();
         if (StringUtil.isEmpty(config.publicServiceBaseUrl)) {
             StatusCode.PARAMETER_VALUE_INVALID.throwException("尚未设置我方“对外服务地址”，请在全局设置中设置。");
@@ -63,30 +62,32 @@ public class GatewayService extends AbstractService {
         FusionNodeInfo myself = FusionNodeInfo.of(config.publicKey, config.publicServiceBaseUrl);
 
         // 在请求参数中带上自己的身份信息
-        params.put("partnerCaller", myself);
+        params.put("caller", myself);
 
         // 使用对方的公钥加密替代签名
         String data = params.toJSONString();
         String sign = SM3.create().digestHex(data);
-        sign += "_" + Sm2.encryptByPublicKey(sign, partnerPublicKey);
+        sign += "_" + Sm2.encryptByPublicKey(sign, target.publicKey);
 
         // 重新组装签名后的参数
-        JSONObject signedParams = new JSONObject();
-        signedParams.put("data", data);
-        signedParams.put("sign", sign);
+        SignedApiInput signedApiInput = new SignedApiInput();
+        signedApiInput.sign = sign;
+        signedApiInput.data = data;
 
+        String url = target.baseUrl + "/" + apiClass.getAnnotation(Api.class).path();
         HttpResponse response = HttpRequest
-                .create(targetUrl)
-                .setBody(signedParams.toJSONString())
-                .post();
+                .create(url)
+                .setBody(signedApiInput.toJSONString())
+                .setTimeout(1_000 * 60 * 10)
+                .postJson();
 
         if (!response.success()) {
             StatusCode
                     .REMOTE_SERVICE_ERROR
                     .throwException(
-                            "访问合作方失败：" + response.getMessage()
+                            "合作方异常：" + response.getMessage()
                                     + System.lineSeparator()
-                                    + targetUrl
+                                    + url
                     );
         }
         return response;
@@ -95,33 +96,27 @@ public class GatewayService extends AbstractService {
     /**
      * 调用其他节点接口
      */
-    public void callOtherFusionNode(FusionNodeInfo target, Class<? extends AbstractApi> apiClass) throws StatusCodeWithException {
-        callOtherFusionNode(target, apiClass, new NoneApiInput(), JObject.class);
+    public <IN extends AbstractApiInput, OUT> void callOtherFusionNode(FusionNodeInfo target, Class<? extends AbstractApi<IN, OUT>> apiClass) throws StatusCodeWithException {
+        callOtherFusionNode(target, apiClass, new NoneApiInput());
     }
 
-    /**
-     * 调用其他节点接口
-     */
-    public void callOtherFusionNode(FusionNodeInfo target, Class<? extends AbstractApi> apiClass, AbstractApiInput input) throws StatusCodeWithException {
-        callOtherFusionNode(target, apiClass, input, JObject.class);
-    }
 
     /**
      * 调用其他节点接口
      *
-     * @param target      目标节点间
-     * @param apiClass    接口
-     * @param input       请求参数
-     * @param resultClass 返回值类型
+     * @param target   目标节点间
+     * @param apiClass 接口
+     * @param input    请求参数
      */
-    public <T> T callOtherFusionNode(FusionNodeInfo target, Class<? extends AbstractApi> apiClass, AbstractApiInput input, Class<T> resultClass) throws StatusCodeWithException {
-        if (input.fromOtherFusionNode()) {
+    public <IN extends AbstractApiInput, OUT> OUT callOtherFusionNode(FusionNodeInfo target, Class<? extends AbstractApi<IN, OUT>> apiClass, AbstractApiInput input) throws StatusCodeWithException {
+        if (input.isRequestFromPartner()) {
             return null;
         }
 
-        String url = target.baseUrl + "/" + apiClass.getAnnotation(Api.class).path();
+        // 使用过滤器对需要保护的字段进行脱敏
+        JSONObject params = BlockForPartnerFieldUtil.toJson(input);
 
-        HttpResponse httpResponse = requestOtherFusionNode(url, target.publicKey, input.toJson());
+        HttpResponse httpResponse = requestOtherFusionNode(target, apiClass, params);
         JSONObject json = httpResponse.getBodyAsJson();
         ApiResult apiResult = json.toJavaObject(ApiResult.class);
         if (apiResult.code != 0) {
@@ -136,11 +131,16 @@ public class GatewayService extends AbstractService {
             return null;
         }
 
+        Class<OUT> resultClass = Launcher.getBean(apiClass).getOutputClass();
+        if (resultClass == null) {
+            return null;
+        }
+
         if (resultClass == JSONObject.class) {
-            return (T) data;
+            return (OUT) data;
         }
         if (resultClass == JObject.class) {
-            return (T) JObject.create(data);
+            return (OUT) JObject.create(data);
         }
 
         return data.toJavaObject(resultClass);

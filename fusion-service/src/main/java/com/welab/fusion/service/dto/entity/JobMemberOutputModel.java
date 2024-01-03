@@ -16,7 +16,8 @@
 package com.welab.fusion.service.dto.entity;
 
 import com.alibaba.fastjson.JSONObject;
-import com.welab.fusion.core.data_resource.base.DataResourceType;
+import com.welab.fusion.core.Job.data_resource.DataResourceType;
+import com.welab.fusion.service.api.job.CreateJobApi;
 import com.welab.fusion.service.constans.JobMemberRole;
 import com.welab.fusion.service.database.entity.JobMemberDbModel;
 import com.welab.fusion.service.database.entity.MemberDbModel;
@@ -24,6 +25,7 @@ import com.welab.wefe.common.fieldvalidate.annotation.Check;
 
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import java.util.LinkedHashSet;
 
 /**
  * @author zane.luo
@@ -34,7 +36,10 @@ public class JobMemberOutputModel extends AbstractOutputModel {
     private String memberName;
     @Check(name = "成员Id")
     private String memberId;
-
+    @Check(name = "公钥")
+    private String publicKey;
+    @Check(name = "服务端地址")
+    private String baseUrl;
     @Enumerated(EnumType.STRING)
     private JobMemberRole role;
     @Enumerated(EnumType.STRING)
@@ -43,12 +48,13 @@ public class JobMemberOutputModel extends AbstractOutputModel {
 
     @Check(name = "主键hash生成方法")
     private JSONObject hashConfig;
-
+    @Check(name = "附加结果字段")
+    private LinkedHashSet<String> additionalResultColumns;
     @Check(name = "过滤器Id")
     private String bloomFilterId;
 
     @Check(name = "数据源信息")
-    private JSONObject tableDataResourceInfo;
+    private CreateJobApi.TableDataResourceInput tableDataResourceInfo;
 
     public static JobMemberOutputModel of(MemberDbModel member, JobMemberDbModel jobMember) {
         if (jobMember == null) {
@@ -58,11 +64,28 @@ public class JobMemberOutputModel extends AbstractOutputModel {
         JobMemberOutputModel output = jobMember.mapTo(JobMemberOutputModel.class);
         if (member != null) {
             output.memberName = member.getName();
+            output.publicKey = member.getPublicKey();
+            output.baseUrl = member.getBaseUrl();
+            output.setTableDataResourceInfo(jobMember.getTableDataResourceInfo());
         }
         return output;
     }
 
+    public void setTableDataResourceInfo(JSONObject tableDataResourceInfo) {
+        if (tableDataResourceInfo != null) {
+            this.tableDataResourceInfo = tableDataResourceInfo.toJavaObject(CreateJobApi.TableDataResourceInput.class);
+        }
+    }
+
     // region getter/setter
+
+    public String getMemberName() {
+        return memberName;
+    }
+
+    public void setMemberName(String memberName) {
+        this.memberName = memberName;
+    }
 
     public String getMemberId() {
         return memberId;
@@ -70,6 +93,22 @@ public class JobMemberOutputModel extends AbstractOutputModel {
 
     public void setMemberId(String memberId) {
         this.memberId = memberId;
+    }
+
+    public String getPublicKey() {
+        return publicKey;
+    }
+
+    public void setPublicKey(String publicKey) {
+        this.publicKey = publicKey;
+    }
+
+    public String getBaseUrl() {
+        return baseUrl;
+    }
+
+    public void setBaseUrl(String baseUrl) {
+        this.baseUrl = baseUrl;
     }
 
     public JobMemberRole getRole() {
@@ -104,6 +143,14 @@ public class JobMemberOutputModel extends AbstractOutputModel {
         this.hashConfig = hashConfig;
     }
 
+    public LinkedHashSet<String> getAdditionalResultColumns() {
+        return additionalResultColumns;
+    }
+
+    public void setAdditionalResultColumns(LinkedHashSet<String> additionalResultColumns) {
+        this.additionalResultColumns = additionalResultColumns;
+    }
+
     public String getBloomFilterId() {
         return bloomFilterId;
     }
@@ -112,11 +159,11 @@ public class JobMemberOutputModel extends AbstractOutputModel {
         this.bloomFilterId = bloomFilterId;
     }
 
-    public JSONObject getTableDataResourceInfo() {
+    public CreateJobApi.TableDataResourceInput getTableDataResourceInfo() {
         return tableDataResourceInfo;
     }
 
-    public void setTableDataResourceInfo(JSONObject tableDataResourceInfo) {
+    public void setTableDataResourceInfo(CreateJobApi.TableDataResourceInput tableDataResourceInfo) {
         this.tableDataResourceInfo = tableDataResourceInfo;
     }
 

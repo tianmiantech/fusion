@@ -15,10 +15,13 @@
  */
 package com.welab.fusion.core.progress;
 
-import com.welab.fusion.core.Job.JobPhase;
-import com.welab.fusion.core.Job.JobStatus;
+import com.alibaba.fastjson.JSONObject;
+import com.welab.fusion.core.Job.base.JobStatus;
+import com.welab.fusion.core.Job.base.JobPhase;
+import com.welab.wefe.common.util.JObject;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -26,16 +29,23 @@ import java.util.List;
  * @date 2023/11/10
  */
 public class JobProgress {
-    public List<JobPhaseProgress> jobPhaseProgressList = new ArrayList<>();
+    /**
+     * 开始时间
+     */
+    protected Date startTime = new Date();
+    public List<JobPhaseProgress> phases = new ArrayList<>();
 
     public void addPhaseProgress(JobPhaseProgress phaseProgress) {
-        jobPhaseProgressList.add(phaseProgress);
+        phases.add(phaseProgress);
     }
 
     /**
      * 返回最后一个阶段的 message
      */
     public String getMessage() {
+        if (phases.isEmpty()) {
+            return null;
+        }
         return getCurrentPhaseProgress().getMessage();
     }
 
@@ -66,7 +76,7 @@ public class JobProgress {
      * 获取当前进度的状态
      */
     public JobStatus getCurrentPhaseStatus() {
-        if (jobPhaseProgressList.isEmpty()) {
+        if (phases.isEmpty()) {
             return JobStatus.wait_run;
         }
 
@@ -77,16 +87,19 @@ public class JobProgress {
      * 获取当前阶段的进度
      */
     public JobPhaseProgress getCurrentPhaseProgress() {
-        if (jobPhaseProgressList.isEmpty()) {
+        if (phases.isEmpty()) {
             return null;
         }
-        return jobPhaseProgressList.get(jobPhaseProgressList.size() - 1);
+        return phases.get(phases.size() - 1);
     }
 
     /**
      * 获取当前阶段
      */
     public JobPhase getCurrentPhase() {
+        if (phases.isEmpty()) {
+            return null;
+        }
         return getCurrentPhaseProgress().getJobPhase();
     }
 
@@ -105,6 +118,34 @@ public class JobProgress {
     }
 
     public boolean isEmpty() {
-        return jobPhaseProgressList.isEmpty();
+        return phases.isEmpty();
+    }
+
+    public JSONObject toJson() {
+        return JObject.create(this);
+    }
+
+    public Date getStartTime() {
+        return startTime;
+    }
+
+    public Date getEndTime() {
+        if (!getJobStatus().isFinished()) {
+            return null;
+        }
+
+        return getCurrentPhaseProgress().getEndTime();
+    }
+
+    /**
+     * 耗时
+     */
+    public long getCostTime() {
+        Date endTime = getEndTime();
+        if (endTime == null) {
+            return System.currentTimeMillis() - startTime.getTime();
+        }
+
+        return endTime.getTime() - startTime.getTime();
     }
 }

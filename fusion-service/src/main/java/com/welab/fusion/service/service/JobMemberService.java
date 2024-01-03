@@ -15,8 +15,9 @@
  */
 package com.welab.fusion.service.service;
 
-import com.welab.fusion.core.data_resource.base.DataResourceType;
-import com.welab.fusion.core.data_source.AbstractTableDataSourceReader;
+import com.welab.fusion.core.Job.data_resource.DataResourceType;
+import com.welab.fusion.core.io.data_source.AbstractTableDataSourceReader;
+import com.welab.fusion.service.api.job.SendJobToProviderApi;
 import com.welab.fusion.service.constans.JobMemberRole;
 import com.welab.fusion.service.database.base.MySpecification;
 import com.welab.fusion.service.database.base.Where;
@@ -26,13 +27,12 @@ import com.welab.fusion.service.database.repository.JobMemberRepository;
 import com.welab.fusion.service.dto.JobConfigInput;
 import com.welab.fusion.service.dto.JobMemberDataResourceInput;
 import com.welab.fusion.service.service.base.AbstractService;
-import com.welab.wefe.common.data.source.JdbcDataSourceClient;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.net.URISyntaxException;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author zane.luo
@@ -48,31 +48,53 @@ public class JobMemberService extends AbstractService {
     private BloomFilterService bloomFilterService;
 
     /**
-     * 添加发起方
-     * 仅在创建任务时调用
+     * 添加协作方
+     * 仅在推送任务到协作方时调用
      */
-    public void addMember(JobConfigInput input) throws URISyntaxException {
-        String memberId = input.fromMyselfFrontEnd()
-                ? MemberService.MYSELF_NAME
-                : memberService.findByUrl(input.caller.baseUrl).getId();
+    public void addProvider(SendJobToProviderApi.Input input) {
+        String providerId = MemberService.buildMemberId(input.getBaseUrl());
 
         JobMemberDbModel model = new JobMemberDbModel();
         model.setJobId(input.jobId);
+        model.setMemberId(providerId);
+        model.setRole(JobMemberRole.provider);
+        model.save();
+    }
+
+    /**
+     * 添加或更新成员信息
+     */
+    public void putMember(JobMemberRole role, JobConfigInput input) throws URISyntaxException {
+        String memberId = input.isRequestFromMyself()
+                ? MemberService.MYSELF_NAME
+                : memberService.findByUrl(input.caller.baseUrl).getId();
+
+        JobMemberDbModel model = findByMemberId(input.jobId, memberId);
+        if (model == null) {
+            model = new JobMemberDbModel();
+        }
+        model.setJobId(input.jobId);
         model.setMemberId(memberId);
-        model.setRole(JobMemberRole.promoter);
+        model.setRole(role);
         model.setDataResourceType(input.dataResource.dataResourceType);
+        model.setAdditionalResultColumns(input.dataResource.additionalResultColumns);
+        if (input.dataResource.tableDataResourceInfo != null) {
+            model.setTableDataResourceInfo(input.dataResource.tableDataResourceInfo.toJson());
+        }
+        if (input.dataResource.bloomFilterResourceInput != null) {
+            model.setBloomFilterId(input.dataResource.bloomFilterResourceInput.bloomFilterId);
+        }
+
         model.setTotalDataCount(input.dataResource.totalDataCount);
         model.setHashConfig(input.dataResource.hashConfig.toJson());
-
         model.save();
     }
 
     /**
      * 异步更新资源数据量
      */
-    @Async
     public void updateTotalDataCount(JobConfigInput input) {
-        if (input.fromOtherFusionNode()) {
+        if (input.isRequestFromPartner()) {
             return;
         }
 
@@ -85,12 +107,14 @@ public class JobMemberService extends AbstractService {
         }
         // 如果是数据库，则从数据库中获取数据量
         else {
-            try (AbstractTableDataSourceReader reader = input.dataResource.tableDataResourceInput.createReader(-1, -1)) {
+            try (AbstractTableDataSourceReader reader = input.dataResource.tableDataResourceInfo.createReader(-1, -1)) {
                 totalDataCount = reader.getTotalDataRowCount();
             } catch (Exception e) {
                 LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);
             }
         }
+
+        input.dataResource.totalDataCount = totalDataCount;
 
         JobMemberDbModel model = findMyself(input.jobId);
         if (model != null) {
@@ -101,6 +125,9 @@ public class JobMemberService extends AbstractService {
     }
 
     public JobMemberDbModel findByMemberId(String jobId, String memberId) {
+        if (jobId == null || memberId == null) {
+            return null;
+        }
         MySpecification<JobMemberDbModel> where = Where
                 .create()
                 .equal("jobId", jobId)
@@ -113,4 +140,17 @@ public class JobMemberService extends AbstractService {
     public JobMemberDbModel findMyself(String jobId) {
         return findByMemberId(jobId, MemberService.MYSELF_NAME);
     }
+
+    /**
+     * 请空任务中的成员列表
+     */
+    public void deleteByJobId(String id) {
+        MySpecification<JobMemberDbModel> where = Where.create()
+                .equal("jobId", id)
+                .build();
+
+        List<JobMemberDbModel> list = jobMemberRepository.findAll(where);
+        jobMemberRepository.deleteAll(list);
+    }
+
 }

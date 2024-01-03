@@ -15,8 +15,9 @@
  */
 package com.welab.fusion.core.progress;
 
-import com.welab.fusion.core.Job.JobPhase;
-import com.welab.fusion.core.Job.JobStatus;
+import com.alibaba.fastjson.annotation.JSONField;
+import com.welab.fusion.core.Job.base.JobPhase;
+import com.welab.fusion.core.Job.base.JobStatus;
 
 /**
  * 关于某阶段的任务进度
@@ -27,6 +28,10 @@ import com.welab.fusion.core.Job.JobStatus;
 public class JobPhaseProgress extends Progress {
     private JobPhase jobPhase;
     private JobStatus jobStatus;
+    /**
+     * 是否跳过
+     */
+    private boolean skipThisPhase;
 
     public static JobPhaseProgress of(String jobId, JobPhase jobPhase, long totalWorkload) {
         JobPhaseProgress progress = new JobPhaseProgress();
@@ -34,19 +39,39 @@ public class JobPhaseProgress extends Progress {
         progress.jobPhase = jobPhase;
         progress.totalWorkload = totalWorkload;
         progress.jobStatus = JobStatus.running;
+        progress.setStatus(ProgressStatus.doing);
         return progress;
     }
 
     public void finish(JobStatus status, String message) {
+        // 不执行的阶段由 skip() 方法执行 finish()。
+        if (skipThisPhase) {
+            return;
+        }
+
         if (!status.isFinished()) {
             throw new RuntimeException("意料之外的状态：" + status);
         }
-        super.finish(status.toProgressStatus(),message);
+        super.finish(status.toProgressStatus(), message);
         this.jobStatus = status;
 
         if (status == JobStatus.success) {
             this.completedWorkload = this.totalWorkload;
         }
+    }
+
+    @JSONField(serialize = false)
+    public void skipThisPhase() {
+        skipThisPhase("我方跳过此阶段");
+    }
+
+    @JSONField(serialize = false)
+    public void skipThisPhase(String message) {
+        if (skipThisPhase) {
+            return;
+        }
+        finish(JobStatus.success, message);
+        skipThisPhase = true;
     }
 
     // region getter/setter
@@ -55,8 +80,24 @@ public class JobPhaseProgress extends Progress {
         return jobPhase;
     }
 
+    public void setJobPhase(JobPhase jobPhase) {
+        this.jobPhase = jobPhase;
+    }
+
     public JobStatus getJobStatus() {
         return jobStatus;
+    }
+
+    public void setJobStatus(JobStatus jobStatus) {
+        this.jobStatus = jobStatus;
+    }
+
+    public boolean isSkipThisPhase() {
+        return skipThisPhase;
+    }
+
+    public void setSkipThisPhase(boolean skipThisPhase) {
+        this.skipThisPhase = skipThisPhase;
     }
 
     // endregion

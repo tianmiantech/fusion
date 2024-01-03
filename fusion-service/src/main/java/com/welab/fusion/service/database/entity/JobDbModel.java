@@ -15,14 +15,22 @@
  */
 package com.welab.fusion.service.database.entity;
 
-import com.welab.fusion.core.Job.JobStatus;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.annotation.JSONField;
+import com.welab.fusion.core.Job.base.JobStatus;
+import com.welab.fusion.core.algorithm.base.PsiAlgorithm;
+import com.welab.fusion.core.io.FileSystem;
+import com.welab.fusion.core.progress.JobProgress;
 import com.welab.fusion.service.constans.JobMemberRole;
 import com.welab.wefe.common.fieldvalidate.annotation.Check;
-import com.welab.wefe.common.web.dto.FusionNodeInfo;
+import org.hibernate.annotations.Type;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import java.io.File;
+import java.util.Date;
 
 /**
  * @author zane.luo
@@ -30,6 +38,8 @@ import javax.persistence.Enumerated;
  */
 @Entity(name = "job")
 public class JobDbModel extends AbstractDbModel {
+    @Check(name = "算法")
+    private PsiAlgorithm algorithm;
     @Check(name = "创建任务的成员ID")
     private String creatorMemberId;
     @Check(name = "合作方ID")
@@ -41,10 +51,51 @@ public class JobDbModel extends AbstractDbModel {
     private JobMemberRole role;
 
     private String remark;
-   private JobStatus status;
+    @Check(name = "交集数量")
+    private Long fusionCount;
+    @Check(name = "任务开始时间")
+    private Date startTime;
+    @Check(name = "任务结束时间")
+    private Date endTime;
+    @Check(name = "任务耗时")
+    private Long costTime;
+    @Check(name = "任务状态")
+    @Enumerated(EnumType.STRING)
+    private JobStatus status;
     private String message;
 
+    @Type(type = "json")
+    @Column(columnDefinition = "json")
+    private JSONObject progressDetail;
+
+    @JSONField(serialize = false)
+    public File getResultFile() {
+        File file = FileSystem.FusionResult.getResultFile(getId());
+        if (!file.exists()) {
+            return null;
+        }
+        return file;
+    }
+
+    @JSONField(serialize = false)
+    public JobProgress getProgressModel() {
+        if (progressDetail == null) {
+            return new JobProgress();
+        }
+
+        return progressDetail.toJavaObject(JobProgress.class);
+    }
+
     // region getter/setter
+
+
+    public PsiAlgorithm getAlgorithm() {
+        return algorithm;
+    }
+
+    public void setAlgorithm(PsiAlgorithm algorithm) {
+        this.algorithm = algorithm;
+    }
 
     public String getCreatorMemberId() {
         return creatorMemberId;
@@ -86,6 +137,38 @@ public class JobDbModel extends AbstractDbModel {
         this.remark = remark;
     }
 
+    public Long getFusionCount() {
+        return fusionCount;
+    }
+
+    public void setFusionCount(Long fusionCount) {
+        this.fusionCount = fusionCount;
+    }
+
+    public Date getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
+    }
+
+    public Date getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(Date endTime) {
+        this.endTime = endTime;
+    }
+
+    public Long getCostTime() {
+        return costTime;
+    }
+
+    public void setCostTime(Long costTime) {
+        this.costTime = costTime;
+    }
+
     public JobStatus getStatus() {
         return status;
     }
@@ -100,6 +183,14 @@ public class JobDbModel extends AbstractDbModel {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public JSONObject getProgressDetail() {
+        return progressDetail;
+    }
+
+    public void setProgressDetail(JSONObject progressDetail) {
+        this.progressDetail = progressDetail;
     }
 
     // endregion

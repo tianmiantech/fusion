@@ -15,6 +15,7 @@
  */
 package com.welab.fusion.service.model;
 
+import com.welab.fusion.service.model.global_config.FusionConfigModel;
 import com.welab.fusion.service.service.GlobalConfigService;
 import com.welab.wefe.common.web.Launcher;
 
@@ -28,6 +29,10 @@ public class CacheObjects {
      * 获取私钥
      */
     public static String getPrivateKey() {
-        return Launcher.getBean(GlobalConfigService.class).getFusionConfig().privateKey;
+        FusionConfigModel config = Launcher.getBean(GlobalConfigService.class).getFusionConfig();
+        if (!config.isInitialized) {
+            throw new RuntimeException("Fusion service is not initialized");
+        }
+        return config.privateKey;
     }
 }

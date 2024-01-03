@@ -16,6 +16,8 @@
 
 package com.welab.wefe.common.web.dto;
 
+import com.alibaba.fastjson.JSON;
+
 /**
  * Data is a JSON string called by the API encrypted by the private key on the board side, which may also contain memberId,
  * After receiving the request, THE API searches for the public key through the memberId, and continues to call the API after decrypting the public key
@@ -25,4 +27,8 @@ package com.welab.wefe.common.web.dto;
 public class SignedApiInput extends AbstractApiInput {
     public String sign;
     public String data;
+
+    public String toJSONString() {
+        return JSON.toJSONString(this);
+    }
 }

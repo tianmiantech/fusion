@@ -34,6 +34,10 @@ public enum MaskStrategy {
      * 密码，固定长度的星号。
      */
     PASSWORD,
+    /**
+     * Map 结构中包含密码的字段，仅对其中的 password 字段进行保护。
+     */
+    MAP_WITH_PASSWORD,
     PHONE_NUMBER,
     EMAIL;
 
@@ -42,6 +46,7 @@ public enum MaskStrategy {
     static {
         FUNCTION_MAP.put(BLOCK, x -> null);
         FUNCTION_MAP.put(PASSWORD, x -> "***************");
+        FUNCTION_MAP.put(MAP_WITH_PASSWORD, x -> "***************");
         FUNCTION_MAP.put(PHONE_NUMBER, Masker::maskPhoneNumber);
         FUNCTION_MAP.put(EMAIL, Masker::maskEmail);
     }

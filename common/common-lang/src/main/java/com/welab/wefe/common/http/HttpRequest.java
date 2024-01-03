@@ -165,11 +165,11 @@ public class HttpRequest {
     }
 
     /**
-     * Set both connectTimeout and socketTimeout in milliseconds. Default is 10 seconds.
+     * Set both connectTimeout and socketTimeout in milliseconds.
      */
-    public HttpRequest setTimeout(int timeout) {
-        this.connectTimeout = timeout;
-        this.socketTimeout = timeout;
+    public HttpRequest setTimeout(int timeoutInMs) {
+        this.connectTimeout = timeoutInMs;
+        this.socketTimeout = timeoutInMs;
         return this;
     }
 

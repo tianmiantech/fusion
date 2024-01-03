@@ -29,7 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author zane.luo
  * @date 2023/11/20
  */
-@Api(path = "job/create", name = "创建任务")
+@Api(path = "job/create", name = "创建任务", allowAccessWithSign = true)
 public class CreateJobApi extends AbstractApi<JobConfigInput, CreateJobApi.Output> {
     @Autowired
     private JobService jobService;

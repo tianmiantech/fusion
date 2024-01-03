@@ -15,11 +15,13 @@
  */
 package com.welab.fusion.service.service;
 
+import com.welab.fusion.service.database.entity.AccountDbModel;
 import com.welab.fusion.service.model.global_config.FusionConfigModel;
 import com.welab.fusion.service.service.base.AbstractService;
 import com.welab.wefe.common.StatusCode;
 import com.welab.wefe.common.crypto.Sm2;
 import com.welab.wefe.common.exception.StatusCodeWithException;
+import com.welab.wefe.common.web.util.CurrentAccount;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -45,14 +47,16 @@ public class InitService extends AbstractService {
 
     /**
      * 创建超级管理员账号，并初始化系统。
+     *
+     * @return
      */
-    public synchronized void init(String username, String password) throws StatusCodeWithException {
+    public synchronized AccountDbModel init(String username, String password) throws StatusCodeWithException {
         FusionConfigModel config = globalConfigService.getModel(FusionConfigModel.class);
         if (config.isInitialized) {
             StatusCode.PERMISSION_DENIED.throwException("系统已初始化，无法重复初始化");
         }
 
-        accountService.add(username, password);
+        AccountDbModel account = accountService.add(username, password);
 
         Sm2.Sm2KeyPair sm2KeyPair = Sm2.generateKeyPair();
         config.publicKey = sm2KeyPair.publicKey;
@@ -60,6 +64,10 @@ public class InitService extends AbstractService {
         config.isInitialized = true;
 
         globalConfigService.save(config);
+
+        CurrentAccount.logined(account.getId(), account.getUsername());
+
+        return account;
     }
 
 }

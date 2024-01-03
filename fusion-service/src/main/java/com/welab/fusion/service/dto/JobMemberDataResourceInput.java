@@ -15,11 +15,14 @@
  */
 package com.welab.fusion.service.dto;
 
-import com.welab.fusion.core.data_resource.base.DataResourceType;
+import com.welab.fusion.core.Job.data_resource.DataResourceType;
 import com.welab.fusion.core.hash.HashConfig;
 import com.welab.fusion.service.api.job.CreateJobApi;
+import com.welab.wefe.common.exception.StatusCodeWithException;
 import com.welab.wefe.common.fieldvalidate.annotation.Check;
 import com.welab.wefe.common.web.dto.AbstractApiInput;
+
+import java.util.LinkedHashSet;
 
 /**
  * @author zane.luo
@@ -35,8 +38,25 @@ public class JobMemberDataResourceInput extends AbstractApiInput {
     @Check(name = "输入的过滤器信息")
     public CreateJobApi.BloomFilterResourceInput bloomFilterResourceInput;
     @Check(name = "输入的数据集信息")
-    public CreateJobApi.TableDataResourceInput tableDataResourceInput;
+    public CreateJobApi.TableDataResourceInput tableDataResourceInfo;
 
     @Check(name = "主键 hash 方案", require = true)
     public HashConfig hashConfig;
+
+    @Check(name = "附加结果字段")
+    public LinkedHashSet<String> additionalResultColumns;
+
+    @Override
+    public void checkAndStandardize() throws StatusCodeWithException {
+        super.checkAndStandardize();
+
+        // 去重，主键相关的字段不应该出现在附加结果字段中。
+        if (additionalResultColumns != null) {
+            LinkedHashSet<String> idHeaders = hashConfig.getIdHeadersForCsv();
+            for (String column : idHeaders) {
+                additionalResultColumns.remove(column);
+            }
+        }
+
+    }
 }

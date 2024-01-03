@@ -25,6 +25,7 @@ import com.welab.fusion.service.api.global_config.GlobalConfigUpdateApi;
 import com.welab.fusion.service.database.base.Where;
 import com.welab.fusion.service.database.entity.GlobalConfigDbModel;
 import com.welab.fusion.service.database.repository.GlobalConfigRepository;
+import com.welab.fusion.service.database.repository.MemberRepository;
 import com.welab.fusion.service.model.global_config.FusionConfigModel;
 import com.welab.fusion.service.model.global_config.base.AbstractConfigModel;
 import com.welab.fusion.service.model.global_config.base.ConfigModel;
@@ -52,7 +53,9 @@ public class GlobalConfigService {
     protected final Logger LOG = LoggerFactory.getLogger(this.getClass());
     @Autowired
     protected GlobalConfigRepository globalConfigRepository;
-
+    @Autowired
+    private MemberRepository memberRepository;
+    
     /**
      * 初始化配置项
      */
@@ -235,13 +238,14 @@ public class GlobalConfigService {
         return TempSm2Cache.decrypt(map, clazz);
     }
 
-
     public void update(GlobalConfigUpdateApi.Input input) throws Exception {
         for (Map.Entry<String, Map<String, Object>> group : input.groups.entrySet()) {
             AbstractConfigModel model = toModel(group.getKey(), group.getValue());
             save(model);
         }
 
+        // 删除 myself 记录，使其刷新。
+        memberRepository.deleteByName(MemberService.MYSELF_NAME);
     }
 
     public FusionConfigModel getFusionConfig() {

@@ -15,7 +15,10 @@
  */
 package com.welab.fusion.service.model;
 
-import com.welab.fusion.core.Job.FusionJob;
+import com.welab.fusion.core.Job.AbstractPsiJob;
+import net.jodah.expiringmap.ExpiringMap;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * 在内存中管理 FusionJob 对象
@@ -24,7 +27,21 @@ import com.welab.fusion.core.Job.FusionJob;
  * @date 2023/11/29
  */
 public class FusionJobManager {
-    public static void start(FusionJob job){
+    private static ExpiringMap<String, AbstractPsiJob> JOBS = ExpiringMap
+            .builder()
+            .expiration(30, TimeUnit.MINUTES)
+            .build();
+
+    public static void start(AbstractPsiJob job) {
+        JOBS.put(job.getJobId(), job);
         job.start();
+    }
+
+    public static AbstractPsiJob get(String jobId) {
+        return JOBS.get(jobId);
+    }
+
+    public static void remove(String jobId) {
+        JOBS.remove(jobId);
     }
 }

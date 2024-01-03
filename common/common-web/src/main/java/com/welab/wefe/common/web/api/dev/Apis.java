@@ -32,7 +32,7 @@ import java.io.IOException;
 /**
  * @author Zane
  */
-@Api(path = "apis", name = "获取 api 列表", allowAccessWithNothing = false)
+@Api(path = "apis", name = "获取 api 列表", allowAccessWithNothing = true)
 public class Apis extends AbstractApi<Apis.Input, ResponseEntity<?>> {
 
 

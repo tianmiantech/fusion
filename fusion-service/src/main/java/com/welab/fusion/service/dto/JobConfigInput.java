@@ -15,6 +15,7 @@
  */
 package com.welab.fusion.service.dto;
 
+import com.welab.fusion.core.algorithm.base.PsiAlgorithm;
 import com.welab.wefe.common.fieldvalidate.annotation.Check;
 import com.welab.wefe.common.fieldvalidate.secret.MaskStrategy;
 import com.welab.wefe.common.fieldvalidate.secret.Secret;
@@ -27,9 +28,11 @@ import com.welab.wefe.common.web.dto.AbstractApiInput;
 public class JobConfigInput extends AbstractApiInput {
     @Check(name = "任务Id", donotShow = true)
     public String jobId;
+    @Check(name = "算法", require = true)
+    public PsiAlgorithm algorithm;
     @Check(name = "备注")
     @Secret(maskStrategy = MaskStrategy.BLOCK)
     public String remark;
-    @Check(name = "资源信息")
+    @Check(name = "资源信息", require = true)
     public JobMemberDataResourceInput dataResource;
 }

@@ -16,19 +16,20 @@
 package com.welab.fusion.core.hash;
 
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.annotation.JSONField;
+import com.welab.wefe.common.fieldvalidate.AbstractCheckModel;
+import com.welab.wefe.common.fieldvalidate.annotation.Check;
 import com.welab.wefe.common.util.JObject;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
  * @author zane.luo
  * @date 2023/11/14
  */
-public class HashConfig {
+public class HashConfig extends AbstractCheckModel {
+    @Check(name = "主键 hash 方案", require = true)
     public List<HashConfigItem> list = new ArrayList<>();
 
     public static HashConfig of(HashConfigItem... items) {
@@ -47,7 +48,26 @@ public class HashConfig {
         return JObject.create(this);
     }
 
+    @JSONField(serialize = false)
     public boolean isEmpty() {
         return list.isEmpty();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(list);
+    }
+
+
+    /**
+     * 拼接用于输出到 csv 的主键相关字段列表
+     */
+    @JSONField(serialize = false)
+    public LinkedHashSet<String> getIdHeadersForCsv() {
+        LinkedHashSet<String> result = new LinkedHashSet<>();
+        for (HashConfigItem item : list) {
+            result.addAll(item.columns);
+        }
+        return result;
     }
 }

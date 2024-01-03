@@ -287,7 +287,7 @@ public abstract class JdbcDataSourceClient<T extends JdbcDataSourceParams> exten
     /**
      * 检查连接是否可用
      */
-    public String test() throws StatusCodeWithException {
+    public String test() {
         return testSql("select 1");
     }
 

@@ -17,6 +17,7 @@ package com.welab.wefe.common.fieldvalidate.secret;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializeFilter;
 import com.welab.wefe.common.util.ClassUtils;
 import com.welab.wefe.common.util.StringUtil;
 import org.slf4j.Logger;
@@ -44,7 +45,8 @@ public class SecretUtil {
     }
 
     public static String toJsonString(Object obj) {
-        return JSON.toJSONString(obj, SecretValueFilter.instance);
+        SerializeFilter[] filter = {SecretPropertyFilter.instance, SecretValueFilter.instance};
+        return JSON.toJSONString(obj, filter);
     }
 
 
