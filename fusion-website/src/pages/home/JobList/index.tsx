@@ -1,5 +1,5 @@
 import {useRef} from 'react'
-import { Table,Tag ,Button,Card, message, Space,Spin, Badge} from "antd"
+import { Table,Tag ,Button,Card, message, Space,Spin, Badge,Form,Radio } from "antd"
 import { TmTable } from "@tianmiantech/pro";
 import type { ColumnsType } from 'antd/es/table';
 import { useRequest,useMount } from "ahooks";
@@ -46,18 +46,26 @@ const ROLE_TO_CN = {
     [ROLE_TYPE.PROVIDER]:'我参与的',
  }
 
-const Index =()=>{
+interface JobListPropsInterface {
+    handleCallBack?:Function
+}
 
-    const tabelRef = useRef<any>()
+const Index =(props:JobListPropsInterface)=>{
+
+
+    const {handleCallBack} = props;
+
+    const tabelSearchFormRef = useRef<any>()
    // 角色类型
 
    
     const [jobListData,setJobListData] = useImmer({
         page_size:10,
-        page_index:0,
+        page_index:1,
         total:0,
         dataSource:[],
-        isFirstLoading:true//标记是否第一次加载,用于判断是否显示loading
+        isFirstLoading:true,//标记是否第一次加载,用于判断是否显示loading
+        isSearch:false //标记是否是搜索
     })
 
     const {run:runGetJobListData,loading:getJobListLoading} = useRequest(async (params)=>{
@@ -96,7 +104,7 @@ const Index =()=>{
 
 
     useMount(()=>{
-        runGetJobListData({page_size:jobListData.page_size,page_index:jobListData.page_index,role:''})
+        runGetJobListData({page_size:jobListData.page_size,page_index:jobListData.page_index})
     })
 
 
@@ -154,9 +162,37 @@ const Index =()=>{
     
 
     const columns: ColumnsType<RowProps>|any = [{
+        title: '角色',
+        dataIndex: 'role',
+        key: 'role',
+        hideInTable:true,
+        formItemProps:{
+          labelCol:2
+        },
+        valueType: 'radioButton',
+        valueEnum: {
+          [ROLE_TYPE.PROMOTER]: { text: '我发起的' },
+          [ROLE_TYPE.PROVIDER]: { text: '我参与的' },
+        },
+    },{
+        title: '任务ID',
+        dataIndex: 'job_id',
+        key: 'job_id',
+        hideInTable:true,
+        fieldProps: {
+          style:{
+            width:250
+          }
+        },
+        formItemProps:{
+          labelCol:2
+        },
+    },
+      {
         title: '时间/算法',
         dataIndex: 'create',
         key: 'create',
+        search: false,
         width:200,
         render:(text:string,row:RowProps)=>{
             const { created_time = new Date().getTime(),role,algorithm} = row;
@@ -168,7 +204,8 @@ const Index =()=>{
         title: '发起方',
         dataIndex: 'promoter',
         key: 'promoter',
-        width:400,
+        search: false,
+        width:300,
         render:(text:string,row:RowProps)=>{
           const { role,id } = row;
           //role表示我方这条数据中所处的角色 
@@ -181,7 +218,8 @@ const Index =()=>{
         title: '协作方',
         dataIndex: 'provider',
         key: 'provider',
-        width:400,
+        search: false,
+        width:300,
         render:(text:string,row:RowProps)=>{
           const { role,id } = row;
           const key = role===ROLE_TYPE.PROVIDER?'myself':'partner';
@@ -192,28 +230,38 @@ const Index =()=>{
         title: '状态',
         dataIndex: 'status',
         key: 'status',
-        width:80,
-        render:(text:string)=>{
-            return <Badge status={getBadgeStatus(text)}  text={JobStatus.get(text)}/>
+        width:90,
+        valueType: 'select',
+        valueEnum: JobStatus,
+        fieldProps: {
+          style:{
+            width:120
+          }
+        },
+        render:(text:string,row:RowProps)=>{
+          const status = lodash.get(row,'status',null);
+          return <Badge status={getBadgeStatus(status)}  text={JobStatus.get(status)}/>
         }
     },{
         title: '备注',
+        search: false,
         dataIndex: 'remark',
         key: 'remark'
     },{
         key: 'optionOop',
         title: '操作',
         fixed: 'right',
+        search: false,
         width:120,
         render:(record:RowProps)=> {
             const {role,status} = record;
-            const defaultList = [<Button type='link' onClick={()=>{actionClickHandle('detail',record)}}>{role===ROLE_TYPE.PROVIDER&& status === JOB_STATUS.AUDITING?'去审批':'详情'}</Button>]
+            const defaultList = [<Button key={'auditing'} type='link' onClick={()=>{actionClickHandle('detail',record)}}>{role===ROLE_TYPE.PROVIDER&& status === JOB_STATUS.AUDITING?'去审批':'详情'}</Button>]
             if(role === ROLE_TYPE.PROMOTER){
                 if(!status || status === JOB_STATUS.EDITING){
-                    defaultList.push(<Button type='link' onClick={()=>{actionClickHandle('delete',record)}}>删除</Button>)
+                    defaultList.push(<Button key={'detail'} type='link' onClick={()=>{actionClickHandle('delete',record)}}>删除</Button>)
                 }
                 if(status === JOB_STATUS.SUCCESS|| status === JOB_STATUS.STOP_ON_RUNNING|| status === JOB_STATUS.ERROR_ON_RUNNING  ){
-                    defaultList.push(<Button type='link'  onClick={()=>{actionClickHandle('restart',record)}}>重启任务</Button>)
+                    defaultList.push(<Button key={'restart'} type='link'  onClick={()=>{actionClickHandle('restart',record)}}>重启任务</Button>)
                 }
             }
             return <Space>
@@ -223,6 +271,7 @@ const Index =()=>{
     }]
 
     const actionClickHandle = (key:string, record:RowProps,)=>{
+        handleCallBack && handleCallBack(record)
         if (key === 'detail') {
             const {id} = record
             history.push(`/job/detail/${id}`);
@@ -237,6 +286,7 @@ const Index =()=>{
 
     const renderBtn = ()=>{
         return <Button type="primary" onClick={()=>{
+            handleCallBack && handleCallBack()
             history.push('/job/create')
         }}>发起任务</Button>
     }
@@ -255,31 +305,59 @@ const Index =()=>{
         <Spin size='large'/>
         </div>
     }
-
+    
+    const searchData = async (page_index=1)=>{
+        const values = await tabelSearchFormRef.current?.getFieldsValue();
+        runGetJobListData({page_size:jobListData.page_size,page_index,...values})
+        setJobListData(draft=>{
+            draft.isSearch = true;
+            if(page_index!==jobListData.page_index){
+              draft.page_index = page_index;
+            }
+            
+        })
+    }
+    
+    
     const renderList = ()=>{
-        return <Card title='任务列表' extra={renderBtn()}>
-                <TmTable
-                    ref={tabelRef}
-                    dataSource={jobListData.dataSource}
-                    columns={columns}
-                    pagination={{
-                        page_size:jobListData.page_size,
-                        current:jobListData.page_index,
-                        showSizeChanger: false,
-                        size: 'small',
-                    }}
+        return <TmTable
+                  dataSource={jobListData.dataSource}
+                  columns={columns}
+                  rowKey="id"
                 >
                 <TmTable.Table
                     loading={getJobListLoading||deleteLoading||restartLoading}
+                    cardBordered
+                    formRef={tabelSearchFormRef}
+                    pagination={{
+                      pageSize:jobListData.page_size,
+                      current:jobListData.page_index,
+                      size: 'small',
+                      total:jobListData.total,
+                      onChange: (page:number, pageSize:number) => {
+                        searchData(page)
+                      }
+                    }}
+                    search={{
+                      span: 6,
+                      optionRender: (searchConfig:any, formProps:any) => <Space>
+                        <Button key='resetFields' onClick={() => {
+                          tabelSearchFormRef.current?.resetFields();
+                        }}>重置</Button>
+                        <Button  key='submit' type="primary" onClick={() => {
+                        searchData()
+                        }}>搜索</Button>
+                        {renderBtn()}
+                      </Space>
+                    }}
             />
         </TmTable>
-        </Card>
     }
 
     const renderContent = ()=>{ 
       if(jobListData.isFirstLoading){
         return renderLoading()
-      } else if(jobListData.dataSource.length === 0){
+      } else if(jobListData.dataSource.length === 0 && !jobListData.isSearch){
         return renderNoData()
       } else {
         return renderList()

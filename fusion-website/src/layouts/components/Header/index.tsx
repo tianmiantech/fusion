@@ -8,8 +8,8 @@ import AuditingListDrawer from '../AuditingListDrawer';
 import { useLocation,history } from 'umi';
 const { Header, Footer, Sider, Content } = Layout;
 const Index =()=>{
-    const secretKeyDrawerRef:any = useRef()
-    const historyListRef:any  = useRef()
+    const secretKeyDrawerRef = useRef<any>()
+    const historyListRef  = useRef<any>()
     const location = useLocation();
 
     const showHistory=()=>{
@@ -17,12 +17,12 @@ const Index =()=>{
     }
     
     const renderRightContent = ()=>{
-        const iconList = [<AuditingListDrawer/>]
+        const iconList = [<AuditingListDrawer key={'AuditingListDrawer'}/>]
         if (location.pathname.indexOf('/home')==-1) {
-            iconList.push(<PlusOutlined  className={styles.setting} onClick={()=>{history.push('/job/create')}}/>)
-            iconList.push(<BarsOutlined  className={styles.setting} onClick={showHistory}/>)
+            iconList.push(<PlusOutlined key={'PlusOutlined'}  className={styles.setting} onClick={()=>{history.push('/job/create')}}/>)
+            // iconList.push(<BarsOutlined key={'BarsOutlined'} className={styles.setting} onClick={showHistory}/>)
         }
-        iconList.push(<SettingOutlined className={styles.setting} onClick={()=>{secretKeyDrawerRef?.current?.showDrawer()}}/>)
+        iconList.push(<SettingOutlined key={'SettingOutlined'} className={styles.setting} onClick={()=>{secretKeyDrawerRef?.current?.showDrawer()}}/>)
         return <>{iconList}</>
     }
 

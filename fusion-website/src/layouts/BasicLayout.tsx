@@ -3,8 +3,6 @@ import { ConfigProvider, Drawer, Layout } from 'antd';
 import { Outlet,history,useModel} from '@umijs/max';
 import zhCN from 'antd/es/locale/zh_CN';
 import Header from './components/Header'
-import { TmLayout, TmContext } from '@tianmiantech/pro';
-import useInitializedStore from '@/models/initializeConfig'
 import { useMount } from "ahooks";
 interface BasicLayoutPros {
   children:any

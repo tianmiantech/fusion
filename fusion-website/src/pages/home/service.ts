@@ -8,7 +8,8 @@ export interface GetJobListRequestInterface {
     page_index:number
 }
 export const getJobList = (params:GetJobListRequestInterface) => {
-    return request.get('/job/query',params)
+    const {page_index} = params //服务器的分页从0开始
+    return request.get('/job/query',{...params,page_index:page_index-1})
 }
 
 export const deleteJob = (id:string) => {

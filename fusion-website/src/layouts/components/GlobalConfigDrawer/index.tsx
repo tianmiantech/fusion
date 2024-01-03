@@ -1,6 +1,6 @@
 
 
-import {useState,useImperativeHandle,forwardRef} from 'react'
+import {useState,useImperativeHandle,forwardRef, useEffect} from 'react'
 import { Button, Drawer,Input,Spin,Form, message,Row } from 'antd'
 import { TmDrawer } from '@tianmiantech/pro';
 import { history } from '@umijs/max';
@@ -26,9 +26,11 @@ const Index = forwardRef((props,ref)=>{
         }
     })
 
-    useMount(()=>{
-        runGetGlobalConfig();
-    })
+    useEffect(()=>{
+        if(visible){
+            runGetGlobalConfig();
+        }
+    },[visible])
 
     const {run:runGetGlobalConfig,loading:getGlobalConfigLaoding} = useRequest(async ()=>{
         const res = await getGlobalConfig();
