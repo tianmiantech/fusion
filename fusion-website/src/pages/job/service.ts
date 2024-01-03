@@ -22,7 +22,7 @@ export const getDataSourceList = ()=>{
  */
 export interface TestDataSourceInterface {
     database_type:string,
-    data_source_params:{}
+    data_source_params:any
 }
 export const testDataSource = (parmas:TestDataSourceInterface)=>{
     return request.post('/data_source/test',parmas)
@@ -30,6 +30,7 @@ export const testDataSource = (parmas:TestDataSourceInterface)=>{
 
 export interface CreateJobRequestInterface {
     remark?:string,
+    algorithm:string,
     data_resource:{
         bloom_filter_resource_input?:{
             bloom_filter_id:string
@@ -43,6 +44,7 @@ export interface CreateJobRequestInterface {
         },
         data_resource_type:'TableDataSource'|'PsiBloomFilter'
         hash_config?:{list:HashFormValue[]}
+        additional_result_columns?:string[]
     },
 }
 /**
@@ -57,7 +59,7 @@ export const createJob = (parmas:CreateJobRequestInterface) => {
 
 export interface TestPartnerConntentRequestInterface {
     base_url:string,
-    name:string,
+    name?:string,
     public_key:string
 }
 /**
@@ -133,3 +135,26 @@ export const getMyJobProgress = (job_id:string)=>{
     return request.get('/job/get_my_job_progress',{job_id})
 }
 
+export interface QueryBloomFilterListRequestInterface {
+    page_size:number,
+    name:string,
+    page_index:number
+}
+export const queryBloomFilterList= (params:QueryBloomFilterListRequestInterface)=>{
+    return request.post('/bloom_filter/query',params)
+}
+
+//根据id获取过滤器详情
+export const getBloomFilterDetailById = (id:string)=>{
+    return request.get('bloom_filter/detail',{id})
+}
+
+//获取算法列表
+export const getAlgorithmList = ()=>{
+    return request.get('/algorithm/list')
+}
+
+//获取算法阶段列表
+export const getAlgorithmPhaseList = (algorithm:string)=>{
+    return request.get('/algorithm/list_phase',{algorithm})
+}

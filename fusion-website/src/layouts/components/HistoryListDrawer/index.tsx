@@ -1,7 +1,7 @@
 import {useState,useImperativeHandle,forwardRef} from 'react'
 import { Button, Drawer,Input,Spin } from 'antd'
 import { TmDrawer } from '@tianmiantech/pro';
-import History from '@/pages/home/JobList'
+import JobList from '@/pages/home/JobList'
 const Index = forwardRef((props,ref)=>{
     
     const [visible, setVisible] = useState(false);
@@ -14,6 +14,10 @@ const Index = forwardRef((props,ref)=>{
         }
     })
 
+    const handleCallBack = ()=>{
+        setVisible(false)
+    }
+
     return <TmDrawer 
         title={'历史任务'} 
         onClose={()=>{
@@ -23,7 +27,7 @@ const Index = forwardRef((props,ref)=>{
         open={visible}
         footer={null}
        >
-        <History/>
+        <JobList handleCallBack={handleCallBack}/>
        </TmDrawer>
 })
 export default Index;

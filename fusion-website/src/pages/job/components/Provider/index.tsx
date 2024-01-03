@@ -22,65 +22,65 @@ interface PromoterPropsInterface {
  */
 const Index = forwardRef((props:PromoterPropsInterface,ref) => {
  
-  const { detailData,setDetailData } = useDetail()
+  const { detailData,clearDetailData } = useDetail()
   const jobFormRef = useRef<any>();
-  const [showRefuseModal,setShowRefuseModal] = useState(false)
 
-  const [promoterDetail,setPromoterDetail] = useState()
+  const refuseModalRef = useRef<any>();
+ 
+  useEffect(()=>{
+    if(detailData.jobDetailData){
+      jobFormRef.current.setFieldsValue({
+        algorithm:lodash.get(detailData,'jobDetailData.algorithm')
+      })
+    }
+  },[detailData.jobDetailData])
 
   const {run:runAgreeAndStart,loading:agreeAndStartLoading} = useRequest(async (params:CreateJobRequestInterface)=>{
     const reponse = await agreeAndStart(params)
     const {code,data} = reponse;
     if(code === 0){
       message.success('操作成功')
-      setDetailData(g=>{
-        g.jobId = lodash.get(data,'job_id');
-      })
+      clearDetailData()
+      setTimeout(()=>{
+        history.push('/job/list')
+      },800)
     }  
   },{ manual:true})
 
-const {run:runDisagreeJob,loading:disagreeJobLoading} = useRequest(async (params:DisagreeJobRequestInterface)=>{
-  const reponse = await disagreeJob(params)
-  const {code,data} = reponse;
-  if(code === 0){
-    message.success('操作成功')
-  }}
-  ,{ manual:true})
+
 
   const submitFormData = async () => {
-    const {data_resource_type,dataSetAddMethod,hash_config,remark,table_data_resource_info} = await jobFormRef.current?.validateFields();
+    const {data_resource_type,add_method,hash_config,remark,algorithm,table_data_resource_info,additional_result_columns,bloom_filter_resource_input=null} = await jobFormRef.current?.validateFields();
     const requestParams = {
       remark,
+      algorithm,
       job_id:detailData.jobId,
       data_resource:{
         data_resource_type,
         table_data_resource_info,
-        hash_config
+        hash_config,
+        add_method,
+        additional_result_columns,
+        bloom_filter_resource_input
       }
     }
     runAgreeAndStart(requestParams)
   }
 
-  const submitDisagreeJob = (value:string)=>{
-    const requestParams = {
-      job_id:detailData.jobId,
-      reason:value
-    } as DisagreeJobRequestInterface
-    runDisagreeJob(requestParams)
-  }
+  
 
   const renderFormAction = ()=>{
-    return  <Spin spinning={agreeAndStartLoading|| disagreeJobLoading}>
+    return  <Spin spinning={agreeAndStartLoading}>
     <Space size={30}>
       <Button
         type="primary"
         danger
-
+        onClick={()=>{refuseModalRef.current.showRefuseModal()}}
       >拒绝</Button>
       <Button
         type="primary"
         onClick={() => submitFormData()}
-      >通过</Button>
+      >通过并开启任务</Button>
     </Space>
   </Spin>
 
@@ -100,16 +100,14 @@ const {run:runDisagreeJob,loading:disagreeJobLoading} = useRequest(async (params
           >
              <JobForm
                ref={jobFormRef}
-               loading={agreeAndStartLoading|| disagreeJobLoading}
+               loading={agreeAndStartLoading}
                renderFormAction={renderFormAction}
              />
           </JobCard>
         </Col>
       </Row>
       <RefuseModal
-        open={showRefuseModal}
-        onCancel={()=>{setShowRefuseModal(false)}}
-        onOk={submitDisagreeJob}
+        ref={refuseModalRef}
       />
     </>
   );

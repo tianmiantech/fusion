@@ -1,32 +1,43 @@
 import { Button, Checkbox, Form, Input, Card, message } from 'antd';
 import React from 'react';
-import { initUser,login,UserRequestParams } from './service'
+import { initUser,login,UserRequestParams,addUser } from './service'
 import { useRequest } from 'ahooks';
 import { history } from '@umijs/max';
-import {getTokenName} from '@/utils/index'
+import {getTokenName} from '@/utils/utils'
 import {setCookies} from '@tianmiantech/util'
 import lodash from 'lodash'
-import Sm3Util from '@/utils/Sm3Util';
+import SmUtil from '@/utils/SmUtil';
+import {FUNSION_INITIALIZED_KEY} from '@/constant/dictionary'
+
+
+
+const LOGIN_FORM_TYPE = {
+  LOGIN: 'login',
+  REGISTER: 'register',
+  ADDUSER: 'addUser',
+};
 
 interface LoginFormProps {
-  isRegister?:boolean //是否是系统初始化，如果是初始化则需要确认密码
+  formType:string //是否是系统初始化，如果是初始化则需要确认密码
 }
 
 
 const Index = (props: LoginFormProps) => {
-  const {isRegister=false} = props
-  const registerHandler = async(params:UserRequestParams): Promise<null> =>{
+  const {formType=LOGIN_FORM_TYPE.LOGIN} = props
+
+  const {run:initUserHandler,loading:initUserLoading} = useRequest(async (params)=>{
     const reponse = await initUser(params)
     const {code} = reponse
     if(code === 0 ){
       message.info('初始化成功')
+      localStorage.setItem(FUNSION_INITIALIZED_KEY,'true')
       setTimeout(()=>{
         history.replace('/home')
       },800)
     }
-    return null
-  }
-  const loginHandeler =  async(params:UserRequestParams): Promise<null> =>{
+  },{manual:true})
+
+  const {run:loginHandler,loading:loginLoading} = useRequest(async (params)=>{
     const reponse = await login(params)
     const {code} = reponse
     if(code === 0 ){
@@ -40,24 +51,59 @@ const Index = (props: LoginFormProps) => {
         message.error('获取token失败')
       }
     }
-    return null
+  },{manual:true})
+
+  const {run:addUserHandler,loading:addUserLoading} = useRequest(async (params)=>{
+    const reponse = await addUser(params)
+    const {code} = reponse
+    if(code === 0 ){
+      message.info('添加成功')
+      setTimeout(()=>{
+        history.replace('/home')
+      },800)
+    }
+  },{manual:true})
+
+  const getLoading=() =>{
+    return loginLoading || initUserLoading || addUserLoading
   }
-
-
-  const {run:submitData,loading } = useRequest(isRegister?registerHandler:loginHandeler,{manual:true})
-
- 
-
   
 
   const onFinish = (values: UserRequestParams) => {
     const {username,password} = values
-    submitData({username,password:Sm3Util.encrypt(`_${username}-${password}_${username}@!#`)})
+    const requestParams = {username,password:SmUtil.encrypt(`_${username}-${password}_${username}@!#`)}
+    if(formType === LOGIN_FORM_TYPE.LOGIN){
+      loginHandler(requestParams)
+    } else if(formType === LOGIN_FORM_TYPE.REGISTER){
+      initUserHandler(requestParams)
+    } else if(formType === LOGIN_FORM_TYPE.ADDUSER){
+      addUserHandler(requestParams)
+    }
   };
 
+  const getBtntitle = ()=>{
+    if(formType === LOGIN_FORM_TYPE.LOGIN){
+      return '登录'
+    } else if(formType === LOGIN_FORM_TYPE.REGISTER){
+      return '初始化'
+    } else if(formType === LOGIN_FORM_TYPE.ADDUSER){
+      return '添加用户'
+    }
+  }
+
+  const getLoginFormTitle = ()=>{
+    if(formType === LOGIN_FORM_TYPE.LOGIN){
+      return '用户登录'
+    } else if(formType === LOGIN_FORM_TYPE.REGISTER){
+      return '系统初始化'
+    } else if(formType === LOGIN_FORM_TYPE.ADDUSER){
+      return '添加用户'
+    }
+  }
 
 
-  return <Card title={isRegister?'系统初始化':'用户登录'} style={{width:500}} >
+
+  return <Card title={getLoginFormTitle()} style={{width:500}} >
     <Form
       name="basic"
       labelCol={{span: 4}}
@@ -89,7 +135,7 @@ const Index = (props: LoginFormProps) => {
       >
         <Input.Password />
       </Form.Item>
-      {isRegister &&  <Form.Item
+      {(formType===LOGIN_FORM_TYPE.ADDUSER||formType === LOGIN_FORM_TYPE.REGISTER) &&  <Form.Item
         label="确认密码"
         name="confirm"
         dependencies={['password']}
@@ -119,11 +165,12 @@ const Index = (props: LoginFormProps) => {
           span: 16,
         }}
       >
-        <Button type="primary" htmlType="submit" loading={loading}>
-          {isRegister?'初始化':'登录'}
+        <Button type="primary" htmlType="submit" loading={getLoading()}>
+          {getBtntitle()}
         </Button>
       </Form.Item>
     </Form>
   </Card>
 };
+Index.LOGIN_FORM_TYPE = LOGIN_FORM_TYPE
 export default Index

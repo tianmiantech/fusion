@@ -2,6 +2,7 @@ import React from "react";
 import classNames from "classnames";
 import { UploaderContext } from "../UploaderContext";
 import UploaderFile from "../File";
+import ReadonlyFile from '../File/ReadonlyFile'
 import "./index.css";
 
 type UploaderListType = {
@@ -9,12 +10,19 @@ type UploaderListType = {
   style?: React.CSSProperties;
   fileList: Record<string, any>;
   children?: (props: { fileList: any }) => React.ReactNode;
+  setFileList: (fileList: any) => void;
+  disabled?:boolean
 };
 
 export default (props: UploaderListType) => {
-  const { className, style, fileList, children } = props;
+  const { className, style, fileList, children,setFileList,disabled } = props;
   const { getPrefixCls } = React.useContext(UploaderContext);
   const prefixCls = getPrefixCls("list");
+
+  const isString = (str: any) => {
+    return typeof str === 'string';
+  }
+
 
   return (
     <div className={classNames(prefixCls, className)} style={style}>
@@ -22,8 +30,8 @@ export default (props: UploaderListType) => {
         children({ fileList })
       ) : (
         <ul>
-          {fileList.map((file: Record<string, any>) => (
-            <UploaderFile key={file.id} file={file} list />
+          {fileList.map((file: Record<string, any>,index:number) => (
+            isString(file)?<ReadonlyFile fileIndex={index}  disabled={disabled} fileList={fileList} setFileList={setFileList} file={file} list />:<UploaderFile fileIndex={index} fileList={fileList}   setFileList={setFileList} key={file.id} file={file} list />
           ))}
         </ul>
       )}

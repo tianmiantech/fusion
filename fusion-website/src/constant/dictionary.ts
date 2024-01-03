@@ -1,8 +1,14 @@
 
+export const FUNSION_INITIALIZED_KEY = 'fission_initialized';
+
+export const DATARESOURCE_TYPE = {
+  TABLE_DATASOURCE: 'TableDataSource',
+  PSI_BLOOM_FILTER: 'PsiBloomFilter',
+};
 // 样本类型
 export const dataResourceTypeMap = new Map([
-  ['TableDataSource', '数据集'],
-  ['PsiBloomFilter', '布隆过滤器'],
+  [DATARESOURCE_TYPE.TABLE_DATASOURCE, '数据集'],
+  [DATARESOURCE_TYPE.PSI_BLOOM_FILTER, '布隆过滤器'],
 ]);
 
 // 样本选择方式
@@ -52,13 +58,4 @@ export const JobStatus = new Map([
   [JOB_STATUS.STOP_ON_RUNNING,'终止运行'],
   [JOB_STATUS.ERROR_ON_RUNNING,'运行出错'],
   [JOB_STATUS.SUCCESS,'运行成功']
-])
-
-// 任务阶段
-export const JOB_PHASE_LSIT = new Map([
-  ['ConfirmMemberRole', '协商成员角色'],
-  ['CreatePsiBloomFilter', '生成过滤器'],
-  ['DownloadPsiBloomFilter', '下载过滤器'],
-  ['Intersection', '求交'],
-  ['SaveResult', '保存结果'],
 ])

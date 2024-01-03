@@ -1,7 +1,8 @@
 import { message } from 'antd';
 import { axiosInstance, iam } from '@tianmiantech/request';
 import utils from '@tianmiantech/util';
-import { getTokenName } from './index';
+import { getTokenName } from './utils';
+import {FUNSION_INITIALIZED_KEY} from '@/constant/dictionary'
 
 const { getToken:getTokenByName, createUUID, formatDate,sleep,removeCookie } = utils;
 const HOST_ENV = process.env.HOST_ENV;
@@ -18,7 +19,8 @@ export const isQianKun = () => {
 // 全局变量
 export function getBaseURL(){
   //return "http://localhost:8080/fusion"
-  return "http://172.31.21.36:8080/fusion"
+  //return "http://172.31.21.36:9090/fusion"
+  //return "https://xbd-dev.tianmiantech.com/fusion-01"
   if(window._wefeApi){
       /** 提供给客户快速修改请求地址，一般通过修改html head */
       return window._wefeApi;
@@ -34,9 +36,8 @@ export const request = axiosInstance({
   successCode:0,
   onTokenInvalid: async (response:any) => {
     const { code, message: msg } = response.data;
-    console.log("window.location.pathname",window.location.pathname);
-    
-    if (window.location.pathname.match('/login')|| window.location.pathname.match('/register')) {
+    const initialized = localStorage.getItem(FUNSION_INITIALIZED_KEY)||'false';
+    if (initialized==='false'|| window.location.pathname.match('/login')|| window.location.pathname.match('/register')) {
       return;
     }
     removeCookie(getTokenName())

@@ -5,8 +5,6 @@ import { useImmer } from 'use-immer';
 import { history } from '@umijs/max';
 import JobForm from "../JobForm";
 import SendJobForm from "../SendJobForm";
-import TaskDetail from "../ReadOnlyDetailItem";
-import RefuseModal from "../RefuseModal";
 import lodash from 'lodash'
 import JobCard from '../JobCard'
 import useDetail from "../../hooks/useDetail";
@@ -44,13 +42,16 @@ const Index = forwardRef((props:PromoterPropsInterface,ref) => {
   },{ manual:true})
 
   const submitFormData = async () => {
-    const {data_resource_type,dataSetAddMethod,hash_config,remark,table_data_resource_info} = await jobFormRef.current?.validateFields();
+    const {data_resource_type,hash_config,remark,table_data_resource_info=null,bloom_filter_resource_input=null,algorithm,additional_result_columns} = await jobFormRef.current?.validateFields();
     const requestParams = {
       remark,
+      algorithm,
       data_resource:{
         data_resource_type,
+        hash_config,
         table_data_resource_info,
-        hash_config
+        bloom_filter_resource_input,
+        additional_result_columns
       }
     }
     runCreateJob(requestParams)
@@ -71,6 +72,33 @@ const Index = forwardRef((props:PromoterPropsInterface,ref) => {
       return `协作方（${member_id}）`
     }
   }
+
+   /**
+   *  初始化表格填充内容
+    remark:string,
+    status:string,
+    data_resource_type:string,
+    hash_config:{},
+    table_data_resource_info:{},
+    bloom_filter_id:string,
+   */
+    useEffect(()=>{
+      if(detailData.jobDetailData){
+        jobFormRef.current.setFieldsValue({
+          remark:lodash.get(detailData,'jobDetailData.remark',''),
+          status: lodash.get(detailData,'jobDetailData.status','') ,
+          data_resource_type: lodash.get(detailData,'jobDetailData.myself.data_resource_type',''),
+          hash_config: {...lodash.get(detailData,'jobDetailData.myself.hash_config',''),source:'setFieldsValue'},
+          table_data_resource_info:{...lodash.get(detailData,'jobDetailData.myself.table_data_resource_info',{}),source:'setFieldsValue'},
+          bloom_filter_resource_input:{bloom_filter_id:lodash.get(detailData,'jobDetailData.myself.bloom_filter_id',''),source:'setFieldsValue'},
+          add_method:lodash.get(detailData,'jobDetailData.myself.table_data_resource_info.add_method'),
+          algorithm:lodash.get(detailData,'jobDetailData.algorithm'),
+          additional_result_columns:lodash.get(detailData,'jobDetailData.myself.additional_result_columns',[]),
+        })
+      }
+    },[detailData.jobDetailData])
+
+
   
 
   return (

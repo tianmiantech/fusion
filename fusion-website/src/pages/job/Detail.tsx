@@ -4,10 +4,12 @@ import Promoter from "./components/Promoter";
 import Provider from './components/Provider'
 import DetailWithProgress from './components/DetailWithProgress'
 import useDetail from './hooks/useDetail'
+import DisagreeDetail from './components/DisagreeDetail'
 import { useParams } from "@umijs/max";
 import { useUnmount } from "ahooks";
 import styles from './index.less'
 import lodash from 'lodash'
+import { JOB_STATUS,ROLE_TYPE } from "@/constant/dictionary";
 
 const Detail = () => {
   
@@ -43,13 +45,20 @@ const renderLoading = ()=>{
 
 const renderDetail = ()=>{
   const status = lodash.get(detailData,'jobDetailData.status','')
-  if(!status|| status === 'editing' || status === 'auditing') {
-    if(detailData.role === 'promoter'){
+  if(!status|| status === JOB_STATUS.EDITING || status === JOB_STATUS.AUDITING ) {
+    if(detailData.role === ROLE_TYPE.PROMOTER){
       return <Promoter />
-    }else if(detailData.role === 'provider'){
+    }else if(detailData.role === ROLE_TYPE.PROVIDER){
       return <Provider />
     }
-  } else if(status) {
+  } else if(status === JOB_STATUS.DISAGREE) { // 审核不通过 发起方，协作方展示同一个界面
+    if(detailData.role === ROLE_TYPE.PROMOTER){
+      return <Promoter />
+    }else if(detailData.role === ROLE_TYPE.PROVIDER){
+      return <DisagreeDetail />
+    }
+   
+  } else {
     return <DetailWithProgress />
   }
   return renderLoading();

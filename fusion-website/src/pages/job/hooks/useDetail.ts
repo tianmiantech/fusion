@@ -6,18 +6,42 @@ import lodash from 'lodash'
 import { useRequest } from "ahooks";
 import { JOB_STATUS } from "@/constant/dictionary";
 
-import { getJobDetail,getMergedJobProgress,getMyJobProgress } from "../service";
+import { getJobDetail,getMergedJobProgress,getAlgorithmPhaseList } from "../service";
 
+
+export interface PhasesListItemInterface {
+  completed_workload:number,
+  cost_time:number,  //耗时  毫秒
+  end_time:number,//结束时间
+  job_phase:string, //所处阶段
+  job_status:string,
+  logs:string[],//日志
+  message:string,
+  percent:number, //进度百分比
+  start_time:string,
+  status:'doing'|'completed'|'failed', //状态
+  speed_in_second:string  //每秒速度
+  total_workload:number,
+  skip_this_phase:boolean,//是否跳过
+}
+
+export interface PhasesStpesListItemInterface {
+  name:string,
+  phase:string
+
+}
 interface useDetailDataInterface {
     role:'promoter'|'provider'|'',
     status?:string,// 审核状态
-    jobId?:string,
+    jobId:string,
     jobDetailData:any,
-    myselfJobProgress?:any,
-    partnerJobProgress?:any,
-    myselfPhasesList:any[],
-    partnerPhasesList:any[],
-  }
+    myselfJobCurrentProgress?:PhasesListItemInterface|null,
+    partnerJobCurrentProgress?:PhasesListItemInterface|null,
+    myselfPhasesList:PhasesListItemInterface[],
+    partnerPhasesList:PhasesListItemInterface[],
+    phasesStpesList:PhasesStpesListItemInterface[] //任务详情阶段
+}
+
 
 const useDetail = ()=>{
     
@@ -25,10 +49,11 @@ const useDetail = ()=>{
       role:'',
       jobDetailData:null,//任务详情数据
       jobId:'',
-      myselfJobProgress:null, //我方当前任务进度
-      partnerJobProgress:null,//协作方当前任务进度
+      myselfJobCurrentProgress:null, //我方当前任务进度
+      partnerJobCurrentProgress:null,//协作方当前任务进度
       myselfPhasesList:[], //我方任务阶段列表
       partnerPhasesList:[],//协作方任务阶段列表
+      phasesStpesList:[]
   });
 
   const clearDetailData = ()=>{
@@ -36,11 +61,12 @@ const useDetail = ()=>{
       draft.role = '';
       draft.jobDetailData = null;
       draft.jobId = '';
-      draft.myselfJobProgress = null;
-      draft.partnerJobProgress = null;
+      draft.myselfJobCurrentProgress = null;
+      draft.partnerJobCurrentProgress = null;
       draft.myselfPhasesList = [];
       draft.partnerPhasesList = [];
     })
+    cancelGetMergedJobProgress();
   }
 
   useEffect(() => {
@@ -50,12 +76,30 @@ const useDetail = ()=>{
   },[detailData.jobId]) 
 
   useEffect(() => {
-    const status = lodash.get(detailData,'jobDetailData.status','');
-    if(status && status !== JOB_STATUS.EDITING && status!==JOB_STATUS.AUDITING && detailData.jobId){
-      runGetMergedJobProgress(detailData.jobId);
-      runGetMyJobProgress(detailData.jobId)
+    if(detailData.jobDetailData?.status) {
+      const checkResult = checkIfNeedToGetMergedJobProgress()
+      if(checkResult){
+        runGetMergedJobProgress(detailData.jobId);
+      }
     }
-  },[detailData.jobDetailData])
+   
+  },[detailData.jobDetailData?.status])
+
+  const checkIfNeedToGetMergedJobProgress = ()=>{
+    const status = lodash.get(detailData,'jobDetailData.status','');
+    let result = false
+    if(detailData.jobId && detailData.jobDetailData){
+      if(status === JOB_STATUS.RUNNING || 
+        status===JOB_STATUS.WAIT_RUN ||
+        ((status ===JOB_STATUS.ERROR_ON_RUNNING || 
+          status=== JOB_STATUS.STOP_ON_RUNNING || 
+          status=== JOB_STATUS.SUCCESS) && 
+          (!detailData.myselfJobCurrentProgress || !detailData.partnerJobCurrentProgress))){
+        result =  true
+      } 
+    }
+    return result
+  }
 
 
 
@@ -63,45 +107,59 @@ const useDetail = ()=>{
       const res = await getJobDetail(id);
       const {code,data} = res;
       if(code === 0){
-        const {role } = data
+        const {role,algorithm } = data
+
         setDetailData(draft=>{
           draft.role = role;
           draft.jobDetailData = data
         })
+        if(detailData.phasesStpesList.length == 0){
+          runGetAlgorithmPhaseList(algorithm)
+        }
       }
   }, {manual:true})
+
+  //不同的算法有不同的阶段步骤
+  const {run:runGetAlgorithmPhaseList} = useRequest(async (algorithm:string)=>{
+    const res = await getAlgorithmPhaseList(algorithm);
+    const {code,data} = res;
+    if(code === 0){
+      setDetailData(draft=>{
+        draft.phasesStpesList = lodash.get(data,'list',[])
+      })
+    }
+  },{manual:true})
 
   /**
    * 获取多方任务进度
    */
-  const {run:runGetMergedJobProgress} = useRequest(async (id:string)=>{
+  const {run:runGetMergedJobProgress,cancel:cancelGetMergedJobProgress} = useRequest(async (id:string)=>{
     const res = await getMergedJobProgress(id);
     const {code,data} = res;
     if(code === 0){
       const partner = lodash.get(data,'partner.current_phase_progress',null);
       const partnerPhasesList = lodash.get(data,'partner.phases',[]);
+      const myself = lodash.get(data,'myself.current_phase_progress',null);
+      const myselfPhasesList = lodash.get(data,'myself.phases',[]);
+      const status = lodash.get(detailData,'jobDetailData.status','');
       setDetailData(draft=>{
-        draft.partnerJobProgress = partner;
+        draft.partnerJobCurrentProgress = partner;
+        draft.myselfJobCurrentProgress = myself;
         draft.partnerPhasesList = partnerPhasesList;
+        draft.myselfPhasesList = myselfPhasesList;
       })
+      //如果任务阶段步骤完成，则取消轮询，并且重新获取任务详情
+      const tmplength = lodash.get(detailData,'phasesStpesList.length',0);
+      if(partnerPhasesList.length === tmplength && myselfPhasesList.length===tmplength && status === JOB_STATUS.RUNNING){
+        runGetJobDetail(id);
+      } 
+      const checkResult = checkIfNeedToGetMergedJobProgress()
+      if(!checkResult){
+        cancelGetMergedJobProgress();
+      }
     }
   } ,{manual:true,pollingInterval:3000})
 
-  /**
-   * 主要是协作方任务进度
-   */
-  const {run:runGetMyJobProgress} = useRequest(async (id:string)=>{
-    const res = await getMyJobProgress(id);
-    const {code,data} = res;
-    if(code === 0){
-      const myselfJobProgress = lodash.get(data,'current_phase_progress',null);
-      const myselfPhasesList = lodash.get(data,'phases',[]);
-      setDetailData(draft=>{
-        draft.myselfJobProgress = myselfJobProgress;
-        draft.myselfPhasesList = myselfPhasesList;
-      })
-    }
-  } ,{manual:true,pollingInterval:3000})
 
     return {
         detailData,

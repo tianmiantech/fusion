@@ -1,19 +1,25 @@
 import React, { useState,forwardRef,useImperativeHandle,useEffect } from 'react';
-import { Form, Input, Button, Row, Col,Tooltip, Spin, message } from 'antd';
+import { Form, Input, Button, Row, Col,Tooltip, Spin, message,Alert } from 'antd';
 import { FolderOpenOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import { history, useModel } from '@umijs/max';
 import { useRequest } from "ahooks";
-import {testPartnerConntent,TestPartnerConntentRequestInterface,sendJobToProvider,SendTaskToProviderRequestInterface} from '../service'
-import useDetail from '../hooks/useDetail';
+import {testPartnerConntent,TestPartnerConntentRequestInterface,sendJobToProvider,SendTaskToProviderRequestInterface} from '../../service'
+import useDetail from '../../hooks/useDetail';
 import lodash from 'lodash'
+import { JOB_STATUS } from '@/constant/dictionary';
+import { formRuleRequire } from '@/utils/common';
+import styles from './index.less'
 
-const SendJobForm = forwardRef((props, ref) => {
-
+interface SendJobFormPropsInterface {
+  showActionButton?:boolean
+}
+const SendJobForm = forwardRef((props:SendJobFormPropsInterface, ref) => {
+  const { showActionButton=true } = props
   const [isTestConnect,setIsTestConnect] = useState(false)
 
   const [formRef] = Form.useForm();
 
-  const {detailData} = useDetail()
+  const {detailData,clearDetailData} = useDetail()
 
   useEffect(()=>{
     if(detailData.jobDetailData){
@@ -43,6 +49,7 @@ const SendJobForm = forwardRef((props, ref) => {
     const {code} = reponse;
     if(code === 0) {
       message.success('发送成功')
+      clearDetailData()
       setTimeout(()=>{
         history.push('/home')
       },800)
@@ -72,7 +79,15 @@ const SendJobForm = forwardRef((props, ref) => {
     })
   };
   const checkFormDisable = ()=>{
-    return  !(!detailData.jobDetailData || detailData.jobDetailData.status==='editing')
+    return  !(!detailData.jobDetailData || detailData.jobDetailData.status===JOB_STATUS.EDITING)
+  }
+
+  const renderRejectReason = ()=>{
+    const status = lodash.get(detailData,'jobDetailData.status')
+    const message = lodash.get(detailData,'jobDetailData.message')
+    if(status===JOB_STATUS.DISAGREE && message){
+      return <Alert message={message} type="error" className={styles.alertContainer} ></Alert>
+    }
   }
 
   return (
@@ -80,6 +95,7 @@ const SendJobForm = forwardRef((props, ref) => {
       <Row justify="center" className="form-scroll">
         <Col lg={{span: 16}} md={{span: 24}}>
           <Spin spinning={testPartnerConntentLoading||loadingSendJobToProvider}>
+            {renderRejectReason()}
           <Form
             form={formRef}
             layout="vertical"
@@ -98,10 +114,10 @@ const SendJobForm = forwardRef((props, ref) => {
               服务地址&nbsp;<QuestionCircleOutlined />
             </Tooltip>
           </>
-          }  name="base_url" rules={[{required:true}]}>
+          }  name="base_url" rules={[formRuleRequire('请输入服务地址')]}>
               <Input placeholder='请输入' />
             </Form.Item>
-            <Form.Item name="public_key" label="公钥"  rules={[{required:true}]}>
+            <Form.Item name="public_key" label="公钥"  rules={[formRuleRequire()]}>
               <Input.TextArea placeholder='请输入' rows={4} />
             </Form.Item>
             <Form.Item>
@@ -113,9 +129,12 @@ const SendJobForm = forwardRef((props, ref) => {
           </Spin>
         </Col>
       </Row>
-      <Row className="operation-area">
-          <Button type="primary" disabled={testPartnerConntentLoading||loadingSendJobToProvider || checkFormDisable()} onClick={submitData}>发起任务</Button> 
-      </Row>
+      {
+       showActionButton &&  <Row className="operation-area">
+        <Button type="primary" disabled={testPartnerConntentLoading||loadingSendJobToProvider || checkFormDisable()} onClick={submitData}>发起任务</Button>
+        </Row>
+      }
+      
     </>
   );
 });

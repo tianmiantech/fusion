@@ -16,7 +16,7 @@
   display: block;
 }
 .rsu-file.success .rsu-file-remove {
-  display: none;
+  display: block;
 }
 .rsu-file.error .rsu-file-progress {
   background: #ffe0e0;

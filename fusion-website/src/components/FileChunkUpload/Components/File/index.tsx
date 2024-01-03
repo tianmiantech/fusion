@@ -22,10 +22,13 @@ export type FileType = {
   file: Recordable;
   list: boolean;
   children?: (props: Recordable) => React.ReactNode;
+  setFileList: (fileList: any) => void;
+  fileIndex:number
+  fileList?:any[]
 };
 
 export default (props: FileType) => {
-  const { className, style, file, list = true, children } = props;
+  const { className, style, file, list = true, children,setFileList,fileIndex,fileList=[] } = props;
   const { getPrefixCls } = React.useContext(UploaderContext);
 
   const prefixCls = getPrefixCls("file");
@@ -238,6 +241,9 @@ export default (props: FileType) => {
 
   function remove() {
     file.cancel();
+    const tmpFileList = JSON.parse(JSON.stringify(fileList))
+    tmpFileList.splice(fileIndex,1)
+    setFileList(tmpFileList)
   }
 
   function retry() {
