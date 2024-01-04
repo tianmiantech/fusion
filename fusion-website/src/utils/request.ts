@@ -59,8 +59,14 @@ export const request = axiosInstance({
     const reLoginUrl = `/login?redirect=${redirectUrl}`;
     if(window.location.host.includes('localhost')){
       location.href = `${window.location.origin}${process.env.BASE_PATH}${reLoginUrl}`;
-    } else 
+    } else {
+      console.log('reLoginUrl',reLoginUrl);
+      console.log('process.env.BASE_PATH',process.env.BASE_PATH);
+      console.log('${process.env.BASE_PATH}${reLoginUrl}',`${process.env.BASE_PATH}${reLoginUrl}`);
+      
       location.href = `${process.env.BASE_PATH}${reLoginUrl}`;
+    }
+      
   },
   getHeaders: () => ({
     'x-user-token': getTokenByName(getTokenName()),
