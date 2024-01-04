@@ -17,11 +17,11 @@ WEB_PROJECT_PATH=$(dirname $(dirname "$WEB_SCRIPT_PATH"))
 
 echo "编译文件所在的目录：$WEB_PROJECT_PATH"
 
-# WBE_OLD_DIST=$WEB_PROJECT_PATH/dist
-# if [ -d "$WBE_OLD_DIST" ]; then
-#   echo "web端dist目录存在，即将进行清理..."
-#   rm -r "$WBE_OLD_DIST"
-# fi
+WBE_OLD_DIST=$WEB_PROJECT_PATH/dist
+if [ -d "$WBE_OLD_DIST" ]; then
+  echo "web端dist目录存在，即将进行清理..."
+  rm -r "$WBE_OLD_DIST"
+fi
 
 #java中访问资源的路径默认为根目录，此处需要根据访问路径定义资源
 WEB_PROJECT_CODE=$(echo $JAVA_PROJECT_PATH | cut -d'/' -f3)
