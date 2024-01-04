@@ -21,6 +21,7 @@ export default defineConfig({
     ],
     define: {
       'process.env.HOST_ENV': process.env.HOST_ENV,
+      'process.env.BASE_PATH': BASE_PATH,
     },
     model: {},
     initialState: {},

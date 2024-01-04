@@ -31,8 +31,7 @@ export const extractFirstPathAfterOrigin = (url: string)=>{
 
 
 // 全局变量
-export function getBaseURL(){
-  //return "http://localhost:8080/fusion"
+export function getRequestBaseURL(){
   //return "http://172.31.21.36:9090/fusion"
   //return "https://xbd-dev.tianmiantech.com/fusion-01"
   if(window._wefeApi){
@@ -45,7 +44,7 @@ export function getBaseURL(){
 
 export const request = axiosInstance({
   message,
-  baseURL:getBaseURL(),
+  baseURL:getRequestBaseURL(),
   invalidTokenCodes:['10006'],
   successCode:0,
   onTokenInvalid: async (response:any) => {
@@ -58,7 +57,10 @@ export const request = axiosInstance({
     await sleep(1e3);
     const redirectUrl = location.href;
     const reLoginUrl = `/login?redirect=${redirectUrl}`;
-    location.href = reLoginUrl;
+    if(window.location.host.includes('localhost')){
+      location.href = `${window.location.origin}${process.env.BASE_PATH}${reLoginUrl}`;
+    } else 
+      location.href = `${getRequestBaseURL()}${reLoginUrl}`;
   },
   getHeaders: () => ({
     'x-user-token': getTokenByName(getTokenName()),
