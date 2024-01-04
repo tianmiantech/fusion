@@ -38,7 +38,8 @@ export function getRequestBaseURL(){
       /** 提供给客户快速修改请求地址，一般通过修改html head */
       return window._wefeApi;
   }
-  return `${window.location.origin}/${extractFirstPathAfterOrigin(window.location.href)}`;
+  return `https://xbd-dev.tianmiantech.com/${extractFirstPathAfterOrigin(window.location.href)}`;
+  //return `${window.location.origin}/${extractFirstPathAfterOrigin(window.location.href)}`;
   // return  `${process.env[`VUE_APP_${process.env.HOST_ENV}`]}${second ? `-${second}` : ''}`;
 }
 
@@ -57,15 +58,10 @@ export const request = axiosInstance({
     await sleep(1e3);
     const redirectUrl = location.href;
     const reLoginUrl = `login?redirect=${redirectUrl}`;
-    if(window.location.host.includes('localhost')){
-      location.href = `${window.location.origin}${process.env.BASE_PATH}/${reLoginUrl}`;
-    } else {
-      console.log('reLoginUrl',reLoginUrl);
-      console.log('process.env.BASE_PATH',process.env.BASE_PATH);
-      console.log('${process.env.BASE_PATH}${reLoginUrl}',`${window.location.origin}${process.env.BASE_PATH}${reLoginUrl}`);
-      
-      //location.href = `${window.location.origin}${process.env.BASE_PATH}${reLoginUrl}`;
-    }
+    console.log('reLoginUrl',reLoginUrl);
+    console.log('process.env.BASE_PATH',process.env.BASE_PATH);
+    console.log('${process.env.BASE_PATH}${reLoginUrl}',`${window.location.origin}${process.env.BASE_PATH}${reLoginUrl}`);
+    //location.href = `${window.location.origin}${process.env.BASE_PATH}${reLoginUrl}`;
       
   },
   getHeaders: () => ({
