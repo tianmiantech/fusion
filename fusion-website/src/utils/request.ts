@@ -64,7 +64,7 @@ export const request = axiosInstance({
       console.log('process.env.BASE_PATH',process.env.BASE_PATH);
       console.log('${process.env.BASE_PATH}${reLoginUrl}',`${process.env.BASE_PATH}${reLoginUrl}`);
       
-      location.href = `${process.env.BASE_PATH}${reLoginUrl}`;
+      //location.href = `${process.env.BASE_PATH}${reLoginUrl}`;
     }
       
   },
