@@ -15,6 +15,20 @@ export const isQianKun = () => {
 };
 
 
+export const extractFirstPathAfterOrigin = (url: string)=>{
+  // 创建正则表达式，匹配 origin 后的第一个路径
+  const regex = /^https?:\/\/[^\/]+\/([^\/]*)/;
+  // 使用正则表达式匹配URL
+  const match = url.match(regex);
+
+  // 如果匹配成功，match数组的第一个元素是整个匹配，第二个元素是捕获组中的匹配部分
+  if (match && match.length >= 2) {
+    return match[1];
+  } else {
+    return '';
+  }
+}
+
 
 // 全局变量
 export function getBaseURL(){
@@ -25,7 +39,7 @@ export function getBaseURL(){
       /** 提供给客户快速修改请求地址，一般通过修改html head */
       return window._wefeApi;
   }
-  return window.location.origin
+  return `${window.location.origin}/${extractFirstPathAfterOrigin(window.location.href)}`;
   // return  `${process.env[`VUE_APP_${process.env.HOST_ENV}`]}${second ? `-${second}` : ''}`;
 }
 
