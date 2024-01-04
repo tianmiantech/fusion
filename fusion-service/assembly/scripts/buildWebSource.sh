@@ -25,7 +25,6 @@ echo "编译文件所在的目录：$WEB_PROJECT_PATH"
 
 #java中访问资源的路径默认为根目录，此处需要根据访问路径定义资源
 WEB_PROJECT_CODE=$(echo $JAVA_PROJECT_PATH | cut -d'/' -f3)
-
 bash $WEB_SCRIPT_PATH/buildLocal.sh "/$WEB_PROJECT_CODE/website/"
 
 echo " =======  Web编译执行完毕 ======"

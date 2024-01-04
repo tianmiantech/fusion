@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 SCRIPT_PATH=$(dirname "$(readlink -f "$0") ")
 WEB_PROJECT_CODE="$1"
+echo "WEB_PROJECT_CODE：$SCRIPT_PATH"
 # 获取脚本所在路径的父级目录
 PARENT_PATH=$(dirname $(dirname "$SCRIPT_PATH")) 
 echo "脚本路径为：$PARENT_PATH"
