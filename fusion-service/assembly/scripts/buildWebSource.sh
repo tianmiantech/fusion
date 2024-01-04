@@ -32,13 +32,14 @@ echo " =======  Web编译执行完毕 ======"
 
 TARGET_DIST=$JAVA_PROJECT_PATH/src/main/resources/
 if [ -d "$TARGET_DIST/website" ]; then
-  echo "JAVA端目录存在，即将进行清理..."
+  echo "JAVA端目录:$TARGET_DIST 存在，即将进行清理..."
   rm -r "$TARGET_DIST/website"
 fi
 
 #找到编译后的 website目录
 WBE_DIST=$(find $WEB_PROJECT_PATH/dist -type d -name "website")
 echo "资源文件所在目录为:$WBE_DIST"
+echo "============= ============ "
 if [ -d "$WBE_DIST" ]; then
     echo "JAVA资源目录为：$TARGET_DIST"
     cp -rf $WBE_DIST $TARGET_DIST
