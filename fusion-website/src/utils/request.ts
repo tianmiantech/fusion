@@ -60,7 +60,7 @@ export const request = axiosInstance({
     if(window.location.host.includes('localhost')){
       location.href = `${window.location.origin}${process.env.BASE_PATH}${reLoginUrl}`;
     } else 
-      location.href = `${getRequestBaseURL()}${reLoginUrl}`;
+      location.href = `${process.env.BASE_PATH}${reLoginUrl}`;
   },
   getHeaders: () => ({
     'x-user-token': getTokenByName(getTokenName()),
