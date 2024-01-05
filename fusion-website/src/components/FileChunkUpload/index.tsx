@@ -7,7 +7,7 @@ import  {
   UploaderList,
   UploaderInterfaceRef
 } from "./Components";
-import { getBaseURL,getToken } from '@/utils/request'
+import { getRequestBaseURL,getToken } from '@/utils/request'
 import lodash from 'lodash'
 import {fileMerge,FileMergeInterface,securityScan} from './service'
 import { useImmer } from "use-immer";
@@ -62,7 +62,7 @@ const Index= forwardRef((props:FileChunkUploadInterface,ref) => {
   const [fileType,setFileType] = useState('TableDataSource')
   
   const optionsConfig ={
-    target:`${getBaseURL()}/file/upload`,
+    target:`${getRequestBaseURL()}/file/upload`,
     chunkSize:4*1024*1024,
     simultaneousUploads:4,
     headers:{
