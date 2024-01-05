@@ -31,6 +31,7 @@ import com.welab.fusion.service.model.global_config.base.AbstractConfigModel;
 import com.welab.fusion.service.model.global_config.base.ConfigModel;
 import com.welab.wefe.common.StatusCode;
 import com.welab.wefe.common.exception.StatusCodeWithException;
+import com.welab.wefe.common.util.JObject;
 import com.welab.wefe.common.web.TempSm2Cache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,7 +56,7 @@ public class GlobalConfigService {
     protected GlobalConfigRepository globalConfigRepository;
     @Autowired
     private MemberRepository memberRepository;
-    
+
     /**
      * 初始化配置项
      */
@@ -240,7 +241,12 @@ public class GlobalConfigService {
 
     public void update(GlobalConfigUpdateApi.Input input) throws Exception {
         for (Map.Entry<String, Map<String, Object>> group : input.groups.entrySet()) {
-            AbstractConfigModel model = toModel(group.getKey(), group.getValue());
+            // 考虑到前端并没有提交全量的配置项，所以这里需要先获取旧的配置项，再合并。
+            AbstractConfigModel old = getModel(group.getKey());
+            JObject merged = JObject.create(old);
+            merged.putAll(group.getValue());
+
+            AbstractConfigModel model = toModel(group.getKey(), merged);
             save(model);
         }
 
