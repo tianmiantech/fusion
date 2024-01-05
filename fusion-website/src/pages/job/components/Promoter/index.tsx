@@ -10,6 +10,7 @@ import JobCard from '../JobCard'
 import useDetail from "../../hooks/useDetail";
 import { useRequest,useUnmount } from 'ahooks';
 import {createJob,CreateJobRequestInterface} from '../../service'
+import { JOB_STATUS } from "@/constant/dictionary";
 
 interface PromoterPropsInterface {
   detailData?:any
@@ -64,7 +65,7 @@ const Index = forwardRef((props:PromoterPropsInterface,ref) => {
 
   const renderFormAction = ()=>{
     const status = lodash.get(detailData,'jobDetailData.status','')
-    return  <Button disabled={status==='editing'} loading={createJobloading} type="primary" onClick={submitFormData}>{detailData.jobId?'更新':'保存'}</Button>
+    return  <Button disabled={status===JOB_STATUS.EDITING||status===JOB_STATUS.AUDITING} loading={createJobloading} type="primary" onClick={submitFormData}>{detailData.jobId?'更新':'保存'}</Button>
   }
 
   const renderProviderTitle = ()=>{
