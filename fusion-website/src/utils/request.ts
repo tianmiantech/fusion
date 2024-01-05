@@ -38,9 +38,8 @@ export function getRequestBaseURL(){
       /** 提供给客户快速修改请求地址，一般通过修改html head */
       return window._wefeApi;
   }
-  return `https://xbd-dev.tianmiantech.com/${extractFirstPathAfterOrigin(window.location.href)}`;
-  //return `${window.location.origin}/${extractFirstPathAfterOrigin(window.location.href)}`;
-  // return  `${process.env[`VUE_APP_${process.env.HOST_ENV}`]}${second ? `-${second}` : ''}`;
+  //return `https://xbd-dev.tianmiantech.com/${extractFirstPathAfterOrigin(window.location.href)}`;
+  return `${window.location.origin}/${extractFirstPathAfterOrigin(window.location.href)}`;
 }
 
 export const request = axiosInstance({
