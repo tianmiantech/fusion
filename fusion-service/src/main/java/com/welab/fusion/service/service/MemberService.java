@@ -214,14 +214,6 @@ public class MemberService extends AbstractService {
                     AliveApi.class
             );
         }
-
-        // 如果能联通，自动保存。
-        try {
-            save(input);
-        } catch (Exception e) {
-            LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);
-            // ignore
-        }
     }
 
     public FusionNodeInfo getPartnerFusionNodeInfo(String memberId) {

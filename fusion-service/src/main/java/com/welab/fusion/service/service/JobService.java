@@ -265,6 +265,8 @@ public class JobService extends AbstractService {
      */
     public void sendJobToProvider(SendJobToProviderApi.Input input) throws Exception {
         checkBeforeSendJob(input);
+        // 保存合作方信息
+        jobMemberService.addProvider(input);
 
         JobDbModel job = findById(input.jobId);
 
@@ -277,9 +279,6 @@ public class JobService extends AbstractService {
         }
         job.setStatus(JobStatus.auditing);
         job.save();
-
-        // 保存合作方信息
-        jobMemberService.addProvider(input);
 
         // 发送任务到协作方
         JobMemberDbModel promoter = jobMemberService.findMyself(job.getId());
