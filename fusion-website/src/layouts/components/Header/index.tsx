@@ -18,7 +18,7 @@ const Index =()=>{
     
     const renderRightContent = ()=>{
         const iconList = [<AuditingListDrawer key={'AuditingListDrawer'}/>]
-        if (location.pathname.indexOf('/home')==-1) {
+        if (location.pathname.indexOf('/home')==-1 && location.pathname.indexOf('/job/create')==-1) {
             iconList.push(<PlusOutlined key={'PlusOutlined'}  className={styles.setting} onClick={()=>{history.push('/job/create')}}/>)
             // iconList.push(<BarsOutlined key={'BarsOutlined'} className={styles.setting} onClick={showHistory}/>)
         }

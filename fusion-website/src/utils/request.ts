@@ -57,9 +57,7 @@ export const request = axiosInstance({
     await sleep(1e3);
     const redirectUrl = location.href;
     const reLoginUrl = `login?redirect=${redirectUrl}`;
-    console.log('reLoginUrl',reLoginUrl);
     console.log('process.env.BASE_PATH',process.env.BASE_PATH);
-    console.log('${process.env.BASE_PATH}${reLoginUrl}',`${window.location.origin}${process.env.BASE_PATH}${reLoginUrl}`);
     location.href = `${window.location.origin}${process.env.BASE_PATH}${reLoginUrl}`;
       
   },

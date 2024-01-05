@@ -31,6 +31,8 @@ const Index = (props: LoginFormProps) => {
     if(code === 0 ){
       message.info('初始化成功')
       localStorage.setItem(FUNSION_INITIALIZED_KEY,'true')
+      const token = lodash.get(reponse,'data.token')
+      setCookies({[getTokenName()]:token})
       setTimeout(()=>{
         history.replace('/home')
       },800)
