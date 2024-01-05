@@ -1,9 +1,9 @@
 import { defineConfig } from '@umijs/max';
 import routes from './routes';
-const base = 'fusion-01/website';
+const base = 'fusion';
 //OUTPUT_EXTRA：需要将编译后的文件复制到Java后端项目中 ，Java后端项目以website目录来确认是接口还是地址
 const OUTPUT_EXTRA = process.env.OUTPUT_EXTRA||''
-const BASE_PATH = process.env.BASE_PATH?`${process.env.BASE_PATH}`:`/${base}`
+const BASE_PATH = process.env.BASE_PATH?`${process.env.BASE_PATH}`:`/${base}/`
 export default defineConfig({
     base: `${BASE_PATH}`,
     outputPath: `./dist/${OUTPUT_EXTRA}`,
