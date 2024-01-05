@@ -623,14 +623,8 @@ public class FileUtil {
     }
 
     public static void main(String[] args) throws IOException {
-        // 文件储存路径
-       /* File file = new File("D://test.txt");
-        System.out.println(file.getName().substring(0, ".txt".length()));
-        // 将 jar 包内的资源保存为文件
-        saveJarResource2File("test/pom.xml", file);
-
-        System.out.println(readAllText(file));*/
-
-        createFile(new File("D:\\aaa\\bbb\\c.txt"));
+        System.out.println(getFileSuffix("/website/home"));
+        System.out.println(getFileSuffix("/website/home."));
+        System.out.println(getFileSuffix("/website/home.123"));
     }
 }
