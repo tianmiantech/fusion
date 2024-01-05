@@ -80,6 +80,7 @@ public class PsiECEncryptedDataConsumer implements BiConsumer<Long, LinkedHashMa
      */
     private ThreadPoolExecutor createThreadPoll() {
         int pollSize = Runtime.getRuntime().availableProcessors() - 2;
+        pollSize = Math.max(pollSize,1);
 
         return new ThreadPoolExecutor(
                 pollSize,

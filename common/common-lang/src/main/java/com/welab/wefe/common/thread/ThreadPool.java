@@ -34,6 +34,7 @@ public class ThreadPool {
      * @param poolSize 最大并发量
      */
     public ThreadPool(String threadNamePrefix, int poolSize) {
+        poolSize = Math.max(poolSize, 1);
         ThreadFactory threadFactory = new NamedThreadFactory(threadNamePrefix, false);
         this.threadPoolExecutor = new ThreadPoolExecutor(
                 poolSize,
