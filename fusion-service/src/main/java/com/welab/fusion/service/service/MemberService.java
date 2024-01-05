@@ -154,7 +154,16 @@ public class MemberService extends AbstractService {
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
-        return uri.getHost() + ":" + uri.getPort();
+        int port = uri.getPort();
+        String path = StringUtil.trim(uri.getPath(), '/');
+        return uri.getHost()
+                + (port > 0 ? ":" + port : "")
+                // 必须要拼 path，不然会导致不同的服务，但是端口相同的情况下，会被认为是同一个服务。
+                + (StringUtil.isEmpty(path) ? "" : "/" + path);
+    }
+
+    public static void main(String[] args) {
+        System.out.println(buildMemberId("https://xbd-dev.tianmiantech.com/fusion-01/"));
     }
 
     public MemberDbModel findByUrl(String url) throws URISyntaxException {
@@ -213,6 +222,14 @@ public class MemberService extends AbstractService {
                     FusionNodeInfo.of(input.caller.publicKey, input.caller.baseUrl),
                     AliveApi.class
             );
+        }
+
+        // 如果能联通，自动保存。
+        try {
+            save(input);
+        } catch (Exception e) {
+            LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);
+            // ignore
         }
     }
 
