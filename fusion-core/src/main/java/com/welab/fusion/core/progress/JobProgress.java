@@ -36,9 +36,6 @@ public class JobProgress {
     public List<JobPhaseProgress> phases = new ArrayList<>();
 
     public synchronized void addPhaseProgress(JobPhaseProgress phaseProgress) {
-        if (phases.stream().anyMatch(x -> x.getJobPhase() == phaseProgress.getJobPhase())) {
-            return;
-        }
         phases.add(phaseProgress);
     }
 
@@ -112,6 +109,8 @@ public class JobProgress {
     public void finish(JobStatus status, String message) {
         JobPhaseProgress currentPhaseProgress = getCurrentPhaseProgress();
         if (currentPhaseProgress == null) {
+            currentPhaseProgress = JobPhaseProgress.of(null, JobPhase.InitJob, 1);
+            addPhaseProgress(currentPhaseProgress);
             return;
         }
         currentPhaseProgress.finish(status, message);
