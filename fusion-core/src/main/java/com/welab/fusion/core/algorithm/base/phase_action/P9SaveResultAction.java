@@ -72,7 +72,6 @@ public class P9SaveResultAction<T extends AbstractPsiJob> extends AbstractJobPha
             FileUtil.copy(
                     job.getJobTempData().resultFileOnlyKey.toPath(),
                     target.toPath(),
-                    StandardCopyOption.REPLACE_EXISTING,
                     StandardCopyOption.COPY_ATTRIBUTES
             );
 
