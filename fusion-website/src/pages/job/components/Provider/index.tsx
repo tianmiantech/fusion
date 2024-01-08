@@ -42,7 +42,7 @@ const Index = forwardRef((props:PromoterPropsInterface,ref) => {
       message.success('操作成功')
       clearDetailData()
       setTimeout(()=>{
-        history.push('/job/list')
+        history.push('/home')
       },800)
     }  
   },{ manual:true})
