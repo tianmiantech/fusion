@@ -96,7 +96,10 @@ public class JobService extends AbstractService {
         finish(jobId, progress);
     }
 
-    public void finish(String jobId, JobProgress progress) {
+    /**
+     * sqlite 不支持并发写
+     */
+    public synchronized void finish(String jobId, JobProgress progress) {
         JobDbModel job = findById(jobId);
 
         if (job.getStatus().isFinished()) {
