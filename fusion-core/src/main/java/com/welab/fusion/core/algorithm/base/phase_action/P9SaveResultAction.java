@@ -63,6 +63,9 @@ public class P9SaveResultAction<T extends AbstractPsiJob> extends AbstractJobPha
         if (job.getAlgorithm() == PsiAlgorithm.rsa_psi) {
             if (job.getMyJobRole() == JobRole.follower && job.getMyself().dataResourceInfo.dataResourceType == DataResourceType.PsiBloomFilter) {
                 File target = FileSystem.FusionResult.getResultFile(job.getJobId());
+                try (BufferedWriter writer1 = FileUtil.buildBufferedWriter(target, false)) {
+                    writer1.write(Constant.KEY_COLUMN_NAME + System.lineSeparator());
+                }
                 FileUtil.copy(
                         job.getJobTempData().resultFileOnlyKey.toPath(),
                         target.toPath(),
