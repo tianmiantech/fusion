@@ -18,7 +18,6 @@ package com.welab.fusion.core.Job;
 import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.StrUtil;
 import com.welab.fusion.core.Job.base.*;
-import com.welab.fusion.core.Job.data_resource.DataResourceType;
 import com.welab.fusion.core.algorithm.base.AbstractJobFlow;
 import com.welab.fusion.core.algorithm.base.PsiAlgorithm;
 import com.welab.fusion.core.algorithm.base.phase_action.AbstractJobPhaseAction;
@@ -266,9 +265,6 @@ public abstract class AbstractPsiJob implements Closeable {
         });
     }
 
-    protected abstract void checkBeforeFusion();
-
-
     /**
      * 等待任务结束
      */
@@ -342,6 +338,7 @@ public abstract class AbstractPsiJob implements Closeable {
 
 
     // region abstract
+    protected abstract void checkBeforeFusion();
 
     public abstract <T extends AbstractJobMember> T getMyself();
 
