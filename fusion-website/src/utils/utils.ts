@@ -1,7 +1,7 @@
 import lodash from 'lodash'
 export const getTokenName = ():string => {
     const { host } = window.location
-    const tokenName = `fusion-x-user-token-${host}`;
+    const tokenName = `fusion-x-user-token-${host}-${process.env.BASE_PATH}`;
     return tokenName;
   };
 
@@ -18,7 +18,8 @@ export const renderHashConfig = (hash_config:hashConfigItemInterface) => {
   const list = lodash.get(hash_config,'list',[])
   let result = ''
   list.forEach((item:any,index:number)=>{
-    result += `${item.method==='NONE'?'不哈希':item.method}(${item.columns.join('+')})`
+    const columns = item.columns || []; // 处理columns可能为空的情况
+    result += `${item.method==='NONE'?'不哈希':item.method}(${columns.join('+')})`
     if(index !== list.length-1){
       result += '+'
     }
@@ -27,7 +28,7 @@ export const renderHashConfig = (hash_config:hashConfigItemInterface) => {
 }
 
 export const IsEmptyObject =(obj: any): boolean=> {
-  if (obj === null || obj === undefined) {
+  if (obj === null || obj === undefined || obj === "") {
     return true;
   }
   if (typeof obj === "object") {
