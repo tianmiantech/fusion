@@ -93,6 +93,7 @@ public class Downloader {
         }
         // 文件大小为0时，直接创建空文件。
         else {
+            distFile.getParentFile().mkdirs();
             distFile.createNewFile();
         }
 
