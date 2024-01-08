@@ -55,6 +55,11 @@ public class P6DownloadIntersectionAction<T extends AbstractPsiJob> extends Abst
             result.fusionCount = FileUtil.getFileLineCount(file);
         }
 
+        if (job.getAlgorithm() == PsiAlgorithm.rsa_psi) {
+            if (job.getMyJobRole() == JobRole.follower && job.getMyself().dataResourceInfo.dataResourceType == DataResourceType.PsiBloomFilter) {
+                return;
+            }
+        }
         createIntersectionOriginalData(result);
     }
 
@@ -142,11 +147,6 @@ public class P6DownloadIntersectionAction<T extends AbstractPsiJob> extends Abst
 
     @Override
     protected boolean skipThisAction() {
-        if (job.getAlgorithm() == PsiAlgorithm.rsa_psi) {
-            if (job.getMyJobRole() == JobRole.follower && job.getMyself().dataResourceInfo.dataResourceType == DataResourceType.PsiBloomFilter) {
-                return true;
-            }
-        }
         return false;
     }
 
