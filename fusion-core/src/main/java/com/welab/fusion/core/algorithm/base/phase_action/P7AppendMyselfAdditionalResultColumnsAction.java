@@ -121,7 +121,7 @@ public class P7AppendMyselfAdditionalResultColumnsAction<T extends AbstractPsiJo
     @Override
     protected boolean skipThisAction() {
         if (job.getAlgorithm() == PsiAlgorithm.rsa_psi) {
-            if (job.getMyJobRole() == JobRole.leader && job.getMyself().dataResourceInfo.dataResourceType == DataResourceType.PsiBloomFilter) {
+            if (job.getMyJobRole() == JobRole.follower && job.getMyself().dataResourceInfo.dataResourceType == DataResourceType.PsiBloomFilter) {
                 return true;
             }
         }

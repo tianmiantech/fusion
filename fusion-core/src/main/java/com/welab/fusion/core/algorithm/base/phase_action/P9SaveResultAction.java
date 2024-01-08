@@ -61,7 +61,7 @@ public class P9SaveResultAction<T extends AbstractPsiJob> extends AbstractJobPha
         phaseProgress.setMessageAndLog("正在生成最终求交结果文件...");
 
         if (job.getAlgorithm() == PsiAlgorithm.rsa_psi) {
-            if (job.getMyJobRole() == JobRole.leader && job.getMyself().dataResourceInfo.dataResourceType == DataResourceType.PsiBloomFilter) {
+            if (job.getMyJobRole() == JobRole.follower && job.getMyself().dataResourceInfo.dataResourceType == DataResourceType.PsiBloomFilter) {
                 File target = FileSystem.FusionResult.getResultFile(job.getJobId());
                 FileUtil.copy(
                         job.getJobTempData().resultFileOnlyKey.toPath(),

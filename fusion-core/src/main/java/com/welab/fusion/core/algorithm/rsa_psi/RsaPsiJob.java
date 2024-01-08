@@ -58,7 +58,7 @@ public class RsaPsiJob extends AbstractPsiJob {
             );
         }
 
-        boolean useBloomFilter = myself.dataResourceInfo.dataResourceType == DataResourceType.PsiBloomFilter && partner.dataResourceInfo.dataResourceType == DataResourceType.PsiBloomFilter;
+        boolean useBloomFilter = myself.dataResourceInfo.dataResourceType == DataResourceType.PsiBloomFilter || partner.dataResourceInfo.dataResourceType == DataResourceType.PsiBloomFilter;
         boolean hasAdditionalResultColumns = CollectionUtils.isNotEmpty(myself.dataResourceInfo.additionalResultColumns) || CollectionUtils.isNotEmpty(partner.dataResourceInfo.additionalResultColumns);
         if (useBloomFilter && hasAdditionalResultColumns) {
             finishJobOnException(
