@@ -22,6 +22,7 @@ import com.welab.fusion.core.algorithm.base.AbstractJobFlow;
 import com.welab.fusion.core.algorithm.base.PsiAlgorithm;
 import com.welab.fusion.core.algorithm.base.phase_action.AbstractJobPhaseAction;
 import com.welab.fusion.core.io.FileSystem;
+import com.welab.fusion.core.progress.JobPhaseProgress;
 import com.welab.fusion.core.progress.JobProgress;
 import com.welab.wefe.common.thread.ThreadPool;
 import com.welab.wefe.common.util.CloseableUtils;
@@ -45,7 +46,7 @@ public abstract class AbstractPsiJob implements Closeable {
     private JobTempData jobTempData = new JobTempData();
     private AbstractJobMember myself;
     private AbstractJobMember partner;
-    private JobProgress myProgress = new JobProgress();
+    private JobProgress myProgress;
     private JobRole jobRole;
     private ThreadPool actionSingleThreadExecutor;
     private ThreadPool scheduleSingleThreadExecutor;
@@ -60,6 +61,10 @@ public abstract class AbstractPsiJob implements Closeable {
 
     public AbstractPsiJob(PsiAlgorithm algorithm, String jobId, AbstractJobMember myself, AbstractJobMember partner, AbstractJobFunctions jobFunctions) {
         jobFunctions.check();
+
+        // 初始化进度，不允许进度为空。
+        this.myProgress = new JobProgress();
+        this.myProgress.addPhaseProgress(JobPhaseProgress.of(jobId, JobPhase.InitJob, 1));
 
         this.algorithm = algorithm;
         this.jobFlow = algorithm.createJobFlow();

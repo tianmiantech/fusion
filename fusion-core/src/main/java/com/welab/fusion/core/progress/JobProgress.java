@@ -16,8 +16,8 @@
 package com.welab.fusion.core.progress;
 
 import com.alibaba.fastjson.JSONObject;
-import com.welab.fusion.core.Job.base.JobStatus;
 import com.welab.fusion.core.Job.base.JobPhase;
+import com.welab.fusion.core.Job.base.JobStatus;
 import com.welab.wefe.common.util.JObject;
 
 import java.util.ArrayList;
@@ -35,7 +35,10 @@ public class JobProgress {
     protected Date startTime = new Date();
     public List<JobPhaseProgress> phases = new ArrayList<>();
 
-    public void addPhaseProgress(JobPhaseProgress phaseProgress) {
+    public synchronized void addPhaseProgress(JobPhaseProgress phaseProgress) {
+        if (phases.stream().anyMatch(x -> x.getJobPhase() == phaseProgress.getJobPhase())) {
+            return;
+        }
         phases.add(phaseProgress);
     }
 
@@ -107,7 +110,11 @@ public class JobProgress {
      * 结束任务
      */
     public void finish(JobStatus status, String message) {
-        getCurrentPhaseProgress().finish(status, message);
+        JobPhaseProgress currentPhaseProgress = getCurrentPhaseProgress();
+        if (currentPhaseProgress == null) {
+            return;
+        }
+        currentPhaseProgress.finish(status, message);
     }
 
     /**
