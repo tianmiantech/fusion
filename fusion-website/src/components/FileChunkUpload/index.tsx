@@ -20,7 +20,7 @@ import {DataPreviewBtn} from '@/components/DataSetPreview'
 
 interface FileChunkUploadValue {
   data_source_file:string,
-  add_method:'HttpUpload'|'LocalFile'|'Database',
+  add_method:'HttpUpload'|'LocalFile'|'Database'|'',
 }
 interface FileChunkUploadInterface {
   uploadFinishCallBack?:Function
@@ -50,7 +50,7 @@ const Index= forwardRef((props:FileChunkUploadInterface,ref) => {
       const source = lodash.get(value,'source','')
       if(source === 'setFieldsValue'){
         const dataSourceFile = lodash.get(value,'data_source_file','')
-        uploader.current?.setFileList([dataSourceFile])
+        uploader.current?.updateFilesAndFileList([dataSourceFile],[dataSourceFile])
         setUploadData(draft=>{
           draft.filename = dataSourceFile
           draft.showPreBtn = true
@@ -64,6 +64,7 @@ const Index= forwardRef((props:FileChunkUploadInterface,ref) => {
   const optionsConfig ={
     target:`${getRequestBaseURL()}/file/upload`,
     chunkSize:4*1024*1024,
+    singleFile:true,
     simultaneousUploads:4,
     headers:{
       'X-User-Token':getToken()
@@ -73,9 +74,6 @@ const Index= forwardRef((props:FileChunkUploadInterface,ref) => {
       return params
     },
     processResponse: function (response:any, cb:any) {
-      console.log("response",response);
-      // const responseObj = JSON.parse(response||'{}')
-      // const code = lodash.get(responseObj,'code')
       cb(null, response)
     },
   }
@@ -132,10 +130,10 @@ const Index= forwardRef((props:FileChunkUploadInterface,ref) => {
   }
 
   const clearFileList = ()=>{
-    uploader.current?.setFileList([])
+    onChange?.({ data_source_file:'',add_method:"" });
   }
 
-  //获取获取预览的数据给其他的组件时间
+  //获取获取预览的数据给其他的组件
   const columnsChangeCallBack = (columns:any[])=>{
     uploadFinishCallBack && uploadFinishCallBack(columns)
   }
@@ -156,6 +154,7 @@ const Index= forwardRef((props:FileChunkUploadInterface,ref) => {
       ref={uploader} 
       options={optionsConfig} 
       onFileComplete={onFileComplete}
+      onFileRemoved={clearFileList}
       disabled={disabled}
       renderPrewView={renderPrewView}
       autoStart />

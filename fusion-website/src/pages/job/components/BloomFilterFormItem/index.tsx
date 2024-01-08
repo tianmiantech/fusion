@@ -85,7 +85,7 @@ const  BloomFilterFormItem = (props:BloomFilterFormItemPropsInterface) => {
           <Descriptions column={2}>
             <Descriptions.Item span={2} label="主键" style={itemStyle}>{renderHashConfig(lodash.get(item,'hash_config'))}</Descriptions.Item>
             <Descriptions.Item span={2} label='创建时间' style={itemStyle}>{getNoramlTime(lodash.get(item,'created_time'))}</Descriptions.Item>
-            <Descriptions.Item label='数据量' style={itemStyle}>{item.total_data_count}</Descriptions.Item>
+            <Descriptions.Item span={2} label='数据量' style={itemStyle}>{item.total_data_count}</Descriptions.Item>
             <Descriptions.Item label='文件大小' style={itemStyle}>{getFileSizeInHumanReadable(lodash.get(item,'storage_size'))}</Descriptions.Item>
           </Descriptions>
       </Card>
@@ -130,13 +130,13 @@ const  BloomFilterFormItem = (props:BloomFilterFormItemPropsInterface) => {
         <Modal title={'选择布隆过滤器'} open={data.isModalOpen} width={1200} onCancel={()=>openModel(false)}>
         <List
           grid={{
-            gutter: 16,
+            gutter: 10,
             xs: 1,
             sm: 2,
-            md: 4,
+            md: 3,
             lg: 4,
-            xl: 6,
-            xxl: 3,
+            xl: 5,
+            xxl: 6,
           }}
           dataSource={bloomFilterConfig.suggestList}
           renderItem={renderListItem}

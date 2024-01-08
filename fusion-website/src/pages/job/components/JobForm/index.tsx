@@ -172,7 +172,7 @@ const JobForm = forwardRef((props:JobFormPropsInterface, ref) => {
                          </Form.Item>
                         </>
                       } else {
-                       return  <Form.Item style={{marginTop:30}} name="bloom_filter_resource_input" label="选择布隆过滤器" rules={[formRuleRequire('此行不能为空')]}>
+                       return  <Form.Item style={{marginTop:30}} name="bloom_filter_resource_input" label="选择布隆过滤器" rules={[formRuleRequire('此项不能为空')]}>
                             <BloomFilterFormItem onBloomFilterSelectedCallBack={onBloomFilterSelectedCallBack}/>
                         </Form.Item>
                       }
@@ -187,7 +187,6 @@ const JobForm = forwardRef((props:JobFormPropsInterface, ref) => {
                   const resultArray = [<Form.Item name={'hash_config'} style={{marginBottom:0}} rules={[{ validator: validateSelfField }]}>
                         <HashForm disabled={checkFormDisable()||hashFormDisabled} columnList={jobFormData.dataourceColumnList}/> 
                       </Form.Item>];
-
                   if(data_resource_type != DATARESOURCE_TYPE.PSI_BLOOM_FILTER){
                     resultArray.push(<Form.Item name={'additional_result_columns'} label="附加结果字段" style={{marginTop:20}}>
                        <Select mode="multiple" style={{ width: 300 }} placeholder="请选择字段">

@@ -80,6 +80,15 @@ const Index = forwardRef((props,ref)=>{
         },2000)
     }
 
+    const onOk = ()=>{
+        if (!isTestConnect) {
+            message.warn('请先点击 连通性测试，确保对外连接地址可用')
+            return
+        }
+        runUpdateGlobalConfig();
+
+    }
+
     return <TmDrawer 
         title={'全局配置'} 
         onClose={()=>{
@@ -88,7 +97,7 @@ const Index = forwardRef((props,ref)=>{
         width={500}
         open={visible}
         okText='保存'
-        onOk={runUpdateGlobalConfig}
+        onOk={onOk}
         loading={getGlobalConfigLaoding||updateGlobalConfigLoading||testPartnerConntentLoading}
         extra={<Button type="link" style={{color:'white'}} onClick={()=>{history.push('/user/add')}}>新增用户</Button>}
        >
