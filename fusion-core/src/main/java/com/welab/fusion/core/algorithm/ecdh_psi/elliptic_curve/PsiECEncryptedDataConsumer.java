@@ -19,6 +19,7 @@ import cn.hutool.core.thread.NamedThreadFactory;
 import cn.hutool.core.thread.ThreadUtil;
 import com.welab.fusion.core.progress.Progress;
 import com.welab.fusion.core.util.Constant;
+import com.welab.wefe.common.util.CloseableUtils;
 import com.welab.wefe.common.util.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,7 +81,7 @@ public class PsiECEncryptedDataConsumer implements BiConsumer<Long, LinkedHashMa
      */
     private ThreadPoolExecutor createThreadPoll() {
         int pollSize = Runtime.getRuntime().availableProcessors() - 2;
-        pollSize = Math.max(pollSize,1);
+        pollSize = Math.max(pollSize, 1);
 
         return new ThreadPoolExecutor(
                 pollSize,
@@ -147,8 +148,10 @@ public class PsiECEncryptedDataConsumer implements BiConsumer<Long, LinkedHashMa
 
     @Override
     public void close() throws IOException {
-        THREAD_POOL.shutdownNow();
-        fileWriter.close();
+        if (THREAD_POOL != null) {
+            THREAD_POOL.shutdownNow();
+        }
+        CloseableUtils.closeQuietly(fileWriter);
     }
 
     public void refreshProgress() {

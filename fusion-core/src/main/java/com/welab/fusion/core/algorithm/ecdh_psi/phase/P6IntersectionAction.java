@@ -15,14 +15,14 @@
  */
 package com.welab.fusion.core.algorithm.ecdh_psi.phase;
 
-import com.welab.fusion.core.Job.base.JobRole;
 import com.welab.fusion.core.Job.base.JobPhase;
+import com.welab.fusion.core.Job.base.JobRole;
 import com.welab.fusion.core.algorithm.base.phase_action.AbstractIntersectionAction;
 import com.welab.fusion.core.algorithm.ecdh_psi.EcdhPsiJob;
 import com.welab.fusion.core.algorithm.ecdh_psi.elliptic_curve.EllipticCurve;
-import com.welab.fusion.core.io.data_source.CsvTableDataSourceReader;
 import com.welab.fusion.core.hash.HashConfig;
 import com.welab.fusion.core.io.FileSystem;
+import com.welab.fusion.core.io.data_source.CsvTableDataSourceReader;
 import com.welab.fusion.core.util.Constant;
 import com.welab.wefe.common.exception.StatusCodeWithException;
 import com.welab.wefe.common.util.FileUtil;
@@ -73,32 +73,31 @@ public class P6IntersectionAction extends AbstractIntersectionAction<EcdhPsiJob>
                 .resolve("intersection-index.data")
                 .toFile();
 
-        BufferedWriter writer = FileUtil.buildBufferedWriter(file, false);
         LongAdder fruitCount = new LongAdder();
+        try (BufferedWriter writer = FileUtil.buildBufferedWriter(file, false)) {
+            int partitionIndex = 0;
+            while (true) {
+                Set<ECPoint> partnerPartition = readPartnerPartition(partitionIndex);
+                partitionIndex++;
+                if (partnerPartition.isEmpty()) {
+                    break;
+                }
 
-        int partitionIndex = 0;
-        while (true) {
-            Set<ECPoint> partnerPartition = readPartnerPartition(partitionIndex);
-            partitionIndex++;
-            if (partnerPartition.isEmpty()) {
-                break;
-            }
+                // 得到的交集信息是我方数据的索引
+                LinkedList<String> indexList = matchOnePartition(partnerPartition);
+                fruitCount.add(indexList.size());
+                phaseProgress.setMessage("已找到交集：" + fruitCount);
 
-            // 得到的交集信息是我方数据的索引
-            LinkedList<String> indexList = matchOnePartition(partnerPartition);
-            fruitCount.add(indexList.size());
-            phaseProgress.setMessage("已找到交集：" + fruitCount);
+                // 交集写入文件
+                for (String line : indexList) {
+                    writer.write(line + System.lineSeparator());
+                }
 
-            // 交集写入文件
-            for (String line : indexList) {
-                writer.write(line + System.lineSeparator());
-            }
-
-            if (partnerPartition.size() < batchSize) {
-                break;
+                if (partnerPartition.size() < batchSize) {
+                    break;
+                }
             }
         }
-        writer.close();
 
         job.getJobResult().fusionCount = fruitCount.longValue();
         phaseProgress.setMessageAndLog("求交完毕，交集：" + fruitCount);
@@ -219,5 +218,10 @@ public class P6IntersectionAction extends AbstractIntersectionAction<EcdhPsiJob>
     @Override
     protected boolean skipThisAction() {
         return job.getMyJobRole() == JobRole.follower;
+    }
+
+    @Override
+    public void close() throws IOException {
+
     }
 }

@@ -25,6 +25,7 @@ import com.welab.fusion.core.Job.data_resource.DataResourceType;
 import com.welab.fusion.core.io.data_source.CsvTableDataSourceReader;
 import com.welab.fusion.core.hash.HashConfig;
 
+import java.io.IOException;
 import java.util.UUID;
 
 /**
@@ -88,4 +89,8 @@ public class P2CreatePsiBloomFilterAction extends AbstractJobPhaseAction<RsaPsiJ
         return false;
     }
 
+    @Override
+    public void close() throws IOException {
+
+    }
 }

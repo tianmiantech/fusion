@@ -20,6 +20,7 @@ import com.welab.fusion.core.Job.base.JobPhase;
 import com.welab.fusion.core.hash.HashConfig;
 import com.welab.fusion.core.io.FileSystem;
 import com.welab.fusion.core.util.Constant;
+import com.welab.wefe.common.util.CloseableUtils;
 import com.welab.wefe.common.util.FileUtil;
 import com.welab.wefe.common.util.StringUtil;
 import de.siegmar.fastcsv.reader.CsvParser;
@@ -97,8 +98,6 @@ public class P9SaveResultAction<T extends AbstractPsiJob> extends AbstractJobPha
                 break;
             }
         }
-
-        this.writer.close();
     }
 
     private void writeOnePartition(List<LinkedHashMap<String, Object>> originalDataPartition) throws IOException {
@@ -227,5 +226,10 @@ public class P9SaveResultAction<T extends AbstractPsiJob> extends AbstractJobPha
     @Override
     protected boolean skipThisAction() {
         return false;
+    }
+
+    @Override
+    public void close() throws IOException {
+        CloseableUtils.closeQuietly(this.writer);
     }
 }

@@ -23,6 +23,7 @@ import com.welab.wefe.common.InformationSize;
 import com.welab.wefe.common.file.decompression.SuperDecompressor;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 
 /**
@@ -60,5 +61,10 @@ public class P3DownloadPartnerECEncryptedDataAction extends AbstractJobPhaseActi
     @Override
     public long getTotalWorkload() {
         return 100;
+    }
+
+    @Override
+    public void close() throws IOException {
+
     }
 }

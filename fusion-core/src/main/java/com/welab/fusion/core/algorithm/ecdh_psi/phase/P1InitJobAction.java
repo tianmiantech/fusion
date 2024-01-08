@@ -22,6 +22,8 @@ import com.welab.fusion.core.algorithm.ecdh_psi.EcdhPsiJob;
 import com.welab.fusion.core.Job.data_resource.DataResourceInfo;
 import com.welab.fusion.core.Job.data_resource.DataResourceType;
 
+import java.io.IOException;
+
 /**
  * 确认成员角色
  * 这里采用了离线协商的方式
@@ -121,5 +123,10 @@ public class P1InitJobAction extends AbstractInitJobAction<EcdhPsiJob> {
             default:
                 throw new RuntimeException("意料之外的情形");
         }
+    }
+
+    @Override
+    public void close() throws IOException {
+
     }
 }

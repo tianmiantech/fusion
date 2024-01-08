@@ -121,4 +121,9 @@ public class P7AppendMyselfAdditionalResultColumnsAction<T extends AbstractPsiJo
                 job.getMyself().dataResourceInfo.additionalResultColumns
         );
     }
+
+    @Override
+    public void close() throws IOException {
+
+    }
 }

@@ -65,32 +65,27 @@ public class P6DownloadIntersectionAction<T extends AbstractPsiJob> extends Abst
         phaseProgress.updateTotalWorkload(result.fusionCount);
         phaseProgress.setMessageAndLog("正在将交集密文还原为我方字段...");
 
-        try {
-            this.writer = initIntersectionOriginalData();
+        this.writer = initIntersectionOriginalData();
 
-            int partitionIndex = 0;
-            while (true) {
-                List<String> partition = FileUtil.readPartitionLines(
-                        job.getJobTempData().resultFileOnlyKey,
-                        partitionIndex,
-                        batchSize,
-                        false
-                );
-                partitionIndex++;
+        int partitionIndex = 0;
+        while (true) {
+            List<String> partition = FileUtil.readPartitionLines(
+                    job.getJobTempData().resultFileOnlyKey,
+                    partitionIndex,
+                    batchSize,
+                    false
+            );
+            partitionIndex++;
 
-                if (partition.isEmpty()) {
-                    break;
-                }
-
-                expandOnePartition(partition);
-
-                if (partition.size() < batchSize) {
-                    break;
-                }
+            if (partition.isEmpty()) {
+                break;
             }
 
-        } finally {
-            CloseableUtils.closeQuietly(this.writer);
+            expandOnePartition(partition);
+
+            if (partition.size() < batchSize) {
+                break;
+            }
         }
 
     }
@@ -146,5 +141,10 @@ public class P6DownloadIntersectionAction<T extends AbstractPsiJob> extends Abst
     @Override
     protected boolean skipThisAction() {
         return false;
+    }
+
+    @Override
+    public void close() throws IOException {
+        CloseableUtils.closeQuietly(this.writer);
     }
 }

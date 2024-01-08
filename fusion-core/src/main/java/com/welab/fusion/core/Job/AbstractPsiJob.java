@@ -18,10 +18,10 @@ package com.welab.fusion.core.Job;
 import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.StrUtil;
 import com.welab.fusion.core.Job.base.*;
+import com.welab.fusion.core.Job.data_resource.DataResourceType;
 import com.welab.fusion.core.algorithm.base.AbstractJobFlow;
 import com.welab.fusion.core.algorithm.base.PsiAlgorithm;
 import com.welab.fusion.core.algorithm.base.phase_action.AbstractJobPhaseAction;
-import com.welab.fusion.core.Job.data_resource.DataResourceType;
 import com.welab.fusion.core.io.FileSystem;
 import com.welab.fusion.core.progress.JobProgress;
 import com.welab.wefe.common.thread.ThreadPool;
@@ -236,10 +236,11 @@ public abstract class AbstractPsiJob implements Closeable {
         myProgress.finish(status, message);
         try {
             jobFunctions.finishJobFunction.finish(jobId, myProgress);
-            close();
         } catch (Exception e) {
             LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);
         }
+
+        CloseableUtils.closeQuietly(this);
     }
 
     /**
