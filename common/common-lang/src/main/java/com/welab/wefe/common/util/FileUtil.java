@@ -523,13 +523,14 @@ public class FileUtil {
         file.getParentFile().mkdirs();
 
         try {
+            file.createNewFile();
             return new BufferedWriter(
                     new OutputStreamWriter(
                             new FileOutputStream(file, append),
                             StandardCharsets.UTF_8
                     )
             );
-        } catch (FileNotFoundException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }

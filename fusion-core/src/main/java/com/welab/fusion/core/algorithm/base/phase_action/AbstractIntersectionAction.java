@@ -26,7 +26,7 @@ import java.io.File;
  * @author zane.luo
  * @date 2023/12/28
  */
-public abstract class AbstractIntersectionAction <T extends AbstractPsiJob> extends AbstractJobPhaseAction<T>{
+public abstract class AbstractIntersectionAction<T extends AbstractPsiJob> extends AbstractJobPhaseAction<T> {
     public AbstractIntersectionAction(T job) {
         super(job);
     }

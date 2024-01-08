@@ -72,6 +72,7 @@ public abstract class AbstractInitJobAction<T extends AbstractPsiJob> extends Ab
 
         LinkedHashSet<String> header = getOriginalHeaderWithAdditionalColumns();
         File file = FileSystem.JobTemp.getAllOriginalData(job.getJobId());
+
         try (BufferedWriter writer = FileUtil.buildBufferedWriter(file, false)) {
             writer.write(headerToCsvLine(header));
 

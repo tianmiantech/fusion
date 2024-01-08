@@ -17,8 +17,8 @@ package com.welab.fusion.core.algorithm.base.phase_action;
 
 import com.welab.fusion.core.Job.AbstractPsiJob;
 import com.welab.fusion.core.Job.base.JobPhase;
-import com.welab.fusion.core.io.data_source.CsvTableDataSourceReader;
 import com.welab.fusion.core.io.FileSystem;
+import com.welab.fusion.core.io.data_source.CsvTableDataSourceReader;
 import com.welab.fusion.core.util.Constant;
 import com.welab.wefe.common.util.FileUtil;
 import org.apache.commons.collections4.CollectionUtils;
