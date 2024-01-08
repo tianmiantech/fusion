@@ -18,6 +18,7 @@ import UploaderContext, { defaultGetPrefixCls } from "../UploaderContext";
 import "./index.css";
 import { camelCase } from "../../utils";
 import { Spin } from "antd";
+import { useImmer } from "use-immer";
 type Recordable<T = any> = Record<string, T>;
 
 export type StatusType = {
@@ -62,46 +63,35 @@ const defaultOptions = {
   testChunks: true,
 };
 
-const { FILE_ADDED_EVENT, FILES_ADDED_EVENT, UPLOAD_START_EVENT } =
-  UploadEventEnum;
-
-  export type UploaderInterfaceRef = {
-    // 定义导出的函数或属性
-    setFileList: (files: Recordable[]) => void;
-    fileList?: Recordable[];
-    getUploader: () => any;
+interface UploaderDataInterface {
+  fileList: any[];
+  files: any[];
 }
 
-const Uploader:  React.ForwardRefRenderFunction<UploaderInterfaceRef, UploaderProps> = (props, ref) => {
-  const { className, style, options, fileStatusText, loading=false,children,accept,disabled
+const { FILE_ADDED_EVENT, FILES_ADDED_EVENT, UPLOAD_START_EVENT } = UploadEventEnum;
+
+const Uploader:  React.ForwardRefRenderFunction<any, UploaderProps> = (props, ref) => {
+  const { className, style, options, loading=false,children,accept,disabled
   ,renderPrewView } = props;
 
   const prefixCls = defaultGetPrefixCls("");
 
+  const [datas, setDatas] = useImmer<UploaderDataInterface>({
+    files: [],
+    fileList: [],
+  })
+
   const [started, setStarted] = useState(false);
-  const [files, setFiles] = useState<Recordable[]>([]);
-  const [fileList, setFileList] = useState<Recordable[]>([]);
+
   const uploaderRef = useRef(
     new SimpleUploader({ ...defaultOptions, ...options })
   );
-
-  useEffect(()=>{
-    uploaderRef.current.fileStatusText = fileStatusText || {
-      success: "上传成功",
-      error: "上传失败",
-      uploading: "上传中",
-      paused: "暂停",
-      waiting: "等待上传",
-    };
-  },[uploaderRef.current])
-
- 
 
   function uploadStart() {
     setStarted(true);
   }
 
-  function fileAdded(file: Recordable) {
+  function fileAdded(file: any) {
     if (props[camelCase(FILE_ADDED_EVENT)]) {
       props[camelCase(FILE_ADDED_EVENT)](file);
     }
@@ -115,28 +105,27 @@ const Uploader:  React.ForwardRefRenderFunction<UploaderInterfaceRef, UploaderPr
     if (props[camelCase(FILES_ADDED_EVENT)]) {
       props[camelCase(FILES_ADDED_EVENT)](files, fileList);
     }
-    if (files.ignored || fileList.ignored) {
-      // is ignored, filter it
-      return false;
-    }
   }
 
-  function fileRemoved() {
-    setFiles(uploaderRef.current.files);
-    setFileList(uploaderRef.current.fileList);
+  function fileRemoved(file: any) {
+    updateFilesAndFileList(uploaderRef.current.files,uploaderRef.current.fileList)
   }
 
-  function filesSubmitted(files: Recordable[], fileList: Recordable[]) {
-    const lastFile = fileList[fileList.length - 1];
-    setFiles(files);
-    if (lastFile) {
-      setFileList([lastFile]);
-    } else {
-      setFileList([]);
-    }
+  function filesSubmitted(newFileList: Recordable[], newFileAndFolderList: Recordable[]) {
+    updateFilesAndFileList(uploaderRef.current.files,uploaderRef.current.fileList)
     if (props.autoStart) {
       uploaderRef.current.upload();
     }
+  }
+
+  const updateFilesAndFileList = (files:any[],fileList:any[]) => {
+    setDatas((draft)=>{
+      //useImmer中数组为引用类型，所以需要先清空再push
+      draft.files.length = 0
+      draft.files.push(...files)
+      draft.fileList.length = 0
+      draft.fileList.push(...fileList)
+    })
   }
 
   const eventObj: Record<string, (...args: any) => void | boolean> = {
@@ -169,33 +158,37 @@ const Uploader:  React.ForwardRefRenderFunction<UploaderInterfaceRef, UploaderPr
 
   useImperativeHandle(ref, () => ({
     getUploader: () => uploaderRef.current,
-    setFileList:setFileList,
-    fileList:fileList,
+    updateFilesAndFileList: updateFilesAndFileList,
   }));
 
+
+
   useEffect(() => {
-    uploaderRef.current.fileStatusText = fileStatusText || {
-      success: "上传成功",
-      error: "上传失败",
-      uploading: "上传中",
-      paused: "暂停",
-      waiting: "等待上传",
-    };
-
-    uploaderRef.current.on("catchAll", allEvent);
-    uploaderRef.current.on(FILE_ADDED_EVENT, fileAdded);
-    uploaderRef.current.on(FILES_ADDED_EVENT, filesAdded);
-    uploaderRef.current.on("fileRemoved", fileRemoved);
-    uploaderRef.current.on("filesSubmitted", filesSubmitted);
-
-    return () => {
-      uploaderRef.current.off("catchAll", allEvent);
-      uploaderRef.current.off(FILE_ADDED_EVENT, fileAdded);
-      uploaderRef.current.off(FILES_ADDED_EVENT, filesAdded);
-      uploaderRef.current.off("fileRemoved", fileRemoved);
-      uploaderRef.current.off("filesSubmitted", filesSubmitted);
-      uploaderRef.current = null;
-    };
+    if(uploaderRef.current) {
+      uploaderRef.current.fileStatusText = {
+        success: "上传成功",
+        error: "上传失败",
+        uploading: "上传中",
+        paused: "暂停",
+        waiting: "等待上传",
+      };
+  
+      uploaderRef.current.on("catchAll", allEvent);
+      uploaderRef.current.on(FILE_ADDED_EVENT, fileAdded);
+      uploaderRef.current.on(FILES_ADDED_EVENT, filesAdded);
+      uploaderRef.current.on("fileRemoved", fileRemoved);
+      uploaderRef.current.on("filesSubmitted", filesSubmitted);
+  
+      return () => {
+        uploaderRef.current.off("catchAll", allEvent);
+        uploaderRef.current.off(FILE_ADDED_EVENT, fileAdded);
+        uploaderRef.current.off(FILES_ADDED_EVENT, filesAdded);
+        uploaderRef.current.off("fileRemoved", fileRemoved);
+        uploaderRef.current.off("filesSubmitted", filesSubmitted);
+        uploaderRef.current = null;
+      };
+    }
+  
   }, []);
 
   useEffect(()=>{
@@ -206,7 +199,7 @@ const Uploader:  React.ForwardRefRenderFunction<UploaderInterfaceRef, UploaderPr
         }
     }
   },[disabled])
-
+  
   return (
     <UploaderContext.Provider
       value={{
@@ -221,19 +214,19 @@ const Uploader:  React.ForwardRefRenderFunction<UploaderInterfaceRef, UploaderPr
           style={style}
         >
            {children ? (
-            children({ fileList, files, started })
+            children({ fileList:datas.fileList, files:datas.files, started })
           ) : (
           <Fragment>
             <Spin spinning={loading}>
             <UploaderUnsupport />
             <UploaderDrop>
               <p>拖拽文件上传</p>
-              <UploaderBtn single={true} attrs={{accept:accept,id:'fusion_job_detail_file_input'}}>
+              <UploaderBtn single={true}  attrs={{accept:accept,id:'fusion_job_detail_file_input'}}>
                 上传文件
               </UploaderBtn>
               {renderPrewView && renderPrewView()}
             </UploaderDrop>
-            <UploaderList disabled={disabled} setFileList={setFileList} fileList={fileList} />
+            <UploaderList fileList={datas.files} disabled={disabled}/>
             </Spin>
           </Fragment>
           )}

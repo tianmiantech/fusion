@@ -78,10 +78,11 @@ const HashForm = (props:HashFormPropsInterface) => {
                     twoToneColor="#ff7875"
                     className="operation-btn minus-btn"
                     onClick={() => remove(index)}
+                    key={index}
                   />:null
                  }
                   { (index === fields.length - 1  && !disabled) ?
-                    <PlusCircleTwoTone className="operation-btn" onClick={() => add()} /> : null }
+                    <PlusCircleTwoTone    key={index} className="operation-btn" onClick={() => add()} /> : null }
                 </div>
               </Space>
             ))}
