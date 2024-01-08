@@ -60,19 +60,22 @@ public class P9SaveResultAction<T extends AbstractPsiJob> extends AbstractJobPha
     protected void doAction() throws Exception {
         phaseProgress.setMessageAndLog("正在生成最终求交结果文件...");
 
-        if (job.getAlgorithm() == PsiAlgorithm.rsa_psi) {
-            if (job.getMyJobRole() == JobRole.follower && job.getMyself().dataResourceInfo.dataResourceType == DataResourceType.PsiBloomFilter) {
-                File target = FileSystem.FusionResult.getResultFile(job.getJobId());
-                try (BufferedWriter writer1 = FileUtil.buildBufferedWriter(target, false)) {
-                    writer1.write(Constant.KEY_COLUMN_NAME + System.lineSeparator());
-                }
-                FileUtil.copy(
-                        job.getJobTempData().resultFileOnlyKey.toPath(),
-                        target.toPath(),
-                        StandardCopyOption.REPLACE_EXISTING,
-                        StandardCopyOption.COPY_ATTRIBUTES
-                );
+        // 过滤器方由于缺少原始明文数据，所以无法根据 key 还原为原始字段，只能输出 key。
+        if (job.getAlgorithm() == PsiAlgorithm.rsa_psi
+                && job.getMyJobRole() == JobRole.follower
+                && job.getMyself().dataResourceInfo.dataResourceType == DataResourceType.PsiBloomFilter) {
+
+            File target = FileSystem.FusionResult.getResultFile(job.getJobId());
+            try (BufferedWriter writer1 = FileUtil.buildBufferedWriter(target, false)) {
+                writer1.write(Constant.KEY_COLUMN_NAME + System.lineSeparator());
             }
+            FileUtil.copy(
+                    job.getJobTempData().resultFileOnlyKey.toPath(),
+                    target.toPath(),
+                    StandardCopyOption.REPLACE_EXISTING,
+                    StandardCopyOption.COPY_ATTRIBUTES
+            );
+
         } else {
             createResultFile();
         }
