@@ -47,4 +47,9 @@ public class EcdhPsiJob extends AbstractPsiJob {
     public EcdhPsiJobMember getPartner() {
         return partner;
     }
+
+    @Override
+    protected void checkBeforeFusion() {
+
+    }
 }

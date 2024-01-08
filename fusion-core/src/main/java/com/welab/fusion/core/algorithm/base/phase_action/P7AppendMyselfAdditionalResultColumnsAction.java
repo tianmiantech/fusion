@@ -17,6 +17,9 @@ package com.welab.fusion.core.algorithm.base.phase_action;
 
 import com.welab.fusion.core.Job.AbstractPsiJob;
 import com.welab.fusion.core.Job.base.JobPhase;
+import com.welab.fusion.core.Job.base.JobRole;
+import com.welab.fusion.core.Job.data_resource.DataResourceType;
+import com.welab.fusion.core.algorithm.base.PsiAlgorithm;
 import com.welab.fusion.core.io.FileSystem;
 import com.welab.fusion.core.io.data_source.CsvTableDataSourceReader;
 import com.welab.fusion.core.util.Constant;
@@ -117,6 +120,12 @@ public class P7AppendMyselfAdditionalResultColumnsAction<T extends AbstractPsiJo
 
     @Override
     protected boolean skipThisAction() {
+        if (job.getAlgorithm() == PsiAlgorithm.rsa_psi) {
+            if (job.getMyJobRole() == JobRole.leader && job.getMyself().dataResourceInfo.dataResourceType == DataResourceType.PsiBloomFilter) {
+                return true;
+            }
+        }
+
         return CollectionUtils.isEmpty(
                 job.getMyself().dataResourceInfo.additionalResultColumns
         );

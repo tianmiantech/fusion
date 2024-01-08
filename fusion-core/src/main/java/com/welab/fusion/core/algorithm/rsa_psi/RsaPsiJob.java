@@ -16,7 +16,9 @@
 package com.welab.fusion.core.algorithm.rsa_psi;
 
 import com.welab.fusion.core.Job.AbstractPsiJob;
+import com.welab.fusion.core.Job.data_resource.DataResourceType;
 import com.welab.fusion.core.algorithm.base.PsiAlgorithm;
+import org.apache.commons.collections4.CollectionUtils;
 
 /**
  * @author zane.luo
@@ -46,5 +48,22 @@ public class RsaPsiJob extends AbstractPsiJob {
     @Override
     public RsaPsiJobMember getPartner() {
         return partner;
+    }
+
+    @Override
+    protected void checkBeforeFusion() {
+        if (myself.dataResourceInfo.dataResourceType == DataResourceType.PsiBloomFilter && partner.dataResourceInfo.dataResourceType == DataResourceType.PsiBloomFilter) {
+            finishJobOnException(
+                    new Exception("不能双方都使用布隆过滤器，建议数据量大的一方使用布隆过滤器。")
+            );
+        }
+
+        boolean useBloomFilter = myself.dataResourceInfo.dataResourceType == DataResourceType.PsiBloomFilter && partner.dataResourceInfo.dataResourceType == DataResourceType.PsiBloomFilter;
+        boolean hasAdditionalResultColumns = CollectionUtils.isNotEmpty(myself.dataResourceInfo.additionalResultColumns) || CollectionUtils.isNotEmpty(partner.dataResourceInfo.additionalResultColumns);
+        if (useBloomFilter && hasAdditionalResultColumns) {
+            finishJobOnException(
+                    new Exception("使用布隆过滤器时，不能添加附加结果字段。")
+            );
+        }
     }
 }

@@ -266,13 +266,7 @@ public abstract class AbstractPsiJob implements Closeable {
         });
     }
 
-    private void checkBeforeFusion() {
-        if (myself.dataResourceInfo.dataResourceType == DataResourceType.PsiBloomFilter && partner.dataResourceInfo.dataResourceType == DataResourceType.PsiBloomFilter) {
-            finishJobOnException(
-                    new Exception("不能双方都使用布隆过滤器，建议数据量大的一方使用布隆过滤器。")
-            );
-        }
-    }
+    protected abstract void checkBeforeFusion();
 
 
     /**
@@ -315,6 +309,10 @@ public abstract class AbstractPsiJob implements Closeable {
 
     // region getter/setter
 
+
+    public PsiAlgorithm getAlgorithm() {
+        return algorithm;
+    }
 
     public JobTempData getJobTempData() {
         return jobTempData;

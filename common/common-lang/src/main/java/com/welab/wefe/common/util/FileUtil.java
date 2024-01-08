@@ -499,6 +499,9 @@ public class FileUtil {
      * BufferedReader 是线程安全的，可以在多线程中使用。
      */
     public static BufferedReader buildBufferedReader(File file) throws FileNotFoundException {
+        if (!file.exists()) {
+            throw new FileNotFoundException("FileNotFoundException: " + file.getAbsolutePath());
+        }
         return new BufferedReader(
                 new InputStreamReader(
                         new FileInputStream(file),

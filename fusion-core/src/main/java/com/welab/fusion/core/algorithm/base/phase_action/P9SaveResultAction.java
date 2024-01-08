@@ -17,6 +17,9 @@ package com.welab.fusion.core.algorithm.base.phase_action;
 
 import com.welab.fusion.core.Job.AbstractPsiJob;
 import com.welab.fusion.core.Job.base.JobPhase;
+import com.welab.fusion.core.Job.base.JobRole;
+import com.welab.fusion.core.Job.data_resource.DataResourceType;
+import com.welab.fusion.core.algorithm.base.PsiAlgorithm;
 import com.welab.fusion.core.hash.HashConfig;
 import com.welab.fusion.core.io.FileSystem;
 import com.welab.fusion.core.util.Constant;
@@ -31,6 +34,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.StandardCopyOption;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -55,7 +59,21 @@ public class P9SaveResultAction<T extends AbstractPsiJob> extends AbstractJobPha
     @Override
     protected void doAction() throws Exception {
         phaseProgress.setMessageAndLog("正在生成最终求交结果文件...");
-        createResultFile();
+
+        if (job.getAlgorithm() == PsiAlgorithm.rsa_psi) {
+            if (job.getMyJobRole() == JobRole.leader && job.getMyself().dataResourceInfo.dataResourceType == DataResourceType.PsiBloomFilter) {
+                File target = FileSystem.FusionResult.getResultFile(job.getJobId());
+                FileUtil.copy(
+                        job.getJobTempData().resultFileOnlyKey.toPath(),
+                        target.toPath(),
+                        StandardCopyOption.REPLACE_EXISTING,
+                        StandardCopyOption.COPY_ATTRIBUTES
+                );
+            }
+        } else {
+            createResultFile();
+        }
+
 
         // 储存结果
         job.getJobFunctions().saveFusionResultFunction.save(

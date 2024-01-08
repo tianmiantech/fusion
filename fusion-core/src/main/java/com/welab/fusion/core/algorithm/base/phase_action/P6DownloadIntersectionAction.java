@@ -19,6 +19,8 @@ import com.welab.fusion.core.Job.AbstractPsiJob;
 import com.welab.fusion.core.Job.PsiJobResult;
 import com.welab.fusion.core.Job.base.JobPhase;
 import com.welab.fusion.core.Job.base.JobRole;
+import com.welab.fusion.core.Job.data_resource.DataResourceType;
+import com.welab.fusion.core.algorithm.base.PsiAlgorithm;
 import com.welab.fusion.core.io.FileSystem;
 import com.welab.fusion.core.util.Constant;
 import com.welab.wefe.common.util.CloseableUtils;
@@ -140,6 +142,11 @@ public class P6DownloadIntersectionAction<T extends AbstractPsiJob> extends Abst
 
     @Override
     protected boolean skipThisAction() {
+        if (job.getAlgorithm() == PsiAlgorithm.rsa_psi) {
+            if (job.getMyJobRole() == JobRole.leader && job.getMyself().dataResourceInfo.dataResourceType == DataResourceType.PsiBloomFilter) {
+                return true;
+            }
+        }
         return false;
     }
 
