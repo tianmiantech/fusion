@@ -33,7 +33,7 @@ export const extractFirstPathAfterOrigin = (url: string)=>{
 // 全局变量
 export function getRequestBaseURL(){
   //return "http://172.31.21.36:9090/fusion"
-  return "https://xbd-dev.tianmiantech.com/fusion-01"
+  //return "https://xbd-dev.tianmiantech.com/fusion-01"
   if(window._wefeApi){
       /** 提供给客户快速修改请求地址，一般通过修改html head */
       return window._wefeApi;
