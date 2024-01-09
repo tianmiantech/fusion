@@ -27,7 +27,7 @@ const App: React.FC = (props:any) => {
     const router = getReactRouter(redirectParam)
     console.log('router',router);
     if(location.pathname.includes('index.html') && redirectParam ) {
-      history.push(router);
+      history.push(`/${router}`);
     }
   }, [location.search]);
 
