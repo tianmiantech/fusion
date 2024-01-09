@@ -3,6 +3,7 @@ import {preViewData,PeviewDataRequestInterface} from './service'
 import { useRequest,useMount } from "ahooks";
 import ResizableTable from './ResizableTable';
 import { useImmer } from "use-immer";
+import { message } from "antd";
 import {UploaderBtn} from '../FileChunkUpload/Components'
 import styles from './index.less'
 
@@ -43,8 +44,13 @@ const DataPreviewBtn = forwardRef((props:UploadDataPropsInterface,ref) => {
   },{manual:true})
 
   const onPreViewClick = async ()=>{
-    if(httpData.columns.length == 0 && (requestParams.data_source_file || requestParams.sql)){
-      await getPreViewData()
+    if(httpData.columns.length == 0 ){
+      if(requestParams.data_source_file || requestParams.sql)
+        await getPreViewData()
+      else {
+        message.warning('参数有误，无法发送预览请求')
+        return 
+      }
     } 
     setHttpData(draft=>{draft.previewOpen = true})
   }
