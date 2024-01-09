@@ -14,7 +14,8 @@ const BasicLayout = (props:BasicLayoutPros) => {
 
   const {checkInitialize} = useModel("initializeConfig");
   
-
+  console.log('======BasicLayout ======');
+  
   useMount(()=>{
     //检查系统是否被初始化 、、
     checkNeedInitialize()
