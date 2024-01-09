@@ -47,4 +47,19 @@ export const IsEmptyObject =(obj: any): boolean=> {
 
   return false;
 }
+
+/**
+ * 根据浏览器的地址解析出react-router的地址
+ * @param redirectParam 
+ */
+export const getReactRouter = (redirectParam:string) => {
+  const BASE_PATH = process.env.BASE_PATH;
+  if(redirectParam){
+    const tmPArray = redirectParam.split(BASE_PATH||'');
+    if(tmPArray.length>1){
+      return tmPArray[1];
+    }
+  }
+  return redirectParam;
+}
   
