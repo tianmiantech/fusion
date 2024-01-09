@@ -7,7 +7,7 @@ const BASE_PATH = process.env.BASE_PATH?`${process.env.BASE_PATH}`:`/${base}/`
 export default defineConfig({
     base: `${BASE_PATH}`,
     outputPath: `./dist/${OUTPUT_EXTRA}`,
-    publicPath:`${BASE_PATH}/`,
+    publicPath:`${BASE_PATH}`,
     extraBabelPlugins:[
       [
         'babel-plugin-import',
@@ -19,7 +19,6 @@ export default defineConfig({
         }
       ]
     ],
-    exportStatic:{},
     define: {
       'process.env.HOST_ENV': process.env.HOST_ENV,
       'process.env.BASE_PATH': BASE_PATH,
