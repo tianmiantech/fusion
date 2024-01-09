@@ -131,6 +131,7 @@ const Index= forwardRef((props:FileChunkUploadInterface,ref) => {
 
   const clearFileList = ()=>{
     onChange?.({ data_source_file:'',add_method:"" });
+    uploadFinishCallBack && uploadFinishCallBack([])
   }
 
   //获取获取预览的数据给其他的组件

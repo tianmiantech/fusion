@@ -61,6 +61,8 @@ const JobForm = forwardRef((props:JobFormPropsInterface, ref) => {
     setJobFormData(g=>{
       g.dataourceColumnList = parma;
     })
+    //数据发生变化后续重置依赖数据源的hash设置,附加结果字段
+    resetHashConfig();
   }
  
   useImperativeHandle(ref, () => {
@@ -89,10 +91,15 @@ const JobForm = forwardRef((props:JobFormPropsInterface, ref) => {
 
   // 数据源类型变化清空主键设置
   const onDataSourceTypeChange = (e:any)=>{
+    resetHashConfig()
+  }
+
+  const resetHashConfig = ()=>{
     formRef.setFieldsValue({hash_config:{
       list:[],
       source:'setFieldsValue'
-    }})
+    },
+    additional_result_columns:[]})
   }
   
   const checkAlgorithmDisable = ()=>{
