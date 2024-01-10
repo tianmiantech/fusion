@@ -1,7 +1,7 @@
 
 import { useState,useEffect, JSXElementConstructor, ReactElement, ReactNode, ReactPortal } from 'react';
 import type { StepProps,StepsProps} from 'antd';
-import { Card, Steps,Typography,Popover,Row,Col,Progress,Collapse } from 'antd';
+import { Card, Steps,Typography,Popover,Row,Col,Progress,Collapse,Alert } from 'antd';
 import { LoadingOutlined, SmileOutlined, CheckCircleOutlined, UserOutlined,CloseCircleOutlined } from '@ant-design/icons';
 import { ProDescriptions } from '@ant-design/pro-components';
 import lodash from 'lodash'
@@ -81,15 +81,17 @@ const JobProgress = (props:JobProgressProps) => {
       return <Collapse activeKey={currentStepOpenKey.includes(phase)?phase:''}  onChange={()=>onCollapseChange(phase)}>
        <Panel header="进度详情" key={phase}>
         <Row >
-          <Col span={12} >
-            <Card>
+          <Col span={12}  style={{ display: 'flex', flexDirection: 'column' }}>
+            <Card style={{height:'100%'}} title={renderPhasesItemTitle('发起方',promoterPhasesObj)}>
               {renderPhasesItem(promoterPhasesObj,'发起方')}
+              {promoterPhasesObj?.status === 'failed' && <Alert message={promoterPhasesObj.message} type="error" />}
             </Card>
           </Col>
-          <Col span={12} >
-            {providerPhases && <Card>
+          <Col span={12}  style={{ display: 'flex', flexDirection: 'column' }}>
+           <Card style={{height:'100%'}} title={renderPhasesItemTitle('协作方',providerPhases)}>
               {renderPhasesItem(providerPhases,'协作方')}
-            </Card>}
+              {providerPhases?.status === 'failed' && <Alert message={providerPhases.message} type="error" />}
+            </Card>
             
           </Col>
         </Row>
@@ -101,10 +103,12 @@ const JobProgress = (props:JobProgressProps) => {
 
     const renderPhasesItem = (phasesObj:PhasesListItemInterface,title:string)=>{
       if(!phasesObj)
-        return <></>
+        return <>
+        <Alert message="未执行" type="info" showIcon />
+        </>
       const {skip_this_phase} = phasesObj;
       return <>
-      <ProDescriptions column={1} title={renderPhasesItemTitle(title,phasesObj)} labelStyle={{textAlign:'right'}}>
+      <ProDescriptions column={1} labelStyle={{textAlign:'right'}}>
         {
           !skip_this_phase && <>
             <ProDescriptions.Item label='任务进度'>
@@ -125,13 +129,10 @@ const JobProgress = (props:JobProgressProps) => {
     const renderPhasesItemTitle = (title:string,phasesObj:PhasesListItemInterface)=>{
       const msg = lodash.get(phasesObj,'message','');
       const status = lodash.get(phasesObj,'status','');
-      let color = 'gray';
-      if(status === 'failed'){
-        color = 'red';
-      } 
-      if(!msg)
-        return <span>{title}</span>
-      return <span>{title}<span style={{ fontSize:12,color:color}}>（{msg}）</span></span>
+      if(status !== 'failed' && msg){
+        return <span>{title}<span style={{ fontSize:12,color:'gray'}}>（{msg}）</span></span>
+      }
+      return <span>{title}</span>
     }
 
     const renderLogs = (logs:string[])=>{
@@ -148,7 +149,6 @@ const JobProgress = (props:JobProgressProps) => {
      * @returns 
      */
     const changeProgressStatusToStepStatus = (myselfStatus:string,partnerStatus:string) => {
-      console.log(myselfStatus,partnerStatus);   
       if(myselfStatus === 'failed' || partnerStatus === 'failed'){
         return 'error';
       } else if(myselfStatus === 'running' || partnerStatus === 'running' ){

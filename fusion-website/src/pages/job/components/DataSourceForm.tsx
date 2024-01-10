@@ -181,42 +181,53 @@ const DataSourceForm = (props:DataSourceFormInterface) => {
 
   const BaseDataSourceForm = () => (
     <>
+    <Col span={12}>
       <Form.Item name="database_name" label="默认数据库名称" {...formItemLayout}>
         <Input placeholder='请输入'></Input>
       </Form.Item>
+      </Col>
+      <Col span={12}>
       <Form.Item name="user_name" label="用户名" {...formItemLayout}>
         <Input placeholder='请输入'></Input>
       </Form.Item>
+      </Col>
+      <Col span={12}>
       <Form.Item name="password" label="密码" {...formItemLayout}>
         <Input.Password placeholder='请输入' autoComplete="one-time-code" />
       </Form.Item>
+      </Col>
     </>
   );
 
   const HiveForm = () => (
     <>
+    <Col span={12}>
       <Form.Item name="metastore_port" label="Metastore端口" {...formItemLayout} initialValue={9083}>
         <Input placeholder='请输入'></Input>
       </Form.Item>
+      </Col>
+      <Col span={12}>
       <Form.Item name="database_name" label="默认数据库名称" {...formItemLayout}>
         <Input placeholder='请输入'></Input>
       </Form.Item>
+      </Col>
     </>
   )
     
   return (
     <Spin spinning={testDataSourceLoading}>
-      <Form form={dataSourceFormRef} onValuesChange={onDataSourceFormChange} disabled={disabled}>
+      <Form layout="horizontal" form={dataSourceFormRef} onValuesChange={onDataSourceFormChange} disabled={disabled}>
         <Row
-          justify={'center'}
-          style={{ width: '95%', backgroundColor: '#fbfbfb', padding: '10px 10px 10px ' }}
+          gutter={24}
+          style={{ backgroundColor: '#fbfbfb', padding: '10px 10px 10px ' }}
         >
-          
-          <Col span={24}>
-          <Form.Item name="database_type" label="数据源类型" {...formItemLayout}>
-            <Select options={dataSoureConfig.dataSoureTypeList} onSelect={onDataSourceTypeChange}>
-            </Select>
-          </Form.Item>
+          <Col span={12}>
+            <Form.Item name="database_type" label="数据源类型" {...formItemLayout}>
+              <Select options={dataSoureConfig.dataSoureTypeList} onSelect={onDataSourceTypeChange}>
+              </Select>
+            </Form.Item>
+          </Col>
+          <Col span={12}>
           <Form.Item name="host" label="Host" {...formItemLayout}>
             <AutoComplete 
               placeholder='请输入'
@@ -225,9 +236,12 @@ const DataSourceForm = (props:DataSourceFormInterface) => {
               onSelect={onHostSelected}
             />
           </Form.Item>
+          </Col>
+          <Col span={12}>
           <Form.Item name="port" label="JDBC端口" {...formItemLayout}>
             <Input placeholder='请输入'></Input>
           </Form.Item>
+          </Col>
           <Form.Item noStyle shouldUpdate={(prev, cur) => prev.database_type !== cur.database_type }>
             {({ getFieldValue }) => {
                 const dbType = getFieldValue('database_type');
@@ -238,12 +252,14 @@ const DataSourceForm = (props:DataSourceFormInterface) => {
               }
             }
           </Form.Item>
+          <Col span={24}>
           <Form.Item name="sql" label="查询语句" {...formItemLayout} initialValue={"select * from account"}>
             <Input.TextArea
               rows={6}
               placeholder={`select * from table where id < 30000000;\nselect * from table1 where id >= 30000000 and id < 60000000\nunion\nselect * from table2 where score >= 6 and score < 10;`}
             ></Input.TextArea>
           </Form.Item>
+          </Col>
           <Form.Item {...formItemLayout}>
             <Space>
               <Button
@@ -255,7 +271,6 @@ const DataSourceForm = (props:DataSourceFormInterface) => {
               }
             </Space>
           </Form.Item>
-          </Col>
         
         </Row>
     </Form>
