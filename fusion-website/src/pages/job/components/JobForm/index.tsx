@@ -78,8 +78,6 @@ const JobForm = forwardRef((props:JobFormPropsInterface, ref) => {
       g.dataourceColumnList = parma;
     })
     const hash_config = formRef.getFieldValue('hash_config')
-    console.log('hash_config',hash_config);
-    
     const source = lodash.get(hash_config,'source','')
     //表示设置过初始值，处于编辑状态，判断传过来的columns是否在初始值中
     if(source === 'setFieldsValue'){
@@ -123,9 +121,17 @@ const JobForm = forwardRef((props:JobFormPropsInterface, ref) => {
     resetHashConfig()
   }
 
+  const onAddMethodChange = (e:any)=>{
+    resetHashConfig()
+    formRef.setFieldsValue({table_data_resource_info:null,source:'setFieldsValue'})
+    setJobFormData(g=>{
+      g.dataourceColumnList = []
+    })
+  }
+
   const resetHashConfig = ()=>{
     formRef.setFieldsValue({hash_config:{
-      list:[],
+      list:[{columns:[],method:null}],
       source:'setFieldsValue'
     },
     additional_result_columns:[]})
@@ -137,7 +143,10 @@ const JobForm = forwardRef((props:JobFormPropsInterface, ref) => {
     return flag || role === ROLE_TYPE.PROVIDER
   }
 
-  const validateSelfField =  (_: any, value:any)  =>{
+  const validateSelfField =  (props: any, value:any)  =>{
+    const {field} = props;
+    console.log(props,value);
+    
     const result = IsEmptyObject(value)
     if(result){
       return Promise.reject(new Error('此项不能为空'))
@@ -192,8 +201,8 @@ const JobForm = forwardRef((props:JobFormPropsInterface, ref) => {
                       // 选择数据集
                       if(data_resource_type === DATARESOURCE_TYPE.TABLE_DATASOURCE) {
                         return <>
-                           <Form.Item style={{marginTop:30}} name="add_method" label="选择样本" rules={[formRuleRequire()]}>
-                            <Radio.Group>
+                           <Form.Item style={{marginTop:30}} name="add_method" label="选择样本" rules={[formRuleRequire()]} >
+                            <Radio.Group onChange={onAddMethodChange}>
                               {[...dataSetAddMethodMap].map(([value, label]) => (
                                 <Radio key={value} value={value}>
                                   {label}

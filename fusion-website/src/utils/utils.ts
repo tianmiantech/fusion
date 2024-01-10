@@ -28,23 +28,25 @@ export const renderHashConfig = (hash_config:hashConfigItemInterface) => {
 }
 
 export const IsEmptyObject =(obj: any): boolean=> {
-  if (obj === null || obj === undefined || obj === "") {
+  if (obj === null || obj === undefined || obj === "" ||  (obj+'').trim() === "[]") {
     return true;
   }
-  if (typeof obj === "object") {
-    for (const key in obj) {
-      if (IsEmptyObject(obj[key])) {
-        return true;
-      }
+  if (Array.isArray(obj)) {
+    if(obj.length === 0){
+      return true;
     }
-  } else if (Array.isArray(obj)) {
     for (const item of obj) {
       if (IsEmptyObject(item)) {
         return true;
       }
     }
+  } else  if (typeof obj === "object") {
+    for (const key in obj) {
+      if (IsEmptyObject(obj[key])) {
+        return true;
+      }
+    }
   }
-
   return false;
 }
 
