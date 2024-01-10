@@ -55,14 +55,43 @@ const JobForm = forwardRef((props:JobFormPropsInterface, ref) => {
     formRef.resetFields();
   })
 
- 
-  
+  type ColumnObject = {
+    columns: string[];
+    method: string;
+  };
+
+  //判断hash——config中的columns是否都在数组中,如果有任何一列不存在于数组中，则返回false
+  const areColumnsInArray = (columnsList:string[],list:ColumnObject[])=>{
+    for (const item of list) {
+      const { columns=[] } = item;
+      // 使用 every 方法检查所有列是否都在数组 a 中
+      const allColumnsExist = columns.every(column => columnsList.includes(column));
+       // 如果有任何一列不存在于数组 a 中，则返回 false
+      if (!allColumnsExist) {
+        return false;
+      }
+    }
+    return true;
+  }
   const prevColumnsChangeCallBack = (parma:string[])=>{
     setJobFormData(g=>{
       g.dataourceColumnList = parma;
     })
-    //数据发生变化后续重置依赖数据源的hash设置,附加结果字段
-    resetHashConfig();
+    const hash_config = formRef.getFieldValue('hash_config')
+    console.log('hash_config',hash_config);
+    
+    const source = lodash.get(hash_config,'source','')
+    //表示设置过初始值，处于编辑状态，判断传过来的columns是否在初始值中
+    if(source === 'setFieldsValue'){
+     const {list=[]} = hash_config;
+      // 如果有任何一列不存在于数组 dataourceColumnList 中，则重置hash_config
+      const flag = areColumnsInArray(parma,list)
+      if(!flag){
+        resetHashConfig()
+      }
+      return
+    }
+    resetHashConfig()
   }
  
   useImperativeHandle(ref, () => {
