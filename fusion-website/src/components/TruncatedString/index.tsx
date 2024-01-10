@@ -35,8 +35,7 @@ const TruncatedString: React.FC<TruncatedStringProps> = ({ text,style }) => {
   };
 
   const truncatedText = text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
-  console.log(text.length, maxLength);
-  
+    
   return (
     <Tooltip title={text.length > maxLength ? text : undefined}>
       <span ref={containerRef}  style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',...style }}>

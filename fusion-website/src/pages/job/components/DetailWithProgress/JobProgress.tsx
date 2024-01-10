@@ -172,9 +172,6 @@ const JobProgress = (props:JobProgressProps) => {
       return <SmileOutlined />
     }
 
-    console.log('stepList',stepList);
-    
-    
     return <Steps
       direction="vertical"
       items={stepList}

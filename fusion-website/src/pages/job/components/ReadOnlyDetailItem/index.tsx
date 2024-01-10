@@ -31,10 +31,8 @@ interface ReadOnlyDetailItemProps {
   cardExtra?:ReactNode
 }
 const ReadOnlyDetailItem = (props:ReadOnlyDetailItemProps) => {
-  const {detailData} = useDetail();
   const {detailInfoData,title,bodyStyle,cardExtra=null } = props
   const configContext = useContext(ConfigProvider.ConfigContext);
-  const prefixCls = 'portal' || configContext.getPrefixCls();
   const labelStyle = {
     width: 150,
     justifyContent: 'end',
