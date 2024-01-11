@@ -217,7 +217,7 @@ const Index = ()=>{
 
     const renderPublicInfoTitle = ()=>{
       if(detailData.jobDetailData && detailData.jobDetailData.status === JOB_STATUS.ERROR_ON_RUNNING){
-        return <div className="headerStyle">任务信息 <TruncatedString style={{color:'red',fontSize:12}} text={`（${detailData.jobDetailData.message}）`}/></div>
+        return <div >任务信息 <TruncatedString style={{color:'red',fontSize:12}} text={`（${detailData.jobDetailData.message}）`}/></div>
       }
       return '任务信息'
     }
