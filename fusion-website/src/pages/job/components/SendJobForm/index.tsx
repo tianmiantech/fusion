@@ -92,8 +92,6 @@ const SendJobForm = forwardRef((props:SendJobFormPropsInterface, ref) => {
 
   return (
     <>
-      <Row justify="center" className="form-scroll">
-        <Col lg={{span: 16}} md={{span: 24}}>
           <Spin spinning={testPartnerConntentLoading||loadingSendJobToProvider}>
             {renderRejectReason()}
           <Form
@@ -127,8 +125,6 @@ const SendJobForm = forwardRef((props:SendJobFormPropsInterface, ref) => {
             </Form.Item>
           </Form>
           </Spin>
-        </Col>
-      </Row>
       {
        showActionButton &&  <Row className="operation-area">
         <Button type="primary" disabled={testPartnerConntentLoading||loadingSendJobToProvider || checkFormDisable()} onClick={submitData}>发起任务</Button>

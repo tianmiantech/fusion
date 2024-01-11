@@ -1,20 +1,4 @@
-.topContainer {
-    margin-top: 20px;
-    margin-bottom: 20px;
-}
-.bottomContaner {
-    position: absolute;
-    width: 100%;
-    box-sizing: border-box;
-    padding: 20px;
-    left: 0;
-    bottom: 0;
-    min-height: 80px;
-    display: flex;
-    justify-content: center;
-    background-color: #fff;
-    box-shadow: 0 2px 5px rgb(0 0 0 / 26%);
-}
+
 .logContainer {
     padding-left: 20px;
     background-color: rgb(0 0 0 / 15%);
@@ -28,4 +12,17 @@
     font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, Courier, monospace;
     background-color: rgba(150, 150, 150, 0.1);
     border-radius: 3px;
+}
+.cardContainer {
+   :global {
+    .fusion-card-head {
+        height:40px;
+        min-height: 40px;
+        .fusion-card-head-wrapper {
+            height:40px;
+            line-height: 40px;
+    
+        }   
+    }
+   }
 }

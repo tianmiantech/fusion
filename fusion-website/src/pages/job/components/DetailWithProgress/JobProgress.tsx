@@ -104,7 +104,7 @@ const JobProgress = (props:JobProgressProps) => {
     const renderPhasesItem = (phasesObj:PhasesListItemInterface,title:string)=>{
       if(!phasesObj)
         return <>
-        <Alert message="未执行" type="info" showIcon />
+        <Alert message="无进度信息" type="info" showIcon />
         </>
       const {skip_this_phase} = phasesObj;
       return <>
