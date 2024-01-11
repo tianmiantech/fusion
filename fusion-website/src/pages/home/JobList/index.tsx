@@ -167,7 +167,8 @@ const Index =(props:JobListPropsInterface)=>{
         key: 'role',
         hideInTable:true,
         formItemProps:{
-          labelCol:2
+          labelCol:2,
+          wrapperCol:4
         },
         valueType: 'radioButton',
         valueEnum: {
@@ -175,15 +176,6 @@ const Index =(props:JobListPropsInterface)=>{
           [ROLE_TYPE.PROVIDER]: { text: '我参与的' },
         },
     },{
-        title: '任务ID',
-        dataIndex: 'job_id',
-        key: 'job_id',
-        hideInTable:true,
-        formItemProps:{
-          labelCol:2
-        },
-    },
-      {
         title: '时间/算法',
         dataIndex: 'create',
         key: 'create',
@@ -228,11 +220,10 @@ const Index =(props:JobListPropsInterface)=>{
         width:90,
         valueType: 'select',
         valueEnum: JobStatus,
-        fieldProps: {
-          style:{
-            width:120
-          }
-        },
+        formItemProps:{
+            labelCol:2,
+            wrapperCol:4
+          },
         render:(text:string,row:RowProps)=>{
           const status = lodash.get(row,'status',null);
           return <Badge status={getBadgeStatus(status)}  text={JobStatus.get(status)}/>
@@ -243,6 +234,16 @@ const Index =(props:JobListPropsInterface)=>{
         dataIndex: 'remark',
         key: 'remark'
     },{
+        title: '任务ID',
+        dataIndex: 'job_id',
+        key: 'job_id',
+        hideInTable:true,
+        formItemProps:{
+            labelCol:2,
+            wrapperCol:4
+          },
+    }
+    ,{
         key: 'optionOop',
         title: '操作',
         fixed: 'right',
@@ -348,7 +349,7 @@ const Index =(props:JobListPropsInterface)=>{
                         xs:24,
                         sm:12,
                         md:12,
-                        lg:12,
+                        lg:8,
                         xl:8,
                         xxl:6
                       }

@@ -120,7 +120,7 @@ const Index = forwardRef((props:PromoterPropsInterface,ref) => {
 
   const renderHasJobIdResult = ()=>{
     return <div className={styles.hasJobIdContainer}>
-      <TmSplit sizes={[50,50]}>
+      <TmSplit sizes={[60,40]}>
         <div>
           {renderNoJobIdResult()}
         </div>
