@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef,useContext, ReactNode} from "react";
+import { useEffect, useState, useRef,useContext, ReactNode, CSSProperties} from "react";
 import { Descriptions,Typography,Button,Popover,ConfigProvider, Steps } from 'antd';
 import {dataResourceTypeMap} from '@/constant/dictionary'
 import lodash from 'lodash'
@@ -27,11 +27,12 @@ export interface ReadOnlyDetailItemDeetailInfoDataInterface {
 interface ReadOnlyDetailItemProps {
   title?:string,
   bodyStyle?:any,
+  style?:CSSProperties,
   detailInfoData:ReadOnlyDetailItemDeetailInfoDataInterface|null,
   cardExtra?:ReactNode
 }
 const ReadOnlyDetailItem = (props:ReadOnlyDetailItemProps) => {
-  const {detailInfoData,title,bodyStyle,cardExtra=null } = props
+  const {detailInfoData,title,bodyStyle,cardExtra=null,style } = props
   const configContext = useContext(ConfigProvider.ConfigContext);
   const labelStyle = {
     width: 150,
@@ -78,7 +79,7 @@ const ReadOnlyDetailItem = (props:ReadOnlyDetailItemProps) => {
     return <span>{dataList.join(',')}</span>
   }
 
-  return (<JobCard title={title} bodyStyle={bodyStyle} extra={cardExtra}>
+  return (<JobCard title={title} bodyStyle={bodyStyle} extra={cardExtra} style={style}>
       <Descriptions column={1} bordered labelStyle={labelStyle} contentStyle={{paddingTop:10,paddingBottom:10}}>
         <Descriptions.Item label="服务地址">{lodash.get(detailInfoData,'base_url','') }</Descriptions.Item>
         <Descriptions.Item label="样本类型">{ dataResourceTypeMap.get(lodash.get(detailInfoData,'data_resource_type',''))  }</Descriptions.Item>

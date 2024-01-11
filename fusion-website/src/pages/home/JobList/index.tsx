@@ -167,7 +167,8 @@ const Index =(props:JobListPropsInterface)=>{
         key: 'role',
         hideInTable:true,
         formItemProps:{
-          labelCol:2
+          labelCol:2,
+          wrapperCol:4
         },
         valueType: 'radioButton',
         valueEnum: {
@@ -175,24 +176,10 @@ const Index =(props:JobListPropsInterface)=>{
           [ROLE_TYPE.PROVIDER]: { text: '我参与的' },
         },
     },{
-        title: '任务ID',
-        dataIndex: 'job_id',
-        key: 'job_id',
-        hideInTable:true,
-        fieldProps: {
-          style:{
-            width:250
-          }
-        },
-        formItemProps:{
-          labelCol:2
-        },
-    },
-      {
         title: '时间/算法',
         dataIndex: 'create',
         key: 'create',
-        search: false,
+        hideInSearch: true,
         width:200,
         render:(text:string,row:RowProps)=>{
             const { created_time = new Date().getTime(),role,algorithm} = row;
@@ -204,7 +191,7 @@ const Index =(props:JobListPropsInterface)=>{
         title: '发起方',
         dataIndex: 'promoter',
         key: 'promoter',
-        search: false,
+        hideInSearch: true,
         width:300,
         render:(text:string,row:RowProps)=>{
           const { role,id } = row;
@@ -218,7 +205,7 @@ const Index =(props:JobListPropsInterface)=>{
         title: '协作方',
         dataIndex: 'provider',
         key: 'provider',
-        search: false,
+        hideInSearch: true,
         width:300,
         render:(text:string,row:RowProps)=>{
           const { role,id } = row;
@@ -233,25 +220,34 @@ const Index =(props:JobListPropsInterface)=>{
         width:90,
         valueType: 'select',
         valueEnum: JobStatus,
-        fieldProps: {
-          style:{
-            width:120
-          }
-        },
+        formItemProps:{
+            labelCol:2,
+            wrapperCol:4
+          },
         render:(text:string,row:RowProps)=>{
           const status = lodash.get(row,'status',null);
           return <Badge status={getBadgeStatus(status)}  text={JobStatus.get(status)}/>
         }
     },{
         title: '备注',
-        search: false,
+        hideInSearch: true,
         dataIndex: 'remark',
         key: 'remark'
     },{
+        title: '任务ID',
+        dataIndex: 'job_id',
+        key: 'job_id',
+        hideInTable:true,
+        formItemProps:{
+            labelCol:2,
+            wrapperCol:4
+          },
+    }
+    ,{
         key: 'optionOop',
         title: '操作',
         fixed: 'right',
-        search: false,
+        hideInSearch: true,
         width:120,
         render:(record:RowProps)=> {
             const {role,status} = record;
@@ -339,7 +335,7 @@ const Index =(props:JobListPropsInterface)=>{
                       }
                     }}
                     search={{
-                      span: 6,
+                      labelWidth:50,
                       optionRender: (searchConfig:any, formProps:any) => <Space>
                         <Button key='resetFields' onClick={() => {
                           tabelSearchFormRef.current?.resetFields();
@@ -348,7 +344,15 @@ const Index =(props:JobListPropsInterface)=>{
                         searchData()
                         }}>搜索</Button>
                         {renderBtn()}
-                      </Space>
+                      </Space>,
+                      span:{
+                        xs:24,
+                        sm:12,
+                        md:12,
+                        lg:8,
+                        xl:8,
+                        xxl:6
+                      }
                     }}
             />
         </TmTable>

@@ -120,14 +120,14 @@ const Index = forwardRef((props:PromoterPropsInterface,ref) => {
 
   const renderHasJobIdResult = ()=>{
     return <div className={styles.hasJobIdContainer}>
-      <TmSplit sizes={[50,50]}>
+      <TmSplit sizes={[60,40]}>
         <div>
           {renderNoJobIdResult()}
         </div>
-        <div>
+        <div className={styles.rightContainer}>
         <JobCard
             title={renderProviderTitle()}
-            bodyStyle={{ height: 'calc(100vh - 120px)',}}
+            style={{height:'100%'}}
           >
            <SendJobForm /> 
           </JobCard>
