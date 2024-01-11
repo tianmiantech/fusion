@@ -158,8 +158,6 @@ const JobForm = forwardRef((props:JobFormPropsInterface, ref) => {
 
   return <>
       <Spin spinning={loading} >
-        <Row justify="center" className="form-scroll">
-          <Col lg={{span: 16}} md={{span: 24}}>
             <Form
               form={formRef}
               initialValues={{data_resource_type:'TableDataSource',add_method:'HttpUpload',algorithm:'rsa_psi'}}
@@ -250,13 +248,11 @@ const JobForm = forwardRef((props:JobFormPropsInterface, ref) => {
                 <Input.TextArea rows={4} placeholder="请输入" />
               </Form.Item>
             </Form>
-          </Col>
-        
-      </Row>
       </Spin>
-      <Row className="operation-area">
+      {!checkFormDisable() &&  <Row className="operation-area">
        {renderFormAction && renderFormAction()}
-      </Row>
+      </Row>}
+     
     </>
 });
 

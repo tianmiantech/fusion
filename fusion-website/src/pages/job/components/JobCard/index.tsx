@@ -1,22 +1,12 @@
 import { Card, Row, Col, Button, Space } from 'antd';
 import {ReactNode} from 'react'
-
+import styles from './index.less'
 const Index = (props: { title: any; children: any;bodyStyle?:any,extra?:ReactNode })=>{
     const {title,children,...rest} = props
-    const cardStyles = {
-        headStyle: {
-          height: 50,
-          lineHeight: 2
-        },
-        bodyStyle: {
-          OverflowY: 'hidden',
-          Position: 'relative'
-        }
-      }
     return <Card
     title={title}
     size="small"
-    {...cardStyles}
+    className={styles.container}
     {...rest}
     >
     {children}

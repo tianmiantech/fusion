@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef, useMemo,useImperativeHandle,forwardRef } from "react";
 import { Card, Row, Col, Button,message } from 'antd';
+import { TmSplit } from '@tianmiantech/pro';
 import { CheckCircleFilled } from '@ant-design/icons';
 import { useImmer } from 'use-immer';
 import { history } from '@umijs/max';
@@ -11,7 +12,7 @@ import useDetail from "../../hooks/useDetail";
 import { useRequest,useUnmount } from 'ahooks';
 import {createJob,CreateJobRequestInterface} from '../../service'
 import { JOB_STATUS } from "@/constant/dictionary";
-
+import styles from './index.less'
 interface PromoterPropsInterface {
   detailData?:any
 }
@@ -102,35 +103,44 @@ const Index = forwardRef((props:PromoterPropsInterface,ref) => {
         })
       }
     },[detailData.jobDetailData])
+  
+  const renderNoJobIdResult = ()=>{
+    return <div className={styles.noJobIdContainer}>
+       <JobCard
+        title={renderCardTitlte()}
+       >
+          <JobForm 
+            ref={jobFormRef}
+            loading={createJobloading}
+            renderFormAction={renderFormAction}
+          />
+        </JobCard>
+    </div>
+  }
 
+  const renderHasJobIdResult = ()=>{
+    return <div className={styles.hasJobIdContainer}>
+      <TmSplit sizes={[50,50]}>
+        <div>
+          {renderNoJobIdResult()}
+        </div>
+        <div>
+        <JobCard
+            title={renderProviderTitle()}
+            bodyStyle={{ height: 'calc(100vh - 120px)',}}
+          >
+           <SendJobForm /> 
+          </JobCard>
+          </div>
+    </TmSplit>
+    </div>
+  }
 
   
 
   return (
     <>
-      <Row>
-        <Col span={24 / ((detailData.jobId?1:0) + 1)}>
-          <JobCard
-            title={renderCardTitlte()}
-            bodyStyle={{ height: 'calc(100vh - 92px)',}}
-          >
-            <JobForm 
-              ref={jobFormRef}
-              loading={createJobloading}
-              renderFormAction={renderFormAction}
-            />
-          </JobCard>
-        </Col>
-        { detailData.jobId && <Col span={24 / ((detailData.jobId?1:0) + 1)}>
-          <JobCard
-            title={renderProviderTitle()}
-            bodyStyle={{ height: 'calc(100vh - 92px)'}}
-          >
-           <SendJobForm /> 
-          </JobCard>
-        </Col>
-        }
-      </Row>
+      {detailData.jobId?renderHasJobIdResult():renderNoJobIdResult()}
     </>
   );
 });

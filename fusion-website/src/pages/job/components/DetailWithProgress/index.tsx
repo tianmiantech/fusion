@@ -17,7 +17,7 @@ import { useImmer } from "use-immer";
 import { useRequest } from "ahooks";
 import { getPrevResult,downloadResult } from "./service";
 import {ResizableTable} from '@/components/DataSetPreview'
-import './index.less'
+import styles from  './index.less'
 import { restartJob } from '@/pages/home/service'
 import TruncatedString from "@/components/TruncatedString";
 import {getPersonificationTime} from '@/utils/time'
@@ -42,8 +42,8 @@ const Index = ()=>{
         columns:[],
         dataSource:[]
       }
-
     })
+
     //根据任务角色将我方和合作方的数据转换为发起方和参与方的数据
     useEffect(()=>{
       if(detailData.jobDetailData){
@@ -217,16 +217,16 @@ const Index = ()=>{
 
     const renderPublicInfoTitle = ()=>{
       if(detailData.jobDetailData && detailData.jobDetailData.status === JOB_STATUS.ERROR_ON_RUNNING){
-        return <>任务信息 <TruncatedString style={{color:'red',fontSize:12}} text={`（${detailData.jobDetailData.message}）`}/></>
+        return <div className="headerStyle">任务信息 <TruncatedString style={{color:'red',fontSize:12}} text={`（${detailData.jobDetailData.message}）`}/></div>
       }
       return '任务信息'
     }
 
-    return <Spin spinning={restartLoading}>
-            <Card title={renderPublicInfoTitle()} style={{marginTop:8}} extra={renderPublicInfoExtra()}>
+    return <Spin spinning={restartLoading} >
+            <Card className={styles.cardContainer} title={renderPublicInfoTitle()} style={{marginTop:8}} extra={renderPublicInfoExtra()}>
               {renderPublicInfo()}
             </Card>
-            <Card title='多方详情' style={{marginTop:10}}>
+            <Card className={styles.cardContainer} title='多方详情' style={{marginTop:10}}>
                 <Row>
                   <Col span={12} >
                       <ReadOnlyDetailItem title="发起方" detailInfoData={data.promoterDetail}/>
@@ -236,7 +236,7 @@ const Index = ()=>{
                   </Col>
                 </Row>
             </Card>
-            <Card title='任务进度' style={{marginTop:8}} >
+            <Card className={styles.cardContainer} title='任务进度' style={{marginTop:8}} >
                 <JobProgress promoterPhasesList={data.promoterPhasesList} providerPhasesList={data.providerPhasesList}/>
             </Card>
             
