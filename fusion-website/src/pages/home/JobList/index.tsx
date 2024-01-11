@@ -179,11 +179,6 @@ const Index =(props:JobListPropsInterface)=>{
         dataIndex: 'job_id',
         key: 'job_id',
         hideInTable:true,
-        fieldProps: {
-          style:{
-            width:250
-          }
-        },
         formItemProps:{
           labelCol:2
         },
@@ -192,7 +187,7 @@ const Index =(props:JobListPropsInterface)=>{
         title: '时间/算法',
         dataIndex: 'create',
         key: 'create',
-        search: false,
+        hideInSearch: true,
         width:200,
         render:(text:string,row:RowProps)=>{
             const { created_time = new Date().getTime(),role,algorithm} = row;
@@ -204,7 +199,7 @@ const Index =(props:JobListPropsInterface)=>{
         title: '发起方',
         dataIndex: 'promoter',
         key: 'promoter',
-        search: false,
+        hideInSearch: true,
         width:300,
         render:(text:string,row:RowProps)=>{
           const { role,id } = row;
@@ -218,7 +213,7 @@ const Index =(props:JobListPropsInterface)=>{
         title: '协作方',
         dataIndex: 'provider',
         key: 'provider',
-        search: false,
+        hideInSearch: true,
         width:300,
         render:(text:string,row:RowProps)=>{
           const { role,id } = row;
@@ -244,14 +239,14 @@ const Index =(props:JobListPropsInterface)=>{
         }
     },{
         title: '备注',
-        search: false,
+        hideInSearch: true,
         dataIndex: 'remark',
         key: 'remark'
     },{
         key: 'optionOop',
         title: '操作',
         fixed: 'right',
-        search: false,
+        hideInSearch: true,
         width:120,
         render:(record:RowProps)=> {
             const {role,status} = record;
@@ -339,7 +334,7 @@ const Index =(props:JobListPropsInterface)=>{
                       }
                     }}
                     search={{
-                      span: 6,
+                      labelWidth:50,
                       optionRender: (searchConfig:any, formProps:any) => <Space>
                         <Button key='resetFields' onClick={() => {
                           tabelSearchFormRef.current?.resetFields();
@@ -348,7 +343,15 @@ const Index =(props:JobListPropsInterface)=>{
                         searchData()
                         }}>搜索</Button>
                         {renderBtn()}
-                      </Space>
+                      </Space>,
+                      span:{
+                        xs:24,
+                        sm:12,
+                        md:12,
+                        lg:12,
+                        xl:8,
+                        xxl:6
+                      }
                     }}
             />
         </TmTable>

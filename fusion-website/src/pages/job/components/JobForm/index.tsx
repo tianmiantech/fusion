@@ -164,16 +164,20 @@ const JobForm = forwardRef((props:JobFormPropsInterface, ref) => {
               layout="horizontal"
               disabled={checkFormDisable()}
             >
-              <Form.Item name="algorithm" label="算法类型" required>
-                <Select style={{width:200}} disabled={checkAlgorithmDisable() }>
-                  {jobFormData.algorithmList.map((item:string) => (
-                    <Select.Option key={item} value={item}>
-                      {item}
-                    </Select.Option>
-                    ))}
-                </Select>
-              </Form.Item> 
-              <Form.Item noStyle shouldUpdate={(prev, cur) => prev.algorithm !== cur.algorithm }>
+              <Row>
+                <Col span={12}>
+                  <Form.Item name="algorithm" label="算法类型" required>
+                  <Select style={{width:200}} disabled={checkAlgorithmDisable() }>
+                    {jobFormData.algorithmList.map((item:string) => (
+                      <Select.Option key={item} value={item}>
+                        {item}
+                      </Select.Option>
+                      ))}
+                  </Select>
+                </Form.Item> 
+                </Col>
+                <Col span={12}>
+                <Form.Item noStyle shouldUpdate={(prev, cur) => prev.algorithm !== cur.algorithm }>
                 {({ getFieldValue }) => {
                     const algorithm = getFieldValue('algorithm'); 
                     return  <Form.Item style={{marginBottom:0}}  name="data_resource_type"  label="样本类型"  style={{ display: 'inline-block', marginBottom: 0 }} rules={[{ required: true }]}>
@@ -190,6 +194,10 @@ const JobForm = forwardRef((props:JobFormPropsInterface, ref) => {
                   </Form.Item>
                 }}
               </Form.Item>
+                </Col>
+              </Row>
+             
+             
               <Form.Item noStyle shouldUpdate={(prev, cur) => prev.data_resource_type !== cur.data_resource_type|| prev.add_method !== cur.add_method  }>
                   {({ getFieldValue }) => {
                       const data_resource_type = getFieldValue('data_resource_type');
@@ -197,7 +205,7 @@ const JobForm = forwardRef((props:JobFormPropsInterface, ref) => {
                       // 选择数据集
                       if(data_resource_type === DATARESOURCE_TYPE.TABLE_DATASOURCE) {
                         return <>
-                           <Form.Item style={{marginTop:30}} name="add_method" label="选择样本" rules={[formRuleRequire()]} >
+                           <Form.Item  name="add_method" label="选择样本" rules={[formRuleRequire()]} >
                             <Radio.Group onChange={onAddMethodChange}>
                               {[...dataSetAddMethodMap].map(([value, label]) => (
                                 <Radio key={value} value={value}>
