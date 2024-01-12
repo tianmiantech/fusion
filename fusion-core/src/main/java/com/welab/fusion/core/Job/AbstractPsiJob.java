@@ -70,8 +70,8 @@ public abstract class AbstractPsiJob implements Closeable {
 
         this.psiJobResult = PsiJobResult.of(jobId);
 
-        this.actionSingleThreadExecutor = new ThreadPool("job-" + jobId + "-action-executor");
-        this.scheduleSingleThreadExecutor = new ThreadPool("job-" + jobId + "-schedule");
+        this.actionSingleThreadExecutor = new ThreadPool("job-" + jobId + "-action-executor", 1);
+        this.scheduleSingleThreadExecutor = new ThreadPool("job-" + jobId + "-schedule", 1);
     }
 
     /**
@@ -230,20 +230,17 @@ public abstract class AbstractPsiJob implements Closeable {
      * 结束任务
      */
     private synchronized void finishJob(JobStatus status, String message) {
-        if (myProgress.getJobStatus().isFinished()) {
-            return;
-        }
 
         LOG.info("任务结束，状态：{}，消息：{}", status, message);
         myProgress.finish(status, message);
         getJobResult().finish();
+        CloseableUtils.closeQuietly(this);
+
         try {
             jobFunctions.finishJobFunction.finish(jobId, myProgress);
         } catch (Exception e) {
             LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);
         }
-
-        CloseableUtils.closeQuietly(this);
     }
 
     /**

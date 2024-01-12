@@ -26,10 +26,6 @@ import java.util.concurrent.*;
 public class ThreadPool {
     private ThreadPoolExecutor threadPoolExecutor;
 
-    public ThreadPool(String threadNamePrefix) {
-        this(threadNamePrefix, Runtime.getRuntime().availableProcessors());
-    }
-
     /**
      * @param poolSize 最大并发量
      */
