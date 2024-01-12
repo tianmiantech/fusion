@@ -25,6 +25,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
 import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
+import org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy;
+import org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -34,6 +36,7 @@ import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.sql.DataSource;
+import java.util.Map;
 
 /**
  * @author zane.luo
@@ -80,6 +83,9 @@ public class DataSourceConfig {
     @Primary
     LocalContainerEntityManagerFactoryBean entityManagerFactoryRefWefeBoard(
             EntityManagerFactoryBuilder builder, DataSource dataSource) {
+        Map<String, String> pros = mProperties.getProperties();
+        pros.put("hibernate.physical_naming_strategy", SpringPhysicalNamingStrategy.class.getName());
+        pros.put("hibernate.implicit_naming_strategy", SpringImplicitNamingStrategy.class.getName());
 
         return entityManagerFactoryRef(
                 builder,
