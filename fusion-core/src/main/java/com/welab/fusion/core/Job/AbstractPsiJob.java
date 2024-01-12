@@ -239,6 +239,7 @@ public abstract class AbstractPsiJob implements Closeable {
 
         LOG.info("任务结束，状态：{}，消息：{}", status, message);
         myProgress.finish(status, message);
+        getJobResult().finish();
         try {
             jobFunctions.finishJobFunction.finish(jobId, myProgress);
         } catch (Exception e) {
@@ -294,8 +295,6 @@ public abstract class AbstractPsiJob implements Closeable {
 
     @Override
     public void close() throws IOException {
-        getJobResult().finish();
-
         scheduleSingleThreadExecutor.shutdownNow();
         actionSingleThreadExecutor.shutdownNow();
 
