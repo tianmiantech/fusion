@@ -20,11 +20,18 @@ import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceBuilder;
 import com.welab.fusion.service.FusionService;
 import com.welab.fusion.service.database.repository.base.BaseRepositoryFactoryBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
+import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.orm.jpa.JpaTransactionManager;
+import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
+import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.sql.DataSource;
 
@@ -35,9 +42,28 @@ import javax.sql.DataSource;
 @EntityScan(basePackageClasses = FusionService.class)
 @EnableJpaRepositories(
         basePackageClasses = FusionService.class,
-        repositoryFactoryBeanClass = BaseRepositoryFactoryBean.class
+        repositoryFactoryBeanClass = BaseRepositoryFactoryBean.class,
+        entityManagerFactoryRef = "entityManagerFactoryRefBoard",
+        transactionManagerRef = "transactionManagerRefWefeBoard"
 )
 public class DataSourceConfig {
+
+    @Autowired
+    protected JpaProperties mProperties;
+
+    protected LocalContainerEntityManagerFactoryBean entityManagerFactoryRef(
+            EntityManagerFactoryBuilder builder
+            , DataSource ds
+            , JpaProperties props
+            , Class<?>... basePackageClasses) {
+
+
+        return builder.dataSource(ds)
+                .properties(props.getProperties())
+                .packages(basePackageClasses)
+                .persistenceUnit("SQLitePersistenceUnit")
+                .build();
+    }
 
     @Bean
     @Primary
@@ -47,6 +73,28 @@ public class DataSourceConfig {
         dataSource.setMaxActive(1);
 
         return dataSource;
+    }
+
+
+    @Bean("entityManagerFactoryRefBoard")
+    @Primary
+    LocalContainerEntityManagerFactoryBean entityManagerFactoryRefWefeBoard(
+            EntityManagerFactoryBuilder builder, @Qualifier("board") DataSource dataSource) {
+
+        return entityManagerFactoryRef(
+                builder,
+                dataSource,
+                mProperties,
+                FusionService.class
+        );
+    }
+
+    @Bean
+    @Primary
+    PlatformTransactionManager transactionManagerRefWefeBoard(
+            @Qualifier("entityManagerFactoryRefBoard") LocalContainerEntityManagerFactoryBean factoryBean) {
+
+        return new JpaTransactionManager(factoryBean.getObject());
     }
 
 }
