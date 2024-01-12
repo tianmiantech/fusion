@@ -31,7 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
         path = "job/get_my_job_progress",
         name = "获取我放的任务进度",
         allowAccessWithSign = true,
-        logSaplingInterval = 1_000 * 30
+        logSamplingInterval = 1_000 * 30
 )
 public class GetMyJobProgressApi extends AbstractApi<GetMyJobProgressApi.Input, JobProgress> {
     @Autowired

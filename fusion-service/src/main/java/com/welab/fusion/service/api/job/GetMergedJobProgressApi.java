@@ -35,7 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
         path = "job/get_merged_job_progress",
         name = "获取多方合并的任务进度",
         allowAccessWithSign = true,
-        logSaplingInterval = 1_000 * 30
+        logSamplingInterval = 1_000 * 30
 )
 public class GetMergedJobProgressApi extends AbstractApi<GetMergedJobProgressApi.Input, GetMergedJobProgressApi.Output> {
     @Autowired
