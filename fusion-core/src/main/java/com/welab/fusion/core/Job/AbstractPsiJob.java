@@ -78,14 +78,8 @@ public abstract class AbstractPsiJob implements Closeable {
      * 此方法会执行一些事前检查后进入异步执行
      * 使用异步线程调度任务，使其按顺序执行各阶段动作，并在必要时结束任务。
      */
-    public void start() {
-        try {
-            checkBeforeFusion();
-        } catch (Exception e) {
-            LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);
-            finishJobOnException(e);
-            return;
-        }
+    public void start() throws Exception {
+        checkBeforeFusion();
         startSchedule();
     }
 

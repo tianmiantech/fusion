@@ -16,6 +16,7 @@
 package com.welab.fusion.service.model;
 
 import com.welab.fusion.core.Job.AbstractPsiJob;
+import com.welab.fusion.service.database.entity.JobDbModel;
 import net.jodah.expiringmap.ExpiringMap;
 
 import java.util.concurrent.TimeUnit;
@@ -32,7 +33,7 @@ public class FusionJobManager {
             .expiration(30, TimeUnit.MINUTES)
             .build();
 
-    public static void start(AbstractPsiJob job) {
+    public static void start(AbstractPsiJob job) throws Exception {
         JOBS.put(job.getJobId(), job);
         job.start();
     }

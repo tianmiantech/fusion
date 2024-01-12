@@ -197,7 +197,7 @@ public class JobService extends AbstractService {
             FusionJobManager.start(psiJob);
         } catch (Exception e) {
             job.setStatus(JobStatus.error_on_running);
-            job.setMessage("任务启动失败：" + e.getMessage());
+            job.setMessage("任务重启失败：" + e.getMessage());
             job.setEndTime(new Date());
             job.setCostTime(System.currentTimeMillis() - job.getStartTime().getTime());
             job.save();
@@ -237,7 +237,16 @@ public class JobService extends AbstractService {
 
         // 创建任务并启动
         AbstractPsiJob psiJob = createPsiJobService.createPsiJob(job);
-        FusionJobManager.start(psiJob);
+        try {
+            FusionJobManager.start(psiJob);
+        } catch (Exception e) {
+            job.setStatus(JobStatus.error_on_running);
+            job.setMessage("任务启动失败：" + e.getMessage());
+            job.setEndTime(new Date());
+            job.setCostTime(System.currentTimeMillis() - job.getStartTime().getTime());
+            job.save();
+            throw e;
+        }
     }
 
 
