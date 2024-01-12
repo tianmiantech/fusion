@@ -15,7 +15,6 @@
  */
 package com.welab.fusion.service.api.global_config;
 
-import com.welab.fusion.service.api.member.TestConnectApi;
 import com.welab.fusion.service.service.MemberService;
 import com.welab.wefe.common.StatusCode;
 import com.welab.wefe.common.fieldvalidate.annotation.Check;
@@ -51,16 +50,24 @@ public class TestMyselfConnectApi extends AbstractApi<TestMyselfConnectApi.Input
         String url = baseUrl;
         if (!url.endsWith("/")) {
             url += "/";
-
         }
-        url += TestConnectApi.class.getAnnotation(Api.class).path();
-        url += "?" + CurrentAccount.TOKEN_KEY_NAME + "=" + CurrentAccount.token() + "&from_backend=true";
+        url += TestMyselfConnectApi.class.getAnnotation(Api.class).path();
+
         HttpResponse response = HttpRequest.create(url)
+                .appendParameter("baseUrl", baseUrl)
+                .appendParameter("fromBackend", true)
+                .appendParameter(CurrentAccount.TOKEN_KEY_NAME, CurrentAccount.token())
                 .setTimeout(3_000)
                 .get();
 
         if (!response.success()) {
             throw response.getError();
+        }
+
+        try {
+            response.getBodyAsJson();
+        } catch (Exception e) {
+            throw new Exception("响应失败:" + response.getBodyAsString());
         }
 
         ApiResult apiResult = response.getBodyAsJson().toJavaObject(ApiResult.class);
@@ -72,7 +79,7 @@ public class TestMyselfConnectApi extends AbstractApi<TestMyselfConnectApi.Input
     public static class Input extends AbstractApiInput {
         @Check(name = "对外服务地址", require = true)
         public String baseUrl;
-        @Check(name = "请求是否来自后台", require = true)
+        @Check(name = "请求是否来自后台", require = true, donotShow = true)
         public boolean fromBackend;
 
     }
