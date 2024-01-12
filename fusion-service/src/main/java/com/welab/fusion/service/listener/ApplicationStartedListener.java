@@ -70,5 +70,9 @@ public class ApplicationStartedListener implements ApplicationListener<Applicati
         // 关闭之前处于运行中的任务
         jobService.finishAllJob();
 
+
+
+        // globalConfigService.testDbLock();
+
     }
 }

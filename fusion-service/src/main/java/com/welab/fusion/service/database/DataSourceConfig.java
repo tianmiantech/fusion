@@ -16,14 +16,20 @@
 
 package com.welab.fusion.service.database;
 
+import com.alibaba.druid.pool.DruidDataSource;
+import com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceBuilder;
 import com.welab.fusion.service.FusionService;
 import com.welab.fusion.service.database.repository.base.BaseRepositoryFactoryBean;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
+import javax.sql.DataSource;
+
 /**
- * @author aaron.li
+ * @author zane.luo
  **/
 @Configuration
 @EntityScan(basePackageClasses = FusionService.class)
@@ -31,6 +37,16 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
         basePackageClasses = FusionService.class,
         repositoryFactoryBeanClass = BaseRepositoryFactoryBean.class
 )
-public class DataSourceConfig  {
+public class DataSourceConfig {
+
+    @Bean
+    @Primary
+    DataSource createDataSource() {
+        DruidDataSource dataSource = DruidDataSourceBuilder.create().build();
+        // SQLite 是文件数据库，不支持并发。
+        dataSource.setMaxActive(1);
+
+        return dataSource;
+    }
 
 }

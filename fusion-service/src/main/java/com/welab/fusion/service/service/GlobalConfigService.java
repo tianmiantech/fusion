@@ -42,6 +42,8 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 由于 AbstractService 中包含了 GlobalConfigService，
@@ -256,5 +258,58 @@ public class GlobalConfigService {
 
     public FusionConfigModel getFusionConfig() {
         return getModel(FusionConfigModel.class);
+    }
+
+    /**
+     * SQLite 数据库是文件数据库，不支持并发，这里验证一下程序对锁的控制情况。
+     */
+    public void testDbLock() {
+        Specification<GlobalConfigDbModel> where = Where
+                .create()
+                .equal("group", "test")
+                .equal("name", "test")
+                .build(GlobalConfigDbModel.class);
+        List<GlobalConfigDbModel> list = globalConfigRepository.findAll(where);
+
+        globalConfigRepository.deleteAll(list);
+
+        LOG.info("start testDbLock");
+        int threadCount = 10000;
+        CountDownLatch latch = new CountDownLatch(threadCount);
+        for (int i = 0; i < threadCount; i++) {
+            new Thread(() -> {
+                try {
+
+                    // read
+                    globalConfigRepository.findAll(where);
+
+                    // // write
+                    GlobalConfigDbModel one = new GlobalConfigDbModel();
+                    one.setGroup("test");
+                    one.setName("test");
+                    one.setValue("test");
+                    globalConfigRepository.save(one);
+
+                } catch (Exception e) {
+                    LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);
+                } finally {
+                    latch.countDown();
+                    System.out.println(latch.getCount());
+                }
+            }).start();
+        }
+
+        try {
+            boolean awaited = latch.await(3, TimeUnit.MINUTES);
+            System.out.println(latch.getCount());
+            System.out.println("awaited = " + awaited);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        list = globalConfigRepository.findAll(where);
+        globalConfigRepository.deleteAll(list);
+
+        LOG.info("end testDbLock");
     }
 }
