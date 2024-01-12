@@ -65,13 +65,15 @@ public class P9SaveResultAction<T extends AbstractPsiJob> extends AbstractJobPha
                 && job.getMyJobRole() == JobRole.follower
                 && job.getMyself().dataResourceInfo.dataResourceType == DataResourceType.PsiBloomFilter) {
 
+            File source = job.getJobTempData().resultFileWithPartnerAdditionalColumns == null
+                    ? job.getJobTempData().resultFileOnlyKey
+                    : job.getJobTempData().resultFileWithPartnerAdditionalColumns;
+
             File target = FileSystem.FusionResult.getResultFile(job.getJobId());
-            try (BufferedWriter writer1 = FileUtil.buildBufferedWriter(target, false)) {
-                writer1.write(Constant.KEY_COLUMN_NAME + System.lineSeparator());
-            }
             FileUtil.copy(
-                    job.getJobTempData().resultFileOnlyKey.toPath(),
+                    source.toPath(),
                     target.toPath(),
+                    StandardCopyOption.REPLACE_EXISTING,
                     StandardCopyOption.COPY_ATTRIBUTES
             );
 

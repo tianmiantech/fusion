@@ -80,7 +80,7 @@ public class P6DownloadIntersectionAction<T extends AbstractPsiJob> extends Abst
                     job.getJobTempData().resultFileOnlyKey,
                     partitionIndex,
                     batchSize,
-                    false
+                    true
             );
             partitionIndex++;
 

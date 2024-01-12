@@ -17,6 +17,7 @@ package com.welab.fusion.core.algorithm.base.phase_action;
 
 import com.welab.fusion.core.Job.AbstractPsiJob;
 import com.welab.fusion.core.io.FileSystem;
+import com.welab.fusion.core.util.Constant;
 import com.welab.wefe.common.util.FileUtil;
 
 import java.io.BufferedWriter;
@@ -42,6 +43,9 @@ public abstract class AbstractIntersectionAction<T extends AbstractPsiJob> exten
         File file = FileSystem.JobTemp.getFileOnlyKey(job.getJobId());
         job.getJobTempData().resultFileOnlyKey = file;
 
-        return FileUtil.buildBufferedWriter(file, false);
+        BufferedWriter writer = FileUtil.buildBufferedWriter(file, false);
+        writer.write(Constant.KEY_COLUMN_NAME + System.lineSeparator());
+
+        return writer;
     }
 }
