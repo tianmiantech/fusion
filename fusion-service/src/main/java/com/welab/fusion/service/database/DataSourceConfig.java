@@ -73,7 +73,7 @@ public class DataSourceConfig {
     DataSource createDataSource() {
         DruidDataSource dataSource = DruidDataSourceBuilder.create().build();
         // SQLite 是文件数据库，不支持并发。
-        dataSource.setMaxCreateTaskCount(1);
+        // dataSource.setMaxCreateTaskCount(1);
 
         return dataSource;
     }
