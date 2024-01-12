@@ -79,7 +79,7 @@ public class DataSourceConfig {
     @Bean("entityManagerFactoryRefBoard")
     @Primary
     LocalContainerEntityManagerFactoryBean entityManagerFactoryRefWefeBoard(
-            EntityManagerFactoryBuilder builder, @Qualifier("board") DataSource dataSource) {
+            EntityManagerFactoryBuilder builder, DataSource dataSource) {
 
         return entityManagerFactoryRef(
                 builder,
