@@ -56,8 +56,8 @@ public class RsaPsiJob extends AbstractPsiJob {
             throw new Exception("不能双方都使用布隆过滤器，建议数据量大的一方使用布隆过滤器。");
         }
 
-        boolean useBloomFilter = myself.dataResourceInfo.dataResourceType == DataResourceType.PsiBloomFilter || partner.dataResourceInfo.dataResourceType == DataResourceType.PsiBloomFilter;
-        boolean hasAdditionalResultColumns = CollectionUtils.isNotEmpty(myself.dataResourceInfo.additionalResultColumns) || CollectionUtils.isNotEmpty(partner.dataResourceInfo.additionalResultColumns);
+        boolean useBloomFilter = myself.dataResourceInfo.dataResourceType == DataResourceType.PsiBloomFilter;
+        boolean hasAdditionalResultColumns = CollectionUtils.isNotEmpty(myself.dataResourceInfo.additionalResultColumns);
         if (useBloomFilter && hasAdditionalResultColumns) {
             throw new Exception("使用布隆过滤器时，不能添加附加结果字段。");
         }
