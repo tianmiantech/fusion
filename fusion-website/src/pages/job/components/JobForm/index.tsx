@@ -164,8 +164,6 @@ const JobForm = forwardRef((props:JobFormPropsInterface, ref) => {
               layout="horizontal"
               disabled={checkFormDisable()}
             >
-              <Row>
-                <Col span={12}>
                   <Form.Item name="algorithm" label="算法类型" required>
                   <Select style={{width:200}} disabled={checkAlgorithmDisable() }>
                     {jobFormData.algorithmList.map((item:string) => (
@@ -175,12 +173,10 @@ const JobForm = forwardRef((props:JobFormPropsInterface, ref) => {
                       ))}
                   </Select>
                 </Form.Item> 
-                </Col>
-                <Col span={12}>
                 <Form.Item noStyle shouldUpdate={(prev, cur) => prev.algorithm !== cur.algorithm }>
                 {({ getFieldValue }) => {
                     const algorithm = getFieldValue('algorithm'); 
-                    return  <Form.Item style={{marginBottom:0}}  name="data_resource_type"  label="样本类型"  style={{ display: 'inline-block', marginBottom: 0 }} rules={[{ required: true }]}>
+                    return  <Form.Item style={{marginBottom:30}}  name="data_resource_type"  label="样本类型"  style={{ display: 'inline-block', marginBottom: 0 }} rules={[{ required: true }]}>
                     <Radio.Group onChange={onDataSourceTypeChange}>
                       {[...dataResourceTypeMap].map(([value, label]) => {
                         if(algorithm === 'ecdh_psi' && value === 'PsiBloomFilter'){
@@ -194,10 +190,6 @@ const JobForm = forwardRef((props:JobFormPropsInterface, ref) => {
                   </Form.Item>
                 }}
               </Form.Item>
-                </Col>
-              </Row>
-             
-             
               <Form.Item noStyle shouldUpdate={(prev, cur) => prev.data_resource_type !== cur.data_resource_type|| prev.add_method !== cur.add_method  }>
                   {({ getFieldValue }) => {
                       const data_resource_type = getFieldValue('data_resource_type');
