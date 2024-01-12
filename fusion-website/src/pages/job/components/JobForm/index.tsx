@@ -197,7 +197,7 @@ const JobForm = forwardRef((props:JobFormPropsInterface, ref) => {
                       // 选择数据集
                       if(data_resource_type === DATARESOURCE_TYPE.TABLE_DATASOURCE) {
                         return <>
-                           <Form.Item  name="add_method" label="选择样本" rules={[formRuleRequire()]} >
+                           <Form.Item style={{marginTop:20}}  name="add_method" label="选择样本" rules={[formRuleRequire()]} >
                             <Radio.Group onChange={onAddMethodChange}>
                               {[...dataSetAddMethodMap].map(([value, label]) => (
                                 <Radio key={value} value={value}>
