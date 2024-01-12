@@ -17,7 +17,6 @@ package com.welab.fusion.service.job_function;
 
 import com.welab.fusion.core.Job.PsiJobResult;
 import com.welab.fusion.core.Job.base.JobRole;
-import com.welab.fusion.service.database.entity.JobDbModel;
 import com.welab.fusion.service.service.JobService;
 import com.welab.wefe.common.web.Launcher;
 
@@ -32,12 +31,7 @@ public class SaveFusionResultFunction implements com.welab.fusion.core.algorithm
 
     @Override
     public void save(String jobId, JobRole myRole, PsiJobResult result, Consumer<Long> totalSizeConsumer, Consumer<Long> downloadSizeConsumer) throws Exception {
-        JobDbModel job = jobService.findById(jobId);
-
-        job.setFusionCount(result.fusionCount);
-        job.setUpdatedTimeNow();
-
-        job.save();
+        jobService.savePsiResult(jobId, result);
     }
 
 }

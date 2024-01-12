@@ -16,6 +16,7 @@
 package com.welab.fusion.service.service;
 
 import com.welab.fusion.core.Job.AbstractPsiJob;
+import com.welab.fusion.core.Job.PsiJobResult;
 import com.welab.fusion.core.Job.base.JobStatus;
 import com.welab.fusion.core.progress.JobProgress;
 import com.welab.fusion.service.api.job.*;
@@ -457,5 +458,14 @@ public class JobService extends AbstractService {
         }
 
         FusionJobManager.get(id).finishJobByUserStop();
+    }
+
+    public void savePsiResult(String jobId, PsiJobResult result) {
+        JobDbModel job = findById(jobId);
+
+        job.setFusionCount(result.fusionCount);
+        job.setUpdatedTimeNow();
+
+        jobRepository.save(job);
     }
 }
