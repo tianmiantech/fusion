@@ -231,13 +231,13 @@ public class JobService extends AbstractService {
                 .findById(job.getPartnerMemberId())
                 .toFusionNodeInfo();
 
-        // 同步给发起方
-        gatewayService.callOtherFusionNode(target, AgreeAndStartJobApi.class, input);
 
-
-        // 创建任务并启动
-        AbstractPsiJob psiJob = createPsiJobService.createPsiJob(job);
         try {
+            // 同步给发起方
+            gatewayService.callOtherFusionNode(target, AgreeAndStartJobApi.class, input);
+
+            // 创建任务并启动
+            AbstractPsiJob psiJob = createPsiJobService.createPsiJob(job);
             FusionJobManager.start(psiJob);
         } catch (Exception e) {
             job.setStatus(JobStatus.error_on_running);
