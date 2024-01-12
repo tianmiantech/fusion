@@ -34,16 +34,10 @@ public class SaveFusionResultFunction implements com.welab.fusion.core.algorithm
     public void save(String jobId, JobRole myRole, PsiJobResult result, Consumer<Long> totalSizeConsumer, Consumer<Long> downloadSizeConsumer) throws Exception {
         JobDbModel job = jobService.findById(jobId);
 
-        saveFusionResult(job, result);
-    }
-
-    /**
-     * 保存求交结果到本地
-     */
-    private void saveFusionResult(JobDbModel job, PsiJobResult result) {
         job.setFusionCount(result.fusionCount);
         job.setUpdatedTimeNow();
 
         job.save();
     }
+
 }
