@@ -97,7 +97,7 @@ public class JobService extends AbstractService {
         finish(jobId, progress);
     }
 
-    public synchronized void finish(String jobId, JobProgress progress) {
+    public void finish(String jobId, JobProgress progress) {
         JobDbModel job = findById(jobId);
 
         if (job.getStatus().isFinished()) {

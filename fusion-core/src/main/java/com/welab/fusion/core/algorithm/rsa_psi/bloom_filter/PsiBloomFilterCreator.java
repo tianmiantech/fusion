@@ -49,7 +49,8 @@ public class PsiBloomFilterCreator implements Closeable {
     /**
      * 最小的预估数据量
      */
-    public static int MIN_EXPECTED_INSERTIONS = 100_000_000;
+    // public static int MIN_EXPECTED_INSERTIONS = 100_000_000;
+    public static int MIN_EXPECTED_INSERTIONS = 1;
     private AbstractTableDataSourceReader dataSourceReader;
     private PsiBloomFilter psiBloomFilter;
     /**
