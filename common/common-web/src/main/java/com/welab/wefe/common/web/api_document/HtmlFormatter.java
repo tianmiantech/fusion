@@ -31,7 +31,7 @@ import java.util.TreeMap;
  * @date 2021/12/3
  */
 public class HtmlFormatter extends AbstractApiDocumentFormatter {
-    StringBuilder str = new StringBuilder(2048);
+    private StringBuilder str = new StringBuilder(2048);
     private Map<Class<?>, String> enumTypeDicMap = new TreeMap<>((a, b) -> ObjectToStringComparator.INSTANCE.compare(a.getSimpleName(), b.getSimpleName()));
     private Map<Class<?>, String> classTypeDicMap = new TreeMap<>((a, b) -> ObjectToStringComparator.INSTANCE.compare(a.getSimpleName(), b.getSimpleName()));
 
