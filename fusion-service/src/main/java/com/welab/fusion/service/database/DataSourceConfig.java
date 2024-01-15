@@ -47,62 +47,62 @@ import java.util.Map;
 @EntityScan(basePackageClasses = FusionService.class)
 @EnableJpaRepositories(
         basePackageClasses = FusionService.class,
-        repositoryFactoryBeanClass = BaseRepositoryFactoryBean.class,
-        entityManagerFactoryRef = "entityManagerFactoryRefBoard",
-        transactionManagerRef = "transactionManagerRefWefeBoard"
+        repositoryFactoryBeanClass = BaseRepositoryFactoryBean.class
+        // entityManagerFactoryRef = "entityManagerFactoryRefBoard",
+        // transactionManagerRef = "transactionManagerRefWefeBoard"
 )
 public class DataSourceConfig {
-
-    @Autowired
-    protected JpaProperties mProperties;
-
-    protected LocalContainerEntityManagerFactoryBean entityManagerFactoryRef(
-            EntityManagerFactoryBuilder builder
-            , DataSource ds
-            , JpaProperties props
-            , Class<?>... basePackageClasses) {
-
-
-        return builder.dataSource(ds)
-                .properties(props.getProperties())
-                .packages(basePackageClasses)
-                .persistenceUnit("SQLitePersistenceUnit")
-                .build();
-    }
-
-    @Bean
-    @Primary
-    DataSource createDataSource() {
-        DruidDataSource dataSource = DruidDataSourceBuilder.create().build();
-        // SQLite 是文件数据库，不支持并发。
-        // dataSource.setMaxCreateTaskCount(1);
-        dataSource.setProxyFilters(Collections.singletonList(new SqlMonitor()));
-        return dataSource;
-    }
-
-
-    @Bean("entityManagerFactoryRefBoard")
-    @Primary
-    LocalContainerEntityManagerFactoryBean entityManagerFactoryRefWefeBoard(
-            EntityManagerFactoryBuilder builder, DataSource dataSource) {
-        Map<String, String> pros = mProperties.getProperties();
-        pros.put("hibernate.physical_naming_strategy", SpringPhysicalNamingStrategy.class.getName());
-        pros.put("hibernate.implicit_naming_strategy", SpringImplicitNamingStrategy.class.getName());
-
-        return entityManagerFactoryRef(
-                builder,
-                dataSource,
-                mProperties,
-                FusionService.class
-        );
-    }
-
-    @Bean
-    @Primary
-    PlatformTransactionManager transactionManagerRefWefeBoard(
-            @Qualifier("entityManagerFactoryRefBoard") LocalContainerEntityManagerFactoryBean factoryBean) {
-
-        return new JpaTransactionManager(factoryBean.getObject());
-    }
+    //
+    // @Autowired
+    // protected JpaProperties mProperties;
+    //
+    // protected LocalContainerEntityManagerFactoryBean entityManagerFactoryRef(
+    //         EntityManagerFactoryBuilder builder
+    //         , DataSource ds
+    //         , JpaProperties props
+    //         , Class<?>... basePackageClasses) {
+    //
+    //
+    //     return builder.dataSource(ds)
+    //             .properties(props.getProperties())
+    //             .packages(basePackageClasses)
+    //             .persistenceUnit("SQLitePersistenceUnit")
+    //             .build();
+    // }
+    //
+    // @Bean
+    // @Primary
+    // DataSource createDataSource() {
+    //     DruidDataSource dataSource = DruidDataSourceBuilder.create().build();
+    //     // SQLite 是文件数据库，不支持并发。
+    //     // dataSource.setMaxCreateTaskCount(1);
+    //     dataSource.setProxyFilters(Collections.singletonList(new SqlMonitor()));
+    //     return dataSource;
+    // }
+    //
+    //
+    // @Bean("entityManagerFactoryRefBoard")
+    // @Primary
+    // LocalContainerEntityManagerFactoryBean entityManagerFactoryRefWefeBoard(
+    //         EntityManagerFactoryBuilder builder, DataSource dataSource) {
+    //     Map<String, String> pros = mProperties.getProperties();
+    //     pros.put("hibernate.physical_naming_strategy", SpringPhysicalNamingStrategy.class.getName());
+    //     pros.put("hibernate.implicit_naming_strategy", SpringImplicitNamingStrategy.class.getName());
+    //
+    //     return entityManagerFactoryRef(
+    //             builder,
+    //             dataSource,
+    //             mProperties,
+    //             FusionService.class
+    //     );
+    // }
+    //
+    // @Bean
+    // @Primary
+    // PlatformTransactionManager transactionManagerRefWefeBoard(
+    //         @Qualifier("entityManagerFactoryRefBoard") LocalContainerEntityManagerFactoryBean factoryBean) {
+    //
+    //     return new JpaTransactionManager(factoryBean.getObject());
+    // }
 
 }
