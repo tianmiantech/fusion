@@ -234,13 +234,14 @@ public abstract class AbstractPsiJob implements Closeable {
         LOG.info("任务结束，状态：{}，消息：{}", status, message);
         myProgress.finish(status, message);
         getJobResult().finish();
-        CloseableUtils.closeQuietly(this);
 
         try {
             jobFunctions.finishJobFunction.finish(jobId, myProgress);
         } catch (Exception e) {
             LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);
         }
+
+        CloseableUtils.closeQuietly(this);
     }
 
     /**
