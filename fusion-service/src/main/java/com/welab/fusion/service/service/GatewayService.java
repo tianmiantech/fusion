@@ -78,7 +78,8 @@ public class GatewayService extends AbstractService {
         HttpResponse response = HttpRequest
                 .create(url)
                 .setBody(signedApiInput.toJSONString())
-                .setTimeout(1_000 * 60 * 10)
+                .setConnectTimeout(1_000 * 5)
+                .setSocketTimeout(1_000 * 60)
                 .postJson();
 
         if (!response.success()) {
