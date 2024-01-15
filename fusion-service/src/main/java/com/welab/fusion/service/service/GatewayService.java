@@ -79,7 +79,7 @@ public class GatewayService extends AbstractService {
                 .create(url)
                 .setBody(signedApiInput.toJSONString())
                 .setConnectTimeout(1_000 * 5)
-                .setSocketTimeout(1_000 * 30)
+                .setSocketTimeout(1_000 * 60)
                 .postJson();
 
         if (!response.success()) {
