@@ -287,9 +287,14 @@ public abstract class AbstractPsiJob implements Closeable {
         return myProgress.getJobStatus().isFinished();
     }
 
-
+    private boolean closed = false;
     @Override
-    public void close() throws IOException {
+    public synchronized void close() throws IOException {
+        if (closed) {
+            return;
+        }
+        closed = true;
+
         scheduleSingleThreadExecutor.shutdownNow();
         actionSingleThreadExecutor.shutdownNow();
 
