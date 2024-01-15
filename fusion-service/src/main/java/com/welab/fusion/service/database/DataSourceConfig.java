@@ -70,15 +70,15 @@ public class DataSourceConfig {
     //             .build();
     // }
     //
-    // @Bean
-    // @Primary
-    // DataSource createDataSource() {
-    //     DruidDataSource dataSource = DruidDataSourceBuilder.create().build();
-    //     // SQLite 是文件数据库，不支持并发。
-    //     // dataSource.setMaxCreateTaskCount(1);
-    //     dataSource.setProxyFilters(Collections.singletonList(new SqlMonitor()));
-    //     return dataSource;
-    // }
+    @Bean
+    @Primary
+    DataSource createDataSource() {
+        DruidDataSource dataSource = DruidDataSourceBuilder.create().build();
+        // SQLite 是文件数据库，不支持并发。
+        dataSource.setMaxActive(1);
+        dataSource.setProxyFilters(Collections.singletonList(new SqlMonitor()));
+        return dataSource;
+    }
     //
     //
     // @Bean("entityManagerFactoryRefBoard")
