@@ -17,6 +17,7 @@
 package com.welab.fusion.service.listener;
 
 import com.welab.fusion.core.io.FileSystem;
+import com.welab.fusion.service.model.CacheObjects;
 import com.welab.fusion.service.service.GlobalConfigService;
 import com.welab.fusion.service.service.JobService;
 import org.slf4j.Logger;
@@ -54,6 +55,7 @@ public class ApplicationStartedListener implements ApplicationListener<Applicati
         // 初始化全局配置
         try {
             globalConfigService.init();
+            CacheObjects.refresh();
         } catch (Exception e) {
             LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);
             System.exit(-1);

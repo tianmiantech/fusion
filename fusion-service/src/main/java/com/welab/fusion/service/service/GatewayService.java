@@ -18,6 +18,7 @@ package com.welab.fusion.service.service;
 import cn.hutool.crypto.digest.SM3;
 import com.alibaba.fastjson.JSONObject;
 import com.welab.fusion.service.config.fastjson.BlockForPartnerFieldUtil;
+import com.welab.fusion.service.model.CacheObjects;
 import com.welab.fusion.service.model.global_config.FusionConfigModel;
 import com.welab.fusion.service.service.base.AbstractService;
 import com.welab.wefe.common.StatusCode;
@@ -58,7 +59,7 @@ public class GatewayService extends AbstractService {
      * @param apiClass 目标接口
      */
     public HttpResponse requestOtherFusionNode(FusionNodeInfo target, Class<? extends AbstractApi> apiClass, JSONObject params, int timeoutInMs) throws StatusCodeWithException {
-        FusionConfigModel config = globalConfigService.getFusionConfig();
+        FusionConfigModel config = CacheObjects.getFusionConfig();
         if (StringUtil.isEmpty(config.publicServiceBaseUrl)) {
             StatusCode.PARAMETER_VALUE_INVALID.throwException("尚未设置我方“对外服务地址”，请在全局设置中设置。");
         }

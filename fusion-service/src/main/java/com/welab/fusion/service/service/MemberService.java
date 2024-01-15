@@ -22,6 +22,7 @@ import com.welab.fusion.service.database.entity.MemberDbModel;
 import com.welab.fusion.service.database.repository.MemberRepository;
 import com.welab.fusion.service.dto.entity.MemberInputModel;
 import com.welab.fusion.service.dto.entity.MemberOutputModel;
+import com.welab.fusion.service.model.CacheObjects;
 import com.welab.fusion.service.model.global_config.FusionConfigModel;
 import com.welab.fusion.service.service.base.AbstractService;
 import com.welab.wefe.common.ModelMapper;
@@ -94,7 +95,7 @@ public class MemberService extends AbstractService {
 
     public MemberDbModel save(MemberInputModel input) throws Exception {
         // 如果输入的是自己，不保存。
-        FusionConfigModel config = globalConfigService.getFusionConfig();
+        FusionConfigModel config = CacheObjects.getFusionConfig();
         if (config != null && StringUtil.isNotEmpty(config.publicServiceBaseUrl)) {
             String myselfId = MemberService.buildMemberId(config.publicServiceBaseUrl);
             String inputId = MemberService.buildMemberId(input.getBaseUrl());

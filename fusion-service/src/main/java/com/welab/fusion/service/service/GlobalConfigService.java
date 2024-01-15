@@ -26,6 +26,7 @@ import com.welab.fusion.service.database.base.Where;
 import com.welab.fusion.service.database.entity.GlobalConfigDbModel;
 import com.welab.fusion.service.database.repository.GlobalConfigRepository;
 import com.welab.fusion.service.database.repository.MemberRepository;
+import com.welab.fusion.service.model.CacheObjects;
 import com.welab.fusion.service.model.global_config.FusionConfigModel;
 import com.welab.fusion.service.model.global_config.base.AbstractConfigModel;
 import com.welab.fusion.service.model.global_config.base.ConfigModel;
@@ -254,6 +255,8 @@ public class GlobalConfigService {
 
         // 删除 myself 记录，使其刷新。
         memberRepository.deleteByName(MemberService.MYSELF_NAME);
+
+        CacheObjects.refresh();
     }
 
     public FusionConfigModel getFusionConfig() {
