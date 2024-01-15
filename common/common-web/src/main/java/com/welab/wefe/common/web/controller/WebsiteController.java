@@ -52,7 +52,6 @@ public class WebsiteController {
     @RequestMapping("/website/**")
     public ResponseEntity<?> response(HttpServletRequest request) {
         String resourceName = extractResourceName(request);
-        LOG.info("website resourceName:{}", resourceName);
 
         // 如果指定的是目录，则默认返回 index.html
         if (resourceName.endsWith("/")) {
