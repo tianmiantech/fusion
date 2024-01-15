@@ -20,6 +20,7 @@ import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceBuilder;
 import com.welab.fusion.service.FusionService;
 import com.welab.fusion.service.database.repository.base.BaseRepositoryFactoryBean;
+import com.welab.fusion.service.database.repository.sql_monitor.SqlMonitor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -36,6 +37,7 @@ import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.sql.DataSource;
+import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -74,7 +76,7 @@ public class DataSourceConfig {
         DruidDataSource dataSource = DruidDataSourceBuilder.create().build();
         // SQLite 是文件数据库，不支持并发。
         // dataSource.setMaxCreateTaskCount(1);
-
+        dataSource.setProxyFilters(Collections.singletonList(new SqlMonitor()));
         return dataSource;
     }
 
