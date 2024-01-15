@@ -7,16 +7,23 @@ import { history } from '@umijs/max';
 import styles from './index.less'
 import { useRequest,useMount } from 'ahooks';
 import { useImmer } from 'use-immer';
-import { getGlobalConfig,updateGlobalConfig,UpdateGlobalConfigRequestInterface } from './service';
+import { getGlobalConfig,updateGlobalConfig,testMySelfConnect } from './service';
 import lodash from 'lodash'
 import { testPartnerConntent } from '@/pages/job/service';
+import QRCode from './QRCodeCard'
 
 const { TextArea } = Input;
+type configDataTypes = {
+    public_key?:string,
+    public_service_base_url?:string
+
+}
 const Index = forwardRef((props,ref)=>{
     const [formRef] = Form.useForm();
     const [visible, setVisible] = useState(false);
     const [okLoading,setOkLoading] = useState(false);
     const [isTestConnect,setIsTestConnect] = useState(false)
+    const [configData,setConfigData] = useState<configDataTypes>({})
 
     useImperativeHandle(ref,()=>{
         return {
@@ -39,6 +46,11 @@ const Index = forwardRef((props,ref)=>{
             const public_key = lodash.get(data,'fusion.public_key')
             const public_service_base_url = lodash.get(data,'fusion.public_service_base_url')
             formRef.setFieldsValue({public_key,public_service_base_url});
+            setConfigData({
+                public_key,
+                public_service_base_url
+            
+            })
         }
     },{manual:true})
 
@@ -62,23 +74,13 @@ const Index = forwardRef((props,ref)=>{
 
     const {run:runTestPartnerConntention,loading:testPartnerConntentLoading} = useRequest(async ()=>{
         const values = await formRef.validateFields();
-        const requestParams = {base_url:values.public_service_base_url,public_key:values.public_key}
-        const res = await testPartnerConntent(requestParams);
+        const res = await testMySelfConnect(values.public_service_base_url);
         const {code} = res;
         if(code === 0){
             setIsTestConnect(true)
             message.success('连接成功')
         }
     },{manual:true})
-
-  
-
-    const resetKey = ()=>{
-        setOkLoading(true);
-        setTimeout(()=>{
-            setOkLoading(false);
-        },2000)
-    }
 
     const onOk = ()=>{
         if (!isTestConnect) {
@@ -116,9 +118,9 @@ const Index = forwardRef((props,ref)=>{
                         />
                 </Form.Item>
             </Form>
-            {/* <div className={styles.resetBtnContainer}>
-                <Button type='link' onClick={resetKey}>重置秘钥</Button>
-            </div> */}
+            <div className={styles.resetBtnContainer}>
+                <QRCode configData={configData}/>
+            </div>
         </Spin>
     </TmDrawer>
 })
