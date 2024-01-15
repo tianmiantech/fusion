@@ -212,7 +212,8 @@ public class MemberService extends AbstractService {
             gatewayService.callOtherFusionNode(
                     FusionNodeInfo.of(input.getPublicKey(), input.getBaseUrl()),
                     TestConnectApi.class,
-                    MemberInputModel.of(myself.getPublicKey(), myself.getBaseUrl())
+                    MemberInputModel.of(myself.getPublicKey(), myself.getBaseUrl()),
+                    5_000
             );
         }
 
@@ -220,7 +221,8 @@ public class MemberService extends AbstractService {
         if (input.isRequestFromPartner()) {
             gatewayService.callOtherFusionNode(
                     FusionNodeInfo.of(input.caller.publicKey, input.caller.baseUrl),
-                    AliveApi.class
+                    AliveApi.class,
+                    3_000
             );
         }
 
