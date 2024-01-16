@@ -21,24 +21,14 @@ import com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceBuilder;
 import com.welab.fusion.service.FusionService;
 import com.welab.fusion.service.database.repository.base.BaseRepositoryFactoryBean;
 import com.welab.fusion.service.database.repository.sql_monitor.SqlMonitor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
-import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
-import org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy;
-import org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.orm.jpa.JpaTransactionManager;
-import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
-import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.sql.DataSource;
 import java.util.Collections;
-import java.util.Map;
 
 /**
  * @author zane.luo
@@ -76,6 +66,7 @@ public class DataSourceConfig {
         DruidDataSource dataSource = DruidDataSourceBuilder.create().build();
         // SQLite 是文件数据库，不支持并发。
         dataSource.setMaxActive(1);
+        dataSource.setMaxWait(1000 * 5);
         dataSource.setProxyFilters(Collections.singletonList(new SqlMonitor()));
         return dataSource;
     }
