@@ -64,9 +64,10 @@ public class JobProgress {
         }
 
         // 如果已经到最后一个阶段，且已成功，则整个任务成功。
-        if (currentPhaseProgress.getJobPhase().isLastPhase() && currentPhaseProgress.getJobStatus().isSuccess()) {
-            return JobStatus.success;
-        }
+        // 任务的 success 状态需要多方聚合，不能自己单方判定。
+        // if (currentPhaseProgress.getJobPhase().isLastPhase() && currentPhaseProgress.getJobStatus().isSuccess()) {
+        //     return JobStatus.success;
+        // }
 
         // 其它情况都判定为运行中
         return JobStatus.running;
