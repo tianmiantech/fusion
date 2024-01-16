@@ -161,8 +161,13 @@ public class P9SaveResultAction<T extends AbstractPsiJob> extends AbstractJobPha
         List<String> header = headerRow.getFields();
 
         while (true) {
-            CsvRow row = parser.nextRow();
-
+            CsvRow row;
+            try {
+                row = parser.nextRow();
+            } catch (Exception e) {
+                LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);
+                return null;
+            }
 
             if (row == null) {
                 return null;
