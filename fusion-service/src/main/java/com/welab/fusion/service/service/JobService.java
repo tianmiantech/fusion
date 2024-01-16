@@ -81,7 +81,7 @@ public class JobService extends AbstractService {
             job.setProgressDetail(null);
             job.setUpdatedTimeNow();
 
-            job.save();
+            jobRepository.save(job);
         }
     }
 
@@ -111,7 +111,7 @@ public class JobService extends AbstractService {
         job.setProgressDetail(progress.toJson());
         job.setUpdatedTimeNow();
 
-        job.save();
+        jobRepository.save(job);
 
         FusionJobManager.remove(jobId);
     }
@@ -178,7 +178,7 @@ public class JobService extends AbstractService {
             job.setRemark(input.remark);
         }
         job.setProgressDetail(new JobProgress().toJson());
-        job.save();
+        jobRepository.save(job);
 
         FusionJobManager.remove(input.jobId);
 
@@ -198,7 +198,7 @@ public class JobService extends AbstractService {
             job.setMessage("任务重启失败：" + e.getMessage());
             job.setEndTime(new Date());
             job.setCostTime(System.currentTimeMillis() - job.getStartTime().getTime());
-            job.save();
+            jobRepository.save(job);
             throw e;
         }
 
@@ -242,7 +242,7 @@ public class JobService extends AbstractService {
             job.setMessage("任务启动失败：" + e.getMessage());
             job.setEndTime(new Date());
             job.setCostTime(System.currentTimeMillis() - job.getStartTime().getTime());
-            job.save();
+            jobRepository.save(job);
             throw e;
         }
     }
@@ -288,7 +288,7 @@ public class JobService extends AbstractService {
             job.setPartnerMemberName(provider.getName());
         }
         job.setStatus(JobStatus.auditing);
-        job.save();
+        jobRepository.save(job);
 
         // 发送任务到协作方
         JobMemberDbModel promoter = jobMemberService.findMyself(job.getId());
@@ -340,7 +340,7 @@ public class JobService extends AbstractService {
         job.setStatus(JobStatus.disagree);
         job.setMessage(message);
         job.setUpdatedTimeNow();
-        job.save();
+        jobRepository.save(job);
 
         gatewayService.callOtherFusionNode(
                 memberService.getPartnerFusionNodeInfo(job.getPartnerMemberId()),
@@ -464,6 +464,21 @@ public class JobService extends AbstractService {
         JobDbModel job = findById(jobId);
 
         job.setFusionCount(result.fusionCount);
+        job.setUpdatedTimeNow();
+
+        jobRepository.save(job);
+    }
+
+    public void updateProgress(String jobId, JobProgress progress) {
+        JobDbModel job = findById(jobId);
+
+        if (job.getStatus().isFinished()) {
+            return;
+        }
+
+        job.setStatus(progress.getJobStatus());
+        job.setMessage(progress.getMessage());
+        job.setProgressDetail(progress.toJson());
         job.setUpdatedTimeNow();
 
         jobRepository.save(job);

@@ -143,7 +143,7 @@ public class MemberService extends AbstractService {
 
         model.setBaseUrl(baseUrl);
         model.setPublicKey(publicKey);
-        model.save();
+        memberRepository.save(model);
 
         return model;
     }

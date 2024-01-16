@@ -112,6 +112,12 @@ public abstract class AbstractJobPhaseAction<T extends AbstractPsiJob> implement
             LOG.info("finished phase: {} spend: {}ms", getPhase(), spend);
         }
 
+        try {
+            job.getJobFunctions().updateJobProgressFunction.update(job.getJobId(), job.getMyProgress());
+        } catch (Exception e) {
+            LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);
+            job.finishJobOnException(e);
+        }
     }
 
     /**

@@ -58,7 +58,7 @@ public class JobMemberService extends AbstractService {
         model.setJobId(input.jobId);
         model.setMemberId(providerId);
         model.setRole(JobMemberRole.provider);
-        model.save();
+        jobMemberRepository.save(model);
     }
 
     /**
@@ -87,7 +87,7 @@ public class JobMemberService extends AbstractService {
 
         model.setTotalDataCount(input.dataResource.totalDataCount);
         model.setHashConfig(input.dataResource.hashConfig.toJson());
-        model.save();
+        jobMemberRepository.save(model);
     }
 
     /**
@@ -120,7 +120,7 @@ public class JobMemberService extends AbstractService {
         if (model != null) {
             model.setTotalDataCount(totalDataCount);
             model.setUpdatedTime(new Date());
-            model.save();
+            jobMemberRepository.save(model);
         }
     }
 

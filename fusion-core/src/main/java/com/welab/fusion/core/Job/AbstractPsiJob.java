@@ -53,6 +53,7 @@ public abstract class AbstractPsiJob implements Closeable {
     private PsiJobResult psiJobResult;
     private PsiAlgorithm algorithm;
     private AbstractJobFlow jobFlow;
+    private boolean jobClosed = false;
     /**
      * 已执行的阶段
      */
@@ -102,6 +103,10 @@ public abstract class AbstractPsiJob implements Closeable {
                     // 执行调度
                     boolean keep = schedule();
                     if (!keep) {
+                        break;
+                    }
+
+                    if (jobClosed) {
                         break;
                     }
 
@@ -287,13 +292,12 @@ public abstract class AbstractPsiJob implements Closeable {
         return myProgress.getJobStatus().isFinished();
     }
 
-    private boolean closed = false;
     @Override
     public synchronized void close() throws IOException {
-        if (closed) {
+        if (jobClosed) {
             return;
         }
-        closed = true;
+        jobClosed = true;
 
         scheduleSingleThreadExecutor.shutdownNow();
         actionSingleThreadExecutor.shutdownNow();
