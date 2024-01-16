@@ -116,6 +116,8 @@ const Index =(props:JobListPropsInterface)=>{
         const {status,role} = row;
         if( status === JOB_STATUS.AUDITING ){
           return renderPartnerUrls(row,dataObj)
+        } else if(status === JOB_STATUS.DISAGREE){
+            return <>暂无内容</>
         } else {
           return renderMaindData(row,dataObj)
         }

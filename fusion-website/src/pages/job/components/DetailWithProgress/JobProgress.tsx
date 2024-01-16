@@ -44,9 +44,6 @@ const JobProgress = (props:JobProgressProps) => {
           if(promoterPhasesObj || providerPhases ){
             const myselfStatus = promoterPhasesObj?.status;
             const partnerStatus = providerPhases?.status;
-            console.log('myselfStatus',myselfStatus);
-            console.log('partnerStatus',partnerStatus);
-            
             const status = changeProgressStatusToStepStatus(myselfStatus,partnerStatus);
             step.status = status;
             step.icon = getIconByStatus(status);
