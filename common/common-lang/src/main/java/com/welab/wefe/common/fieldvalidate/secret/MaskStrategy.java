@@ -41,28 +41,27 @@ public enum MaskStrategy {
     PHONE_NUMBER,
     EMAIL;
 
-    private static final Map<MaskStrategy, Function<String, String>> FUNCTION_MAP = new HashMap<>();
+    private static final Map<MaskStrategy, Function<Object, Object>> FUNCTION_MAP = new HashMap<>();
 
     static {
         FUNCTION_MAP.put(BLOCK, x -> null);
         FUNCTION_MAP.put(PASSWORD, x -> "***************");
-        FUNCTION_MAP.put(MAP_WITH_PASSWORD, x -> "***************");
+        FUNCTION_MAP.put(MAP_WITH_PASSWORD, x->x);
         FUNCTION_MAP.put(PHONE_NUMBER, Masker::maskPhoneNumber);
         FUNCTION_MAP.put(EMAIL, Masker::maskEmail);
     }
 
-    public String get(Object value) {
+    public Object get(Object value) {
         if (value == null) {
             return null;
         }
 
-        Function<String, String> function = FUNCTION_MAP.get(this);
+        Function<Object, Object> function = FUNCTION_MAP.get(this);
         if (function == null) {
             throw new RuntimeException("意料之外的枚举：" + this);
         }
 
-        String str = String.valueOf(value);
-        return function.apply(str);
+        return function.apply(value);
 
 
     }
