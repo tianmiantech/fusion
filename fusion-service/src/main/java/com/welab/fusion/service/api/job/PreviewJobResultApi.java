@@ -59,8 +59,6 @@ public class PreviewJobResultApi extends AbstractApi<PreviewJobResultApi.Input, 
             output.header = reader.getHeader();
             output.rows = new ArrayList<>(rows);
 
-            output.header = renderHeader(job, output.header);
-
             reader.readRows((index, row) -> output.rows.add(row));
             return success(output);
         }
