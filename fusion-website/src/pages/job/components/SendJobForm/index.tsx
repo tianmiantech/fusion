@@ -1,14 +1,18 @@
 import React, { useState,forwardRef,useImperativeHandle,useEffect } from 'react';
-import { Form, Input, Button, Row, Col,Tooltip, Spin, message,Alert } from 'antd';
-import { FolderOpenOutlined, QuestionCircleOutlined } from '@ant-design/icons';
+import { Form, Input, Button, Row, Col,Tooltip, Spin, message,Alert,Upload,Space } from 'antd';
+import { UploadOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import { history, useModel } from '@umijs/max';
 import { useRequest } from "ahooks";
 import {testPartnerConntent,TestPartnerConntentRequestInterface,sendJobToProvider,SendTaskToProviderRequestInterface} from '../../service'
+import type {UploadFile,UploadProps} from 'antd'
 import useDetail from '../../hooks/useDetail';
 import lodash from 'lodash'
 import { JOB_STATUS } from '@/constant/dictionary';
 import { formRuleRequire } from '@/utils/common';
 import styles from './index.less'
+import jsQR from 'jsqr'
+import type{  } from 'antd';
+import { RcFile } from 'antd/es/upload/interface';
 
 interface SendJobFormPropsInterface {
   showActionButton?:boolean
@@ -18,7 +22,7 @@ const SendJobForm = forwardRef((props:SendJobFormPropsInterface, ref) => {
   const [isTestConnect,setIsTestConnect] = useState(false)
 
   const [formRef] = Form.useForm();
-
+  const [fileList, setFileList] = useState<UploadFile[]>([])
   const {detailData,clearDetailData} = useDetail()
 
   useEffect(()=>{
@@ -90,10 +94,53 @@ const SendJobForm = forwardRef((props:SendJobFormPropsInterface, ref) => {
     }
   }
 
+  const handleChange: UploadProps['onChange'] = ({file:newFile, fileList: newFileList }) =>
+    setFileList(newFileList);
+
+  const scanQRCode = ()=>{
+    if(fileList.length>0){
+      const file = fileList[0]
+      const reader = new FileReader();
+      reader.onloadend = function(e:any) {
+        const img = new Image();
+        img.src = e.target.result;
+        img.onload = function() {
+          const canvasElement = document.createElement('canvas') as HTMLCanvasElement;
+          if(canvasElement){
+            const ctx = canvasElement.getContext('2d') as CanvasRenderingContext2D ;
+            canvasElement.width = img.width;
+            canvasElement.height = img.height;
+            ctx.drawImage(img, 0, 0, img.width, img.height);
+            const imageData = ctx.getImageData(0, 0, img.width, img.height);
+            const code = jsQR(imageData.data, imageData.width, imageData.height);
+            const data = lodash.get(code,'data','{}')
+            const dataObj = JSON.parse(data)
+            console.log('dataObj',dataObj);
+            if(dataObj.public_service_base_url)
+              formRef.setFieldsValue({...dataObj,base_url:dataObj.public_service_base_url})
+          }
+        }
+      }
+      if(file.originFileObj)
+        reader.readAsDataURL(file.originFileObj as Blob);
+    }
+  }
+
+  const renderQRScan = ()=>{
+    return <div className={styles.qrContainer}>
+        {fileList.length>0?<Button onClick={()=>{scanQRCode()}}>识别二维码</Button>:null}
+      <Upload listType="picture" maxCount={1} fileList={fileList} onChange={handleChange} accept='image/*'>
+          {fileList.length>0?null:<Button icon={<UploadOutlined />}>上传合作方二维码自动识别合作方信息</Button>}
+      </Upload>
+     
+    </div>
+  }
+
   return (
     <>
           <Spin spinning={testPartnerConntentLoading||loadingSendJobToProvider}>
             {renderRejectReason()}
+            {renderQRScan()}
           <Form
             form={formRef}
             layout="vertical"
