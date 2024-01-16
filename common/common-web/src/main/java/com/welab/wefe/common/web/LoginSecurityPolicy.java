@@ -16,6 +16,7 @@
 
 package com.welab.wefe.common.web;
 
+import net.jodah.expiringmap.ExpirationPolicy;
 import net.jodah.expiringmap.ExpiringMap;
 
 import java.util.concurrent.TimeUnit;
@@ -35,6 +36,7 @@ public class LoginSecurityPolicy {
      */
     private static ExpiringMap<String, Integer> LOGIN_FAIL_COUNT_MAP = ExpiringMap
             .builder()
+            .expirationPolicy(ExpirationPolicy.CREATED)
             .expiration(10, TimeUnit.MINUTES)
             .build();
 
@@ -45,6 +47,7 @@ public class LoginSecurityPolicy {
      */
     private static ExpiringMap<String, Integer> A_DARK_ROOM = ExpiringMap
             .builder()
+            .expirationPolicy(ExpirationPolicy.CREATED)
             .expiration(60, TimeUnit.MINUTES)
             .build();
 
