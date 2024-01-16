@@ -145,8 +145,6 @@ const JobForm = forwardRef((props:JobFormPropsInterface, ref) => {
 
   const validateSelfField =  (props: any, value:any)  =>{
     const {field} = props;
-    console.log(props,value);
-    
     const result = IsEmptyObject(value)
     if(result){
       return Promise.reject(new Error('此项不能为空'))
