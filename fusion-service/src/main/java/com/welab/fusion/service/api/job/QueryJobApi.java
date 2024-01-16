@@ -49,5 +49,13 @@ public class QueryJobApi extends AbstractApi<QueryJobApi.Input, PagingOutput<Job
         public JobMemberRole role;
         @Check(name = "任务状态")
         public JobStatus status;
+
+        public static Input ofAuditing() {
+            Input input = new Input();
+            input.role = JobMemberRole.provider;
+            input.status = JobStatus.auditing;
+            input.setPageSize(1000);
+            return input;
+        }
     }
 }

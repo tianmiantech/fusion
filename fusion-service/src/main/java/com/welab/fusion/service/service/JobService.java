@@ -85,18 +85,6 @@ public class JobService extends AbstractService {
         }
     }
 
-    public void finishOnPartnerFinished(String jobId) {
-        JobDbModel job = findById(jobId);
-
-        if (job.getStatus().isFinished()) {
-            return;
-        }
-        JobProgress progress = job.getProgressModel();
-        progress.finish(JobStatus.error_on_running, "合作方已停止，我方跟随其结束任务。");
-
-        finish(jobId, progress);
-    }
-
     public synchronized void finish(String jobId, JobProgress progress) {
         JobDbModel job = findById(jobId);
 
@@ -156,6 +144,8 @@ public class JobService extends AbstractService {
 
         saveJobMember(JobMemberRole.promoter, input);
 
+        ListAuditingJobApi.cleanCache();
+
         return job.getId();
     }
 
@@ -200,6 +190,8 @@ public class JobService extends AbstractService {
             job.setCostTime(System.currentTimeMillis() - job.getStartTime().getTime());
             jobRepository.save(job);
             throw e;
+        } finally {
+            ListAuditingJobApi.cleanCache();
         }
 
     }
@@ -244,6 +236,8 @@ public class JobService extends AbstractService {
             job.setCostTime(System.currentTimeMillis() - job.getStartTime().getTime());
             jobRepository.save(job);
             throw e;
+        } finally {
+            ListAuditingJobApi.cleanCache();
         }
     }
 
@@ -342,6 +336,8 @@ public class JobService extends AbstractService {
         job.setUpdatedTimeNow();
         jobRepository.save(job);
 
+        ListAuditingJobApi.cleanCache();
+        
         gatewayService.callOtherFusionNode(
                 memberService.getPartnerFusionNodeInfo(job.getPartnerMemberId()),
                 DisagreeJobApi.class,
@@ -422,6 +418,8 @@ public class JobService extends AbstractService {
         FusionJobManager.remove(id);
         jobMemberService.deleteByJobId(id);
         jobRepository.deleteById(id);
+
+        ListAuditingJobApi.cleanCache();
     }
 
     /**
