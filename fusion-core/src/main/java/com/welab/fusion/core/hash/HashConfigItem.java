@@ -15,6 +15,8 @@
  */
 package com.welab.fusion.core.hash;
 
+import com.welab.wefe.common.util.StringUtil;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -69,5 +71,16 @@ public class HashConfigItem {
         config.columns = Arrays.asList(columns);
         config.method = options;
         return config;
+    }
+
+    @Override
+    public String toString() {
+        String joined = StringUtil.join(columns, "+");
+        switch (method) {
+            case NONE:
+                return joined;
+            default:
+                return method.name() + "(" + joined + ")";
+        }
     }
 }
