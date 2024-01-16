@@ -4,7 +4,6 @@ import { TmTable } from "@tianmiantech/pro";
 import type { ColumnsType } from 'antd/es/table';
 import { useRequest,useMount } from "ahooks";
 import { history } from 'umi';
-import { useModel } from '@umijs/max';
 import { useImmer } from 'use-immer';
 import styles from './index.less'
 import { getJobList,deleteJob,restartJob } from "../service";

@@ -1,7 +1,7 @@
 import React, { useState,forwardRef,useImperativeHandle,useEffect } from 'react';
 import { Form, Input, Button, Row, Col,Tooltip, Spin, message,Alert,Upload,Space } from 'antd';
 import { UploadOutlined, QuestionCircleOutlined } from '@ant-design/icons';
-import { history, useModel } from '@umijs/max';
+import { history } from '@umijs/max';
 import { useRequest } from "ahooks";
 import {testPartnerConntent,TestPartnerConntentRequestInterface,sendJobToProvider,SendTaskToProviderRequestInterface} from '../../service'
 import type {UploadFile,UploadProps} from 'antd'

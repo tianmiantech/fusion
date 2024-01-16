@@ -1,7 +1,7 @@
 import { useImmer } from 'use-immer';
 import { useState } from 'react';
+import { createModel } from "hox";
 import { checkIsInitialized,getGenerateSm2KeyPair } from './service'
-import {useRequest} from 'ahooks'
 import lodash from 'lodash'
 import {FUNSION_INITIALIZED_KEY} from '@/constant/dictionary'
 
@@ -65,4 +65,4 @@ const useCheckInitializedStore = ()=> {
         
     }
 }
-export default useCheckInitializedStore
+export default createModel(useCheckInitializedStore)
