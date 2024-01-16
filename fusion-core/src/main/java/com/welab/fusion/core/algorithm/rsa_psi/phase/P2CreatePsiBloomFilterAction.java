@@ -15,18 +15,17 @@
  */
 package com.welab.fusion.core.algorithm.rsa_psi.phase;
 
+import com.welab.fusion.core.Job.base.JobPhase;
+import com.welab.fusion.core.Job.base.JobRole;
+import com.welab.fusion.core.Job.data_resource.DataResourceType;
 import com.welab.fusion.core.algorithm.base.phase_action.AbstractJobPhaseAction;
 import com.welab.fusion.core.algorithm.rsa_psi.RsaPsiJob;
-import com.welab.fusion.core.Job.base.JobRole;
-import com.welab.fusion.core.Job.base.JobPhase;
 import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
 import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilterCreator;
-import com.welab.fusion.core.Job.data_resource.DataResourceType;
-import com.welab.fusion.core.io.data_source.CsvTableDataSourceReader;
 import com.welab.fusion.core.hash.HashConfig;
+import com.welab.fusion.core.io.data_source.CsvTableDataSourceReader;
 
 import java.io.IOException;
-import java.util.UUID;
 
 /**
  * @author zane.luo
@@ -35,13 +34,21 @@ import java.util.UUID;
 public class P2CreatePsiBloomFilterAction extends AbstractJobPhaseAction<RsaPsiJob> {
     @Override
     protected void doAction() throws Exception {
+        // 使用缓存
+        if (PsiBloomFilter.exist(job.getJobId())) {
+            phaseProgress.setMessageAndLog("使用已有过滤器，无需生成。");
+            job.getMyself().psiBloomFilter = PsiBloomFilter.of(job.getJobId());
+            return;
+        }
+
+
         CsvTableDataSourceReader reader = new CsvTableDataSourceReader(job.getJobTempData().allOriginalData);
         HashConfig hashConfig = job.getMyself().dataResourceInfo.hashConfig;
 
         phaseProgress.setMessageAndLog("正在生成过滤器...");
         // 生成过滤器
         try (PsiBloomFilterCreator creator = new PsiBloomFilterCreator(
-                UUID.randomUUID().toString().replace("-", ""),
+                job.getJobId(),
                 reader,
                 hashConfig,
                 phaseProgress)
