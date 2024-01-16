@@ -13,6 +13,7 @@ import styles from './index.less'
 import jsQR from 'jsqr'
 import type{  } from 'antd';
 import { RcFile } from 'antd/es/upload/interface';
+import { IsEmptyObject } from '@/utils/utils';
 
 interface SendJobFormPropsInterface {
   showActionButton?:boolean
@@ -115,9 +116,13 @@ const SendJobForm = forwardRef((props:SendJobFormPropsInterface, ref) => {
             const code = jsQR(imageData.data, imageData.width, imageData.height);
             const data = lodash.get(code,'data','{}')
             const dataObj = JSON.parse(data)
-            console.log('dataObj',dataObj);
-            if(dataObj.public_service_base_url)
-              formRef.setFieldsValue({...dataObj,base_url:dataObj.public_service_base_url})
+            const {base_url,public_key} = dataObj
+            if(IsEmptyObject(dataObj) || (!base_url && !public_key)){
+              message.warn('未识别到有效信息')
+            } else {
+              formRef.setFieldsValue({base_url,public_key})
+            }
+            
           }
         }
       }

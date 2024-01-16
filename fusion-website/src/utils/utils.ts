@@ -28,7 +28,7 @@ export const renderHashConfig = (hash_config:hashConfigItemInterface) => {
 }
 
 export const IsEmptyObject =(obj: any): boolean=> {
-  if (obj === null || obj === undefined || obj === "" ||  (obj+'').trim() === "[]") {
+  if (obj === null || obj === undefined || obj === "" ||  (obj+'').trim() === "[]" || (obj+'').trim() === "{}") {
     return true;
   }
   if (Array.isArray(obj)) {
@@ -41,6 +41,9 @@ export const IsEmptyObject =(obj: any): boolean=> {
       }
     }
   } else  if (typeof obj === "object") {
+    if (Object.keys(obj).length === 0) {
+      return true;
+    }
     for (const key in obj) {
       if (IsEmptyObject(obj[key])) {
         return true;

@@ -22,15 +22,9 @@ const QRCodeCard: React.FC<QRCodeCardProps> = (props:QRCodeCardProps) => {
             setDatas((draft)=>{
                 draft.qrCodeJson = configData;
             })
-            console.log('configData',configData);
-            
             generateQRCodeWithText(configData, '测试1').then((res)=>{
-                console.log('res',res);
-                
                 setDatas((draft)=>{
-                    draft.qrCodeUrl = res;
-                    console.log('qrCodeUrl',res);
-                    
+                    draft.qrCodeUrl = res;        
                 })
             })
         }
