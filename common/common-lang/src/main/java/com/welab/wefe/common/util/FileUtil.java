@@ -564,7 +564,7 @@ public class FileUtil {
                 return result;
             }
 
-            if (lineIndex < skipLineCount) {
+            if (lineIndex <= skipLineCount) {
                 continue;
             }
 
@@ -609,7 +609,7 @@ public class FileUtil {
                     return result;
                 }
 
-                if (lineIndex < skipLineCount) {
+                if (lineIndex <= skipLineCount) {
                     continue;
                 }
 
