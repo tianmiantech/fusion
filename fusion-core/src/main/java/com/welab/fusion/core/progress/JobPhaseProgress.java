@@ -44,10 +44,6 @@ public class JobPhaseProgress extends Progress {
     }
 
     public void finish(JobStatus status, String message) {
-        // 不执行的阶段由 skip() 方法执行 finish()。
-        if (skipThisPhase) {
-            return;
-        }
 
         if (!status.isFinished()) {
             throw new RuntimeException("意料之外的状态：" + status);
