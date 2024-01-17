@@ -66,7 +66,7 @@ public class DataSourceConfig {
         DruidDataSource dataSource = DruidDataSourceBuilder.create().build();
         // SQLite 是文件数据库，不支持并发。
         dataSource.setMaxActive(1);
-        dataSource.setMaxWait(1000 * 5);
+        dataSource.setMaxWait(1000 * 10);
         dataSource.setProxyFilters(Collections.singletonList(new SqlMonitor()));
         return dataSource;
     }
