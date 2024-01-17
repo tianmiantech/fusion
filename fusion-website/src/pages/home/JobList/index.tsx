@@ -313,9 +313,9 @@ const Index =(props:JobListPropsInterface)=>{
         </div>
     }
     
-    const searchData = async (page_index=1)=>{
+    const searchData = async (page_index=1,page_size=jobListData.page_size)=>{
         const values = await tabelSearchFormRef.current?.getFieldsValue();
-        runGetJobListData({page_size:jobListData.page_size,page_index,...values})
+        runGetJobListData({page_size:page_size,page_index,...values})
         setJobListData(draft=>{
             draft.isSearch = true;
             if(page_index!==jobListData.page_index){
@@ -342,7 +342,14 @@ const Index =(props:JobListPropsInterface)=>{
                       size: 'small',
                       total:jobListData.total,
                       onChange: (page:number, pageSize:number) => {
-                        searchData(page)
+                        if(pageSize !== jobListData.page_size){
+                          searchData(1,pageSize)
+                          setJobListData(draft=>{
+                            draft.page_size = pageSize;
+                          })
+                        } else {
+                         searchData(page)
+                        }
                       }
                     }}
                     search={{
