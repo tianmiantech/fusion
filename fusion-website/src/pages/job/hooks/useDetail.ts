@@ -90,8 +90,6 @@ const useDetail = ()=>{
 
   const checkIfNeedToGetMergedJobProgress = ()=>{
     const job_status = lodash.get(detailData,'jobDetailData.status','')
-    console.log('checkIfNeedToGetMergedJobProgress',job_status);
-    
     if(job_status === JOB_STATUS.RUNNING || job_status===JOB_STATUS.WAIT_RUN ){
       return true
     }
