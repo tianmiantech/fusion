@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.welab.fusion.service.api.job;
+package com.welab.fusion.service.api.job.schedule;
 
-import com.welab.fusion.core.Job.base.JobStatus;
 import com.welab.fusion.core.progress.JobProgress;
 import com.welab.fusion.service.service.GatewayService;
 import com.welab.fusion.service.service.JobService;

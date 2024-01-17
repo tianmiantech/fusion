@@ -17,7 +17,7 @@ package com.welab.fusion.service.service;
 
 import com.welab.fusion.core.Job.data_resource.DataResourceType;
 import com.welab.fusion.core.io.data_source.AbstractTableDataSourceReader;
-import com.welab.fusion.service.api.job.SendJobToProviderApi;
+import com.welab.fusion.service.api.job.schedule.SendJobToProviderApi;
 import com.welab.fusion.service.constans.JobMemberRole;
 import com.welab.fusion.service.database.base.MySpecification;
 import com.welab.fusion.service.database.base.Where;

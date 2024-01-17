@@ -60,7 +60,7 @@ public class PreviewTableDataSourceApi extends AbstractApi<PreviewTableDataSourc
         @Check(require = true)
         public AddMethod addMethod;
 
-        @Secret(maskStrategy = MaskStrategy.BLOCK)
+        @BlockForPartnerField
         @Check(name = "sql脚本", blockXss = false, oneSelectSql = true)
         public String sql;
 
