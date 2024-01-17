@@ -117,8 +117,7 @@ public class PreviewTableDataSourceApi extends AbstractApi<PreviewTableDataSourc
                 );
 
                 if (model != null) {
-                    String password = model.getConnectorConfig().getString("password");
-                    dataSourceParams.put(passwordKey, password);
+                    model.padLostParams(dataSourceParams);
                 }
             }
 
