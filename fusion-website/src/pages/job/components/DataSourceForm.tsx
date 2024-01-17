@@ -193,7 +193,7 @@ const DataSourceForm = (props:DataSourceFormInterface) => {
       </Col>
       <Col span={12}>
       <Form.Item name="password" label="密码" {...formItemLayout}>
-        <Input.Password placeholder='请输入' autoComplete="one-time-code" />
+        <Input.Password placeholder='请输入' visibilityToggle={disabled?false:true}/>
       </Form.Item>
       </Col>
     </>

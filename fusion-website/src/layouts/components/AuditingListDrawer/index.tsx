@@ -7,8 +7,7 @@ import { TmDrawer } from '@tianmiantech/pro';
 import { useRequest,useMount } from 'ahooks';
 import { useImmer } from 'use-immer';
 import lodash from 'lodash'
-import { getJobList } from '@/pages/home/service';
-import type {GetJobListRequestInterface} from '@/pages/home/service'
+import { getAuditingList } from './service';
 import styles from './index.less'
 import { ROLE_TYPE,JOB_STATUS } from '@/constant/dictionary';
 import {getPersonificationTime} from '@/utils/time'
@@ -26,13 +25,7 @@ const AuditingListDrawer: React.FC<AuditingListDrawerProps> = forwardRef((props,
     });
 
     const {run:runGetJobList} = useRequest(async ()=>{
-        const requestParams = {
-          page_size:1000,
-          status:JOB_STATUS.AUDITING,
-          page_index:0,
-          role:ROLE_TYPE.PROVIDER
-        } as GetJobListRequestInterface
-        const res = await getJobList(requestParams)
+        const res = await getAuditingList()
         const {code,data} = res;
         if(code === 0){
             const listData = lodash.get(data,'list',[])
