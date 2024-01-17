@@ -35,9 +35,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.StandardCopyOption;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.LongAdder;
 import java.util.stream.Collectors;
 
@@ -126,6 +124,12 @@ public class P9SaveResultAction<T extends AbstractPsiJob> extends AbstractJobPha
     }
 
     private void writeOnePartition(List<LinkedHashMap<String, Object>> originalDataPartition) throws IOException {
+        Set<String> originalKeySet = originalDataPartition.stream()
+                .map(x -> x.get(Constant.KEY_COLUMN_NAME).toString())
+                .collect(Collectors.toSet());
+
+        Map<String, LinkedHashMap<String, Object>> partnerRows = findPartnerRows(originalKeySet);
+
         for (LinkedHashMap<String, Object> originalData : originalDataPartition) {
             // 拼接我方 Key 相关字段
             String line = super.rowToCsvLine(getMyselfHeader(), originalData, false);
@@ -133,7 +137,7 @@ public class P9SaveResultAction<T extends AbstractPsiJob> extends AbstractJobPha
             // 拼接协作方附加字段
             if (!getPartnerHeader().isEmpty()) {
                 String key = originalData.get(Constant.KEY_COLUMN_NAME).toString();
-                LinkedHashMap<String, Object> partnerRow = findPartnerRow(key);
+                LinkedHashMap<String, Object> partnerRow = partnerRows.get(key);
                 if (partnerRow != null) {
                     line += "," + super.rowToCsvLine(getPartnerHeader(), partnerRow, false);
                 }
@@ -148,7 +152,9 @@ public class P9SaveResultAction<T extends AbstractPsiJob> extends AbstractJobPha
 
     }
 
-    private LinkedHashMap<String, Object> findPartnerRow(String key) throws IOException {
+    private Map<String, LinkedHashMap<String, Object>> findPartnerRows(Set<String> keySet) throws IOException {
+        Map<String, LinkedHashMap<String, Object>> result = new HashMap<>(keySet.size());
+
         File file = job.getJobTempData().resultFileWithPartnerAdditionalColumns;
         CsvReader reader = new CsvReader();
         reader.setContainsHeader(false);
@@ -156,7 +162,7 @@ public class P9SaveResultAction<T extends AbstractPsiJob> extends AbstractJobPha
         CsvParser parser = reader.parse(file, StandardCharsets.UTF_8);
         CsvRow headerRow = parser.nextRow();
         if (headerRow == null) {
-            return null;
+            return result;
         }
         List<String> header = headerRow.getFields();
 
@@ -166,14 +172,16 @@ public class P9SaveResultAction<T extends AbstractPsiJob> extends AbstractJobPha
                 row = parser.nextRow();
             } catch (Exception e) {
                 LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);
-                return null;
+                break;
             }
 
             if (row == null) {
-                return null;
+                break;
             }
 
-            if (key.equals(row.getField(0))) {
+            String key = row.getField(0);
+
+            if (keySet.contains(key)) {
                 LinkedHashMap<String, Object> map = new LinkedHashMap<>();
                 for (int i = 0; i < header.size(); i++) {
                     String value = "";
@@ -182,9 +190,15 @@ public class P9SaveResultAction<T extends AbstractPsiJob> extends AbstractJobPha
                     }
                     map.put(header.get(i), value);
                 }
-                return map;
+                result.put(key, map);
+            }
+
+            if (result.size() == keySet.size()) {
+                break;
             }
         }
+
+        return result;
     }
 
 
