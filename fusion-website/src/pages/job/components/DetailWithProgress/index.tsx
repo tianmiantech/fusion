@@ -21,6 +21,7 @@ import styles from  './index.less'
 import { restartJob } from '@/pages/home/service'
 import TruncatedString from "@/components/TruncatedString";
 import {getPersonificationTime} from '@/utils/time'
+import {renderHashConfig} from '@/utils/utils'
 
 
 /**
@@ -97,10 +98,11 @@ const Index = ()=>{
       const reponse = await getPrevResult(id);
       const {code,data} = reponse
       if(code == 0) {
+        const hash_config = lodash.get(detailData,'jobDetailData.myself.hash_config','')
         setData(draft=>{
           const columns = data.header.map((item: string)=>{
             return {
-                title:item,
+                title:(item==='k__e__y'&& hash_config)?`${item}(${renderHashConfig(hash_config)})`:item,
                 dataIndex:item,
             }
           }) 

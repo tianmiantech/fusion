@@ -4,7 +4,6 @@ import { TmTable } from "@tianmiantech/pro";
 import type { ColumnsType } from 'antd/es/table';
 import { useRequest,useMount } from "ahooks";
 import { history } from 'umi';
-import { useModel } from '@umijs/max';
 import { useImmer } from 'use-immer';
 import styles from './index.less'
 import { getJobList,deleteJob,restartJob } from "../service";
@@ -117,6 +116,8 @@ const Index =(props:JobListPropsInterface)=>{
         const {status,role} = row;
         if( status === JOB_STATUS.AUDITING ){
           return renderPartnerUrls(row,dataObj)
+        } else if(status === JOB_STATUS.DISAGREE){
+            return <>暂无内容</>
         } else {
           return renderMaindData(row,dataObj)
         }

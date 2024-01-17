@@ -1,7 +1,7 @@
 import { useImmer } from 'use-immer';
 import { useState } from 'react';
+import { createModel } from "hox";
 import { checkIsInitialized,getGenerateSm2KeyPair } from './service'
-import {useRequest} from 'ahooks'
 import lodash from 'lodash'
 import {FUNSION_INITIALIZED_KEY} from '@/constant/dictionary'
 
@@ -16,7 +16,8 @@ interface InitializedReponse {
  * @returns 
  */
 const useCheckInitializedStore = ()=> {
-    const [IsInitialized,setIsInitialized] = useState<boolean>(false)
+    const defaultState = localStorage.getItem(FUNSION_INITIALIZED_KEY)||'false'
+    const [IsInitialized,setIsInitialized] = useState<boolean>(Boolean(defaultState))
     const [encryptPublicKey,setEncryptPublicKey] = useState<string>('')
     //项目加载时请求一次，标记是否请求过了 
     const [isRequested,setIsRequested] = useState(false)
@@ -65,4 +66,4 @@ const useCheckInitializedStore = ()=> {
         
     }
 }
-export default useCheckInitializedStore
+export default createModel(useCheckInitializedStore)
