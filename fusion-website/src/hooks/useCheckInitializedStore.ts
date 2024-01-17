@@ -16,7 +16,8 @@ interface InitializedReponse {
  * @returns 
  */
 const useCheckInitializedStore = ()=> {
-    const [IsInitialized,setIsInitialized] = useState<boolean>(false)
+    const defaultState = localStorage.getItem(FUNSION_INITIALIZED_KEY)||'false'
+    const [IsInitialized,setIsInitialized] = useState<boolean>(Boolean(defaultState))
     const [encryptPublicKey,setEncryptPublicKey] = useState<string>('')
     //项目加载时请求一次，标记是否请求过了 
     const [isRequested,setIsRequested] = useState(false)
