@@ -156,6 +156,10 @@ public class P9SaveResultAction<T extends AbstractPsiJob> extends AbstractJobPha
         Map<String, LinkedHashMap<String, Object>> result = new HashMap<>(keySet.size());
 
         File file = job.getJobTempData().resultFileWithPartnerAdditionalColumns;
+        if (file == null) {
+            return result;
+        }
+
         CsvReader reader = new CsvReader();
         reader.setContainsHeader(false);
         reader.setSkipEmptyRows(true);
