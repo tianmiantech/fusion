@@ -17,8 +17,10 @@ package com.welab.fusion.service.api.job.schedule;
 
 import com.welab.fusion.core.Job.base.JobStatus;
 import com.welab.fusion.core.progress.JobProgress;
+import com.welab.fusion.service.database.entity.MemberDbModel;
 import com.welab.fusion.service.service.GatewayService;
 import com.welab.fusion.service.service.JobService;
+import com.welab.wefe.common.StatusCode;
 import com.welab.wefe.common.fieldvalidate.annotation.Check;
 import com.welab.wefe.common.web.api.base.AbstractApi;
 import com.welab.wefe.common.web.api.base.Api;
@@ -48,9 +50,13 @@ public class GetMergedJobProgressApi extends AbstractApi<GetMergedJobProgressApi
 
         JobProgress myselfProgress = jobService.getMyJobProgress(input.jobId);
 
-        FusionNodeInfo partner = jobService.findPartner(input.jobId).toFusionNodeInfo();
+        MemberDbModel partner = jobService.findPartner(input.jobId);
+        if (partner == null) {
+            StatusCode.PARAMETER_VALUE_INVALID.throwException("此任务尚未推送给合作方");
+        }
+        FusionNodeInfo partnerNodeInfo = partner.toFusionNodeInfo();
         JobProgress partnerProgress = gatewayService.callOtherFusionNode(
-                partner,
+                partnerNodeInfo,
                 GetMyJobProgressApi.class,
                 GetMyJobProgressApi.Input.of(input.jobId)
         );
