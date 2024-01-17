@@ -18,7 +18,6 @@ package com.welab.fusion.core.util;
 import cn.hutool.core.codec.Base64;
 import com.welab.fusion.core.algorithm.rsa_psi.RsaPsiRecord;
 import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
-import org.bouncycastle.math.ec.ECCurve;
 import org.bouncycastle.math.ec.ECPoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,7 +85,8 @@ public class PsiUtils {
 
         return list
                 // 并行处理，但是要保证返回结果顺序一致。
-                .parallelStream().map(item -> {
+                // 暂时取消并行，并行的时候 CPU 打满会导致数据库连接超时。
+                .stream().map(item -> {
                     byte[] bytes = Base64.decode(item);
                     BigInteger x = PsiUtils.bytesToBigInteger(bytes);
 
