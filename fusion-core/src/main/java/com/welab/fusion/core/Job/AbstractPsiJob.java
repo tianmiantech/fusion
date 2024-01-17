@@ -55,6 +55,10 @@ public abstract class AbstractPsiJob implements Closeable {
     private AbstractJobFlow jobFlow;
     private boolean jobClosed = false;
     /**
+     * 双方进度不一致时，记录时间。
+     */
+    private long firstJobPhaseNotEqualTime;
+    /**
      * 已执行的阶段
      */
     private final Set<JobPhase> executedPhases = new HashSet<>();
@@ -93,6 +97,7 @@ public abstract class AbstractPsiJob implements Closeable {
      */
     private void startSchedule() {
         LOG.info("启动监工线程，开始任务。");
+        firstJobPhaseNotEqualTime = System.currentTimeMillis();
         scheduleSingleThreadExecutor.execute(() -> {
             try {
                 // 开始执行第一阶段任务
@@ -132,6 +137,16 @@ public abstract class AbstractPsiJob implements Closeable {
         JobProgress partnerProgress = getPartnerProgress();
         // 失联，任务中止。
         if (partnerProgress == null) {
+            finishJobByDisconnection();
+            return false;
+        }
+
+        // 当双方进度不一致时，记录时间。
+        if (myProgress.getCurrentPhase() == partnerProgress.getCurrentPhase()) {
+            firstJobPhaseNotEqualTime = System.currentTimeMillis();
+        }
+        // 如果双方进度偏离时间过长，任务中止。
+        if (System.currentTimeMillis() - firstJobPhaseNotEqualTime > 1000 * 60) {
             finishJobByDisconnection();
             return false;
         }
