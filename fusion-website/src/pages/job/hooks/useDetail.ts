@@ -138,9 +138,6 @@ const useDetail = ()=>{
       const myselfPhasesList = lodash.get(data,'myself.phases',[]);
       const myJobStatus = lodash.get(data,'myself.job_status','');
       const lastJobStatus = lodash.get(detailData,'lastJobStatus','');
-      console.log('myJobStatus',myJobStatus);
-      console.log('lastJobStatus',lastJobStatus);
-      
       setDetailData(draft=>{
         draft.partnerJobCurrentProgress = partner;
         draft.myselfJobCurrentProgress = myself;
