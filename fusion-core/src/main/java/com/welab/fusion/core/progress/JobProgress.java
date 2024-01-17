@@ -34,6 +34,11 @@ public class JobProgress {
      */
     protected Date startTime = new Date();
     public List<JobPhaseProgress> phases = new ArrayList<>();
+    /**
+     * 任务是否已结束
+     * 该标记为 true 时意味着所有任务参与方已结束
+     */
+    public boolean jobFinished = false;
 
     public synchronized void addPhaseProgress(JobPhaseProgress phaseProgress) {
         phases.add(phaseProgress);
@@ -65,9 +70,11 @@ public class JobProgress {
 
         // 如果已经到最后一个阶段，且已成功，则整个任务成功。
         // 任务的 success 状态需要多方聚合，不能自己单方判定。
-        // if (currentPhaseProgress.getJobPhase().isLastPhase() && currentPhaseProgress.getJobStatus().isSuccess()) {
-        //     return JobStatus.success;
-        // }
+        if (jobFinished) {
+            if (currentPhaseProgress.getJobPhase().isLastPhase() && currentPhaseProgress.getJobStatus().isSuccess()) {
+                return JobStatus.success;
+            }
+        }
 
         // 其它情况都判定为运行中
         return JobStatus.running;
@@ -108,6 +115,7 @@ public class JobProgress {
      * 结束任务
      */
     public void finish(JobStatus status, String message) {
+        jobFinished = true;
         JobPhaseProgress currentPhaseProgress = getCurrentPhaseProgress();
         if (currentPhaseProgress == null) {
             currentPhaseProgress = JobPhaseProgress.of(null, JobPhase.InitJob, 1);
