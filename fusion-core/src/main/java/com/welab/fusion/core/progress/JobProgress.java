@@ -115,6 +115,9 @@ public class JobProgress {
      * 结束任务
      */
     public void finish(JobStatus status, String message) {
+        if (jobFinished) {
+            return;
+        }
         jobFinished = true;
         JobPhaseProgress currentPhaseProgress = getCurrentPhaseProgress();
         if (currentPhaseProgress == null) {
