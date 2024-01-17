@@ -10,6 +10,7 @@ import {DataPreviewBtn} from '@/components/DataSetPreview'
 import type {PeviewDataRequestInterface} from '@/components/DataSetPreview/service'
 import type {DataSourceListItemInterface} from '../models/useDataSourceForm'
 import { useImmer } from 'use-immer';
+import useCheckInitializedStore from '@/hooks/useCheckInitializedStore';
 interface DataSourceFormInterface {
   disabled?:boolean,
   value?:any,
@@ -33,7 +34,7 @@ const DataSourceForm = (props:DataSourceFormInterface) => {
 
   const [dataSourceFormRef] = Form.useForm()
 
-  const {getEncryptPublicKey} = useModel('initializeConfig')
+  const {getEncryptPublicKey} = useCheckInitializedStore()
 
   const [sourceData,setSourceData] = useImmer<SourceDataInterface>({
     successCheck:false,  //展示测试成功的数据源预览
