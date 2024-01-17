@@ -111,8 +111,6 @@ const Index = ()=>{
           draft.previewOpen = true
         })
       }
-      console.log("result",reponse);
-      
     },{manual:true})
 
     const getFileName = (disposition: string) => {

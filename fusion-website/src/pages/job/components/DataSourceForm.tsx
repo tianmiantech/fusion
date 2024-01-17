@@ -51,8 +51,12 @@ const DataSourceForm = (props:DataSourceFormInterface) => {
       if(source === 'setFieldsValue'){
         const data_source_params = lodash.get(value,'data_source_params',{})
         dataSourceFormRef.setFieldsValue(data_source_params);
+        //主动设置值时，预览数据源不需要传password
         setSourceData(draft=>{
-          draft.preViewDataRequest = value
+          draft.preViewDataRequest = {...value,data_source_params:{
+            ...data_source_params,
+            password:null
+          }}
           draft.successCheck = true
         })
       } 

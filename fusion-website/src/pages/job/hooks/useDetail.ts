@@ -40,6 +40,7 @@ interface useDetailDataInterface {
     myselfPhasesList:PhasesListItemInterface[],
     partnerPhasesList:PhasesListItemInterface[],
     phasesStpesList:PhasesStpesListItemInterface[] //任务详情阶段
+    lastJobStatus:string //上一次任务状态
 }
 
 
@@ -53,7 +54,8 @@ const useDetail = ()=>{
       partnerJobCurrentProgress:null,//协作方当前任务进度
       myselfPhasesList:[], //我方任务阶段列表
       partnerPhasesList:[],//协作方任务阶段列表
-      phasesStpesList:[]
+      phasesStpesList:[],
+      lastJobStatus:''
   });
 
   const clearDetailData = ()=>{
@@ -65,6 +67,7 @@ const useDetail = ()=>{
       draft.partnerJobCurrentProgress = null;
       draft.myselfPhasesList = [];
       draft.partnerPhasesList = [];
+      draft.lastJobStatus='';
     })
     cancelGetMergedJobProgress();
   }
@@ -76,29 +79,21 @@ const useDetail = ()=>{
   },[detailData.jobId]) 
 
   useEffect(() => {
-    if(detailData.jobDetailData?.status) {
-      const checkResult = checkIfNeedToGetMergedJobProgress()
-      if(checkResult){
+    const job_status = lodash.get(detailData,'jobDetailData.status','')
+    if(job_status){
+      const exceptArray = [JOB_STATUS.AUDITING,JOB_STATUS.EDITING,JOB_STATUS.DISAGREE]
+      if(!exceptArray.includes(job_status)){
         runGetMergedJobProgress(detailData.jobId);
       }
     }
-   
   },[detailData.jobDetailData?.status])
 
   const checkIfNeedToGetMergedJobProgress = ()=>{
-    const status = lodash.get(detailData,'jobDetailData.status','');
-    let result = false
-    if(detailData.jobId && detailData.jobDetailData){
-      if(status === JOB_STATUS.RUNNING || 
-        status===JOB_STATUS.WAIT_RUN ||
-        ((status ===JOB_STATUS.ERROR_ON_RUNNING || 
-          status=== JOB_STATUS.STOP_ON_RUNNING || 
-          status=== JOB_STATUS.SUCCESS) && 
-          (!detailData.myselfJobCurrentProgress || !detailData.partnerJobCurrentProgress))){
-        result =  true
-      } 
+    const job_status = lodash.get(detailData,'jobDetailData.status','')
+    if(job_status === JOB_STATUS.RUNNING || job_status===JOB_STATUS.WAIT_RUN ){
+      return true
     }
-    return result
+    return false
   }
 
 
@@ -107,7 +102,7 @@ const useDetail = ()=>{
       const res = await getJobDetail(id);
       const {code,data} = res;
       if(code === 0){
-        const {role,algorithm } = data
+        const {role,algorithm,status } = data
 
         setDetailData(draft=>{
           draft.role = role;
@@ -141,20 +136,26 @@ const useDetail = ()=>{
       const partnerPhasesList = lodash.get(data,'partner.phases',[]);
       const myself = lodash.get(data,'myself.current_phase_progress',null);
       const myselfPhasesList = lodash.get(data,'myself.phases',[]);
-      const status = lodash.get(detailData,'jobDetailData.status','');
+      const myJobStatus = lodash.get(data,'myself.job_status','');
+      const lastJobStatus = lodash.get(detailData,'lastJobStatus','');
       setDetailData(draft=>{
         draft.partnerJobCurrentProgress = partner;
         draft.myselfJobCurrentProgress = myself;
         draft.partnerPhasesList = partnerPhasesList;
         draft.myselfPhasesList = myselfPhasesList;
+        draft.lastJobStatus = myJobStatus;
       })
       //如果任务阶段步骤完成，则取消轮询，并且重新获取任务详情
-      const tmplength = lodash.get(detailData,'phasesStpesList.length',0);
-      if(partnerPhasesList.length === tmplength && myselfPhasesList.length===tmplength && status === JOB_STATUS.RUNNING){
+      if(lastJobStatus && myJobStatus !== lastJobStatus){
         runGetJobDetail(id);
       } 
       const checkResult = checkIfNeedToGetMergedJobProgress()
       if(!checkResult){
+        cancelGetMergedJobProgress();
+      }
+    } else {
+      const status = lodash.get(detailData,'jobDetailData.status','')
+      if(status !== JOB_STATUS.RUNNING && status !== JOB_STATUS.WAIT_RUN){
         cancelGetMergedJobProgress();
       }
     }
