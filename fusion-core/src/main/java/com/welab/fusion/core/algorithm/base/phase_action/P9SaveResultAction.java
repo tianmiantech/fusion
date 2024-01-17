@@ -220,6 +220,12 @@ public class P9SaveResultAction<T extends AbstractPsiJob> extends AbstractJobPha
         if (myselfHeader == null) {
             HashConfig hashConfig = job.getMyself().dataResourceInfo.hashConfig;
             myselfHeader = hashConfig.getIdHeadersForCsv();
+
+            // 输出附加字段
+            LinkedHashSet<String> additionalResultColumns = job.getMyself().dataResourceInfo.additionalResultColumns;
+            if (additionalResultColumns != null) {
+                myselfHeader.addAll(additionalResultColumns);
+            }
         }
 
         return myselfHeader;
