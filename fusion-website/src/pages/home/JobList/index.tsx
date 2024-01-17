@@ -30,6 +30,7 @@ export interface RowProps {
         total_data_count:number,
         updated_time:number
     },
+    start_time:number,
     updated_time:string,
     status:string
 }
@@ -160,6 +161,14 @@ const Index =(props:JobListPropsInterface)=>{
             return 'default';
         }
     }
+
+    const getJobTime = (row:RowProps)=>{
+        const {created_time,start_time} = row;
+        if(start_time){
+            return start_time
+        }
+        return created_time
+    }
     
 
     const columns: ColumnsType<RowProps>|any = [{
@@ -177,15 +186,16 @@ const Index =(props:JobListPropsInterface)=>{
           [ROLE_TYPE.PROVIDER]: { text: '我参与的' },
         },
     },{
-        title: '时间/算法',
+        title: '算法/时间',
         dataIndex: 'create',
         key: 'create',
         hideInSearch: true,
         width:200,
         render:(text:string,row:RowProps)=>{
-            const { created_time = new Date().getTime(),role,algorithm} = row;
+            const { created_time = new Date().getTime(),start_time,role,algorithm} = row;
+            const time = getJobTime(row)
             return <><Tag color={role==='promoter'?'success':'blue'}>{ROLE_TO_CN[`${role}`]}</Tag>
-            <div>{algorithm}/{getPersonificationTime(created_time)}</div>
+            <div>{algorithm}/{getPersonificationTime(time)}</div>
             </>
         }
     },{
