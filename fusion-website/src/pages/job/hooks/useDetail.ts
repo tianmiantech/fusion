@@ -90,6 +90,8 @@ const useDetail = ()=>{
 
   const checkIfNeedToGetMergedJobProgress = ()=>{
     const job_status = lodash.get(detailData,'jobDetailData.status','')
+    console.log('checkIfNeedToGetMergedJobProgress',job_status);
+    
     if(job_status === JOB_STATUS.RUNNING || job_status===JOB_STATUS.WAIT_RUN ){
       return true
     }
@@ -154,6 +156,11 @@ const useDetail = ()=>{
       } 
       const checkResult = checkIfNeedToGetMergedJobProgress()
       if(!checkResult){
+        cancelGetMergedJobProgress();
+      }
+    } else {
+      const status = lodash.get(detailData,'jobDetailData.status','')
+      if(status !== JOB_STATUS.RUNNING && status !== JOB_STATUS.WAIT_RUN){
         cancelGetMergedJobProgress();
       }
     }
