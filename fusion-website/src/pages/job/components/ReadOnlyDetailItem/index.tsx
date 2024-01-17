@@ -66,8 +66,14 @@ const ReadOnlyDetailItem = (props:ReadOnlyDetailItemProps) => {
       return {data_source_file:fileName,add_method}
     //数据库
     }else if(add_method ==='Database'){ 
+      //预览时不是用户主动填写的密码则不需要传password
+      const data_source_params = lodash.get(table_data_resource_info,'data_source_params',{})
       return {
-        ...table_data_resource_info
+        ...table_data_resource_info,
+        data_source_params:{
+          ...data_source_params,
+          password:null
+        }
       }
     }
   }

@@ -67,7 +67,7 @@ const useDetail = ()=>{
       draft.partnerJobCurrentProgress = null;
       draft.myselfPhasesList = [];
       draft.partnerPhasesList = [];
-      lastJobStatus:''
+      draft.lastJobStatus='';
     })
     cancelGetMergedJobProgress();
   }
@@ -79,15 +79,17 @@ const useDetail = ()=>{
   },[detailData.jobId]) 
 
   useEffect(() => {
-    if(detailData.lastJobStatus){
+    const job_status = lodash.get(detailData,'jobDetailData.status','')
+    if(job_status){
       const exceptArray = [JOB_STATUS.AUDITING,JOB_STATUS.EDITING,JOB_STATUS.DISAGREE]
-      if(!exceptArray.includes(detailData.lastJobStatus)){
+      if(!exceptArray.includes(job_status)){
         runGetMergedJobProgress(detailData.jobId);
       }
     }
-  },[detailData.lastJobStatus])
+  },[detailData.jobDetailData?.status])
 
-  const checkIfNeedToGetMergedJobProgress = (job_status:string)=>{
+  const checkIfNeedToGetMergedJobProgress = ()=>{
+    const job_status = lodash.get(detailData,'jobDetailData.status','')
     if(job_status === JOB_STATUS.RUNNING || job_status===JOB_STATUS.WAIT_RUN ){
       return true
     }
@@ -105,7 +107,6 @@ const useDetail = ()=>{
         setDetailData(draft=>{
           draft.role = role;
           draft.jobDetailData = data
-          draft.lastJobStatus = status;
         })
         if(detailData.phasesStpesList.length == 0){
           runGetAlgorithmPhaseList(algorithm)
@@ -137,6 +138,9 @@ const useDetail = ()=>{
       const myselfPhasesList = lodash.get(data,'myself.phases',[]);
       const myJobStatus = lodash.get(data,'myself.job_status','');
       const lastJobStatus = lodash.get(detailData,'lastJobStatus','');
+      console.log('myJobStatus',myJobStatus);
+      console.log('lastJobStatus',lastJobStatus);
+      
       setDetailData(draft=>{
         draft.partnerJobCurrentProgress = partner;
         draft.myselfJobCurrentProgress = myself;
@@ -148,7 +152,7 @@ const useDetail = ()=>{
       if(lastJobStatus && myJobStatus !== lastJobStatus){
         runGetJobDetail(id);
       } 
-      const checkResult = checkIfNeedToGetMergedJobProgress(myJobStatus)
+      const checkResult = checkIfNeedToGetMergedJobProgress()
       if(!checkResult){
         cancelGetMergedJobProgress();
       }
