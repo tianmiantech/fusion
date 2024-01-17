@@ -45,7 +45,7 @@ const App: React.FC = (props:any) => {
     if(!IsInitialized){
       history.push("/register")
     } else if(location.pathname.includes('/register')){
-      history.push("/login")
+      history.push("/home")
     }
   },[IsInitialized])
 
