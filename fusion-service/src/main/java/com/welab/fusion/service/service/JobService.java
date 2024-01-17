@@ -484,4 +484,16 @@ public class JobService extends AbstractService {
 
         jobRepository.save(job);
     }
+
+    public void finishOnPartnerFinished(String jobId) {
+        JobDbModel job = findById(jobId);
+
+        if (job.getStatus().isFinished()) {
+            return;
+        }
+        JobProgress progress = job.getProgressModel();
+        progress.finish(JobStatus.error_on_running, "合作方已停止，我方跟随其结束任务。");
+
+        finish(jobId, progress);
+    }
 }

@@ -15,6 +15,7 @@
  */
 package com.welab.fusion.service.api.job.schedule;
 
+import com.welab.fusion.core.Job.base.JobStatus;
 import com.welab.fusion.core.progress.JobProgress;
 import com.welab.fusion.service.service.GatewayService;
 import com.welab.fusion.service.service.JobService;
@@ -53,6 +54,10 @@ public class GetMergedJobProgressApi extends AbstractApi<GetMergedJobProgressApi
                 GetMyJobProgressApi.class,
                 GetMyJobProgressApi.Input.of(input.jobId)
         );
+
+        if (myselfProgress.getJobStatus() == JobStatus.running && partnerProgress.getJobStatus().isFinished()) {
+            jobService.finishOnPartnerFinished(input.jobId);
+        }
 
         return success(Output.of(myselfProgress, partnerProgress));
     }
