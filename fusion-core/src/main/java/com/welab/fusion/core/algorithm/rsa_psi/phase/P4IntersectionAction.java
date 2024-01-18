@@ -26,6 +26,7 @@ import com.welab.fusion.core.io.data_source.CsvTableDataSourceReader;
 import com.welab.fusion.core.util.PsiUtils;
 import com.welab.wefe.common.BatchConsumer;
 import com.welab.wefe.common.exception.StatusCodeWithException;
+import com.welab.wefe.common.util.CloseableUtils;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -68,9 +69,6 @@ public class P4IntersectionAction extends AbstractIntersectionAction<RsaPsiJob> 
 
         // 求交
         intersection();
-
-        // 释放资源
-        this.writerForOnlyKey.close();
 
         job.getJobResult().fusionCount = fruitCount.longValue();
         phaseProgress.setMessageAndLog("求交完毕，交集：" + fruitCount);
@@ -175,5 +173,10 @@ public class P4IntersectionAction extends AbstractIntersectionAction<RsaPsiJob> 
     @Override
     protected boolean skipThisAction() {
         return job.getMyJobRole() == JobRole.follower;
+    }
+
+    @Override
+    public void close() throws IOException {
+        CloseableUtils.closeQuietly(this.writerForOnlyKey);
     }
 }

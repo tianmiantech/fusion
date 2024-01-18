@@ -146,7 +146,7 @@ public class ApiExecutor {
 
         // 是否要省略此次日志打印，以减少磁盘使用。
         boolean omitLog = false;
-        if (annotation.logSaplingInterval() > 0) {
+        if (annotation.logSamplingInterval() > 0) {
             if (!API_LOG_TIME_MAP.containsKey(annotation.path())) {
                 API_LOG_TIME_MAP.put(annotation.path(), 0L);
             }
@@ -155,7 +155,7 @@ public class ApiExecutor {
                     .fromMs(System.currentTimeMillis() - API_LOG_TIME_MAP.get(annotation.path()))
                     .toMs();
 
-            if (interval < annotation.logSaplingInterval()) {
+            if (interval < annotation.logSamplingInterval()) {
                 omitLog = true;
             } else {
                 API_LOG_TIME_MAP.put(annotation.path(), System.currentTimeMillis());

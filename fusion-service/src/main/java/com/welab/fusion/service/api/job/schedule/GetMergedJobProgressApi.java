@@ -13,12 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.welab.fusion.service.api.job;
+package com.welab.fusion.service.api.job.schedule;
 
 import com.welab.fusion.core.Job.base.JobStatus;
 import com.welab.fusion.core.progress.JobProgress;
+import com.welab.fusion.service.database.entity.MemberDbModel;
 import com.welab.fusion.service.service.GatewayService;
 import com.welab.fusion.service.service.JobService;
+import com.welab.wefe.common.StatusCode;
 import com.welab.wefe.common.fieldvalidate.annotation.Check;
 import com.welab.wefe.common.web.api.base.AbstractApi;
 import com.welab.wefe.common.web.api.base.Api;
@@ -35,7 +37,7 @@ import org.springframework.beans.factory.annotation.Autowired;
         path = "job/get_merged_job_progress",
         name = "获取多方合并的任务进度",
         allowAccessWithSign = true,
-        logSaplingInterval = 1_000 * 30
+        logSamplingInterval = 1_000 * 30
 )
 public class GetMergedJobProgressApi extends AbstractApi<GetMergedJobProgressApi.Input, GetMergedJobProgressApi.Output> {
     @Autowired
@@ -48,14 +50,21 @@ public class GetMergedJobProgressApi extends AbstractApi<GetMergedJobProgressApi
 
         JobProgress myselfProgress = jobService.getMyJobProgress(input.jobId);
 
-        FusionNodeInfo partner = jobService.findPartner(input.jobId).toFusionNodeInfo();
+        MemberDbModel partner = jobService.findPartner(input.jobId);
+        if (partner == null) {
+            StatusCode.PARAMETER_VALUE_INVALID.throwException("此任务尚未推送给合作方");
+        }
+        FusionNodeInfo partnerNodeInfo = partner.toFusionNodeInfo();
         JobProgress partnerProgress = gatewayService.callOtherFusionNode(
-                partner,
+                partnerNodeInfo,
                 GetMyJobProgressApi.class,
                 GetMyJobProgressApi.Input.of(input.jobId)
         );
 
         if (myselfProgress.getJobStatus() == JobStatus.running && partnerProgress.getJobStatus().isFinished()) {
+            jobService.finishOnPartnerFinished(input.jobId);
+        }
+        if (System.currentTimeMillis() - partnerProgress.getStartTime().getTime() > 1_000 * 60 && partnerProgress.getJobStatus() == JobStatus.wait_run) {
             jobService.finishOnPartnerFinished(input.jobId);
         }
 

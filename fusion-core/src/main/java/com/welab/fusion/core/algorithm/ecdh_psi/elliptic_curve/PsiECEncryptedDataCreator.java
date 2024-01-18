@@ -25,6 +25,7 @@ import com.welab.fusion.core.io.FileSystem;
 import com.welab.fusion.core.progress.Progress;
 import com.welab.wefe.common.TimeSpan;
 import com.welab.wefe.common.thread.ThreadPool;
+import com.welab.wefe.common.util.CloseableUtils;
 import org.bouncycastle.jce.spec.ECParameterSpec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -153,7 +154,7 @@ public class PsiECEncryptedDataCreator implements Closeable {
             singleThreadExecutor.shutdownNow();
         }
 
-        dataSourceReader.close();
+        CloseableUtils.closeQuietly(dataSourceReader);
     }
 
 

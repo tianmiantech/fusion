@@ -23,6 +23,8 @@ import com.welab.fusion.core.algorithm.ecdh_psi.elliptic_curve.PsiECEncryptedDat
 import com.welab.fusion.core.io.data_source.CsvTableDataSourceReader;
 import com.welab.fusion.core.hash.HashConfig;
 
+import java.io.IOException;
+
 /**
  * @author zane.luo
  * @date 2023/12/19
@@ -65,5 +67,10 @@ public class P2EncryptMyselfDataAction extends AbstractJobPhaseAction<EcdhPsiJob
     @Override
     protected boolean skipThisAction() {
         return false;
+    }
+
+    @Override
+    public void close() throws IOException {
+
     }
 }

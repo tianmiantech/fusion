@@ -16,9 +16,13 @@
 package com.welab.fusion.service.service;
 
 import com.welab.fusion.core.Job.AbstractPsiJob;
+import com.welab.fusion.core.Job.PsiJobResult;
 import com.welab.fusion.core.Job.base.JobStatus;
 import com.welab.fusion.core.progress.JobProgress;
 import com.welab.fusion.service.api.job.*;
+import com.welab.fusion.service.api.job.schedule.AgreeAndStartJobApi;
+import com.welab.fusion.service.api.job.schedule.RestartJobApi;
+import com.welab.fusion.service.api.job.schedule.SendJobToProviderApi;
 import com.welab.fusion.service.constans.JobMemberRole;
 import com.welab.fusion.service.database.base.MySpecification;
 import com.welab.fusion.service.database.base.Where;
@@ -80,23 +84,11 @@ public class JobService extends AbstractService {
             job.setProgressDetail(null);
             job.setUpdatedTimeNow();
 
-            job.save();
+            jobRepository.save(job);
         }
     }
 
-    public void finishOnPartnerFinished(String jobId) {
-        JobDbModel job = findById(jobId);
-
-        if (job.getStatus().isFinished()) {
-            return;
-        }
-        JobProgress progress = job.getProgressModel();
-        progress.finish(JobStatus.error_on_running, "合作方已停止，我方跟随其结束任务。");
-
-        finish(jobId, progress);
-    }
-
-    public void finish(String jobId, JobProgress progress) {
+    public synchronized void finish(String jobId, JobProgress progress) {
         JobDbModel job = findById(jobId);
 
         if (job.getStatus().isFinished()) {
@@ -110,7 +102,7 @@ public class JobService extends AbstractService {
         job.setProgressDetail(progress.toJson());
         job.setUpdatedTimeNow();
 
-        job.save();
+        jobRepository.save(job);
 
         FusionJobManager.remove(jobId);
     }
@@ -155,6 +147,8 @@ public class JobService extends AbstractService {
 
         saveJobMember(JobMemberRole.promoter, input);
 
+        ListAuditingJobApi.cleanCache();
+
         return job.getId();
     }
 
@@ -177,7 +171,7 @@ public class JobService extends AbstractService {
             job.setRemark(input.remark);
         }
         job.setProgressDetail(new JobProgress().toJson());
-        job.save();
+        jobRepository.save(job);
 
         FusionJobManager.remove(input.jobId);
 
@@ -194,11 +188,13 @@ public class JobService extends AbstractService {
             FusionJobManager.start(psiJob);
         } catch (Exception e) {
             job.setStatus(JobStatus.error_on_running);
-            job.setMessage("任务启动失败：" + e.getMessage());
+            job.setMessage("任务重启失败：" + e.getMessage());
             job.setEndTime(new Date());
             job.setCostTime(System.currentTimeMillis() - job.getStartTime().getTime());
-            job.save();
+            jobRepository.save(job);
             throw e;
+        } finally {
+            ListAuditingJobApi.cleanCache();
         }
 
     }
@@ -228,13 +224,24 @@ public class JobService extends AbstractService {
                 .findById(job.getPartnerMemberId())
                 .toFusionNodeInfo();
 
-        // 同步给发起方
-        gatewayService.callOtherFusionNode(target, AgreeAndStartJobApi.class, input);
 
+        try {
+            // 同步给发起方
+            gatewayService.callOtherFusionNode(target, AgreeAndStartJobApi.class, input);
 
-        // 创建任务并启动
-        AbstractPsiJob psiJob = createPsiJobService.createPsiJob(job);
-        FusionJobManager.start(psiJob);
+            // 创建任务并启动
+            AbstractPsiJob psiJob = createPsiJobService.createPsiJob(job);
+            FusionJobManager.start(psiJob);
+        } catch (Exception e) {
+            job.setStatus(JobStatus.error_on_running);
+            job.setMessage("任务启动失败：" + e.getMessage());
+            job.setEndTime(new Date());
+            job.setCostTime(System.currentTimeMillis() - job.getStartTime().getTime());
+            jobRepository.save(job);
+            throw e;
+        } finally {
+            ListAuditingJobApi.cleanCache();
+        }
     }
 
 
@@ -265,6 +272,8 @@ public class JobService extends AbstractService {
      */
     public void sendJobToProvider(SendJobToProviderApi.Input input) throws Exception {
         checkBeforeSendJob(input);
+        // 保存合作方信息
+        jobMemberService.addProvider(input);
 
         JobDbModel job = findById(input.jobId);
 
@@ -276,10 +285,7 @@ public class JobService extends AbstractService {
             job.setPartnerMemberName(provider.getName());
         }
         job.setStatus(JobStatus.auditing);
-        job.save();
-
-        // 保存合作方信息
-        jobMemberService.addProvider(input);
+        jobRepository.save(job);
 
         // 发送任务到协作方
         JobMemberDbModel promoter = jobMemberService.findMyself(job.getId());
@@ -331,8 +337,10 @@ public class JobService extends AbstractService {
         job.setStatus(JobStatus.disagree);
         job.setMessage(message);
         job.setUpdatedTimeNow();
-        job.save();
+        jobRepository.save(job);
 
+        ListAuditingJobApi.cleanCache();
+        
         gatewayService.callOtherFusionNode(
                 memberService.getPartnerFusionNodeInfo(job.getPartnerMemberId()),
                 DisagreeJobApi.class,
@@ -413,6 +421,8 @@ public class JobService extends AbstractService {
         FusionJobManager.remove(id);
         jobMemberService.deleteByJobId(id);
         jobRepository.deleteById(id);
+
+        ListAuditingJobApi.cleanCache();
     }
 
     /**
@@ -449,5 +459,41 @@ public class JobService extends AbstractService {
         }
 
         FusionJobManager.get(id).finishJobByUserStop();
+    }
+
+    public void savePsiResult(String jobId, PsiJobResult result) {
+        JobDbModel job = findById(jobId);
+
+        job.setFusionCount(result.fusionCount);
+        job.setUpdatedTimeNow();
+
+        jobRepository.save(job);
+    }
+
+    public void updateProgress(String jobId, JobProgress progress) {
+        JobDbModel job = findById(jobId);
+
+        if (job.getStatus().isFinished()) {
+            return;
+        }
+
+        job.setStatus(progress.getJobStatus());
+        job.setMessage(progress.getMessage());
+        job.setProgressDetail(progress.toJson());
+        job.setUpdatedTimeNow();
+
+        jobRepository.save(job);
+    }
+
+    public void finishOnPartnerFinished(String jobId) {
+        JobDbModel job = findById(jobId);
+
+        if (job.getStatus().isFinished()) {
+            return;
+        }
+        JobProgress progress = job.getProgressModel();
+        progress.finish(JobStatus.error_on_running, "合作方已停止，我方跟随其结束任务。");
+
+        finish(jobId, progress);
     }
 }

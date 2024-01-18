@@ -31,10 +31,12 @@ public class Masker {
      * before: +8613880000088
      * after: +861388*****88
      */
-    public static String maskPhoneNumber(String phoneNumber) {
-        if (phoneNumber == null) {
+    public static Object maskPhoneNumber(Object value) {
+        if (value == null) {
             return null;
         }
+
+        String phoneNumber = String.valueOf(value);
         if (phoneNumber.length() < 11) {
             return phoneNumber;
         }
@@ -63,11 +65,12 @@ public class Masker {
      * before: Abc-hel@qq.com
      * after: Abc****@qq.com
      */
-    public static String maskEmail(String email) {
-        if (email == null) {
+    public static Object maskEmail(Object value) {
+        if (value == null) {
             return null;
         }
 
+        String email = String.valueOf(value);
         int index = email.indexOf('@');
 
         if (index <= 0) {

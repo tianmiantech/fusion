@@ -70,6 +70,6 @@ public @interface Api {
      * 大于0：
      * 在周期内仅输出一次完整的 api 响应结果，其它响应省略输出。
      */
-    long logSaplingInterval() default 0L;
+    long logSamplingInterval() default 0L;
 
 }

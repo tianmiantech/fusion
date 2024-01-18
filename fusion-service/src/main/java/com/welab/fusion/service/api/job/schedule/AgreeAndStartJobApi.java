@@ -13,36 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.welab.fusion.service.api.job;
+package com.welab.fusion.service.api.job.schedule;
 
+import com.welab.fusion.service.dto.JobConfigInput;
 import com.welab.fusion.service.service.JobService;
-import com.welab.wefe.common.fieldvalidate.annotation.Check;
 import com.welab.wefe.common.web.api.base.AbstractApi;
 import com.welab.wefe.common.web.api.base.Api;
-import com.welab.wefe.common.web.dto.AbstractApiInput;
 import com.welab.wefe.common.web.dto.ApiResult;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author zane.luo
- * @date 2023/12/01
+ * @date 2023/11/27
  */
-@Api(path = "job/stop", name = "中止任务")
-public class StopJobApi extends AbstractApi<StopJobApi.Input, StopJobApi.Output> {
+@Api(path = "job/agree_and_start", name = "协作方填写资源信息并启动任务", allowAccessWithSign = true)
+public class AgreeAndStartJobApi extends AbstractApi<JobConfigInput, AgreeAndStartJobApi.Output> {
     @Autowired
     private JobService jobService;
 
     @Override
-    protected ApiResult<Output> handle(StopJobApi.Input input) throws Exception {
-        jobService.stop(input.id);
+    protected ApiResult<AgreeAndStartJobApi.Output> handle(JobConfigInput input) throws Exception {
+        jobService.agreeAndStartJob(input);
         return success();
     }
 
     public static class Output {
-    }
-
-    public static class Input extends AbstractApiInput {
-        @Check(name = "任务Id", require = true)
-        public String id;
     }
 }

@@ -24,15 +24,31 @@ import com.welab.wefe.common.web.Launcher;
  * @date 2023/11/27
  */
 public class CacheObjects {
+    private static FusionConfigModel fusionConfig;
 
     /**
      * 获取私钥
      */
-    public static String getPrivateKey() {
-        FusionConfigModel config = Launcher.getBean(GlobalConfigService.class).getFusionConfig();
+    public synchronized static String getPrivateKey() {
+        FusionConfigModel config = getFusionConfig();
         if (!config.isInitialized) {
             throw new RuntimeException("Fusion service is not initialized");
         }
         return config.privateKey;
     }
+
+
+    public synchronized static FusionConfigModel getFusionConfig() {
+        if (fusionConfig == null) {
+            fusionConfig = Launcher.getBean(GlobalConfigService.class).getFusionConfig();
+        }
+
+        return fusionConfig;
+    }
+
+    public static void refresh() {
+        fusionConfig = null;
+        getFusionConfig();
+    }
+
 }

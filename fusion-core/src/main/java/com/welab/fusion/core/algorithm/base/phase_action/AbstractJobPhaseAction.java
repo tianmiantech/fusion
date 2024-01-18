@@ -16,15 +16,17 @@
 package com.welab.fusion.core.algorithm.base.phase_action;
 
 import com.welab.fusion.core.Job.AbstractPsiJob;
-import com.welab.fusion.core.Job.base.JobStatus;
 import com.welab.fusion.core.Job.base.JobPhase;
+import com.welab.fusion.core.Job.base.JobStatus;
 import com.welab.fusion.core.hash.HashConfig;
 import com.welab.fusion.core.progress.JobPhaseProgress;
 import com.welab.fusion.core.util.Constant;
+import com.welab.wefe.common.util.CloseableUtils;
 import com.welab.wefe.common.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.Closeable;
 import java.io.File;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -35,7 +37,7 @@ import java.util.stream.Collectors;
  * @author zane.luo
  * @date 2023/11/13
  */
-public abstract class AbstractJobPhaseAction<T extends AbstractPsiJob> {
+public abstract class AbstractJobPhaseAction<T extends AbstractPsiJob> implements Closeable {
     protected final Logger LOG = LoggerFactory.getLogger(this.getClass());
     protected T job;
     protected JobPhaseProgress phaseProgress;
@@ -104,11 +106,18 @@ public abstract class AbstractJobPhaseAction<T extends AbstractPsiJob> {
             message = e.getMessage();
             job.finishJobOnException(e);
         } finally {
+            CloseableUtils.closeQuietly(this);
             phaseProgress.finish(status, message);
             long spend = System.currentTimeMillis() - start;
             LOG.info("finished phase: {} spend: {}ms", getPhase(), spend);
         }
 
+        try {
+            job.getJobFunctions().updateJobProgressFunction.update(job.getJobId(), job.getMyProgress());
+        } catch (Exception e) {
+            LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);
+            job.finishJobOnException(e);
+        }
     }
 
     /**

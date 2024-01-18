@@ -40,16 +40,12 @@ public class SaveMyPsiBloomFilterFunction implements com.welab.fusion.core.algor
     public void save(String jobId, PsiBloomFilter psiBloomFilter) throws Exception {
         int key = psiBloomFilter.hashCode();
 
-        /**
-         * 暂时不考虑去重
-         * 以后稳定了再考虑
-         */
         // 避免储存重复的过滤器
-        // BloomFilterDbModel existed = bloomFilterService.findAutoGenerateByKey(key);
-        // if (existed != null) {
-        //     LOG.info("过滤器已存在，不重复储存。 job_id：{}，bloom_filter_id:{}，key{}", jobId, psiBloomFilter.id, key);
-        //     return;
-        // }
+        BloomFilterDbModel existed = bloomFilterService.findAutoGenerateByKey(key);
+        if (existed != null) {
+            LOG.info("过滤器已存在，不重复储存。 job_id：{}，bloom_filter_id:{}，key{}", jobId, psiBloomFilter.id, key);
+            return;
+        }
 
         LOG.info("开始保存过滤器文件，job_id：{}，bloom_filter_id:{}", jobId, psiBloomFilter.id);
         long startTime = System.currentTimeMillis();

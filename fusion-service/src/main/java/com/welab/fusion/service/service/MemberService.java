@@ -22,6 +22,7 @@ import com.welab.fusion.service.database.entity.MemberDbModel;
 import com.welab.fusion.service.database.repository.MemberRepository;
 import com.welab.fusion.service.dto.entity.MemberInputModel;
 import com.welab.fusion.service.dto.entity.MemberOutputModel;
+import com.welab.fusion.service.model.CacheObjects;
 import com.welab.fusion.service.model.global_config.FusionConfigModel;
 import com.welab.fusion.service.service.base.AbstractService;
 import com.welab.wefe.common.ModelMapper;
@@ -94,7 +95,7 @@ public class MemberService extends AbstractService {
 
     public MemberDbModel save(MemberInputModel input) throws Exception {
         // 如果输入的是自己，不保存。
-        FusionConfigModel config = globalConfigService.getFusionConfig();
+        FusionConfigModel config = CacheObjects.getFusionConfig();
         if (config != null && StringUtil.isNotEmpty(config.publicServiceBaseUrl)) {
             String myselfId = MemberService.buildMemberId(config.publicServiceBaseUrl);
             String inputId = MemberService.buildMemberId(input.getBaseUrl());
@@ -142,7 +143,7 @@ public class MemberService extends AbstractService {
 
         model.setBaseUrl(baseUrl);
         model.setPublicKey(publicKey);
-        model.save();
+        memberRepository.save(model);
 
         return model;
     }
@@ -154,7 +155,16 @@ public class MemberService extends AbstractService {
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
-        return uri.getHost() + ":" + uri.getPort();
+        int port = uri.getPort();
+        String path = StringUtil.trim(uri.getPath(), '/');
+        return uri.getHost()
+                + (port > 0 ? ":" + port : "")
+                // 必须要拼 path，不然会导致不同的服务，但是端口相同的情况下，会被认为是同一个服务。
+                + (StringUtil.isEmpty(path) ? "" : "/" + path);
+    }
+
+    public static void main(String[] args) {
+        System.out.println(buildMemberId("https://xbd-dev.tianmiantech.com/fusion-01/"));
     }
 
     public MemberDbModel findByUrl(String url) throws URISyntaxException {
@@ -203,7 +213,8 @@ public class MemberService extends AbstractService {
             gatewayService.callOtherFusionNode(
                     FusionNodeInfo.of(input.getPublicKey(), input.getBaseUrl()),
                     TestConnectApi.class,
-                    MemberInputModel.of(myself.getPublicKey(), myself.getBaseUrl())
+                    MemberInputModel.of(myself.getPublicKey(), myself.getBaseUrl()),
+                    5_000
             );
         }
 
@@ -211,7 +222,8 @@ public class MemberService extends AbstractService {
         if (input.isRequestFromPartner()) {
             gatewayService.callOtherFusionNode(
                     FusionNodeInfo.of(input.caller.publicKey, input.caller.baseUrl),
-                    AliveApi.class
+                    AliveApi.class,
+                    3_000
             );
         }
 

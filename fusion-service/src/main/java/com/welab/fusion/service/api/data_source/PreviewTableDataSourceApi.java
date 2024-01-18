@@ -17,21 +17,23 @@ package com.welab.fusion.service.api.data_source;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.annotation.JSONField;
+import com.welab.fusion.core.io.FileSystem;
 import com.welab.fusion.core.io.data_source.AbstractTableDataSourceReader;
 import com.welab.fusion.core.io.data_source.CsvTableDataSourceReader;
 import com.welab.fusion.core.io.data_source.ExcelTableDataSourceReader;
 import com.welab.fusion.core.io.data_source.SqlTableDataSourceReader;
-import com.welab.fusion.core.io.FileSystem;
 import com.welab.fusion.service.config.fastjson.BlockForPartnerField;
 import com.welab.fusion.service.constans.AddMethod;
+import com.welab.fusion.service.database.entity.DataSourceDbModel;
+import com.welab.fusion.service.database.repository.DataSourceRepository;
 import com.welab.fusion.service.service.BloomFilterService;
+import com.welab.wefe.common.Convert;
 import com.welab.wefe.common.crypto.Md5;
 import com.welab.wefe.common.data.source.JdbcDataSourceClient;
 import com.welab.wefe.common.data.source.SuperDataSourceClient;
 import com.welab.wefe.common.fieldvalidate.annotation.Check;
-import com.welab.wefe.common.fieldvalidate.secret.MaskStrategy;
-import com.welab.wefe.common.fieldvalidate.secret.Secret;
 import com.welab.wefe.common.util.FileUtil;
+import com.welab.wefe.common.web.Launcher;
 import com.welab.wefe.common.web.api.base.AbstractApi;
 import com.welab.wefe.common.web.api.base.Api;
 import com.welab.wefe.common.web.dto.ApiResult;
@@ -60,7 +62,7 @@ public class PreviewTableDataSourceApi extends AbstractApi<PreviewTableDataSourc
         @Check(require = true)
         public AddMethod addMethod;
 
-        @Secret(maskStrategy = MaskStrategy.BLOCK)
+        @BlockForPartnerField
         @Check(name = "sql脚本", blockXss = false, oneSelectSql = true)
         public String sql;
 
@@ -105,6 +107,20 @@ public class PreviewTableDataSourceApi extends AbstractApi<PreviewTableDataSourc
             if (addMethod != AddMethod.Database) {
                 throw new UnsupportedOperationException();
             }
+            String passwordKey = "password";
+
+            // 如果前端没有指定密码，则从数据库中获取。
+            if (dataSourceParams.get(passwordKey) == null) {
+                DataSourceDbModel model = Launcher.getBean(DataSourceRepository.class).findByHostAndPort(
+                        dataSourceParams.get("host").toString(),
+                        Convert.toInt(dataSourceParams.get("port"))
+                );
+
+                if (model != null) {
+                    model.padLostParams(dataSourceParams);
+                }
+            }
+
             return SuperDataSourceClient.create(databaseType.name(), dataSourceParams);
         }
 

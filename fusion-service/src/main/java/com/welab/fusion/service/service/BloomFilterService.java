@@ -69,7 +69,7 @@ public class BloomFilterService extends AbstractService {
         CommonThreadPool.run(() -> {
             try (AbstractTableDataSourceReader reader = input.createReader(-1, -1)) {
                 create(model, progress, reader, input.hashConfig);
-                model.save();
+                bloomFilterRepository.save(model);
                 progress.success();
 
                 // 清理
@@ -165,7 +165,7 @@ public class BloomFilterService extends AbstractService {
         model.setName(input.name);
         model.setDescription(input.description);
         model.setUpdatedTime(new Date());
-        model.save();
+        bloomFilterRepository.save(model);
     }
 
     public BloomFilterDbModel findAutoGenerateByKey(int key) {

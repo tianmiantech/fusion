@@ -27,7 +27,7 @@ import java.io.File;
 
 @Api(path = "file/download_log", name = "下载日志文件")
 public class DownloadLogFileApi extends AbstractApi<DownloadLogFileApi.Input, ResponseEntity<?>> {
-    @Value("${logging.file}")
+    @Value("${logging.file.name:}")
     private String logFile;
 
     @Override

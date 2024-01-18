@@ -21,7 +21,6 @@ import com.welab.fusion.core.Job.base.*;
 import com.welab.fusion.core.algorithm.base.AbstractJobFlow;
 import com.welab.fusion.core.algorithm.base.PsiAlgorithm;
 import com.welab.fusion.core.algorithm.base.phase_action.AbstractJobPhaseAction;
-import com.welab.fusion.core.Job.data_resource.DataResourceType;
 import com.welab.fusion.core.io.FileSystem;
 import com.welab.fusion.core.progress.JobProgress;
 import com.welab.wefe.common.thread.ThreadPool;
@@ -54,6 +53,11 @@ public abstract class AbstractPsiJob implements Closeable {
     private PsiJobResult psiJobResult;
     private PsiAlgorithm algorithm;
     private AbstractJobFlow jobFlow;
+    private boolean jobClosed = false;
+    /**
+     * 双方进度不一致时，记录时间。
+     */
+    private long firstJobPhaseNotEqualTime;
     /**
      * 已执行的阶段
      */
@@ -71,15 +75,15 @@ public abstract class AbstractPsiJob implements Closeable {
 
         this.psiJobResult = PsiJobResult.of(jobId);
 
-        this.actionSingleThreadExecutor = new ThreadPool("job-" + jobId + "-action-executor");
-        this.scheduleSingleThreadExecutor = new ThreadPool("job-" + jobId + "-schedule");
+        this.actionSingleThreadExecutor = new ThreadPool("job-" + jobId + "-action-executor", 1);
+        this.scheduleSingleThreadExecutor = new ThreadPool("job-" + jobId + "-schedule", 1);
     }
 
     /**
      * 此方法会执行一些事前检查后进入异步执行
      * 使用异步线程调度任务，使其按顺序执行各阶段动作，并在必要时结束任务。
      */
-    public void start() {
+    public void start() throws Exception {
         checkBeforeFusion();
         startSchedule();
     }
@@ -93,6 +97,7 @@ public abstract class AbstractPsiJob implements Closeable {
      */
     private void startSchedule() {
         LOG.info("启动监工线程，开始任务。");
+        firstJobPhaseNotEqualTime = System.currentTimeMillis();
         scheduleSingleThreadExecutor.execute(() -> {
             try {
                 // 开始执行第一阶段任务
@@ -103,6 +108,10 @@ public abstract class AbstractPsiJob implements Closeable {
                     // 执行调度
                     boolean keep = schedule();
                     if (!keep) {
+                        break;
+                    }
+
+                    if (jobClosed) {
                         break;
                     }
 
@@ -132,6 +141,16 @@ public abstract class AbstractPsiJob implements Closeable {
             return false;
         }
 
+        // 当双方进度不一致时，记录时间。
+        if (myProgress.getCurrentPhase() == partnerProgress.getCurrentPhase()) {
+            firstJobPhaseNotEqualTime = System.currentTimeMillis();
+        }
+        // 如果双方进度偏离时间过长，任务中止。
+        if (System.currentTimeMillis() - firstJobPhaseNotEqualTime > 1000 * 60) {
+            finishJobByDisconnection();
+            return false;
+        }
+
         // 还没有任何进度，等待。
         if (partnerProgress.isEmpty()) {
             return true;
@@ -145,7 +164,7 @@ public abstract class AbstractPsiJob implements Closeable {
 
         // 双方都已完成，任务结束。
         if (jobFlow.isLastPhase(myProgress.getCurrentPhase()) && jobFlow.isLastPhase(partnerProgress.getCurrentPhase())) {
-            if (myProgress.getJobStatus().isSuccess() && partnerProgress.getJobStatus().isSuccess()) {
+            if (myProgress.getCurrentPhaseStatus().isSuccess() && partnerProgress.getCurrentPhaseStatus().isSuccess()) {
                 finishJobBySuccess();
                 return false;
             }
@@ -230,16 +249,19 @@ public abstract class AbstractPsiJob implements Closeable {
     /**
      * 结束任务
      */
-    private void finishJob(JobStatus status, String message) {
+    private synchronized void finishJob(JobStatus status, String message) {
 
         LOG.info("任务结束，状态：{}，消息：{}", status, message);
         myProgress.finish(status, message);
+        getJobResult().finish();
+
         try {
             jobFunctions.finishJobFunction.finish(jobId, myProgress);
-            close();
         } catch (Exception e) {
             LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);
         }
+
+        CloseableUtils.closeQuietly(this);
     }
 
     /**
@@ -265,15 +287,6 @@ public abstract class AbstractPsiJob implements Closeable {
         });
     }
 
-    private void checkBeforeFusion() {
-        if (myself.dataResourceInfo.dataResourceType == DataResourceType.PsiBloomFilter && partner.dataResourceInfo.dataResourceType == DataResourceType.PsiBloomFilter) {
-            finishJobOnException(
-                    new Exception("不能双方都使用布隆过滤器，建议数据量大的一方使用布隆过滤器。")
-            );
-        }
-    }
-
-
     /**
      * 等待任务结束
      */
@@ -294,10 +307,12 @@ public abstract class AbstractPsiJob implements Closeable {
         return myProgress.getJobStatus().isFinished();
     }
 
-
     @Override
-    public void close() throws IOException {
-        getJobResult().finish();
+    public synchronized void close() throws IOException {
+        if (jobClosed) {
+            return;
+        }
+        jobClosed = true;
 
         scheduleSingleThreadExecutor.shutdownNow();
         actionSingleThreadExecutor.shutdownNow();
@@ -314,6 +329,10 @@ public abstract class AbstractPsiJob implements Closeable {
 
     // region getter/setter
 
+
+    public PsiAlgorithm getAlgorithm() {
+        return algorithm;
+    }
 
     public JobTempData getJobTempData() {
         return jobTempData;
@@ -343,6 +362,7 @@ public abstract class AbstractPsiJob implements Closeable {
 
 
     // region abstract
+    protected abstract void checkBeforeFusion() throws Exception;
 
     public abstract <T extends AbstractJobMember> T getMyself();
 

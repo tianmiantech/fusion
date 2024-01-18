@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Repository
 public interface MemberRepository extends BaseRepository<MemberDbModel, String> {
+    @Transactional
     MemberDbModel findByName(String name);
 
     @Transactional

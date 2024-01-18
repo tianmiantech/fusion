@@ -30,7 +30,7 @@ import java.util.concurrent.TimeUnit;
  * 当前登录用户工具类
  */
 public class CurrentAccount {
-    private static final String TOKEN_KEY_NAME = "x-user-token";
+    public static final String TOKEN_KEY_NAME = "x-user-token";
 
     /**
      * token : AccountInfo

@@ -19,6 +19,8 @@ import com.welab.fusion.core.Job.AbstractPsiJob;
 import com.welab.fusion.core.Job.base.JobPhase;
 import org.apache.commons.collections4.CollectionUtils;
 
+import java.io.IOException;
+
 /**
  * @author zane.luo
  * @date 2023/12/26
@@ -48,5 +50,10 @@ public class P8AppendPartnerAdditionalResultColumnsAction<T extends AbstractPsiJ
         return CollectionUtils.isEmpty(
                 job.getPartner().dataResourceInfo.additionalResultColumns
         );
+    }
+
+    @Override
+    public void close() throws IOException {
+
     }
 }

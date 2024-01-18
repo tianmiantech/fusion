@@ -20,6 +20,7 @@ import com.alibaba.fastjson.annotation.JSONField;
 import com.welab.wefe.common.fieldvalidate.AbstractCheckModel;
 import com.welab.wefe.common.fieldvalidate.annotation.Check;
 import com.welab.wefe.common.util.JObject;
+import com.welab.wefe.common.util.StringUtil;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -69,5 +70,11 @@ public class HashConfig extends AbstractCheckModel {
             result.addAll(item.columns);
         }
         return result;
+    }
+
+    @Override
+    @JSONField(serialize = false)
+    public String toString() {
+        return StringUtil.join(list, "+");
     }
 }

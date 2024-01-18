@@ -15,7 +15,7 @@
  */
 package com.welab.fusion.service.job_function;
 
-import com.welab.fusion.service.api.job.EncryptPsiRecordsApi;
+import com.welab.fusion.service.api.job.schedule.EncryptPsiRecordsApi;
 import com.welab.fusion.service.service.GatewayService;
 import com.welab.fusion.service.service.MemberService;
 import com.welab.wefe.common.web.Launcher;

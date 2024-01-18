@@ -31,5 +31,6 @@ public class MyEcdhJobFunctions extends EcdhPsiJobFunctions {
         getPartnerProgressFunction = new GetPartnerProgressFunction();
         saveFusionResultFunction = new SaveFusionResultFunction();
         finishJobFunction = new FinishJobFunction();
+        updateJobProgressFunction = new UpdateJobProgressFunction();
     }
 }

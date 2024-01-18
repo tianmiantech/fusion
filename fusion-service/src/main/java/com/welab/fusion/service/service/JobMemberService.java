@@ -17,7 +17,7 @@ package com.welab.fusion.service.service;
 
 import com.welab.fusion.core.Job.data_resource.DataResourceType;
 import com.welab.fusion.core.io.data_source.AbstractTableDataSourceReader;
-import com.welab.fusion.service.api.job.SendJobToProviderApi;
+import com.welab.fusion.service.api.job.schedule.SendJobToProviderApi;
 import com.welab.fusion.service.constans.JobMemberRole;
 import com.welab.fusion.service.database.base.MySpecification;
 import com.welab.fusion.service.database.base.Where;
@@ -58,7 +58,7 @@ public class JobMemberService extends AbstractService {
         model.setJobId(input.jobId);
         model.setMemberId(providerId);
         model.setRole(JobMemberRole.provider);
-        model.save();
+        jobMemberRepository.save(model);
     }
 
     /**
@@ -87,7 +87,7 @@ public class JobMemberService extends AbstractService {
 
         model.setTotalDataCount(input.dataResource.totalDataCount);
         model.setHashConfig(input.dataResource.hashConfig.toJson());
-        model.save();
+        jobMemberRepository.save(model);
     }
 
     /**
@@ -120,7 +120,7 @@ public class JobMemberService extends AbstractService {
         if (model != null) {
             model.setTotalDataCount(totalDataCount);
             model.setUpdatedTime(new Date());
-            model.save();
+            jobMemberRepository.save(model);
         }
     }
 

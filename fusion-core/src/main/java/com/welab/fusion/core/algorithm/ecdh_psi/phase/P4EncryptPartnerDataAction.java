@@ -23,6 +23,7 @@ import com.welab.fusion.core.io.FileSystem;
 import com.welab.fusion.core.io.data_source.CsvTableDataSourceReader;
 import com.welab.fusion.core.util.Constant;
 import com.welab.wefe.common.thread.ThreadPool;
+import com.welab.wefe.common.util.CloseableUtils;
 import com.welab.wefe.common.util.FileUtil;
 
 import java.io.BufferedWriter;
@@ -67,9 +68,6 @@ public class P4EncryptPartnerDataAction extends AbstractJobPhaseAction<EcdhPsiJo
         while (THREAD_POOL.isWorking()) {
             ThreadUtil.safeSleep(1000);
         }
-
-        THREAD_POOL.shutdownNow();
-        this.fileWriter.close();
     }
 
     /**
@@ -137,4 +135,9 @@ public class P4EncryptPartnerDataAction extends AbstractJobPhaseAction<EcdhPsiJo
         return false;
     }
 
+    @Override
+    public void close() throws IOException {
+        CloseableUtils.closeQuietly(this.fileWriter);
+        THREAD_POOL.shutdownNow();
+    }
 }

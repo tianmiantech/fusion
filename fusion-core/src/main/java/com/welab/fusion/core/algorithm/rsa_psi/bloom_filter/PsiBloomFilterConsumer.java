@@ -61,6 +61,7 @@ public class PsiBloomFilterConsumer implements BiConsumer<Long, LinkedHashMap<St
      */
     private ThreadPoolExecutor createThreadPoll() {
         int pollSize = Runtime.getRuntime().availableProcessors() - 2;
+        pollSize = Math.max(pollSize, 1);
 
         return new ThreadPoolExecutor(
                 pollSize,

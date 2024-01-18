@@ -17,6 +17,7 @@
 package com.welab.wefe.common.web.controller;
 
 import cn.hutool.core.util.StrUtil;
+import com.welab.wefe.common.util.FileUtil;
 import com.welab.wefe.common.util.StringUtil;
 import com.welab.wefe.common.util.UrlUtil;
 import com.welab.wefe.common.util.enums.ContentType;
@@ -51,10 +52,15 @@ public class WebsiteController {
     @RequestMapping("/website/**")
     public ResponseEntity<?> response(HttpServletRequest request) {
         String resourceName = extractResourceName(request);
-        LOG.info("website resourceName:{}", resourceName);
+
+        // 如果指定的是目录，则默认返回 index.html
+        if (resourceName.endsWith("/")) {
+            resourceName += "index.html";
+        } else if (StringUtil.isEmpty(FileUtil.getFileSuffix(resourceName))) {
+            resourceName += "/index.html";
+        }
 
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream(resourceName);
-
 
         // 404
         if (inputStream == null) {

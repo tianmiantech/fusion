@@ -21,6 +21,7 @@ import com.welab.fusion.core.algorithm.base.phase_action.AbstractJobPhaseAction;
 import com.welab.fusion.core.algorithm.ecdh_psi.EcdhPsiJob;
 
 import java.io.File;
+import java.io.IOException;
 
 /**
  * @author zane.luo
@@ -52,5 +53,10 @@ public class P5DownloadSecondaryECEncryptedDataAction extends AbstractJobPhaseAc
     @Override
     public long getTotalWorkload() {
         return 100;
+    }
+
+    @Override
+    public void close() throws IOException {
+
     }
 }

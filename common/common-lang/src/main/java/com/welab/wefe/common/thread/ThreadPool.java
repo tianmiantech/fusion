@@ -26,14 +26,11 @@ import java.util.concurrent.*;
 public class ThreadPool {
     private ThreadPoolExecutor threadPoolExecutor;
 
-    public ThreadPool(String threadNamePrefix) {
-        this(threadNamePrefix, Runtime.getRuntime().availableProcessors());
-    }
-
     /**
      * @param poolSize 最大并发量
      */
     public ThreadPool(String threadNamePrefix, int poolSize) {
+        poolSize = Math.max(poolSize, 1);
         ThreadFactory threadFactory = new NamedThreadFactory(threadNamePrefix, false);
         this.threadPoolExecutor = new ThreadPoolExecutor(
                 poolSize,

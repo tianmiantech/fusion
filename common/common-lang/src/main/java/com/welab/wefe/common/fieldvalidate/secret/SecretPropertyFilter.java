@@ -51,10 +51,10 @@ public class SecretPropertyFilter implements PropertyFilter {
             if (map.containsKey(PASSWORD)) {
                 map.put(
                         PASSWORD,
-                        MaskStrategy.MAP_WITH_PASSWORD.get(map.get(PASSWORD))
+                        "***************"
                 );
             }
-            return false;
+            return true;
         }
 
         return true;

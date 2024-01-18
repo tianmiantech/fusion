@@ -19,6 +19,8 @@ import com.welab.fusion.core.Job.AbstractPsiJob;
 import com.welab.fusion.core.Job.PsiJobResult;
 import com.welab.fusion.core.Job.base.JobPhase;
 import com.welab.fusion.core.Job.base.JobRole;
+import com.welab.fusion.core.Job.data_resource.DataResourceType;
+import com.welab.fusion.core.algorithm.base.PsiAlgorithm;
 import com.welab.fusion.core.io.FileSystem;
 import com.welab.fusion.core.util.Constant;
 import com.welab.wefe.common.util.CloseableUtils;
@@ -53,6 +55,11 @@ public class P6DownloadIntersectionAction<T extends AbstractPsiJob> extends Abst
             result.fusionCount = FileUtil.getFileLineCount(file);
         }
 
+        if (job.getAlgorithm() == PsiAlgorithm.rsa_psi) {
+            if (job.getMyJobRole() == JobRole.follower && job.getMyself().dataResourceInfo.dataResourceType == DataResourceType.PsiBloomFilter) {
+                return;
+            }
+        }
         createIntersectionOriginalData(result);
     }
 
@@ -65,32 +72,27 @@ public class P6DownloadIntersectionAction<T extends AbstractPsiJob> extends Abst
         phaseProgress.updateTotalWorkload(result.fusionCount);
         phaseProgress.setMessageAndLog("正在将交集密文还原为我方字段...");
 
-        try {
-            this.writer = initIntersectionOriginalData();
+        this.writer = initIntersectionOriginalData();
 
-            int partitionIndex = 0;
-            while (true) {
-                List<String> partition = FileUtil.readPartitionLines(
-                        job.getJobTempData().resultFileOnlyKey,
-                        partitionIndex,
-                        batchSize,
-                        false
-                );
-                partitionIndex++;
+        int partitionIndex = 0;
+        while (true) {
+            List<String> partition = FileUtil.readPartitionLines(
+                    job.getJobTempData().resultFileOnlyKey,
+                    partitionIndex,
+                    batchSize,
+                    true
+            );
+            partitionIndex++;
 
-                if (partition.isEmpty()) {
-                    break;
-                }
-
-                expandOnePartition(partition);
-
-                if (partition.size() < batchSize) {
-                    break;
-                }
+            if (partition.isEmpty()) {
+                break;
             }
 
-        } finally {
-            CloseableUtils.closeQuietly(this.writer);
+            expandOnePartition(partition);
+
+            if (partition.size() < batchSize) {
+                break;
+            }
         }
 
     }
@@ -146,5 +148,10 @@ public class P6DownloadIntersectionAction<T extends AbstractPsiJob> extends Abst
     @Override
     protected boolean skipThisAction() {
         return false;
+    }
+
+    @Override
+    public void close() throws IOException {
+        CloseableUtils.closeQuietly(this.writer);
     }
 }

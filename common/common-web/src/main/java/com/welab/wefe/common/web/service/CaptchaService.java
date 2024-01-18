@@ -18,6 +18,7 @@ package com.welab.wefe.common.web.service;
 
 import com.welab.wefe.common.WeSpecCaptcha;
 import com.welab.wefe.common.web.dto.Captcha;
+import net.jodah.expiringmap.ExpirationPolicy;
 import net.jodah.expiringmap.ExpiringMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +37,7 @@ public class CaptchaService {
      */
     private static ExpiringMap<String, String> captchaMap = ExpiringMap
             .builder()
+            .expirationPolicy(ExpirationPolicy.CREATED)
             .expiration(60, TimeUnit.SECONDS)
             .maxSize(10000)
             .build();

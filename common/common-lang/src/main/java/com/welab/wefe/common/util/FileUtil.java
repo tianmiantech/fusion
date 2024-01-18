@@ -499,6 +499,9 @@ public class FileUtil {
      * BufferedReader 是线程安全的，可以在多线程中使用。
      */
     public static BufferedReader buildBufferedReader(File file) throws FileNotFoundException {
+        if (!file.exists()) {
+            throw new FileNotFoundException("FileNotFoundException: " + file.getAbsolutePath());
+        }
         return new BufferedReader(
                 new InputStreamReader(
                         new FileInputStream(file),
@@ -523,13 +526,14 @@ public class FileUtil {
         file.getParentFile().mkdirs();
 
         try {
+            file.createNewFile();
             return new BufferedWriter(
                     new OutputStreamWriter(
                             new FileOutputStream(file, append),
                             StandardCharsets.UTF_8
                     )
             );
-        } catch (FileNotFoundException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
@@ -560,7 +564,7 @@ public class FileUtil {
                 return result;
             }
 
-            if (lineIndex < skipLineCount) {
+            if (lineIndex <= skipLineCount) {
                 continue;
             }
 
@@ -605,7 +609,7 @@ public class FileUtil {
                     return result;
                 }
 
-                if (lineIndex < skipLineCount) {
+                if (lineIndex <= skipLineCount) {
                     continue;
                 }
 
@@ -623,14 +627,8 @@ public class FileUtil {
     }
 
     public static void main(String[] args) throws IOException {
-        // 文件储存路径
-       /* File file = new File("D://test.txt");
-        System.out.println(file.getName().substring(0, ".txt".length()));
-        // 将 jar 包内的资源保存为文件
-        saveJarResource2File("test/pom.xml", file);
-
-        System.out.println(readAllText(file));*/
-
-        createFile(new File("D:\\aaa\\bbb\\c.txt"));
+        System.out.println(getFileSuffix("/website/home"));
+        System.out.println(getFileSuffix("/website/home."));
+        System.out.println(getFileSuffix("/website/home.123"));
     }
 }

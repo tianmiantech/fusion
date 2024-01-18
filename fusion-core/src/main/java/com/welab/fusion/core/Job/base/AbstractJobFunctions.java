@@ -17,6 +17,7 @@ package com.welab.fusion.core.Job.base;
 
 import com.welab.fusion.core.algorithm.base.function.DownloadPartnerFileFunction;
 import com.welab.fusion.core.algorithm.base.function.FinishJobFunction;
+import com.welab.fusion.core.algorithm.base.function.UpdateJobProgressFunction;
 import com.welab.fusion.core.algorithm.rsa_psi.function.GetPartnerProgressFunction;
 import com.welab.fusion.core.algorithm.rsa_psi.function.SaveFusionResultFunction;
 import com.welab.wefe.common.tuple.Tuple2;
@@ -34,12 +35,14 @@ public abstract class AbstractJobFunctions {
     public GetPartnerProgressFunction getPartnerProgressFunction;
     public DownloadPartnerFileFunction downloadPartnerFileFunction;
     public SaveFusionResultFunction saveFusionResultFunction;
+    public UpdateJobProgressFunction updateJobProgressFunction;
     public FinishJobFunction finishJobFunction;
 
     public void check() {
         List<Tuple2> list = Arrays.asList(
                 Tuple2.of(getPartnerProgressFunction, GetPartnerProgressFunction.class),
                 Tuple2.of(saveFusionResultFunction, SaveFusionResultFunction.class),
+                Tuple2.of(updateJobProgressFunction, UpdateJobProgressFunction.class),
                 Tuple2.of(finishJobFunction, FinishJobFunction.class),
                 Tuple2.of(downloadPartnerFileFunction, DownloadPartnerFileFunction.class)
         );

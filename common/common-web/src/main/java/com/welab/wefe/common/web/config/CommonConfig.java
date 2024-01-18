@@ -31,7 +31,7 @@ public class CommonConfig {
     /**
      * 日志文件储存路径
      */
-    @Value("${logging.file:}")
+    @Value("${logging.file.name:}")
     private String loggingFilePath;
 
     @Value("${wefe.file.upload.dir:}")

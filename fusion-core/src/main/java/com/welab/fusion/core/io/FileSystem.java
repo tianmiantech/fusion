@@ -49,9 +49,17 @@ public class FileSystem {
     public static void init(String fileSystemBaseDir, String serverPort) throws IOException {
         // 当未指定时，设置默认值。
         if (StringUtil.isEmpty(fileSystemBaseDir)) {
-            fileSystemBaseDir = OS.get() == OS.windows
-                    ? "D:\\data\\fusion"
-                    : "/data/fusion";
+            switch (OS.get()) {
+                case windows:
+                    fileSystemBaseDir = "D:\\data\\fusion";
+                    break;
+                case mac:
+                    fileSystemBaseDir = "~/data/fusion";
+                    break;
+                default:
+                    fileSystemBaseDir = "/data/fusion";
+                    break;
+            }
         }
 
         ROOT_DIR = Paths.get(fileSystemBaseDir);

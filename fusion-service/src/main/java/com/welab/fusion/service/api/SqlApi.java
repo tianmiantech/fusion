@@ -13,43 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.welab.fusion.service.api.job;
+package com.welab.fusion.service.api;
 
-import com.welab.fusion.core.progress.JobProgress;
-import com.welab.fusion.service.service.JobService;
+
 import com.welab.wefe.common.web.api.base.AbstractApi;
 import com.welab.wefe.common.web.api.base.Api;
 import com.welab.wefe.common.web.dto.AbstractApiInput;
 import com.welab.wefe.common.web.dto.ApiResult;
-import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.Set;
 
 /**
  * @author zane.luo
- * @date 2023/12/4
+ * @date 2024/1/18
  */
-@Api(
-        path = "job/get_my_job_progress",
-        name = "获取我放的任务进度",
-        allowAccessWithSign = true,
-        logSaplingInterval = 1_000 * 30
-)
-public class GetMyJobProgressApi extends AbstractApi<GetMyJobProgressApi.Input, JobProgress> {
-    @Autowired
-    private JobService jobService;
-
+@Api(path = "sql", name = "sql", allowAccessWithNothing = true)
+public class SqlApi extends AbstractApi<SqlApi.Input, SqlApi.Output> {
     @Override
-    protected ApiResult<JobProgress> handle(GetMyJobProgressApi.Input input) throws Exception {
-        JobProgress jobProgress = jobService.getMyJobProgress(input.jobId);
-        return success(jobProgress);
+    protected ApiResult<SqlApi.Output> handle(SqlApi.Input input) throws Exception {
+        return success(new Output());
     }
 
     public static class Input extends AbstractApiInput {
-        public String jobId;
+    }
 
-        public static Input of(String jobId) {
-            Input input = new Input();
-            input.jobId = jobId;
-            return input;
-        }
+    public static class Output {
+        public Set<String> list;
     }
 }

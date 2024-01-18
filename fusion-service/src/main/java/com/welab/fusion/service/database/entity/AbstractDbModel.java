@@ -52,8 +52,9 @@ public abstract class AbstractDbModel implements Serializable {
 
 
     public void save() {
-        BaseRepository repository = RepositoryManager.get(this.getClass());
-        repository.save(this);
+        RepositoryManager
+                .get(this.getClass())
+                .save(this);
     }
 
     public void setUpdatedTimeNow() {

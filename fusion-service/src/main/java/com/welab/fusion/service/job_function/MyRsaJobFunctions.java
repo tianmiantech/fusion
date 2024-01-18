@@ -33,5 +33,6 @@ public class MyRsaJobFunctions extends RsaPsiJobFunctions {
         saveFusionResultFunction = new SaveFusionResultFunction();
         saveMyPsiBloomFilterFunction = new SaveMyPsiBloomFilterFunction();
         finishJobFunction = new FinishJobFunction();
+        updateJobProgressFunction = new UpdateJobProgressFunction();
     }
 }

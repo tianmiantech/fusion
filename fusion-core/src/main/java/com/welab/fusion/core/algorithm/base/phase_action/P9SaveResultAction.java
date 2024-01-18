@@ -17,9 +17,13 @@ package com.welab.fusion.core.algorithm.base.phase_action;
 
 import com.welab.fusion.core.Job.AbstractPsiJob;
 import com.welab.fusion.core.Job.base.JobPhase;
+import com.welab.fusion.core.Job.base.JobRole;
+import com.welab.fusion.core.Job.data_resource.DataResourceType;
+import com.welab.fusion.core.algorithm.base.PsiAlgorithm;
 import com.welab.fusion.core.hash.HashConfig;
 import com.welab.fusion.core.io.FileSystem;
 import com.welab.fusion.core.util.Constant;
+import com.welab.wefe.common.util.CloseableUtils;
 import com.welab.wefe.common.util.FileUtil;
 import com.welab.wefe.common.util.StringUtil;
 import de.siegmar.fastcsv.reader.CsvParser;
@@ -30,9 +34,8 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
+import java.nio.file.StandardCopyOption;
+import java.util.*;
 import java.util.concurrent.atomic.LongAdder;
 import java.util.stream.Collectors;
 
@@ -54,7 +57,28 @@ public class P9SaveResultAction<T extends AbstractPsiJob> extends AbstractJobPha
     @Override
     protected void doAction() throws Exception {
         phaseProgress.setMessageAndLog("正在生成最终求交结果文件...");
-        createResultFile();
+
+        // 过滤器方由于缺少原始明文数据，所以无法根据 key 还原为原始字段，只能输出 key。
+        if (job.getAlgorithm() == PsiAlgorithm.rsa_psi
+                && job.getMyJobRole() == JobRole.follower
+                && job.getMyself().dataResourceInfo.dataResourceType == DataResourceType.PsiBloomFilter) {
+
+            File source = job.getJobTempData().resultFileWithPartnerAdditionalColumns == null
+                    ? job.getJobTempData().resultFileOnlyKey
+                    : job.getJobTempData().resultFileWithPartnerAdditionalColumns;
+
+            File target = FileSystem.FusionResult.getResultFile(job.getJobId());
+            FileUtil.copy(
+                    source.toPath(),
+                    target.toPath(),
+                    StandardCopyOption.REPLACE_EXISTING,
+                    StandardCopyOption.COPY_ATTRIBUTES
+            );
+
+        } else {
+            createResultFile();
+        }
+
 
         // 储存结果
         job.getJobFunctions().saveFusionResultFunction.save(
@@ -97,11 +121,15 @@ public class P9SaveResultAction<T extends AbstractPsiJob> extends AbstractJobPha
                 break;
             }
         }
-
-        this.writer.close();
     }
 
     private void writeOnePartition(List<LinkedHashMap<String, Object>> originalDataPartition) throws IOException {
+        Set<String> originalKeySet = originalDataPartition.stream()
+                .map(x -> x.get(Constant.KEY_COLUMN_NAME).toString())
+                .collect(Collectors.toSet());
+
+        Map<String, LinkedHashMap<String, Object>> partnerRows = findPartnerRows(originalKeySet);
+
         for (LinkedHashMap<String, Object> originalData : originalDataPartition) {
             // 拼接我方 Key 相关字段
             String line = super.rowToCsvLine(getMyselfHeader(), originalData, false);
@@ -109,7 +137,7 @@ public class P9SaveResultAction<T extends AbstractPsiJob> extends AbstractJobPha
             // 拼接协作方附加字段
             if (!getPartnerHeader().isEmpty()) {
                 String key = originalData.get(Constant.KEY_COLUMN_NAME).toString();
-                LinkedHashMap<String, Object> partnerRow = findPartnerRow(key);
+                LinkedHashMap<String, Object> partnerRow = partnerRows.get(key);
                 if (partnerRow != null) {
                     line += "," + super.rowToCsvLine(getPartnerHeader(), partnerRow, false);
                 }
@@ -124,27 +152,40 @@ public class P9SaveResultAction<T extends AbstractPsiJob> extends AbstractJobPha
 
     }
 
-    private LinkedHashMap<String, Object> findPartnerRow(String key) throws IOException {
+    private Map<String, LinkedHashMap<String, Object>> findPartnerRows(Set<String> keySet) throws IOException {
+        Map<String, LinkedHashMap<String, Object>> result = new HashMap<>(keySet.size());
+
         File file = job.getJobTempData().resultFileWithPartnerAdditionalColumns;
+        if (file == null) {
+            return result;
+        }
+
         CsvReader reader = new CsvReader();
         reader.setContainsHeader(false);
         reader.setSkipEmptyRows(true);
         CsvParser parser = reader.parse(file, StandardCharsets.UTF_8);
         CsvRow headerRow = parser.nextRow();
         if (headerRow == null) {
-            return null;
+            return result;
         }
         List<String> header = headerRow.getFields();
 
         while (true) {
-            CsvRow row = parser.nextRow();
-
-
-            if (row == null) {
-                return null;
+            CsvRow row;
+            try {
+                row = parser.nextRow();
+            } catch (Exception e) {
+                LOG.error(e.getClass().getSimpleName() + " " + e.getMessage(), e);
+                break;
             }
 
-            if (key.equals(row.getField(0))) {
+            if (row == null) {
+                break;
+            }
+
+            String key = row.getField(0);
+
+            if (keySet.contains(key)) {
                 LinkedHashMap<String, Object> map = new LinkedHashMap<>();
                 for (int i = 0; i < header.size(); i++) {
                     String value = "";
@@ -153,9 +194,15 @@ public class P9SaveResultAction<T extends AbstractPsiJob> extends AbstractJobPha
                     }
                     map.put(header.get(i), value);
                 }
-                return map;
+                result.put(key, map);
+            }
+
+            if (result.size() == keySet.size()) {
+                break;
             }
         }
+
+        return result;
     }
 
 
@@ -191,6 +238,12 @@ public class P9SaveResultAction<T extends AbstractPsiJob> extends AbstractJobPha
         if (myselfHeader == null) {
             HashConfig hashConfig = job.getMyself().dataResourceInfo.hashConfig;
             myselfHeader = hashConfig.getIdHeadersForCsv();
+
+            // 输出附加字段
+            LinkedHashSet<String> additionalResultColumns = job.getMyself().dataResourceInfo.additionalResultColumns;
+            if (additionalResultColumns != null) {
+                myselfHeader.addAll(additionalResultColumns);
+            }
         }
 
         return myselfHeader;
@@ -227,5 +280,10 @@ public class P9SaveResultAction<T extends AbstractPsiJob> extends AbstractJobPha
     @Override
     protected boolean skipThisAction() {
         return false;
+    }
+
+    @Override
+    public void close() throws IOException {
+        CloseableUtils.closeQuietly(this.writer);
     }
 }

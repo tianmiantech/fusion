@@ -103,7 +103,7 @@ public class HttpRequest {
      */
     private Map<String, Object> paramMap = new HashMap<>();
 
-    private int retryCount = 1;
+    private int retryCount = 0;
     private long retryDelay = 0;
     private int connectTimeout = 10 * 1000;
     private int socketTimeout = 10 * 1000;

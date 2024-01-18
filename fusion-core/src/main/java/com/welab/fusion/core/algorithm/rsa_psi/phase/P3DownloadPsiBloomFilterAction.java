@@ -26,6 +26,7 @@ import com.welab.wefe.common.file.decompression.SuperDecompressor;
 import com.welab.wefe.common.util.FileUtil;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 
 /**
@@ -80,5 +81,10 @@ public class P3DownloadPsiBloomFilterAction extends AbstractJobPhaseAction<RsaPs
     @Override
     public long getTotalWorkload() {
         return 100;
+    }
+
+    @Override
+    public void close() throws IOException {
+
     }
 }
