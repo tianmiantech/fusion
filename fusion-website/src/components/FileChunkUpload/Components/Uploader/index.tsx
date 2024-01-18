@@ -39,6 +39,7 @@ export type UploaderProps = {
   style?: React.CSSProperties;
   loading?: boolean;
   accept?: string;
+  acceptTitle?: string;
   disabled?: boolean;
   renderPrewView?: () => React.ReactNode;
   
@@ -71,7 +72,7 @@ interface UploaderDataInterface {
 const { FILE_ADDED_EVENT, FILES_ADDED_EVENT, UPLOAD_START_EVENT } = UploadEventEnum;
 
 const Uploader:  React.ForwardRefRenderFunction<any, UploaderProps> = (props, ref) => {
-  const { className, style, options, loading=false,children,accept,disabled
+  const { className, style, options, loading=false,children,accept,disabled,acceptTitle
   ,renderPrewView } = props;
 
   const prefixCls = defaultGetPrefixCls("");
@@ -199,7 +200,7 @@ const Uploader:  React.ForwardRefRenderFunction<any, UploaderProps> = (props, re
         }
     }
   },[disabled])
-  
+  console.log('accept',accept)
   return (
     <UploaderContext.Provider
       value={{
@@ -220,7 +221,7 @@ const Uploader:  React.ForwardRefRenderFunction<any, UploaderProps> = (props, re
             <Spin spinning={loading}>
             <UploaderUnsupport />
             <UploaderDrop>
-              <p>拖拽文件上传</p>
+              <p>拖拽文件上传<span style={{fontSize:12}}>{acceptTitle}</span></p>
               <UploaderBtn single={true}  attrs={{accept:accept,id:'fusion_job_detail_file_input'}}>
                 上传文件
               </UploaderBtn>

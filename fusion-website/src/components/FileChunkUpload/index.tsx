@@ -41,7 +41,8 @@ const Index= forwardRef((props:FileChunkUploadInterface,ref) => {
     loading:false,
     showPreBtn:false,
     previewOpen:false,
-    accept:'.csv, text/csv, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    accept:'.csv, text/csv, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    acceptTitle:'（仅支持.csv .xls .xlsx文件）'
   })  
 
   useEffect(()=>{
@@ -158,6 +159,8 @@ const Index= forwardRef((props:FileChunkUploadInterface,ref) => {
       onFileRemoved={clearFileList}
       disabled={disabled}
       renderPrewView={renderPrewView}
+      accept={uploadData.accept}
+      acceptTitle={uploadData.acceptTitle}
       autoStart />
     </>
 });
