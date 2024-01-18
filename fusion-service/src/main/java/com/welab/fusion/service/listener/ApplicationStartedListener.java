@@ -73,8 +73,7 @@ public class ApplicationStartedListener implements ApplicationListener<Applicati
         jobService.finishAllJob();
 
 
-
-        // globalConfigService.testDbLock();
+        globalConfigService.testDbLock();
 
     }
 }

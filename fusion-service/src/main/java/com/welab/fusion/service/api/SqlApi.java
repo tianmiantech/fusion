@@ -15,7 +15,7 @@
  */
 package com.welab.fusion.service.api;
 
-import com.welab.fusion.service.database.repository.sql_monitor.SqliteMonitor;
+
 import com.welab.wefe.common.web.api.base.AbstractApi;
 import com.welab.wefe.common.web.api.base.Api;
 import com.welab.wefe.common.web.dto.AbstractApiInput;
@@ -38,6 +38,6 @@ public class SqlApi extends AbstractApi<SqlApi.Input, SqlApi.Output> {
     }
 
     public static class Output {
-        public Set<String> list = SqliteMonitor.synSet;
+        public Set<String> list;
     }
 }

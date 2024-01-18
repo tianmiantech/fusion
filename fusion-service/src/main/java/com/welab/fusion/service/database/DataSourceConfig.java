@@ -16,19 +16,18 @@
 
 package com.welab.fusion.service.database;
 
-import com.alibaba.druid.pool.DruidDataSource;
-import com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceBuilder;
 import com.welab.fusion.service.FusionService;
 import com.welab.fusion.service.database.repository.base.BaseRepositoryFactoryBean;
-import com.welab.fusion.service.database.repository.sql_monitor.SqliteMonitor;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.sqlite.SQLiteConfig;
+import org.sqlite.javax.SQLiteConnectionPoolDataSource;
 
 import javax.sql.DataSource;
-import java.util.Collections;
 
 /**
  * @author zane.luo
@@ -60,17 +59,26 @@ public class DataSourceConfig {
     //             .build();
     // }
     //
-    @Bean
-    @Primary
-    DataSource createDataSource() {
-        DruidDataSource dataSource = DruidDataSourceBuilder.create().build();
-        // SQLite 是文件数据库，不支持并发。
-        dataSource.setMaxActive(2);
-        dataSource.setMaxWait(1000 * 10);
-        dataSource.getProxyFilters().add(new SqliteMonitor());
+    // @Bean
+    // @Primary
+    // DataSource createDataSource() {
+    //     // DruidDataSource dataSource = DruidDataSourceBuilder.create().build();
+    //     // // SQLite 是文件数据库，不支持并发。
+    //     // dataSource.setMaxActive(2);
+    //     // dataSource.setMaxWait(1000 * 10);
+    //     // dataSource.getProxyFilters().add(new SqliteMonitor());
+    //
+    //     SQLiteConfig config = new SQLiteConfig();
+    //     config.setJournalMode(SQLiteConfig.JournalMode.WAL);
+    //     config.setSynchronous(SQLiteConfig.SynchronousMode.FULL);
+    //
+    //     SQLiteConnectionPoolDataSource dataSource = new SQLiteConnectionPoolDataSource(config);
+    //     dataSource.setUrl("jdbc:sqlite:D:\\data\\fusion\\fusion1.db");
+    //
+    //     return dataSource;
+    //     // return new MyDataSource();
+    // }
 
-        return dataSource;
-    }
     //
     //
     // @Bean("entityManagerFactoryRefBoard")
