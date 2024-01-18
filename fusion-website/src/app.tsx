@@ -30,7 +30,12 @@ const App: React.FC = (props:any) => {
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
     const redirectParam = queryParams.get('redirect')||'';
+    console.log('redirectParam',redirectParam);
+    
     const router = getReactRouter(redirectParam)
+    console.log('router',router);
+    console.log('location.pathname',location.pathname);
+    
     if(location.pathname.includes('index.html') && redirectParam ) {
       history.push(`/${router}`);
     }

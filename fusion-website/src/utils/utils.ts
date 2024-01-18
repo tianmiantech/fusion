@@ -58,11 +58,11 @@ export const IsEmptyObject =(obj: any): boolean=> {
  * @param redirectParam 
  */
 export const getReactRouter = (redirectParam:string) => {
-  const BASE_PATH = process.env.BASE_PATH;
+  const BASE_PATH:string = process.env.BASE_PATH||'';
   if(redirectParam){
-    const tmPArray = redirectParam.split(BASE_PATH||'');
-    if(tmPArray.length>1){
-      return tmPArray[1];
+    const startIndex = redirectParam.indexOf(BASE_PATH);
+    if (startIndex !== -1) {
+      return  redirectParam.substring(startIndex + BASE_PATH.length);
     }
   }
   return redirectParam;
