@@ -64,6 +64,9 @@ public class GetMergedJobProgressApi extends AbstractApi<GetMergedJobProgressApi
         if (myselfProgress.getJobStatus() == JobStatus.running && partnerProgress.getJobStatus().isFinished()) {
             jobService.finishOnPartnerFinished(input.jobId);
         }
+        if (System.currentTimeMillis() - partnerProgress.getStartTime().getTime() > 1_000 * 60 && partnerProgress.getJobStatus() == JobStatus.wait_run) {
+            jobService.finishOnPartnerFinished(input.jobId);
+        }
 
         return success(Output.of(myselfProgress, partnerProgress));
     }
