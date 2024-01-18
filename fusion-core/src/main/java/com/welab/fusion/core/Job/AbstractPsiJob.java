@@ -163,11 +163,11 @@ public abstract class AbstractPsiJob implements Closeable {
         }
 
         // 双方都已完成，任务结束。
-        if (jobFlow.isLastPhase(myProgress.getCurrentPhase()) && jobFlow.isLastPhase(partnerProgress.getCurrentPhase())) {
-            if (myProgress.getCurrentPhaseStatus().isSuccess() && partnerProgress.getCurrentPhaseStatus().isSuccess()) {
-                finishJobBySuccess();
-                return false;
-            }
+        boolean allAreLastPhase = jobFlow.isLastPhase(myProgress.getCurrentPhase()) && jobFlow.isLastPhase(partnerProgress.getCurrentPhase());
+        boolean allAreSuccess = myProgress.getCurrentPhaseStatus().isSuccess() && partnerProgress.getCurrentPhaseStatus().isSuccess();
+        if (allAreLastPhase && allAreSuccess) {
+            finishJobBySuccess();
+            return false;
         }
 
         // 进入下一个阶段。

@@ -61,9 +61,14 @@ public class GetMergedJobProgressApi extends AbstractApi<GetMergedJobProgressApi
                 GetMyJobProgressApi.Input.of(input.jobId)
         );
 
-        if (myselfProgress.getJobStatus() == JobStatus.running && partnerProgress.getJobStatus().isFinished()) {
+        // 我方还在跑，对面已经结束了，且对面结束时间超过1分钟。
+        boolean iamRunning = myselfProgress.getJobStatus() == JobStatus.running;
+        boolean parentFinishedLong = partnerProgress.getJobStatus().isFinished()
+                && System.currentTimeMillis() - partnerProgress.getEndTime().getTime() > 1_000 * 60;
+        if (iamRunning && parentFinishedLong) {
             jobService.finishOnPartnerFinished(input.jobId);
         }
+
         if (System.currentTimeMillis() - partnerProgress.getStartTime().getTime() > 1_000 * 60 && partnerProgress.getJobStatus() == JobStatus.wait_run) {
             jobService.finishOnPartnerFinished(input.jobId);
         }
