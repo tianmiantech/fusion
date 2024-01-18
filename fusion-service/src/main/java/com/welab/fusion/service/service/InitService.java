@@ -16,6 +16,7 @@
 package com.welab.fusion.service.service;
 
 import com.welab.fusion.service.database.entity.AccountDbModel;
+import com.welab.fusion.service.model.CacheObjects;
 import com.welab.fusion.service.model.global_config.FusionConfigModel;
 import com.welab.fusion.service.service.base.AbstractService;
 import com.welab.wefe.common.StatusCode;
@@ -66,7 +67,8 @@ public class InitService extends AbstractService {
         globalConfigService.save(config);
 
         CurrentAccount.logined(account.getId(), account.getUsername());
-
+        CacheObjects.refresh();
+        
         return account;
     }
 
