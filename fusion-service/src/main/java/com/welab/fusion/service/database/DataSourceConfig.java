@@ -20,7 +20,7 @@ import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceBuilder;
 import com.welab.fusion.service.FusionService;
 import com.welab.fusion.service.database.repository.base.BaseRepositoryFactoryBean;
-import com.welab.fusion.service.database.repository.sql_monitor.SqlMonitor;
+import com.welab.fusion.service.database.repository.sql_monitor.SqliteMonitor;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -67,7 +67,9 @@ public class DataSourceConfig {
         // SQLite 是文件数据库，不支持并发。
         dataSource.setMaxActive(1);
         dataSource.setMaxWait(1000 * 10);
-        dataSource.setProxyFilters(Collections.singletonList(new SqlMonitor()));
+        dataSource.getProxyFilters()
+                .add(new SqliteMonitor());
+
         return dataSource;
     }
     //
