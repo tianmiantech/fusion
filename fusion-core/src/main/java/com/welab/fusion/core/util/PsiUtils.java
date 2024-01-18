@@ -86,7 +86,8 @@ public class PsiUtils {
         return list
                 // 并行处理，但是要保证返回结果顺序一致。
                 // 暂时取消并行，并行的时候 CPU 打满会导致数据库连接超时。
-                .stream().map(item -> {
+                .parallelStream()
+                .map(item -> {
                     byte[] bytes = Base64.decode(item);
                     BigInteger x = PsiUtils.bytesToBigInteger(bytes);
 
