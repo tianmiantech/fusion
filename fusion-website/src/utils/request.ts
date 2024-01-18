@@ -61,7 +61,7 @@ export const request = axiosInstance({
     console.log('process.env.BASE_PATH',process.env.BASE_PATH);
     console.log('{window.location.origin',window.location.origin);
     
-    //location.href = `${window.location.origin}${process.env.BASE_PATH}${reLoginUrl}`;
+    location.href = `${window.location.origin}${process.env.BASE_PATH}${reLoginUrl}`;
       
   },
   getHeaders: () => ({
