@@ -8,6 +8,7 @@ import {setCookies} from '@tianmiantech/util'
 import lodash from 'lodash'
 import SmUtil from '@/utils/SmUtil';
 import {FUNSION_INITIALIZED_KEY} from '@/constant/dictionary'
+import {getReactRouter} from '@/utils/utils'
 
 
 
@@ -46,9 +47,21 @@ const Index = (props: LoginFormProps) => {
       const token = lodash.get(reponse,'data.token')
       if(token){
         setCookies({[getTokenName()]:token})
-        setTimeout(()=>{
-          history.replace('/home')
-        },800)
+        message.info('登录成功')
+        const queryParams = new URLSearchParams(location.search);
+        const redirectParam = queryParams.get('redirect')||'';
+        if(redirectParam){
+          const router = getReactRouter(redirectParam)
+          console.log('router__router',router);
+          
+          history.replace(`/${router}`);
+          return;
+        } else {
+          setTimeout(()=>{
+            history.replace('/home')
+          },800)
+        }
+        
       } else {
         message.error('获取token失败')
       }
