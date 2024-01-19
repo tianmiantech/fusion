@@ -40,6 +40,9 @@ public class ExcelTableDataSourceReader extends AbstractTableDataSourceReader {
     public ExcelTableDataSourceReader(File file, long maxReadRows, long maxReadTimeInMs) throws Exception {
         super(maxReadRows, maxReadTimeInMs);
         reader = new ExcelReader(file);
+
+        // 避免后续空指针
+        getHeader();
     }
 
     @Override

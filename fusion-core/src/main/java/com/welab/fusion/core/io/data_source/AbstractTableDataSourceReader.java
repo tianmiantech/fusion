@@ -70,9 +70,6 @@ public abstract class AbstractTableDataSourceReader implements Closeable {
     public AbstractTableDataSourceReader(long maxReadRows, long maxReadTimeInMs) throws StatusCodeWithException {
         this.maxReadRows = maxReadRows;
         this.maxReadTimeInMs = maxReadTimeInMs;
-
-        // 避免后续空指针
-        getHeader();
     }
 
     public synchronized long getTotalDataRowCount() {
