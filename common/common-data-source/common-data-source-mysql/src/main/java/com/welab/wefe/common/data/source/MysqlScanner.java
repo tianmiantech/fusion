@@ -36,10 +36,12 @@ import java.util.List;
 public class MysqlScanner extends JdbcScanner {
     public MysqlScanner(Connection conn, String sql, long maxReadLine) throws SQLException, StatusCodeWithException {
         super(conn, sql, maxReadLine);
+        conn.setReadOnly(true);
     }
 
     public MysqlScanner(Connection conn, String sql, long maxReadLine, List<String> returnFields) throws SQLException, StatusCodeWithException {
         super(conn, sql, maxReadLine, returnFields);
+        conn.setReadOnly(true);
     }
 
     @Override

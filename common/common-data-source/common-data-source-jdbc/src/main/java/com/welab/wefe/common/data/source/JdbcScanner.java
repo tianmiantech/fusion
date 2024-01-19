@@ -57,8 +57,6 @@ public abstract class JdbcScanner implements Closeable {
     }
 
     public JdbcScanner(Connection conn, String sql, long maxReadLine, List<String> returnFields) throws SQLException, StatusCodeWithException {
-        conn.setReadOnly(true);
-
         this.conn = conn;
         this.sql = sql;
         this.maxReadLine = maxReadLine;
