@@ -32,7 +32,7 @@ export const extractFirstPathAfterOrigin = (url: string)=>{
 
 // 全局变量
 export function getRequestBaseURL(){
-  //return "http://172.31.21.36:9090/fusion"
+  //return "http://172.31.21.36:7070/fusion"
   //return "https://xbd-dev.tianmiantech.com/fusion-01"
   if(window._wefeApi){
       /** 提供给客户快速修改请求地址，一般通过修改html head */
@@ -57,7 +57,10 @@ export const request = axiosInstance({
     await sleep(1e3);
     const redirectUrl = location.href;
     const reLoginUrl = `login?redirect=${redirectUrl}`;
+    console.log('redirectUrl',redirectUrl);
     console.log('process.env.BASE_PATH',process.env.BASE_PATH);
+    console.log('{window.location.origin',window.location.origin);
+    
     location.href = `${window.location.origin}${process.env.BASE_PATH}${reLoginUrl}`;
       
   },
