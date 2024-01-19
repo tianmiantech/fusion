@@ -206,11 +206,11 @@ const DataSourceForm = (props:DataSourceFormInterface) => {
 
   const HiveForm = () => (
     <>
-    <Col span={12}>
+    {/* <Col span={12}>
       <Form.Item name="metastore_port" label="Metastore端口" {...formItemLayout} initialValue={9083}>
         <Input placeholder='请输入'></Input>
       </Form.Item>
-      </Col>
+      </Col> */}
       <Col span={12}>
       <Form.Item name="database_name" label="默认数据库名称" {...formItemLayout}>
         <Input placeholder='请输入'></Input>

@@ -119,7 +119,6 @@ export default (props: FileType) => {
   function getProgressStyle() {
     const curProgress = Math.floor(progress * 100);
     const style = `translateX(${Math.floor(curProgress - 100)}%)`;
-    console.log("progress", style);
     setProgressStyle({
       progress: `${curProgress}%`,
       WebkitTransform: style,
@@ -199,7 +198,6 @@ export default (props: FileType) => {
     file?: Recordable,
     message?: string
   ) {
-    console.log("_fileSuccess");
     if (rootFile && message) {
       processResponse(message);
     }
