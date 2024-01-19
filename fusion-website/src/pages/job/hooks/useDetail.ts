@@ -109,8 +109,6 @@ const useDetail = ()=>{
           draft.role = role;
           draft.jobDetailData = data
         })
-        console.log('detailData_detailData.phasesStpesList',detailData.phasesStpesList);
-        
         if(detailData.phasesStpesList.length == 0){
           runGetAlgorithmPhaseList(algorithm)
         }
