@@ -37,7 +37,7 @@ public class ExcelTableDataSourceReader extends AbstractTableDataSourceReader {
         this(file, -1, -1);
     }
 
-    public ExcelTableDataSourceReader(File file,long maxReadRows, long maxReadTimeInMs) throws IOException {
+    public ExcelTableDataSourceReader(File file, long maxReadRows, long maxReadTimeInMs) throws Exception {
         super(maxReadRows, maxReadTimeInMs);
         reader = new ExcelReader(file);
     }
@@ -56,7 +56,8 @@ public class ExcelTableDataSourceReader extends AbstractTableDataSourceReader {
     protected LinkedHashMap<String, Object> readOneRow() throws StatusCodeWithException {
 
         // Read data row
-        List<Object> row = reader.getRowData(0, Convert.toInt(readDataRows + 1), header.size());
+        Integer rowIndex = Convert.toInt(readDataRows + 1);
+        List<Object> row = reader.getRowData(0, rowIndex, header.size());
 
         if (row == null) {
             return null;

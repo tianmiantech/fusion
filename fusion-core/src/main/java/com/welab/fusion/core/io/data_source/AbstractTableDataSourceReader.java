@@ -67,9 +67,12 @@ public abstract class AbstractTableDataSourceReader implements Closeable {
         SuperDataSourceClient.register(MySqlDataSourceClient.class);
     }
 
-    public AbstractTableDataSourceReader(long maxReadRows, long maxReadTimeInMs) {
+    public AbstractTableDataSourceReader(long maxReadRows, long maxReadTimeInMs) throws StatusCodeWithException {
         this.maxReadRows = maxReadRows;
         this.maxReadTimeInMs = maxReadTimeInMs;
+
+        // 避免后续空指针
+        getHeader();
     }
 
     public synchronized long getTotalDataRowCount() {
@@ -129,7 +132,7 @@ public abstract class AbstractTableDataSourceReader implements Closeable {
         while ((row = readOneRow()) != null) {
 
             if (getHeader().size() != row.size()) {
-                finished=true;
+                finished = true;
                 StatusCode
                         .PARAMETER_VALUE_INVALID
                         .throwException(
