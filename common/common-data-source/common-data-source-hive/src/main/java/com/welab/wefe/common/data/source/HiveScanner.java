@@ -48,4 +48,9 @@ public class HiveScanner extends JdbcScanner {
 
         return statement.executeQuery(sql);
     }
+
+    @Override
+    protected boolean enableReadOnly() {
+        return false;
+    }
 }
