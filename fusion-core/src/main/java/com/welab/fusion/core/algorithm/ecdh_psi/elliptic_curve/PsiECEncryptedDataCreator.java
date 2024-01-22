@@ -30,6 +30,7 @@ import org.bouncycastle.jce.spec.ECParameterSpec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.naming.BinaryRefAddr;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
