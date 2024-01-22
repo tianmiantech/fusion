@@ -60,7 +60,7 @@ public class PsiBloomFilterConsumer implements BiConsumer<Long, LinkedHashMap<St
      * 创建线程池，将加密动作并行。
      */
     private ThreadPoolExecutor createThreadPoll() {
-        int pollSize = Runtime.getRuntime().availableProcessors() - 2;
+        int pollSize = Runtime.getRuntime().availableProcessors() - 1;
         pollSize = Math.max(pollSize, 1);
 
         return new ThreadPoolExecutor(

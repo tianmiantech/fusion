@@ -39,9 +39,9 @@ import java.util.concurrent.atomic.LongAdder;
 public class P4EncryptPartnerDataAction extends AbstractJobPhaseAction<EcdhPsiJob> {
     private final ThreadPool THREAD_POOL = new ThreadPool(
             "encrypt_partner_data-thread-pool-",
-            Runtime.getRuntime().availableProcessors() - 2
-
+            Runtime.getRuntime().availableProcessors() - 1
     );
+
     /**
      * 保存加密后的数据的文件
      * 务必使用线程安全的写入方式
