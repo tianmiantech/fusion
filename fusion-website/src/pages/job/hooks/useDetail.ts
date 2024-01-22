@@ -67,6 +67,7 @@ const useDetail = ()=>{
       draft.partnerJobCurrentProgress = null;
       draft.myselfPhasesList = [];
       draft.partnerPhasesList = [];
+      draft.phasesStpesList = [];
       draft.lastJobStatus='';
     })
     cancelGetMergedJobProgress();

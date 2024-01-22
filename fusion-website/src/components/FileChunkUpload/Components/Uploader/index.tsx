@@ -200,7 +200,6 @@ const Uploader:  React.ForwardRefRenderFunction<any, UploaderProps> = (props, re
         }
     }
   },[disabled])
-  console.log('accept',accept)
   return (
     <UploaderContext.Provider
       value={{
