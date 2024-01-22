@@ -61,7 +61,7 @@ public class GatewayService extends AbstractService {
     public HttpResponse requestOtherFusionNode(FusionNodeInfo target, Class<? extends AbstractApi> apiClass, JSONObject params, int timeoutInMs) throws StatusCodeWithException {
         FusionConfigModel config = CacheObjects.getFusionConfig();
         if (StringUtil.isEmpty(config.publicServiceBaseUrl)) {
-            StatusCode.PARAMETER_VALUE_INVALID.throwException("尚未设置我方“对外服务地址”，请在全局设置中设置。");
+            StatusCode.PARAMETER_VALUE_INVALID.throwException("尚未设置“对外服务地址”，请在全局设置中设置。");
         }
 
         FusionNodeInfo myself = FusionNodeInfo.of(config.publicKey, config.publicServiceBaseUrl);
@@ -135,7 +135,7 @@ public class GatewayService extends AbstractService {
         if (apiResult.code != 0) {
             StatusCode
                     .REMOTE_SERVICE_ERROR
-                    .throwException("访问合作方失败(" + apiResult.code + ")：" + apiResult.message);
+                    .throwException("合作方异常(" + apiResult.code + ")：" + apiResult.message);
         }
 
         JSONObject data = json.getJSONObject("data");
