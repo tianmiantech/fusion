@@ -17,8 +17,8 @@ package com.welab.fusion.service.service;
 
 import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilter;
 import com.welab.fusion.core.algorithm.rsa_psi.bloom_filter.PsiBloomFilterCreator;
-import com.welab.fusion.core.io.data_source.AbstractTableDataSourceReader;
 import com.welab.fusion.core.hash.HashConfig;
+import com.welab.fusion.core.io.data_source.AbstractTableDataSourceReader;
 import com.welab.fusion.core.progress.Progress;
 import com.welab.fusion.service.api.bloom_filter.AddBloomFilterApi;
 import com.welab.fusion.service.api.bloom_filter.QueryBloomFilterApi;
@@ -34,6 +34,7 @@ import com.welab.fusion.service.dto.entity.BloomFilterOutputModel;
 import com.welab.fusion.service.model.ProgressManager;
 import com.welab.fusion.service.service.base.AbstractService;
 import com.welab.wefe.common.CommonThreadPool;
+import com.welab.wefe.common.util.FileUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -112,7 +113,7 @@ public class BloomFilterService extends AbstractService {
      * 预览数据源中的数据
      */
     public PreviewTableDataSourceApi.Output previewTableDataSource(PreviewTableDataSourceApi.Input input) throws Exception {
-        try (AbstractTableDataSourceReader reader = input.createReader(100, -1)){
+        try (AbstractTableDataSourceReader reader = input.createReader(100, -1)) {
 
             PreviewTableDataSourceApi.Output output = new PreviewTableDataSourceApi.Output();
             output.header = reader.getHeader();
@@ -155,7 +156,7 @@ public class BloomFilterService extends AbstractService {
 
         // 删除整个文件夹
         File dir = new File(model.getStorageDir());
-        dir.delete();
+        FileUtil.deleteFileOrDir(dir);
 
         bloomFilterRepository.delete(model);
     }
