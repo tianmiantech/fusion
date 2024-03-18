@@ -99,7 +99,7 @@ const AuditingListDrawer: React.FC<AuditingListDrawerProps> = forwardRef((props,
         footer={null}
         className={styles.drawerStyle}
        >
-        <Table columns={columnsList} dataSource={auditData.auditList}/>
+        <Table rowKey={'id'} columns={columnsList} dataSource={auditData.auditList}/>
        </TmDrawer>
     </>
 });

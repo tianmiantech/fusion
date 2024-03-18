@@ -328,6 +328,7 @@ const Index =(props:JobListPropsInterface)=>{
           dataSource={jobListData.dataSource}
           cardBordered
           options={false}
+          rowKey={'id'}
           className={styles.tableStyle}
           pagination={{
             pageSize: jobListData.page_size,
