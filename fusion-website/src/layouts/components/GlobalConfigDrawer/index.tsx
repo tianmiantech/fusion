@@ -2,7 +2,7 @@
 
 import {useState,useImperativeHandle,forwardRef, useEffect} from 'react'
 import { Button, Drawer,Input,Spin,Form, message,Row } from 'antd'
-import { TmDrawer } from '@tianmiantech/pro';
+import TmDrawer from '@/components/TmDrawer'
 import { history } from '@umijs/max';
 import styles from './index.less'
 import { useRequest,useMount } from 'ahooks';

@@ -4,7 +4,7 @@ import { initUser,login,UserRequestParams,addUser } from './service'
 import { useRequest } from 'ahooks';
 import { history } from '@umijs/max';
 import {getTokenName} from '@/utils/utils'
-import {setCookies} from '@tianmiantech/util'
+import {setCookies} from '@/utils/token'
 import lodash from 'lodash'
 import SmUtil from '@/utils/SmUtil';
 import {FUNSION_INITIALIZED_KEY} from '@/constant/dictionary'
