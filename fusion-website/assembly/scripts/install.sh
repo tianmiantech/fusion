@@ -11,11 +11,11 @@ echo ">> 2.开始部署: 环境【"$REGION"】, 分支【"$CI_SERVICE_PRODUCT"�
 # echo ">> 3.清理完毕"
 
 echo "当前npm源"
-npm config get registry
+# npm config get registry
 
 echo ">> 安装依赖"
 #npm  install --no-frozen-lockfile
-npm install --legacy-peer-deps --verbose
+yarn install 
 
 echo ">> 安装依赖完成"
 export WEB_BASE_PATH="$1"
