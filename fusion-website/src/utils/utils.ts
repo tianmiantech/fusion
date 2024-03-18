@@ -1,4 +1,6 @@
 import lodash from 'lodash'
+import { v4 as uuidv4 } from 'uuid';
+import moment from 'moment';
 export const getTokenName = ():string => {
     const { host } = window.location
     const tokenName = `fusion-x-user-token-${host}-${process.env.BASE_PATH}`;
@@ -68,3 +70,14 @@ export const getReactRouter = (redirectParam:string) => {
   return redirectParam;
 }
   
+// 获取 UUID
+export const createUUID = uuidv4;
+
+export const dateFormat = {
+  common: 'YYYY-MM-DD',
+  complete: 'YYYY-MM-DD HH:mm:ss',
+};
+
+export const formatDate = (date = Date.now()): string => moment(date).format(dateFormat.complete);
+export const sleep = (ms = 1e3) => new Promise((resolve) => setTimeout(resolve, ms));
+

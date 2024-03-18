@@ -1,6 +1,6 @@
 import {useRef} from 'react'
 import { Table,Tag ,Button,Card, message, Space,Spin, Badge,Form,Radio } from "antd"
-import { TmTable } from "@tianmiantech/pro";
+import { ProTable, TableDropdown } from '@ant-design/pro-components';
 import type { ColumnsType } from 'antd/es/table';
 import { useRequest,useMount } from "ahooks";
 import { history } from 'umi';
@@ -8,7 +8,7 @@ import { useImmer } from 'use-immer';
 import styles from './index.less'
 import { getJobList,deleteJob,restartJob } from "../service";
 import moment from "moment";
-import {dataResourceTypeMap,AddMethodMap,JobStatus,JOB_STATUS,ROLE_TYPE} from '@/constant/dictionary'
+import {dataResourceTypeMap,JobStatus,JOB_STATUS,ROLE_TYPE} from '@/constant/dictionary'
 import lodash from 'lodash'
 import {getPersonificationTime} from '@/utils/time'
 import {renderHashConfig} from '@/utils/utils'
@@ -35,11 +35,6 @@ export interface RowProps {
     status:string
 }
 
-interface ActionItemInterface {
-    text:string,
-    key:string,
-    confirmConfig?:any
-}
 
 const ROLE_TO_CN = {
     [ROLE_TYPE.PROMOTER]:'我发起的',
@@ -203,7 +198,7 @@ const Index =(props:JobListPropsInterface)=>{
         dataIndex: 'promoter',
         key: 'promoter',
         hideInSearch: true,
-        width:300,
+        width:200,
         render:(text:string,row:RowProps)=>{
           const { role,id } = row;
           //role表示我方这条数据中所处的角色 
@@ -217,7 +212,7 @@ const Index =(props:JobListPropsInterface)=>{
         dataIndex: 'provider',
         key: 'provider',
         hideInSearch: true,
-        width:300,
+        width:200,
         render:(text:string,row:RowProps)=>{
           const { role,id } = row;
           const key = role===ROLE_TYPE.PROVIDER?'myself':'partner';
@@ -327,53 +322,51 @@ const Index =(props:JobListPropsInterface)=>{
     
     
     const renderList = ()=>{
-        return <TmTable
-                  dataSource={jobListData.dataSource}
-                  columns={columns}
-                  rowKey="id"
-                >
-                <TmTable.Table
-                    loading={getJobListLoading||deleteLoading||restartLoading}
-                    cardBordered
-                    formRef={tabelSearchFormRef}
-                    pagination={{
-                      pageSize:jobListData.page_size,
-                      current:jobListData.page_index,
-                      size: 'small',
-                      total:jobListData.total,
-                      onChange: (page:number, pageSize:number) => {
-                        if(pageSize !== jobListData.page_size){
-                          searchData(1,pageSize)
-                          setJobListData(draft=>{
-                            draft.page_size = pageSize;
-                          })
-                        } else {
-                         searchData(page)
-                        }
-                      }
-                    }}
-                    search={{
-                      labelWidth:50,
-                      optionRender: (searchConfig:any, formProps:any) => <Space>
-                        <Button key='resetFields' onClick={() => {
-                          tabelSearchFormRef.current?.resetFields();
-                        }}>重置</Button>
-                        <Button  key='submit' type="primary" onClick={() => {
-                        searchData()
-                        }}>搜索</Button>
-                        {renderBtn()}
-                      </Space>,
-                      span:{
-                        xs:24,
-                        sm:12,
-                        md:12,
-                        lg:8,
-                        xl:8,
-                        xxl:6
-                      }
-                    }}
-            />
-        </TmTable>
+        return <ProTable
+          columns={columns}
+          formRef={tabelSearchFormRef}
+          dataSource={jobListData.dataSource}
+          cardBordered
+          options={false}
+          className={styles.tableStyle}
+          pagination={{
+            pageSize: jobListData.page_size,
+            current: jobListData.page_index,
+            size: 'small',
+            total: jobListData.total,
+            onChange: (page: number, pageSize: number) => {
+              if (pageSize !== jobListData.page_size) {
+                searchData(1, pageSize)
+                setJobListData(draft => {
+                  draft.page_size = pageSize;
+                })
+              } else {
+                searchData(page)
+              }
+            }
+          }}
+          search={{
+            labelWidth: 50,
+            optionRender: (searchConfig: any, formProps: any) => [<Space>
+              <Button key='resetFields' onClick={() => {
+                tabelSearchFormRef.current?.resetFields();
+              }}>重置</Button>
+              <Button key='submit' type="primary" onClick={() => {
+                searchData()
+              }}>搜索</Button>
+              {renderBtn()}
+            </Space>],
+            span: {
+              xs: 24,
+              sm: 12,
+              md: 12,
+              lg: 8,
+              xl: 8,
+              xxl: 6
+            },
+            className:styles.searchStyle
+          }}
+          />
     }
 
     const renderContent = ()=>{ 

@@ -3,7 +3,7 @@ import { Button, Table } from 'antd'
 import { Layout, Badge } from 'antd';
 import { history } from 'umi';
 import {SettingOutlined,PlusOutlined,BarsOutlined,MailOutlined} from "@ant-design/icons"
-import { TmDrawer } from '@tianmiantech/pro';
+import TmDrawer from '@/components/TmDrawer'
 import { useRequest,useMount } from 'ahooks';
 import { useImmer } from 'use-immer';
 import lodash from 'lodash'
@@ -97,6 +97,7 @@ const AuditingListDrawer: React.FC<AuditingListDrawerProps> = forwardRef((props,
         width={700}
         open={auditData.visible}
         footer={null}
+        className={styles.drawerStyle}
        >
         <Table columns={columnsList} dataSource={auditData.auditList}/>
        </TmDrawer>

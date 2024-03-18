@@ -1,9 +1,6 @@
 import { useEffect, useState, useRef, useMemo,useImperativeHandle,forwardRef } from "react";
 import { Card, Row, Col, Button,message } from 'antd';
-import { TmSplit } from '@tianmiantech/pro';
-import { CheckCircleFilled } from '@ant-design/icons';
-import { useImmer } from 'use-immer';
-import { history } from '@umijs/max';
+import TmSplit from '@/components/TmSplit'
 import JobForm from "../JobForm";
 import SendJobForm from "../SendJobForm";
 import lodash from 'lodash'
