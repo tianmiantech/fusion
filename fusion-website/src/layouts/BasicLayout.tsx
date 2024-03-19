@@ -10,7 +10,7 @@ const { Footer, Sider, Content } = Layout;
 
 const BasicLayout = (props:BasicLayoutPros) => {
  
-  return <Layout style={{height:'100%',paddingBottom:'40px'}}>
+  return <Layout style={{height:'100%'}}>
     <Header />
     <Content style={{ overflow: 'auto', height: "calc(100vh - 40px)", padding: '14px 12px' ,paddingBottom:'30px'}}>
       <Outlet />
