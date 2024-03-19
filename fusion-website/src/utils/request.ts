@@ -1,13 +1,15 @@
 import { message } from 'antd';
-import { axiosInstance, iam } from '@tianmiantech/request';
-import utils from '@tianmiantech/util';
-import { getTokenName } from './utils';
+import axiosInstance from './axios';
+import { getTokenName, createUUID, sleep, formatDate } from './utils';
+import { removeCookie, getToken as getTokenByName } from '@/utils/token';
 import {FUNSION_INITIALIZED_KEY} from '@/constant/dictionary'
 
-const { getToken:getTokenByName, createUUID, formatDate,sleep,removeCookie } = utils;
+
+
+
+
 const HOST_ENV = process.env.HOST_ENV;
 
-const { generateOnTokenInvalid, invalidTokenCodes } = iam;
 
 
 export const isQianKun = () => {
@@ -32,7 +34,6 @@ export const extractFirstPathAfterOrigin = (url: string)=>{
 
 // 全局变量
 export function getRequestBaseURL(){
-  //return "http://172.31.21.36:7070/fusion"
   //return "https://xbd-dev.tianmiantech.com/fusion-01"
   if(window._wefeApi){
       /** 提供给客户快速修改请求地址，一般通过修改html head */
@@ -47,6 +48,8 @@ export const request = axiosInstance({
   baseURL:getRequestBaseURL(),
   invalidTokenCodes:['10006'],
   successCode:0,
+  infoCodes: [], // Add the missing infoCodes property
+  whiteList: [], // Add the missing whiteList property
   onTokenInvalid: async (response:any) => {
     const { code, message: msg } = response.data;
     const initialized = localStorage.getItem(FUNSION_INITIALIZED_KEY)||'false';
@@ -57,9 +60,6 @@ export const request = axiosInstance({
     await sleep(1e3);
     const redirectUrl = location.href;
     const reLoginUrl = `login?redirect=${redirectUrl}`;
-    console.log('redirectUrl',redirectUrl);
-    console.log('process.env.BASE_PATH',process.env.BASE_PATH);
-    console.log('{window.location.origin',window.location.origin);
     
     location.href = `${window.location.origin}${process.env.BASE_PATH}${reLoginUrl}`;
       

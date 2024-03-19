@@ -1,6 +1,6 @@
 import {useState,useImperativeHandle,forwardRef} from 'react'
 import { Button, Drawer,Input,Spin } from 'antd'
-import { TmDrawer } from '@tianmiantech/pro';
+import TmDrawer from '@/components/TmDrawer'
 import JobList from '@/pages/home/JobList'
 const Index = forwardRef((props,ref)=>{
     
