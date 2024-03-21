@@ -1,0 +1,85 @@
+/*
+ * Copyright 2021 Tianmian Tech. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.welab.wefe.common.web.dto;
+
+
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.annotation.JSONField;
+import com.welab.wefe.common.Stopwatch;
+import com.welab.wefe.common.fieldvalidate.AbstractCheckModel;
+import com.welab.wefe.common.fieldvalidate.annotation.Check;
+import com.welab.wefe.common.util.JObject;
+
+import javax.servlet.http.HttpServletRequest;
+
+/**
+ * 这个类中的字段大多数情况下都需要加上 @JSONField(serialize = false)
+ * 避免在序列化输出时输出不应该传递的参数
+ *
+ * @author Zane
+ */
+public abstract class AbstractApiInput extends AbstractCheckModel {
+
+    /**
+     * 用于调试 api 耗时
+     */
+    @JSONField(serialize = false)
+    public Stopwatch stopwatch = Stopwatch.startNew();
+
+    /**
+     * 原始的全部接口请求参数
+     */
+    @JSONField(serialize = false)
+    public JSONObject rawRequestParams;
+
+    @Check(name = "Request way")
+    @JSONField(serialize = false)
+    public String method;
+
+    @Check(name = "The request object")
+    @JSONField(serialize = false)
+    public HttpServletRequest request;
+
+    @Check(name = "被合作方调用时，合作方的信息")
+    @JSONField(serialize = false)
+    public FusionNodeInfo caller;
+
+    /**
+     * 请求是否来自己方
+     */
+    @JSONField(serialize = false)
+    public boolean isRequestFromMyself() {
+        return caller == null;
+    }
+
+    /**
+     * 请求是否来自其它合作节点
+     */
+    @JSONField(serialize = false)
+    public boolean isRequestFromPartner() {
+        return caller != null;
+    }
+
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
+
+    public JSONObject toJson() {
+        return JObject.create(this);
+    }
+}

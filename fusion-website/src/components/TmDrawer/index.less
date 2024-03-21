@@ -1,0 +1,52 @@
+.tmDrawerStyle {
+  :global {
+    .fusion-drawer-content {
+      .fusion-drawer-wrapper-body {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+
+        .fusion-drawer-header {
+          display: flex;
+          align-items: center;
+          height: 40px;
+          padding: 10px 12px;
+          color: #fff;
+          font-size: 16px;
+          background-color: #0078d4;
+          border: 0 none;
+          border-radius: 0;
+
+          .fusion-drawer-title {
+            color: #fff;
+          }
+        }
+
+        .fusion-drawer-body {
+          display: flex;
+          flex: 1;
+          flex-direction: column;
+          padding: 12px;
+          overflow: auto;
+        }
+      }
+      .drawer_content {
+        flex: 1;
+        height: 100%;
+        padding: 12px;
+        overflow: auto;
+      }
+      .drawer_footer {
+        z-index: 100;
+        text-align: right;
+        background: #fff;
+
+        button {
+          margin-left: 8px;
+        }
+      }
+    }
+  }
+
+
+}

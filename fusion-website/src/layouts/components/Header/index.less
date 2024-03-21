@@ -1,0 +1,45 @@
+@headerBg   : var(--tm-header-bg, #0078d4);
+@headerColor: var(--tm-header-color, #f9f9f9); // #fff;
+@hoverBg    : var(--tm-header-hoverBg, #fff);
+@linkPadding: 0 12px;
+.layoutHeader {
+    height: 40px;
+    padding: 0;
+    background: #0078d4;
+    color: #fff;
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    z-index: 101;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, .26);
+}
+.headerBar {
+    display        : flex;
+    align-items    : center;
+    justify-content: space-between;
+    width          : 100%;
+    height         : 100%;
+    background     : @headerBg;
+    color          : @headerColor;
+    outline        : none;
+    .left {
+        display          : flex;
+        flex-direction   : row;
+        align-items      : center;
+        // color         : #fff;
+        height           : 100%;
+        padding-left: 20px;
+        cursor: pointer;
+    }
+    .right {
+        padding-right  : 30px;
+        display        : inline-flex;
+        justify-content: start;
+        align-items    : center;
+    }
+}
+
+.setting {
+    cursor: pointer;
+    padding: 10px;
+}

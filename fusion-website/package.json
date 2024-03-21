@@ -1,0 +1,47 @@
+{
+  "private": true,
+  "author": "",
+  "scripts": {
+    "dev": "max dev",
+    "build": "max build",
+    "build:local": "cross-env OUTPUT_EXTRA=website BASE_PATH=$WEB_BASE_PATH max build",
+    "postinstall": "max setup",
+    "setup": "max setup",
+    "start": "npm run dev"
+  },
+  "dependencies": {
+    "@ant-design/icons": "^5.2.6",
+    "@ant-design/pro-components": "^2.6.50",
+    "@rpldy/chunked-uploady": "^1.6.0",
+    "@rpldy/upload-button": "^1.6.1",
+    "@umijs/max": "^4.0.81",
+    "ahooks": "^3.7.8",
+    "antd": "^4.24.12",
+    "axios": "^0.27.2",
+    "classnames": "^2.3.2",
+    "hox": "1.1.6",
+    "js-cookie": "^3.0.5",
+    "jsqr": "^1.4.0",
+    "lodash": "^4.17.21",
+    "moment": "^2.29.4",
+    "qrcode": "^1.5.3",
+    "rc-resize-observer": "^1.3.1",
+    "react-simple-uploader": "^0.3.4",
+    "react-split": "^2.0.14",
+    "react-window": "^1.8.9",
+    "simple-uploader.js": "^0.6.0",
+    "sm-crypto": "^0.3.13",
+    "use-immer": "^0.9.0",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3",
+    "@types/react": "^18.0.33",
+    "@types/react-dom": "^18.0.11",
+    "@types/react-window": "^1.8.5",
+    "babel-plugin-import": "^1.13.8",
+    "eslint": "^8.49.0",
+    "stylelint": "^14.16.1",
+    "typescript": "5.1.6"
+  }
+}
