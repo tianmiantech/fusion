@@ -3,7 +3,7 @@
 
 # Fusion（数据融合工具系统）
 
-fusion是一款基于ECDH（Elliptic Curve Diffie-Hellman）算法和RSA（Rivest-Shamir-Adleman）两种算法的数据融合工具系统。fusion系统的目标是为了解决数据融合过程中的数据隐私保护问题，保护数据的隐私性，同时保证数据融合的准确性。
+fusion是一款基于ECDH（Elliptic Curve Diffie-Hellman）和RSA（Rivest-Shamir-Adleman）两种算法的数据融合工具系统。fusion系统的目标是为了解决数据融合过程中的数据隐私保护问题，保护数据的隐私性，同时保证数据融合的准确性。
 
 **项目特点**
 1. **简化传输**: 工具采用https端口进行数据传输，双方交互只需要一个端口即可完成，无需复杂的网络配置，提高了传输的效率和安全性。
